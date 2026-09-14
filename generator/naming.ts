@@ -1,6 +1,8 @@
 // Naming helpers: deterministic kebab-case -> lowerCamelCase / PascalCase
 // conversion, with an acronym table so e.g. "ssh-key" becomes SSHKey rather
-// than SshKey.
+// than SshKey. Also renders OpenAPI descriptions to JSDoc comment blocks.
+
+import type { JSON } from './model.js'
 
 // Common standard acronyms.
 const STANDARD_ACRONYMS = new Set([
@@ -611,19 +613,106 @@ function toInitialCamel(s: string, lower: boolean): string {
   return words.join('')
 }
 
+// docLines normalizes an OpenAPI description into JSDoc comment lines,
+// preserving blank lines and indentation so markdown (headings, lists, code
+// fences) renders correctly in TypeDoc. `*/` is escaped so a description can
+// never terminate the comment. Leading/trailing blank lines are dropped.
+export function docLines(doc: string | undefined): string[] {
+  if (!doc || doc === 'null') return []
+
+  const lines = doc.split('\n').map((l) => l.replace(/\*\//g, '*\\/').replace(/[ \t\r]+$/, ''))
+
+  let start = 0
+  let end = lines.length
+  while (start < end && lines[start].trim() === '') start++
+  while (end > start && lines[end - 1].trim() === '') end--
+  return lines.slice(start, end)
+}
+
+// renderDocBlock renders a JSDoc comment block from groups of lines. Groups
+// are separated by a blank line (e.g. description, constraints, tags); empty
+// groups are skipped. Returns '' when there is nothing to render.
+export function renderDocBlock(groups: Array<string[]>): string {
+  const lines: string[] = []
+  for (const group of groups) {
+    if (group.length === 0) continue
+    if (lines.length > 0) lines.push('')
+    lines.push(...group)
+  }
+  if (lines.length === 0) return ''
+  return ['/**', ...lines.map((l) => (l === '' ? ' *' : ` * ${l}`)), ' */'].join('\n')
+}
+
 // renderDoc returns a JSDoc comment block from an OpenAPI description.
 export function renderDoc(doc: string | undefined): string {
-  if (!doc || doc === 'null') return ''
+  return renderDocBlock([docLines(doc)])
+}
 
-  const lines = doc
-    .split('\n')
-    .map((l) => l.trim())
-    .filter((l) => l !== '')
+// numBound renders one numeric bound as "Min 0", "Min >0" or "Max <100".
+// OpenAPI 3.0 encodes exclusivity as a boolean next to the bound; 3.1 encodes
+// it as the bound itself. Both are handled.
+function numBound(value: any, exclusive: any, label: 'Min' | 'Max'): string {
+  const op = label === 'Min' ? '>' : '<'
+  if (value !== undefined && value !== null) {
+    return exclusive === true ? `${label} ${op}${value}` : `${label} ${value}`
+  }
+  if (typeof exclusive === 'number') {
+    return `${label} ${op}${exclusive}`
+  }
+  return ''
+}
 
-  if (lines.length === 0) return ''
+// constraintLine renders a schema's constraints as one compact line, e.g.
+// "Min 0, Max 65535, Length 3-63, Read-only". Returns '' when there are none.
+function constraintLine(schema: JSON): string {
+  const parts: string[] = []
 
-  const safe = lines.map((l) => l.replace(/\*\//g, '*\\/'))
-  return ['/**', ...safe.map((l) => ` * ${l}`), ' */'].join('\n')
+  const min = numBound(schema.minimum, schema.exclusiveMinimum, 'Min')
+  const max = numBound(schema.maximum, schema.exclusiveMaximum, 'Max')
+  if (min) parts.push(min)
+  if (max) parts.push(max)
+
+  if (schema.minLength != null && schema.maxLength != null) {
+    parts.push(`Length ${schema.minLength}-${schema.maxLength}`)
+  } else if (schema.minLength != null) {
+    parts.push(`Min length ${schema.minLength}`)
+  } else if (schema.maxLength != null) {
+    parts.push(`Max length ${schema.maxLength}`)
+  }
+
+  if (typeof schema.pattern === 'string' && schema.pattern !== '') {
+    parts.push(`Pattern \`${schema.pattern}\``)
+  }
+  if (schema.maxItems != null) parts.push(`Max items ${schema.maxItems}`)
+  if (schema.uniqueItems === true) parts.push('Unique items')
+  if (schema.readOnly === true) parts.push('Read-only')
+
+  return parts.join(', ')
+}
+
+// schemaTags renders the JSDoc block tags for a schema's default, example and
+// deprecation status. Returns an empty list when there is nothing to tag.
+function schemaTags(schema: JSON): string[] {
+  const tags: string[] = []
+  if (schema.deprecated === true) tags.push('@deprecated')
+  if (schema.default !== undefined && schema.default !== null) {
+    tags.push(`@defaultValue ${JSON.stringify(schema.default)}`)
+  }
+  if (schema.example !== undefined && schema.example !== null) {
+    tags.push(`@example ${JSON.stringify(schema.example)}`)
+  }
+  return tags
+}
+
+// schemaDoc renders the full JSDoc block for a schema: its description, a
+// compact constraint line, and @deprecated/@defaultValue/@example tags. For a
+// $ref schema only the description is rendered, since siblings of a $ref are
+// ignored by the OpenAPI 3.0 spec.
+export function schemaDoc(schema: JSON, description: string | undefined): string {
+  const remarks = docLines(description)
+  if (schema.$ref !== undefined) return renderDocBlock([remarks])
+  const line = constraintLine(schema)
+  return renderDocBlock([remarks, line === '' ? [] : [line], schemaTags(schema)])
 }
 
 // isAlphanumeric reports whether the whole string is [A-Za-z0-9]+.

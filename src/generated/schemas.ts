@@ -22,6 +22,8 @@ export interface AccessKey {
   resources?: AccessKeyResource[]
   /**
    * IAM Access Key Secret
+   *
+   * Read-only
    */
   secret?: string
   /**
@@ -30,6 +32,8 @@ export interface AccessKey {
   tags?: string[]
   /**
    * IAM Access Key type
+   *
+   * Read-only
    */
   type?: 'restricted' | 'unrestricted'
   /**
@@ -139,10 +143,14 @@ export function fromWireAccessKeyResource(w: any): AccessKeyResource {
 export interface AIAPIKey {
   /**
    * Creation timestamp
+   *
+   * Read-only
    */
   createdAT: Date
   /**
    * AI API key ID
+   *
+   * Read-only
    */
   id: string
   /**
@@ -151,6 +159,8 @@ export interface AIAPIKey {
   name: string
   /**
    * Organization UUID that owns this key
+   *
+   * Read-only
    */
   orgUuid: string
   /**
@@ -159,6 +169,8 @@ export interface AIAPIKey {
   scope: string
   /**
    * Last update timestamp
+   *
+   * Read-only
    */
   updatedAT: Date
 }
@@ -217,18 +229,26 @@ export function fromWireAIAPIKeyValue(w: any): AIAPIKeyValue {
 export interface AntiAffinityGroup {
   /**
    * Anti-affinity Group description
+   *
+   * Max length 255
    */
   description?: string
   /**
    * Anti-affinity Group ID
+   *
+   * Read-only
    */
   id?: string
   /**
    * Anti-affinity Group instances
+   *
+   * Read-only
    */
   instances?: Instance[]
   /**
    * Anti-affinity Group name
+   *
+   * Length 1-255
    */
   name?: string
 }
@@ -323,10 +343,14 @@ export interface BlockStorageSnapshot {
   blockStorageVolume?: BlockStorageVolumeRef
   /**
    * Snapshot creation date
+   *
+   * Read-only
    */
   createdAT?: Date
   /**
    * Snapshot ID
+   *
+   * Read-only
    */
   id?: string
   /**
@@ -335,14 +359,20 @@ export interface BlockStorageSnapshot {
   labels?: Labels
   /**
    * Snapshot name
+   *
+   * Length 1-255
    */
   name?: string
   /**
    * Snapshot size
+   *
+   * Min 1
    */
   size?: number
   /**
    * Snapshot state
+   *
+   * Read-only
    */
   state?:
     | 'partially-destroyed'
@@ -355,6 +385,8 @@ export interface BlockStorageSnapshot {
     | 'allocated'
   /**
    * Original Volume size
+   *
+   * Min 0
    */
   volumeSize?: number
 }
@@ -423,18 +455,26 @@ export interface BlockStorageVolume {
   blockStorageSnapshots?: BlockStorageSnapshotRef[]
   /**
    * Volume block size
+   *
+   * Min 0, Read-only
    */
   blocksize?: number
   /**
    * Volume creation date
+   *
+   * Read-only
    */
   createdAT?: Date
   /**
    * Indicates if the block-storage volume is encrypted
+   *
+   * Read-only
    */
   encrypted?: boolean
   /**
    * Volume ID
+   *
+   * Read-only
    */
   id?: string
   /**
@@ -447,14 +487,20 @@ export interface BlockStorageVolume {
   labels?: Labels
   /**
    * Volume name
+   *
+   * Length 1-255
    */
   name?: string
   /**
    * Volume size
+   *
+   * Min 1
    */
   size?: number
   /**
    * Volume state
+   *
+   * Read-only
    */
   state?:
     | 'snapshotting'
@@ -536,6 +582,8 @@ export function fromWireBlockStorageVolumeRef(w: any): BlockStorageVolumeRef {
 export interface CreateAIAPIKeyRequest {
   /**
    * Human-readable name for the AI API key
+   *
+   * Length 1-50, Pattern `^[A-Za-z0-9](?:[A-Za-z0-9 _'()-]*[A-Za-z0-9])?$`
    */
   name: string
   /**
@@ -566,10 +614,14 @@ export function fromWireCreateAIAPIKeyRequest(w: any): CreateAIAPIKeyRequest {
 export interface CreateAIAPIKeyResponse {
   /**
    * Creation timestamp
+   *
+   * Read-only
    */
   createdAT: Date
   /**
    * AI API key ID
+   *
+   * Read-only
    */
   id: string
   /**
@@ -578,6 +630,8 @@ export interface CreateAIAPIKeyResponse {
   name: string
   /**
    * Organization UUID that owns this key
+   *
+   * Read-only
    */
   orgUuid: string
   /**
@@ -586,6 +640,8 @@ export interface CreateAIAPIKeyResponse {
   scope: string
   /**
    * Last update timestamp
+   *
+   * Read-only
    */
   updatedAT: Date
   /**
@@ -626,6 +682,8 @@ export function fromWireCreateAIAPIKeyResponse(w: any): CreateAIAPIKeyResponse {
 export interface CreateDeploymentRequest {
   /**
    * Number of GPUs (1-8)
+   *
+   * Min 1
    */
   gpuCount: number
   /**
@@ -640,14 +698,20 @@ export interface CreateDeploymentRequest {
   model: ModelRef
   /**
    * Deployment name
+   *
+   * Min length 1
    */
   name: string
   /**
    * Billing identifier for this deployment. Used by the Router for usage counters and Kafka events.
+   *
+   * Min length 1
    */
   productName?: string
   /**
    * Number of replicas (>=1)
+   *
+   * Min 1
    */
   replicas: number
 }
@@ -691,12 +755,17 @@ export interface CreateKmsKeyRequest {
   description?: string
   /**
    * True if this is a multi-zone key.
+   *
+   * @defaultValue false
    */
   multiZone?: boolean
   /**
    * A human-readable display name uniquely identifying the KMS key within the tenant space.
    */
   name: string
+  /**
+   * @defaultValue "encrypt-decrypt"
+   */
   usage?: 'encrypt-decrypt'
 }
 
@@ -802,6 +871,8 @@ export interface CreateModelRequest {
   huggingfaceToken?: string
   /**
    * Model name
+   *
+   * Min length 1
    */
   name: string
 }
@@ -828,36 +899,50 @@ export function fromWireCreateModelRequest(w: any): CreateModelRequest {
 export interface DBAASBackupConfig {
   /**
    * Interval of taking a frequent backup in service types supporting different backup schedules
+   *
+   * Min 0, Read-only
    */
   frequentIntervalMinutes?: number
   /**
    * Maximum age of the oldest frequent backup in service types supporting different backup schedules
+   *
+   * Min 0, Read-only
    */
   frequentOldestAgeMinutes?: number
   /**
    * Interval of taking a frequent backup in service types supporting different backup schedules
+   *
+   * Min 0, Read-only
    */
   infrequentIntervalMinutes?: number
   /**
    * Maximum age of the oldest infrequent backup in service types supporting different backup schedules
+   *
+   * Min 0, Read-only
    */
   infrequentOldestAgeMinutes?: number
   /**
    * The interval, in hours, at which backups are generated.
-   * For some services, like PostgreSQL, this is the interval
-   * at which full snapshots are taken and continuous incremental
-   * backup stream is maintained in addition to that.
+   *                                             For some services, like PostgreSQL, this is the interval
+   *                                             at which full snapshots are taken and continuous incremental
+   *                                             backup stream is maintained in addition to that.
+   *
+   * Min >0, Read-only
    */
   interval?: number
   /**
    * Maximum number of backups to keep. Zero when no backups are created.
+   *
+   * Min 0, Read-only
    */
   maxCount?: number
   /**
    * Mechanism how backups can be restored. 'regular'
-   * means a backup is restored as is so that the system
-   * is restored to the state it was when the backup was generated.
-   * 'pitr' means point-in-time-recovery, which allows restoring the system to any state since the first available full snapshot.
+   *                                             means a backup is restored as is so that the system
+   *                                             is restored to the state it was when the backup was generated.
+   *                                             'pitr' means point-in-time-recovery, which allows restoring the system to any state since the first available full snapshot.
+   *
+   * Read-only
    */
   recoveryMode?: string
 }
@@ -1215,15 +1300,22 @@ export function fromWireDBAASClickhouseUsers(w: any): DBAASClickhouseUsers {
   return v
 }
 
+/**
+ * Length 1-40
+ */
 export type DBAASDatabaseName = string
 
 export interface DBAASDatadogTag {
   /**
    * Optional tag explanation
+   *
+   * Max length 1024
    */
   comment?: string
   /**
    * Tag value
+   *
+   * Length 1-200
    */
   tag: string
 }
@@ -1255,14 +1347,20 @@ export interface DBAASEndpointDatadogCommon {
   disableConsumerStats?: boolean
   /**
    * Number of separate instances to fetch kafka consumer statistics with. Applies only when attached to kafka services.
+   *
+   * Min 1, Max 100
    */
   kafkaConsumerCheckInstances?: number
   /**
    * Number of seconds that datadog will wait to get consumer statistics from brokers. Applies only when attached to kafka services.
+   *
+   * Min 2, Max 300
    */
   kafkaConsumerStatsTimeout?: number
   /**
    * Maximum number of partition contexts to send. Applies only when attached to kafka services.
+   *
+   * Min 200, Max 200000
    */
   maxPartitionContexts?: number
 }
@@ -1302,6 +1400,8 @@ export function fromWireDBAASEndpointDatadogCommon(w: any): DBAASEndpointDatadog
 export interface DBAASEndpointDatadogInputCreateSettings {
   /**
    * Datadog API key
+   *
+   * Length 1-256, Pattern `^[A-Za-z0-9]{1,256}$`
    */
   datadogAPIKey: string
   /**
@@ -1314,14 +1414,20 @@ export interface DBAASEndpointDatadogInputCreateSettings {
   disableConsumerStats?: boolean
   /**
    * Number of separate instances to fetch kafka consumer statistics with. Applies only when attached to kafka services.
+   *
+   * Min 1, Max 100
    */
   kafkaConsumerCheckInstances?: number
   /**
    * Number of seconds that datadog will wait to get consumer statistics from brokers. Applies only when attached to kafka services.
+   *
+   * Min 2, Max 300
    */
   kafkaConsumerStatsTimeout?: number
   /**
    * Maximum number of partition contexts to send. Applies only when attached to kafka services.
+   *
+   * Min 200, Max 200000
    */
   maxPartitionContexts?: number
   /**
@@ -1393,6 +1499,8 @@ export function fromWireDBAASEndpointDatadogInputCreate(w: any): DBAASEndpointDa
 export interface DBAASEndpointDatadogInputUpdateSettings {
   /**
    * Datadog API key
+   *
+   * Length 1-256, Pattern `^[A-Za-z0-9]{1,256}$`
    */
   datadogAPIKey: string
   /**
@@ -1405,14 +1513,20 @@ export interface DBAASEndpointDatadogInputUpdateSettings {
   disableConsumerStats?: boolean
   /**
    * Number of separate instances to fetch kafka consumer statistics with. Applies only when attached to kafka services.
+   *
+   * Min 1, Max 100
    */
   kafkaConsumerCheckInstances?: number
   /**
    * Number of seconds that datadog will wait to get consumer statistics from brokers. Applies only when attached to kafka services.
+   *
+   * Min 2, Max 300
    */
   kafkaConsumerStatsTimeout?: number
   /**
    * Maximum number of partition contexts to send. Applies only when attached to kafka services.
+   *
+   * Min 200, Max 200000
    */
   maxPartitionContexts?: number
   /**
@@ -1495,14 +1609,20 @@ export interface DBAASEndpointDatadogSettingsSettings {
   disableConsumerStats?: boolean
   /**
    * Number of separate instances to fetch kafka consumer statistics with. Applies only when attached to kafka services.
+   *
+   * Min 1, Max 100
    */
   kafkaConsumerCheckInstances?: number
   /**
    * Number of seconds that datadog will wait to get consumer statistics from brokers. Applies only when attached to kafka services.
+   *
+   * Min 2, Max 300
    */
   kafkaConsumerStatsTimeout?: number
   /**
    * Maximum number of partition contexts to send. Applies only when attached to kafka services.
+   *
+   * Min 200, Max 200000
    */
   maxPartitionContexts?: number
   /**
@@ -1575,18 +1695,26 @@ export function fromWireDBAASEndpointDatadogSettings(w: any): DBAASEndpointDatad
 export interface DBAASEndpointElasticsearch {
   /**
    * Maximum number of days of logs to keep
+   *
+   * Min 1, Max 10000
    */
   indexDaysMax?: number
   /**
    * Elasticsearch index prefix
+   *
+   * Length 1-1000, Pattern `^[a-z0-9][a-z0-9-_.]+$`
    */
   indexPrefix: string
   /**
    * Elasticsearch request timeout limit
+   *
+   * Min 10, Max 120
    */
   timeout?: number
   /**
    * Elasticsearch connection URL
+   *
+   * Length 12-2048
    */
   url: string
 }
@@ -1616,22 +1744,32 @@ export function fromWireDBAASEndpointElasticsearch(w: any): DBAASEndpointElastic
 export interface DBAASEndpointElasticsearchInputCreateSettings {
   /**
    * PEM encoded CA certificate
+   *
+   * Max length 16384
    */
   ca?: string
   /**
    * Maximum number of days of logs to keep
+   *
+   * Min 1, Max 10000
    */
   indexDaysMax?: number
   /**
    * Elasticsearch index prefix
+   *
+   * Length 1-1000, Pattern `^[a-z0-9][a-z0-9-_.]+$`
    */
   indexPrefix: string
   /**
    * Elasticsearch request timeout limit
+   *
+   * Min 10, Max 120
    */
   timeout?: number
   /**
    * Elasticsearch connection URL
+   *
+   * Length 12-2048
    */
   url: string
 }
@@ -1689,22 +1827,32 @@ export function fromWireDBAASEndpointElasticsearchInputCreate(
 export interface DBAASEndpointElasticsearchInputUpdateSettings {
   /**
    * PEM encoded CA certificate
+   *
+   * Max length 16384
    */
   ca?: string
   /**
    * Maximum number of days of logs to keep
+   *
+   * Min 1, Max 10000
    */
   indexDaysMax?: number
   /**
    * Elasticsearch index prefix
+   *
+   * Length 1-1000, Pattern `^[a-z0-9][a-z0-9-_.]+$`
    */
   indexPrefix?: string
   /**
    * Elasticsearch request timeout limit
+   *
+   * Min 10, Max 120
    */
   timeout?: number
   /**
    * Elasticsearch connection URL
+   *
+   * Length 12-2048
    */
   url?: string
 }
@@ -1762,18 +1910,26 @@ export function fromWireDBAASEndpointElasticsearchInputUpdate(
 export interface DBAASEndpointElasticsearchOptionalFields {
   /**
    * Maximum number of days of logs to keep
+   *
+   * Min 1, Max 10000
    */
   indexDaysMax?: number
   /**
    * Elasticsearch index prefix
+   *
+   * Length 1-1000, Pattern `^[a-z0-9][a-z0-9-_.]+$`
    */
   indexPrefix?: string
   /**
    * Elasticsearch request timeout limit
+   *
+   * Min 10, Max 120
    */
   timeout?: number
   /**
    * Elasticsearch connection URL
+   *
+   * Length 12-2048
    */
   url?: string
 }
@@ -1848,6 +2004,8 @@ export function fromWireDBAASEndpointElasticsearchOutput(w: any): DBAASEndpointE
 export interface DBAASEndpointElasticsearchSecrets {
   /**
    * PEM encoded CA certificate
+   *
+   * Max length 16384
    */
   ca?: string
 }
@@ -1876,6 +2034,8 @@ export function fromWireDBAASEndpointElasticsearchSecrets(
 export interface DBAASEndpointExternalPrometheusOutputSettings {
   /**
    * Prometheus basic authentication username
+   *
+   * Length 5-32, Pattern `^[a-z0-9\-@_]{5,32}$`
    */
   basicAuthUsername?: string
 }
@@ -1946,18 +2106,26 @@ export function fromWireDBAASEndpointExternalPrometheusOutput(
 export interface DBAASEndpointOpensearch {
   /**
    * Maximum number of days of logs to keep
+   *
+   * Min 1, Max 10000
    */
   indexDaysMax?: number
   /**
    * OpenSearch index prefix
+   *
+   * Length 1-1000, Pattern `^[a-z0-9][a-z0-9-_.]+$`
    */
   indexPrefix: string
   /**
    * OpenSearch request timeout limit
+   *
+   * Min 10, Max 120
    */
   timeout?: number
   /**
    * OpenSearch connection URL
+   *
+   * Length 12-2048
    */
   url: string
 }
@@ -1985,22 +2153,32 @@ export function fromWireDBAASEndpointOpensearch(w: any): DBAASEndpointOpensearch
 export interface DBAASEndpointOpensearchInputCreateSettings {
   /**
    * PEM encoded CA certificate
+   *
+   * Max length 16384
    */
   ca?: string
   /**
    * Maximum number of days of logs to keep
+   *
+   * Min 1, Max 10000
    */
   indexDaysMax?: number
   /**
    * OpenSearch index prefix
+   *
+   * Length 1-1000, Pattern `^[a-z0-9][a-z0-9-_.]+$`
    */
   indexPrefix: string
   /**
    * OpenSearch request timeout limit
+   *
+   * Min 10, Max 120
    */
   timeout?: number
   /**
    * OpenSearch connection URL
+   *
+   * Length 12-2048
    */
   url: string
 }
@@ -2058,22 +2236,32 @@ export function fromWireDBAASEndpointOpensearchInputCreate(
 export interface DBAASEndpointOpensearchInputUpdateSettings {
   /**
    * PEM encoded CA certificate
+   *
+   * Max length 16384
    */
   ca?: string
   /**
    * Maximum number of days of logs to keep
+   *
+   * Min 1, Max 10000
    */
   indexDaysMax?: number
   /**
    * OpenSearch index prefix
+   *
+   * Length 1-1000, Pattern `^[a-z0-9][a-z0-9-_.]+$`
    */
   indexPrefix?: string
   /**
    * OpenSearch request timeout limit
+   *
+   * Min 10, Max 120
    */
   timeout?: number
   /**
    * OpenSearch connection URL
+   *
+   * Length 12-2048
    */
   url?: string
 }
@@ -2131,18 +2319,26 @@ export function fromWireDBAASEndpointOpensearchInputUpdate(
 export interface DBAASEndpointOpensearchOptionalFields {
   /**
    * Maximum number of days of logs to keep
+   *
+   * Min 1, Max 10000
    */
   indexDaysMax?: number
   /**
    * OpenSearch index prefix
+   *
+   * Length 1-1000, Pattern `^[a-z0-9][a-z0-9-_.]+$`
    */
   indexPrefix?: string
   /**
    * OpenSearch request timeout limit
+   *
+   * Min 10, Max 120
    */
   timeout?: number
   /**
    * OpenSearch connection URL
+   *
+   * Length 12-2048
    */
   url?: string
 }
@@ -2217,6 +2413,8 @@ export function fromWireDBAASEndpointOpensearchOutput(w: any): DBAASEndpointOpen
 export interface DBAASEndpointOpensearchSecrets {
   /**
    * PEM encoded CA certificate
+   *
+   * Max length 16384
    */
   ca?: string
 }
@@ -2240,6 +2438,8 @@ export function fromWireDBAASEndpointOpensearchSecrets(w: any): DBAASEndpointOpe
 export interface DBAASEndpointPrometheus {
   /**
    * Prometheus basic authentication username
+   *
+   * Length 5-32, Pattern `^[a-z0-9\-@_]{5,32}$`
    */
   basicAuthUsername?: string
 }
@@ -2261,10 +2461,14 @@ export function fromWireDBAASEndpointPrometheus(w: any): DBAASEndpointPrometheus
 export interface DBAASEndpointPrometheusPayloadSettings {
   /**
    * Prometheus basic authentication password
+   *
+   * Length 8-64
    */
   basicAuthPassword?: string
   /**
    * Prometheus basic authentication username
+   *
+   * Length 5-32, Pattern `^[a-z0-9\-@_]{5,32}$`
    */
   basicAuthUsername?: string
 }
@@ -2314,6 +2518,8 @@ export function fromWireDBAASEndpointPrometheusPayload(w: any): DBAASEndpointPro
 export interface DBAASEndpointPrometheusSecrets {
   /**
    * Prometheus basic authentication password
+   *
+   * Length 8-64
    */
   basicAuthPassword?: string
 }
@@ -2341,22 +2547,32 @@ export interface DBAASEndpointRsyslog {
   format: EnumRsyslogFormat
   /**
    * Custom syslog message format
+   *
+   * Length 1-512, Pattern `^[ -~\t]+$`
    */
   logline?: string
   /**
    * Rsyslog max message size
+   *
+   * Min 2048, Max 2147483647
    */
   maxMessageSize?: number
   /**
    * Rsyslog server port
+   *
+   * Min 1, Max 65535
    */
   port: number
   /**
    * Structured data block for log message
+   *
+   * Max length 1024
    */
   sd?: string
   /**
    * Rsyslog server IP address or hostname
+   *
+   * Length 4-255
    */
   server: string
   /**
@@ -2394,10 +2610,14 @@ export function fromWireDBAASEndpointRsyslog(w: any): DBAASEndpointRsyslog {
 export interface DBAASEndpointRsyslogInputCreateSettings {
   /**
    * PEM encoded CA certificate
+   *
+   * Max length 16384
    */
   ca?: string
   /**
    * PEM encoded client certificate
+   *
+   * Max length 16384
    */
   cert?: string
   /**
@@ -2406,26 +2626,38 @@ export interface DBAASEndpointRsyslogInputCreateSettings {
   format: EnumRsyslogFormat
   /**
    * PEM encoded client key
+   *
+   * Max length 16384
    */
   key?: string
   /**
    * Custom syslog message format
+   *
+   * Length 1-512, Pattern `^[ -~\t]+$`
    */
   logline?: string
   /**
    * Rsyslog max message size
+   *
+   * Min 2048, Max 2147483647
    */
   maxMessageSize?: number
   /**
    * Rsyslog server port
+   *
+   * Min 1, Max 65535
    */
   port: number
   /**
    * Structured data block for log message
+   *
+   * Max length 1024
    */
   sd?: string
   /**
    * Rsyslog server IP address or hostname
+   *
+   * Length 4-255
    */
   server: string
   /**
@@ -2495,10 +2727,14 @@ export function fromWireDBAASEndpointRsyslogInputCreate(w: any): DBAASEndpointRs
 export interface DBAASEndpointRsyslogInputUpdateSettings {
   /**
    * PEM encoded CA certificate
+   *
+   * Max length 16384
    */
   ca?: string
   /**
    * PEM encoded client certificate
+   *
+   * Max length 16384
    */
   cert?: string
   /**
@@ -2507,26 +2743,38 @@ export interface DBAASEndpointRsyslogInputUpdateSettings {
   format?: EnumRsyslogFormat
   /**
    * PEM encoded client key
+   *
+   * Max length 16384
    */
   key?: string
   /**
    * Custom syslog message format
+   *
+   * Length 1-512, Pattern `^[ -~\t]+$`
    */
   logline?: string
   /**
    * Rsyslog max message size
+   *
+   * Min 2048, Max 2147483647
    */
   maxMessageSize?: number
   /**
    * Rsyslog server port
+   *
+   * Min 1, Max 65535
    */
   port?: number
   /**
    * Structured data block for log message
+   *
+   * Max length 1024
    */
   sd?: string
   /**
    * Rsyslog server IP address or hostname
+   *
+   * Length 4-255
    */
   server?: string
   /**
@@ -2600,22 +2848,32 @@ export interface DBAASEndpointRsyslogOptionalFields {
   format?: EnumRsyslogFormat
   /**
    * Custom syslog message format
+   *
+   * Length 1-512, Pattern `^[ -~\t]+$`
    */
   logline?: string
   /**
    * Rsyslog max message size
+   *
+   * Min 2048, Max 2147483647
    */
   maxMessageSize?: number
   /**
    * Rsyslog server port
+   *
+   * Min 1, Max 65535
    */
   port?: number
   /**
    * Structured data block for log message
+   *
+   * Max length 1024
    */
   sd?: string
   /**
    * Rsyslog server IP address or hostname
+   *
+   * Length 4-255
    */
   server?: string
   /**
@@ -2657,14 +2915,20 @@ export function fromWireDBAASEndpointRsyslogOptionalFields(
 export interface DBAASEndpointRsyslogSecrets {
   /**
    * PEM encoded CA certificate
+   *
+   * Max length 16384
    */
   ca?: string
   /**
    * PEM encoded client certificate
+   *
+   * Max length 16384
    */
   cert?: string
   /**
    * PEM encoded client key
+   *
+   * Max length 16384
    */
   key?: string
 }
@@ -2736,14 +3000,20 @@ export interface DBAASExternalEndpointDatadogOutputSettings {
   disableConsumerStats?: boolean
   /**
    * Number of separate instances to fetch kafka consumer statistics with. Applies only when attached to kafka services.
+   *
+   * Min 1, Max 100
    */
   kafkaConsumerCheckInstances?: number
   /**
    * Number of seconds that datadog will wait to get consumer statistics from brokers. Applies only when attached to kafka services.
+   *
+   * Min 2, Max 300
    */
   kafkaConsumerStatsTimeout?: number
   /**
    * Maximum number of partition contexts to send. Applies only when attached to kafka services.
+   *
+   * Min 200, Max 200000
    */
   maxPartitionContexts?: number
   /**
@@ -3128,6 +3398,9 @@ export function fromWireDBAASIntegrationType(w: any): DBAASIntegrationType {
   return v
 }
 
+/**
+ * Length 1-40
+ */
 export type DBAASKafkaAclID = string
 
 export interface DBAASKafkaAcls {
@@ -3170,10 +3443,14 @@ export interface DBAASKafkaSchemaRegistryAclEntry {
   permission: 'schema_registry_read' | 'schema_registry_write'
   /**
    * Kafka Schema Registry name or pattern
+   *
+   * Length 1-249
    */
   resource: string
   /**
    * Kafka username or username pattern
+   *
+   * Length 1-64
    */
   username: string
 }
@@ -3211,10 +3488,14 @@ export interface DBAASKafkaTopicAclEntry {
   permission: 'admin' | 'read' | 'readwrite' | 'write'
   /**
    * Kafka topic name or pattern
+   *
+   * Length 1-249
    */
   topic: string
   /**
    * Kafka username or username pattern
+   *
+   * Length 1-64
    */
   username: string
 }
@@ -3321,8 +3602,14 @@ export function fromWireDBAASMigrationStatus(w: any): DBAASMigrationStatus {
   return v
 }
 
+/**
+ * Length 1-64
+ */
 export type DBAASMysqlDatabaseName = string
 
+/**
+ * Length 8-256, Pattern `^[a-zA-Z0-9!#%^*_+={}()<>|.,;~?-]+$`
+ */
 export type DBAASMysqlUserPassword = string
 
 /**
@@ -3381,14 +3668,20 @@ export interface DBAASNodeStateProgressUpdate {
   completed: boolean
   /**
    * Current progress for this phase. May be missing or null.
+   *
+   * Min 0
    */
   current?: number
   /**
    * Maximum progress value for this phase. May be missing or null. May change.
+   *
+   * Min 0
    */
   max?: number
   /**
    * Minimum progress value for this phase. May be missing or null.
+   *
+   * Min 0
    */
   min?: number
   /**
@@ -3397,7 +3690,7 @@ export interface DBAASNodeStateProgressUpdate {
   phase: 'stream' | 'basebackup' | 'prepare' | 'finalize'
   /**
    * Unit for current/min/max values. New units may be added.
-   * If null should be treated as generic unit
+   *                         If null should be treated as generic unit
    */
   unit?: string
 }
@@ -3431,6 +3724,8 @@ export function fromWireDBAASNodeStateProgressUpdate(w: any): DBAASNodeStateProg
 export interface DBAASOpensearchAclConfigAclsRules {
   /**
    * OpenSearch index pattern
+   *
+   * Max length 249
    */
   index: string
   /**
@@ -3520,12 +3815,24 @@ export function fromWireDBAASOpensearchAclConfig(w: any): DBAASOpensearchAclConf
   return v
 }
 
+/**
+ * Length 1-63
+ */
 export type DBAASPGDatabaseName = string
 
+/**
+ * Length 1-63
+ */
 export type DBAASPGPoolName = string
 
+/**
+ * Min 1, Max 10000
+ */
 export type DBAASPGPoolSize = number
 
+/**
+ * Length 1-64
+ */
 export type DBAASPGPoolUsername = string
 
 export type DBAASPGTargetVersions = '14' | '17' | '15' | '18' | '13' | '16'
@@ -3536,6 +3843,8 @@ export type DBAASPGTargetVersions = '14' | '17' | '15' | '18' | '13' | '16'
 export interface DBAASPlan {
   /**
    * Requires authorization or publicly available
+   *
+   * Read-only
    */
   authorized?: boolean
   /**
@@ -3544,6 +3853,8 @@ export interface DBAASPlan {
   backupConfig?: DBAASBackupConfig
   /**
    * DBaaS plan disk space
+   *
+   * Read-only
    */
   diskSpace?: number
   /**
@@ -3552,22 +3863,32 @@ export interface DBAASPlan {
   family?: string
   /**
    * DBaaS plan max memory allocated percentage
+   *
+   * Min >0, Read-only
    */
   maxMemoryPercent?: number
   /**
    * DBaaS plan name
+   *
+   * Read-only
    */
   name?: string
   /**
    * DBaaS plan node count
+   *
+   * Min >0, Read-only
    */
   nodeCount?: number
   /**
    * DBaaS plan CPU count per node
+   *
+   * Min >0, Read-only
    */
   nodeCPUCount?: number
   /**
    * DBaaS plan memory count per node
+   *
+   * Min >0, Read-only
    */
   nodeMemory?: number
   /**
@@ -3666,10 +3987,14 @@ export interface DBAASServiceBackup {
   backupTime: Date
   /**
    * Backup's original size before compression, in bytes
+   *
+   * Min 0
    */
   dataSize: number
   /**
    * Amount of tiered storage data in bytes referenced by this backup
+   *
+   * Min 0
    */
   tieredStorageDataSize?: number
 }
@@ -3706,6 +4031,8 @@ export interface DBAASServiceClickhouseComponents {
   host: string
   /**
    * Port number for connecting to the service component
+   *
+   * Min 0, Max 65535
    */
   port: number
   /**
@@ -3714,8 +4041,8 @@ export interface DBAASServiceClickhouseComponents {
   route: EnumComponentRoute
   /**
    * Whether the endpoint is encrypted or accepts plaintext.
-   * By default endpoints are always encrypted and
-   * this property is only included for service components that may disable encryption.
+   *              By default endpoints are always encrypted and
+   *              this property is only included for service components that may disable encryption.
    */
   ssl?: boolean
   /**
@@ -3786,6 +4113,9 @@ export function fromWireDBAASServiceClickhouseConnectionInfo(
  */
 export interface DBAASServiceClickhousePrometheusURI {
   host?: string
+  /**
+   * Min 0, Max 65535
+   */
   port?: number
 }
 
@@ -3832,6 +4162,8 @@ export interface DBAASServiceClickhouse {
   createdAT?: Date
   /**
    * TODO UNIT disk space for data storage
+   *
+   * Min 0
    */
   diskSize?: number
   /**
@@ -3852,14 +4184,20 @@ export interface DBAASServiceClickhouse {
   name: DBAASServiceName
   /**
    * Number of service nodes in the active plan
+   *
+   * Min 0
    */
   nodeCount?: number
   /**
    * Number of CPUs for each node
+   *
+   * Min 0
    */
   nodeCPUCount?: number
   /**
    * TODO UNIT of memory for each node
+   *
+   * Min 0
    */
   nodeMemory?: number
   /**
@@ -4006,6 +4344,8 @@ export interface DBAASServiceCommon {
   createdAT?: Date
   /**
    * TODO UNIT disk space for data storage
+   *
+   * Min 0
    */
   diskSize?: number
   /**
@@ -4018,14 +4358,20 @@ export interface DBAASServiceCommon {
   name: DBAASServiceName
   /**
    * Number of service nodes in the active plan
+   *
+   * Min 0
    */
   nodeCount?: number
   /**
    * Number of CPUs for each node
+   *
+   * Min 0
    */
   nodeCPUCount?: number
   /**
    * TODO UNIT of memory for each node
+   *
+   * Min 0
    */
   nodeMemory?: number
   /**
@@ -4125,6 +4471,8 @@ export interface DBAASServiceComponents {
   path?: string
   /**
    * Port number for connecting to the service component
+   *
+   * Min 0, Max 65535
    */
   port: number
   /**
@@ -4133,8 +4481,8 @@ export interface DBAASServiceComponents {
   route: 'dynamic' | 'private' | 'public' | 'privatelink'
   /**
    * Whether the endpoint is encrypted or accepts plaintext.
-   * By default endpoints are always encrypted and
-   * this property is only included for service components that may disable encryption.
+   *                                            By default endpoints are always encrypted and
+   *                                            this property is only included for service components that may disable encryption.
    */
   ssl?: boolean
   /**
@@ -4184,6 +4532,8 @@ export interface DBAASServiceGrafanaComponents {
   host: string
   /**
    * Port number for connecting to the service component
+   *
+   * Min 0, Max 65535
    */
   port: number
   /**
@@ -4256,6 +4606,9 @@ export function fromWireDBAASServiceGrafanaConnectionInfo(
  */
 export interface DBAASServiceGrafanaPrometheusURI {
   host?: string
+  /**
+   * Min 0, Max 65535
+   */
   port?: number
 }
 
@@ -4326,6 +4679,8 @@ export interface DBAASServiceGrafana {
   description?: string
   /**
    * TODO UNIT disk space for data storage
+   *
+   * Min 0
    */
   diskSize?: number
   /**
@@ -4350,14 +4705,20 @@ export interface DBAASServiceGrafana {
   name: DBAASServiceName
   /**
    * Number of service nodes in the active plan
+   *
+   * Min 0
    */
   nodeCount?: number
   /**
    * Number of CPUs for each node
+   *
+   * Min 0
    */
   nodeCPUCount?: number
   /**
    * TODO UNIT of memory for each node
+   *
+   * Min 0
    */
   nodeMemory?: number
   /**
@@ -4546,6 +4907,8 @@ export interface DBAASServiceKafkaComponents {
   kafkaAuthenticationMethod?: EnumKafkaAuthMethod
   /**
    * Port number for connecting to the service component
+   *
+   * Min 0, Max 65535
    */
   port: number
   /**
@@ -4629,6 +4992,9 @@ export function fromWireDBAASServiceKafkaConnectionInfo(w: any): DBAASServiceKaf
  */
 export interface DBAASServiceKafkaPrometheusURI {
   host?: string
+  /**
+   * Min 0, Max 65535
+   */
   port?: number
 }
 
@@ -4706,6 +5072,8 @@ export interface DBAASServiceKafka {
   createdAT?: Date
   /**
    * TODO UNIT disk space for data storage
+   *
+   * Min 0
    */
   diskSize?: number
   /**
@@ -4746,14 +5114,20 @@ export interface DBAASServiceKafka {
   name: DBAASServiceName
   /**
    * Number of service nodes in the active plan
+   *
+   * Min 0
    */
   nodeCount?: number
   /**
    * Number of CPUs for each node
+   *
+   * Min 0
    */
   nodeCPUCount?: number
   /**
    * TODO UNIT of memory for each node
+   *
+   * Min 0
    */
   nodeMemory?: number
   /**
@@ -4987,6 +5361,8 @@ export interface DBAASServiceMaintenance {
   dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
   /**
    * Time for installing updates, UTC
+   *
+   * Length 8-8
    */
   time: string
   /**
@@ -5019,10 +5395,14 @@ export function fromWireDBAASServiceMaintenance(w: any): DBAASServiceMaintenance
 export interface DBAASServiceMysqlBackupSchedule {
   /**
    * The hour of day (in UTC) when backup for the service is started. New backup is only started if previous backup has already completed.
+   *
+   * Min 0, Max 23
    */
   backupHour?: number
   /**
    * The minute of an hour when backup for the service is started. New backup is only started if previous backup has already completed.
+   *
+   * Min 0, Max 59
    */
   backupMinute?: number
 }
@@ -5056,6 +5436,8 @@ export interface DBAASServiceMysqlComponents {
   host: string
   /**
    * Port number for connecting to the service component
+   *
+   * Min 0, Max 65535
    */
   port: number
   /**
@@ -5128,6 +5510,9 @@ export function fromWireDBAASServiceMysqlConnectionInfo(w: any): DBAASServiceMys
  */
 export interface DBAASServiceMysqlPrometheusURI {
   host?: string
+  /**
+   * Min 0, Max 65535
+   */
   port?: number
 }
 
@@ -5187,6 +5572,8 @@ export interface DBAASServiceMysql {
   backups?: DBAASServiceBackup[]
   /**
    * The minimum amount of time in seconds to keep binlog entries before deletion. This may be extended for services that require binlog entries for longer than the default for example if using the MySQL Debezium Kafka connector.
+   *
+   * Min >0
    */
   binlogRetentionPeriod?: number
   /**
@@ -5207,6 +5594,8 @@ export interface DBAASServiceMysql {
   databases?: DBAASMysqlDatabaseName[]
   /**
    * TODO UNIT disk space for data storage
+   *
+   * Min 0
    */
   diskSize?: number
   /**
@@ -5231,14 +5620,20 @@ export interface DBAASServiceMysql {
   name: DBAASServiceName
   /**
    * Number of service nodes in the active plan
+   *
+   * Min 0
    */
   nodeCount?: number
   /**
    * Number of CPUs for each node
+   *
+   * Min 0
    */
   nodeCPUCount?: number
   /**
    * TODO UNIT of memory for each node
+   *
+   * Min 0
    */
   nodeMemory?: number
   /**
@@ -5384,6 +5779,9 @@ export function fromWireDBAASServiceMysql(w: any): DBAASServiceMysql {
   return v
 }
 
+/**
+ * Length 0-63
+ */
 export type DBAASServiceName = string
 
 /**
@@ -5396,6 +5794,8 @@ export interface DBAASServiceNotification {
   level: 'warning' | 'notice'
   /**
    * Human notification message
+   *
+   * Length 1-1024
    */
   message: string
   /**
@@ -5441,6 +5841,8 @@ export interface DBAASServiceOpensearchComponents {
   host: string
   /**
    * Port number for connecting to the service component
+   *
+   * Min 0, Max 65535
    */
   port: number
   /**
@@ -5514,10 +5916,14 @@ export function fromWireDBAASServiceOpensearchConnectionInfo(
 export interface DBAASServiceOpensearchIndexPatterns {
   /**
    * Maximum number of indexes to keep
+   *
+   * Min 0
    */
   maxIndexCount?: number | null
   /**
    * fnmatch pattern
+   *
+   * Max length 1024
    */
   pattern?: string
   /**
@@ -5555,14 +5961,20 @@ export function fromWireDBAASServiceOpensearchIndexPatterns(
 export interface DBAASServiceOpensearchIndexTemplate {
   /**
    * The maximum number of nested JSON objects that a single document can contain across all nested types. This limit helps to prevent out of memory errors when a document contains too many nested objects. Default is 10000.
+   *
+   * Min 0, Max 100000
    */
   mappingNestedObjectsLimit?: number
   /**
    * The number of replicas each primary shard has.
+   *
+   * Min 0, Max 29
    */
   numberOfReplicas?: number
   /**
    * The number of primary shards that an index should have.
+   *
+   * Min 1, Max 1024
    */
   numberOfShards?: number
 }
@@ -5601,10 +6013,14 @@ export interface DBAASServiceOpensearchOpensearchDashboards {
   enabled?: boolean
   /**
    * Limits the maximum amount of memory (in MiB) the OpenSearch Dashboards process can use. This sets the max_old_space_size option of the nodejs running the OpenSearch Dashboards. Note: the memory reserved by OpenSearch Dashboards is not available for OpenSearch. (default: 128)
+   *
+   * Min 64, Max 1024
    */
   maxOldSpaceSize?: number
   /**
    * Timeout in milliseconds for requests made by OpenSearch Dashboards towards OpenSearch (default: 30000)
+   *
+   * Min 5000, Max 120000
    */
   opensearchRequestTimeout?: number
 }
@@ -5638,6 +6054,9 @@ export function fromWireDBAASServiceOpensearchOpensearchDashboards(
  */
 export interface DBAASServiceOpensearchPrometheusURI {
   host?: string
+  /**
+   * Min 0, Max 65535
+   */
   port?: number
 }
 
@@ -5710,6 +6129,8 @@ export interface DBAASServiceOpensearch {
   description?: string
   /**
    * TODO UNIT disk space for data storage
+   *
+   * Min 0
    */
   diskSize?: number
   /**
@@ -5738,6 +6159,8 @@ export interface DBAASServiceOpensearch {
   maintenance?: DBAASServiceMaintenance
   /**
    * Maximum number of indexes to keep before deleting the oldest one
+   *
+   * Min 0
    */
   maxIndexCount?: number | null
   /**
@@ -5746,14 +6169,20 @@ export interface DBAASServiceOpensearch {
   name: DBAASServiceName
   /**
    * Number of service nodes in the active plan
+   *
+   * Min 0
    */
   nodeCount?: number
   /**
    * Number of CPUs for each node
+   *
+   * Min 0
    */
   nodeCPUCount?: number
   /**
    * TODO UNIT of memory for each node
+   *
+   * Min 0
    */
   nodeMemory?: number
   /**
@@ -5934,10 +6363,14 @@ export function fromWireDBAASServiceOpensearch(w: any): DBAASServiceOpensearch {
 export interface DBAASServicePGBackupSchedule {
   /**
    * The hour of day (in UTC) when backup for the service is started. New backup is only started if previous backup has already completed.
+   *
+   * Min 0, Max 23
    */
   backupHour?: number
   /**
    * The minute of an hour when backup for the service is started. New backup is only started if previous backup has already completed.
+   *
+   * Min 0, Max 59
    */
   backupMinute?: number
 }
@@ -5971,6 +6404,8 @@ export interface DBAASServicePGComponents {
   host: string
   /**
    * Port number for connecting to the service component
+   *
+   * Min 0, Max 65535
    */
   port: number
   /**
@@ -6099,6 +6534,9 @@ export function fromWireDBAASServicePGConnectionPools(w: any): DBAASServicePGCon
  */
 export interface DBAASServicePGPrometheusURI {
   host?: string
+  /**
+   * Min 0, Max 65535
+   */
   port?: number
 }
 
@@ -6190,6 +6628,8 @@ export interface DBAASServicePG {
   databases?: DBAASDatabaseName[]
   /**
    * TODO UNIT disk space for data storage
+   *
+   * Min 0
    */
   diskSize?: number
   /**
@@ -6206,6 +6646,8 @@ export interface DBAASServicePG {
   maintenance?: DBAASServiceMaintenance
   /**
    * Maximum number of connections allowed to an instance
+   *
+   * Min >0
    */
   maxConnections?: number
   /**
@@ -6214,14 +6656,20 @@ export interface DBAASServicePG {
   name: DBAASServiceName
   /**
    * Number of service nodes in the active plan
+   *
+   * Min 0
    */
   nodeCount?: number
   /**
    * Number of CPUs for each node
+   *
+   * Min 0
    */
   nodeCPUCount?: number
   /**
    * TODO UNIT of memory for each node
+   *
+   * Min 0
    */
   nodeMemory?: number
   /**
@@ -6258,6 +6706,8 @@ export interface DBAASServicePG {
   prometheusURI: DBAASServicePGPrometheusURI
   /**
    * Percentage of total RAM that the database server uses for shared memory buffers. Valid range is 20-60 (float), which corresponds to 20% - 60%. This setting adjusts the shared_buffers configuration value.
+   *
+   * Min 20, Max 60
    */
   sharedBuffersPercentage?: number
   /**
@@ -6302,6 +6752,8 @@ export interface DBAASServicePG {
   version?: string
   /**
    * Sets the maximum amount of memory to be used by a query operation (such as a sort or hash table) before writing to temporary disk files, in MB. Default is 1MB + 0.075% of total RAM (up to 32MB).
+   *
+   * Min 1, Max 1024
    */
   workMem?: number
   /**
@@ -6440,6 +6892,8 @@ export interface DBAASServiceThanosComponents {
   host: string
   /**
    * Port number for connecting to the service component
+   *
+   * Min 0, Max 65535
    */
   port: number
   /**
@@ -6448,8 +6902,8 @@ export interface DBAASServiceThanosComponents {
   route: EnumComponentRoute
   /**
    * Whether the endpoint is encrypted or accepts plaintext.
-   * By default endpoints are always encrypted and
-   * this property is only included for service components that may disable encryption.
+   *              By default endpoints are always encrypted and
+   *              this property is only included for service components that may disable encryption.
    */
   ssl?: boolean
   /**
@@ -6523,6 +6977,9 @@ export function fromWireDBAASServiceThanosConnectionInfo(w: any): DBAASServiceTh
  */
 export interface DBAASServiceThanosPrometheusURI {
   host?: string
+  /**
+   * Min 0, Max 65535
+   */
   port?: number
 }
 
@@ -6587,6 +7044,8 @@ export interface DBAASServiceThanos {
   createdAT?: Date
   /**
    * TODO UNIT disk space for data storage
+   *
+   * Min 0
    */
   diskSize?: number
   /**
@@ -6607,14 +7066,20 @@ export interface DBAASServiceThanos {
   name: DBAASServiceName
   /**
    * Number of service nodes in the active plan
+   *
+   * Min 0
    */
   nodeCount?: number
   /**
    * Number of CPUs for each node
+   *
+   * Min 0
    */
   nodeCPUCount?: number
   /**
    * TODO UNIT of memory for each node
+   *
+   * Min 0
    */
   nodeMemory?: number
   /**
@@ -6756,14 +7221,20 @@ export function fromWireDBAASServiceThanos(w: any): DBAASServiceThanos {
 export interface DBAASServiceType {
   /**
    * DbaaS service available versions
+   *
+   * Read-only
    */
   availableVersions?: string[]
   /**
    * DbaaS service default version
+   *
+   * Read-only
    */
   defaultVersion?: string
   /**
    * DbaaS service description
+   *
+   * Read-only
    */
   description?: string
   /**
@@ -6772,6 +7243,8 @@ export interface DBAASServiceType {
   name?: DBAASServiceTypeName
   /**
    * DbaaS service plans
+   *
+   * Read-only
    */
   plans?: DBAASPlan[]
 }
@@ -6798,6 +7271,9 @@ export function fromWireDBAASServiceType(w: any): DBAASServiceType {
   return v
 }
 
+/**
+ * Length 0-64
+ */
 export type DBAASServiceTypeName = string
 
 /**
@@ -6853,6 +7329,8 @@ export interface DBAASServiceValkeyComponents {
   host: string
   /**
    * Port number for connecting to the service component
+   *
+   * Min 0, Max 65535
    */
   port: number
   /**
@@ -6861,8 +7339,8 @@ export interface DBAASServiceValkeyComponents {
   route: EnumComponentRoute
   /**
    * Whether the endpoint is encrypted or accepts plaintext.
-   * By default endpoints are always encrypted and
-   * this property is only included for service components that may disable encryption.
+   *              By default endpoints are always encrypted and
+   *              this property is only included for service components that may disable encryption.
    */
   ssl?: boolean
   /**
@@ -6931,6 +7409,9 @@ export function fromWireDBAASServiceValkeyConnectionInfo(w: any): DBAASServiceVa
  */
 export interface DBAASServiceValkeyPrometheusURI {
   host?: string
+  /**
+   * Min 0, Max 65535
+   */
   port?: number
 }
 
@@ -7031,6 +7512,8 @@ export interface DBAASServiceValkey {
   createdAT?: Date
   /**
    * TODO UNIT disk space for data storage
+   *
+   * Min 0
    */
   diskSize?: number
   /**
@@ -7051,14 +7534,20 @@ export interface DBAASServiceValkey {
   name: DBAASServiceName
   /**
    * Number of service nodes in the active plan
+   *
+   * Min 0
    */
   nodeCount?: number
   /**
    * Number of CPUs for each node
+   *
+   * Min 0
    */
   nodeCPUCount?: number
   /**
    * TODO UNIT of memory for each node
+   *
+   * Min 0
    */
   nodeMemory?: number
   /**
@@ -7457,6 +7946,9 @@ export function fromWireDBAASUserOpensearchSecrets(w: any): DBAASUserOpensearchS
   return v
 }
 
+/**
+ * Length 8-256
+ */
 export type DBAASUserPassword = string
 
 /**
@@ -7521,6 +8013,9 @@ export function fromWireDBAASUserThanosSecrets(w: any): DBAASUserThanosSecrets {
   return v
 }
 
+/**
+ * Length 1-64
+ */
 export type DBAASUserUsername = string
 
 /**
@@ -7723,6 +8218,8 @@ export function fromWireDeleteModelConflictResponse(w: any): DeleteModelConflict
 export interface DeployTarget {
   /**
    * Deploy Target description
+   *
+   * Max length 255
    */
   description?: string
   /**
@@ -7731,6 +8228,8 @@ export interface DeployTarget {
   id: string
   /**
    * Deploy Target name
+   *
+   * Length 1-255
    */
   name?: string
   /**
@@ -7809,14 +8308,20 @@ export function fromWireDisableKmsKeyRotationResponse(w: any): DisableKmsKeyRota
 export interface DNSDomain {
   /**
    * DNS domain creation date
+   *
+   * Read-only
    */
   createdAT?: Date
   /**
    * DNS domain ID
+   *
+   * Read-only
    */
   id?: string
   /**
    * DNS domain unicode name
+   *
+   * Length 1-255
    */
   unicodeName?: string
 }
@@ -7849,10 +8354,14 @@ export interface DNSDomainRecord {
   content?: string
   /**
    * DNS domain record creation date
+   *
+   * Read-only
    */
   createdAT?: Date
   /**
    * DNS domain record ID
+   *
+   * Read-only
    */
   id?: string
   /**
@@ -7861,14 +8370,20 @@ export interface DNSDomainRecord {
   name?: string
   /**
    * DNS domain record priority
+   *
+   * Min 0
    */
   priority?: number
   /**
    * DNS domain record system status
+   *
+   * Read-only
    */
   systemRecord?: boolean
   /**
    * DNS domain record TTL
+   *
+   * Min 0
    */
   ttl?: number
   /**
@@ -7893,6 +8408,8 @@ export interface DNSDomainRecord {
     | 'SPF'
   /**
    * DNS domain record update date
+   *
+   * Read-only
    */
   updatedAT?: Date
 }
@@ -7927,6 +8444,9 @@ export function fromWireDNSDomainRecord(w: any): DNSDomainRecord {
   return v
 }
 
+/**
+ * Length 1-253
+ */
 export type DomainName = string
 
 /**
@@ -7935,14 +8455,20 @@ export type DomainName = string
 export interface ElasticIP {
   /**
    * Elastic IP address family
+   *
+   * Read-only
    */
   addressfamily?: 'inet4' | 'inet6'
   /**
    * Elastic IP cidr
+   *
+   * Read-only
    */
   cidr?: string
   /**
    * Elastic IP description
+   *
+   * Max length 255
    */
   description?: string
   /**
@@ -7951,10 +8477,14 @@ export interface ElasticIP {
   healthcheck?: ElasticIPHealthcheck
   /**
    * Elastic IP ID
+   *
+   * Read-only
    */
   id?: string
   /**
    * Elastic IP address
+   *
+   * Read-only
    */
   ip?: string
   /**
@@ -7995,6 +8525,8 @@ export function fromWireElasticIP(w: any): ElasticIP {
 export interface ElasticIPHealthcheck {
   /**
    * Interval between the checks in seconds (default: 10)
+   *
+   * Min 5, Max 300
    */
   interval?: number
   /**
@@ -8003,18 +8535,26 @@ export interface ElasticIPHealthcheck {
   mode: 'tcp' | 'http' | 'https'
   /**
    * Health check port
+   *
+   * Min 1, Max 65535
    */
   port: number
   /**
    * Number of attempts before considering the target unhealthy (default: 3)
+   *
+   * Min 1, Max 20
    */
   strikesFail?: number
   /**
    * Number of attempts before considering the target healthy (default: 2)
+   *
+   * Min 1, Max 20
    */
   strikesOk?: number
   /**
    * Health check timeout value in seconds (default: 2)
+   *
+   * Min 2, Max 60
    */
   timeout?: number
   /**
@@ -8023,10 +8563,14 @@ export interface ElasticIPHealthcheck {
   tlsSkipVerify?: boolean
   /**
    * An optional domain or subdomain to check TLS against
+   *
+   * Length 1-255
    */
   tlsSNI?: string
   /**
    * An endpoint to use for the health check, for example '/status'
+   *
+   * Length 1-255
    */
   uri?: string
 }
@@ -8088,6 +8632,10 @@ export function fromWireElasticIPRef(w: any): ElasticIPRef {
 export interface EnableKmsKeyRotationRequest {
   /**
    * The number of days between each automatic key rotation.
+   *
+   * Min 90, Max 2560
+   *
+   * @defaultValue 365
    */
   rotationPeriod?: number
 }
@@ -8396,6 +8944,9 @@ export interface ErrorResponse {
    * A highly contextual, readable explanation breaking down explicitly what triggered this error scenario.
    */
   detail: string
+  /**
+   * Min 100, Max 599
+   */
   status: number
   /**
    * A brief summary defining the class of failure, optimal for quick user interface groupings.
@@ -8437,6 +8988,8 @@ export interface Event {
   bodyParams?: Record<string, unknown>
   /**
    * Operation processing time
+   *
+   * Min >0
    */
   elapsedMS?: number
   /**
@@ -8477,6 +9030,8 @@ export interface Event {
   sourceIP?: string
   /**
    * Operation HTTP status
+   *
+   * Min >0
    */
   status?: number
   /**
@@ -8536,6 +9091,9 @@ export function fromWireEvent(w: any): Event {
 }
 
 export interface GenerateDataKeyRequest {
+  /**
+   * Min 1, Max 1024
+   */
   bytesCount?: number
   /**
    * Base64-encoded Additional Authenticated Data binding key generation parameters securely to operational scope.
@@ -8596,10 +9154,14 @@ export function fromWireGenerateDataKeyResponse(w: any): GenerateDataKeyResponse
 export interface GetAIAPIKeyResponse {
   /**
    * Creation timestamp
+   *
+   * Read-only
    */
   createdAT: Date
   /**
    * AI API key ID
+   *
+   * Read-only
    */
   id: string
   /**
@@ -8608,6 +9170,8 @@ export interface GetAIAPIKeyResponse {
   name: string
   /**
    * Organization UUID that owns this key
+   *
+   * Read-only
    */
   orgUuid: string
   /**
@@ -8616,6 +9180,8 @@ export interface GetAIAPIKeyResponse {
   scope: string
   /**
    * Last update timestamp
+   *
+   * Read-only
    */
   updatedAT: Date
 }
@@ -8743,6 +9309,8 @@ export function fromWireGetDeploymentLogsResponse(w: any): GetDeploymentLogsResp
 export interface GetDeploymentResponse {
   /**
    * Creation time
+   *
+   * Read-only
    */
   createdAT?: Date
   /**
@@ -8751,14 +9319,20 @@ export interface GetDeploymentResponse {
   deploymentURL: string
   /**
    * Number of GPUs
+   *
+   * Min 1
    */
   gpuCount?: number
   /**
    * GPU type family
+   *
+   * Min length 1
    */
   gpuType?: string
   /**
    * Deployment ID
+   *
+   * Read-only
    */
   id?: string
   /**
@@ -8769,14 +9343,20 @@ export interface GetDeploymentResponse {
   model: ModelRef
   /**
    * Deployment name
+   *
+   * Min length 1
    */
   name: string
   /**
    * Number of replicas (>=0)
+   *
+   * Min 0
    */
   replicas?: number
   /**
    * Service level
+   *
+   * Min length 1
    */
   serviceLevel?: string
   /**
@@ -8789,6 +9369,8 @@ export interface GetDeploymentResponse {
   stateDetails?: string
   /**
    * Update time
+   *
+   * Read-only
    */
   updatedAT?: Date
   /**
@@ -8968,18 +9550,26 @@ export function fromWireGetKmsKeyResponse(w: any): GetKmsKeyResponse {
 export interface GetModelResponse {
   /**
    * Creation time
+   *
+   * Read-only
    */
   createdAT: Date
   /**
    * Model ID
+   *
+   * Read-only
    */
   id: string
   /**
    * Model size in bytes
+   *
+   * Min 0
    */
   modelSize: number
   /**
    * Model name
+   *
+   * Min length 1
    */
   name: string
   /**
@@ -8988,6 +9578,8 @@ export interface GetModelResponse {
   state: 'ready' | 'creating' | 'downloading' | 'error' | 'created'
   /**
    * Update time
+   *
+   * Read-only
    */
   updatedAT: Date
 }
@@ -9022,6 +9614,8 @@ export function fromWireGetModelResponse(w: any): GetModelResponse {
 export interface GetOrganizationUsageResponse {
   /**
    * Total GPU count
+   *
+   * Min 0, Read-only
    */
   gpu: number
 }
@@ -9106,6 +9700,8 @@ export interface IAMAPIKeyCreated {
   roleID?: string
   /**
    * IAM API Key Secret
+   *
+   * Read-only
    */
   secret?: string
 }
@@ -9203,6 +9799,8 @@ export interface IAMRole {
   assumeRolePolicy?: IAMAssumeRolePolicy
   /**
    * IAM Role description
+   *
+   * Length 1-255
    */
   description?: string
   /**
@@ -9211,6 +9809,8 @@ export interface IAMRole {
   editable?: boolean
   /**
    * IAM Role ID
+   *
+   * Read-only
    */
   id?: string
   /**
@@ -9219,14 +9819,20 @@ export interface IAMRole {
   labels?: Labels
   /**
    * Maximum TTL requester is allowed to ask for when assuming a role
+   *
+   * Min >0
    */
   maxSessionTtl?: number
   /**
    * IAM Role name
+   *
+   * Length 1-255
    */
   name?: string
   /**
    * IAM Role permissions
+   *
+   * Unique items
    */
   permissions?: string[]
   /**
@@ -9349,6 +9955,9 @@ export function fromWireImpactBreakdown(w: any): ImpactBreakdown {
  */
 export interface ImpactErrorResponse {
   detail: string
+  /**
+   * Min 100, Max 599
+   */
   status: number
   title: string
 }
@@ -9496,6 +10105,8 @@ export function fromWireInferenceEngineParameterEntry(w: any): InferenceEnginePa
 
 /**
  * Inference engine version
+ *
+ * @defaultValue "0.28.0"
  */
 export type InferenceEngineVersion =
   | '0.12.0'
@@ -9531,6 +10142,8 @@ export interface IngestMeteringRequest {
   flushID: string
   /**
    * Router instance identifier that produced this flush
+   *
+   * Min length 1
    */
   routerID: string
   /**
@@ -9715,6 +10328,8 @@ export interface Instance {
   applicationConsistentSnapshotEnabled?: boolean
   /**
    * Instance creation date
+   *
+   * Read-only
    */
   createdAT?: Date
   /**
@@ -9723,10 +10338,14 @@ export interface Instance {
   deployTarget?: DeployTargetRef
   /**
    * Indicates if the root volume of the instance is encrypted
+   *
+   * Read-only
    */
   diskEncrypted?: boolean
   /**
    * Instance disk size in GiB
+   *
+   * Min 10, Max 51200
    */
   diskSize?: number
   /**
@@ -9735,6 +10354,8 @@ export interface Instance {
   elasticIPS?: ElasticIPRef[]
   /**
    * Instance ID
+   *
+   * Read-only
    */
   id?: string
   /**
@@ -9747,6 +10368,8 @@ export interface Instance {
   ipForwarding?: boolean
   /**
    * Instance IPv6 address
+   *
+   * Read-only
    */
   ipv6Address?: string
   /**
@@ -9755,6 +10378,8 @@ export interface Instance {
   labels?: Labels
   /**
    * Instance MAC address
+   *
+   * Read-only
    */
   macAddress?: string
   /**
@@ -9763,6 +10388,8 @@ export interface Instance {
   manager?: Manager
   /**
    * Instance name
+   *
+   * Length 1-255
    */
   name?: string
   /**
@@ -9771,6 +10398,8 @@ export interface Instance {
   privateNetworks?: InstancePrivateNetworks[]
   /**
    * Instance public IPv4 address
+   *
+   * Read-only
    */
   publicIP?: string
   /**
@@ -9811,6 +10440,8 @@ export interface Instance {
   tpmEnabled?: boolean
   /**
    * Instance Cloud-init user-data (base64 encoded)
+   *
+   * Min length 1
    */
   userData?: string
   /**
@@ -9908,6 +10539,8 @@ export function fromWireInstance(w: any): Instance {
 export interface InstancePassword {
   /**
    * Password
+   *
+   * Read-only
    */
   password?: string
 }
@@ -9944,10 +10577,14 @@ export interface InstancePool {
   deployTarget?: DeployTargetRef
   /**
    * Instance Pool description
+   *
+   * Length 1-255
    */
   description?: string
   /**
    * Instances disk size in GiB
+   *
+   * Min 10, Max 51200
    */
   diskSize?: number
   /**
@@ -9956,10 +10593,14 @@ export interface InstancePool {
   elasticIPS?: ElasticIPRef[]
   /**
    * Instance Pool ID
+   *
+   * Read-only
    */
   id?: string
   /**
    * The instances created by the Instance Pool will be prefixed with this value (default: pool)
+   *
+   * Length 1-30
    */
   instancePrefix?: string
   /**
@@ -9968,6 +10609,8 @@ export interface InstancePool {
   instanceType?: InstanceTypeRef
   /**
    * Instances
+   *
+   * Read-only
    */
   instances?: InstanceRef[]
   /**
@@ -9984,10 +10627,14 @@ export interface InstancePool {
   manager?: Manager
   /**
    * Minimum number of running instances
+   *
+   * Min 0
    */
   minAvailable?: number
   /**
    * Instance Pool name
+   *
+   * Length 1-255
    */
   name?: string
   /**
@@ -10004,6 +10651,8 @@ export interface InstancePool {
   securityGroups?: SecurityGroupRef[]
   /**
    * Number of instances
+   *
+   * Min >0
    */
   size?: number
   /**
@@ -10016,6 +10665,8 @@ export interface InstancePool {
   sshKeys?: SSHKeyRef[]
   /**
    * Instance Pool state
+   *
+   * Read-only
    */
   state?:
     'scaling-up' | 'scaling-down' | 'destroying' | 'creating' | 'suspended' | 'running' | 'updating'
@@ -10025,6 +10676,8 @@ export interface InstancePool {
   template?: TemplateRef
   /**
    * Instances Cloud-init user-data
+   *
+   * Min length 1
    */
   userData?: string
 }
@@ -10167,14 +10820,20 @@ export type InstanceState =
 export interface InstanceType {
   /**
    * Requires authorization or publicly available
+   *
+   * Read-only
    */
   authorized?: boolean
   /**
    * CPU count
+   *
+   * Min >0, Read-only
    */
   cpus?: number
   /**
    * Instance type family
+   *
+   * Read-only
    */
   family?:
     | 'gpu3'
@@ -10192,18 +10851,26 @@ export interface InstanceType {
     | 'cpu'
   /**
    * GPU count
+   *
+   * Min >0, Read-only
    */
   gpus?: number
   /**
    * Instance type ID
+   *
+   * Read-only
    */
   id?: string
   /**
    * Available memory
+   *
+   * Min >0, Read-only
    */
   memory?: number
   /**
    * Instance type size
+   *
+   * Read-only
    */
   size?:
     | 'large'
@@ -10220,6 +10887,8 @@ export interface InstanceType {
     | 'tiny'
   /**
    * Instance Type available zones
+   *
+   * Read-only
    */
   zones?: ZoneName[]
 }
@@ -10312,6 +10981,11 @@ export function fromWireInstanceTypeRef(w: any): InstanceTypeRef {
 export interface JSONSchemaClickhouseServerSettings {
   /**
    * Fraction of total server memory allocated to the vector similarity index cache. 0 disables the cache. Default is 0.07 (7% of server memory). Only effective on ClickHouse 25.8+.
+   *
+   * Min 0, Max 0.5
+   *
+   * @defaultValue 0.07
+   * @example 0.07
    */
   vectorSimilarityIndexCacheSize?: number
 }
@@ -10346,6 +11020,11 @@ export interface JSONSchemaClickhouse {
   serverSettings?: JSONSchemaClickhouseServerSettings
   /**
    * The percentage of free disk space required on local storage before data is moved to object storage. A value of 0.2 means data is moved when local storage has less than 20% free space.
+   *
+   * Min 0, Max 1
+   *
+   * @defaultValue 0.2
+   * @example 0.2
    */
   tieredStorageMoveFactor?: number
 }
@@ -10376,30 +11055,52 @@ export function fromWireJSONSchemaClickhouse(w: any): JSONSchemaClickhouse {
 export interface JSONSchemaGrafanaAuthAzuread {
   /**
    * Automatically sign-up users on successful sign-in
+   *
+   * @example false
    */
   allowSignUP?: boolean
   /**
    * Allowed domains
+   *
+   * Max items 50
    */
   allowedDomains?: string[]
   /**
    * Require users to belong to one of given groups
+   *
+   * Max items 50
    */
   allowedGroups?: string[]
   /**
    * Authorization URL
+   *
+   * Max length 2048
+   *
+   * @example "https://login.microsoftonline.com/<AZURE_TENANT_ID>/oauth2/v2.0/authorize"
    */
   authURL: string
   /**
    * Client ID from provider
+   *
+   * Max length 1024, Pattern `^[ -~]+$`
+   *
+   * @example "b1ba0bf54a4c2c0a1c29"
    */
   clientID: string
   /**
    * Client secret from provider
+   *
+   * Max length 1024, Pattern `^[ -~]+$`
+   *
+   * @example "bfa6gea4f129076761dcba8ce5e1e406bd83af7b"
    */
   clientSecret: string
   /**
    * Token URL
+   *
+   * Max length 2048
+   *
+   * @example "https://login.microsoftonline.com/<AZURE_TENANT_ID>/oauth2/v2.0/token"
    */
   tokenURL: string
 }
@@ -10438,46 +11139,80 @@ export function fromWireJSONSchemaGrafanaAuthAzuread(w: any): JSONSchemaGrafanaA
 export interface JSONSchemaGrafanaAuthGenericOauth {
   /**
    * Automatically sign-up users on successful sign-in
+   *
+   * @example false
    */
   allowSignUP?: boolean
   /**
    * Allowed domains
+   *
+   * Max items 50
    */
   allowedDomains?: string[]
   /**
    * Require user to be member of one of the listed organizations
+   *
+   * Max items 50
    */
   allowedOrganizations?: string[]
   /**
    * API URL
+   *
+   * Max length 2048
+   *
+   * @example "https://yourprovider.com/api"
    */
   apiURL: string
   /**
    * Authorization URL
+   *
+   * Max length 2048
+   *
+   * @example "https://yourprovider.com/oauth/authorize"
    */
   authURL: string
   /**
    * Allow users to bypass the login screen and automatically log in
+   *
+   * @example false
    */
   autoLogin?: boolean
   /**
    * Client ID from provider
+   *
+   * Max length 1024, Pattern `^[ -~]+$`
+   *
+   * @example "b1ba0bf54a4c2c0a1c29"
    */
   clientID: string
   /**
    * Client secret from provider
+   *
+   * Max length 1024, Pattern `^[ -~]+$`
+   *
+   * @example "bfa6gea4f129076761dcba8ce5e1e406bd83af7b"
    */
   clientSecret: string
   /**
    * Name of the OAuth integration
+   *
+   * Max length 128, Pattern `^[a-zA-Z0-9_\- ]+$`
+   *
+   * @example "My authentication"
    */
   name?: string
   /**
    * OAuth scopes
+   *
+   * Max items 50
    */
   scopes?: string[]
   /**
    * Token URL
+   *
+   * Max length 2048
+   *
+   * @example "https://yourprovider.com/oauth/token"
    */
   tokenURL: string
 }
@@ -10526,30 +11261,48 @@ export function fromWireJSONSchemaGrafanaAuthGenericOauth(
 export interface JSONSchemaGrafanaAuthGithub {
   /**
    * Automatically sign-up users on successful sign-in
+   *
+   * @example false
    */
   allowSignUP?: boolean
   /**
    * Require users to belong to one of given organizations
+   *
+   * Max items 50
    */
   allowedOrganizations?: string[]
   /**
    * Allow users to bypass the login screen and automatically log in
+   *
+   * @example false
    */
   autoLogin?: boolean
   /**
    * Client ID from provider
+   *
+   * Max length 1024, Pattern `^[ -~]+$`
+   *
+   * @example "b1ba0bf54a4c2c0a1c29"
    */
   clientID: string
   /**
    * Client secret from provider
+   *
+   * Max length 1024, Pattern `^[ -~]+$`
+   *
+   * @example "bfa6gea4f129076761dcba8ce5e1e406bd83af7b"
    */
   clientSecret: string
   /**
    * Stop automatically syncing user roles
+   *
+   * @example false
    */
   skipOrgRoleSync?: boolean
   /**
    * Require users to belong to one of given team IDs
+   *
+   * Max items 50
    */
   teamIDS?: number[]
 }
@@ -10588,30 +11341,54 @@ export function fromWireJSONSchemaGrafanaAuthGithub(w: any): JSONSchemaGrafanaAu
 export interface JSONSchemaGrafanaAuthGitlab {
   /**
    * Automatically sign-up users on successful sign-in
+   *
+   * @example false
    */
   allowSignUP?: boolean
   /**
    * Require users to belong to one of given groups
+   *
+   * Max items 50
    */
   allowedGroups: string[]
   /**
    * API URL. This only needs to be set when using self hosted GitLab
+   *
+   * Max length 2048
+   *
+   * @example "https://gitlab.com/api/v4"
    */
   apiURL?: string
   /**
    * Authorization URL. This only needs to be set when using self hosted GitLab
+   *
+   * Max length 2048
+   *
+   * @example "https://gitlab.com/oauth/authorize"
    */
   authURL?: string
   /**
    * Client ID from provider
+   *
+   * Max length 1024, Pattern `^[ -~]+$`
+   *
+   * @example "b1ba0bf54a4c2c0a1c29"
    */
   clientID: string
   /**
    * Client secret from provider
+   *
+   * Max length 1024, Pattern `^[ -~]+$`
+   *
+   * @example "bfa6gea4f129076761dcba8ce5e1e406bd83af7b"
    */
   clientSecret: string
   /**
    * Token URL. This only needs to be set when using self hosted GitLab
+   *
+   * Max length 2048
+   *
+   * @example "https://gitlab.com/oauth/token"
    */
   tokenURL?: string
 }
@@ -10650,18 +11427,30 @@ export function fromWireJSONSchemaGrafanaAuthGitlab(w: any): JSONSchemaGrafanaAu
 export interface JSONSchemaGrafanaAuthGoogle {
   /**
    * Automatically sign-up users on successful sign-in
+   *
+   * @example false
    */
   allowSignUP?: boolean
   /**
    * Domains allowed to sign-in to this Grafana
+   *
+   * Max items 64
    */
   allowedDomains: string[]
   /**
    * Client ID from provider
+   *
+   * Max length 1024, Pattern `^[ -~]+$`
+   *
+   * @example "b1ba0bf54a4c2c0a1c29"
    */
   clientID: string
   /**
    * Client secret from provider
+   *
+   * Max length 1024, Pattern `^[ -~]+$`
+   *
+   * @example "bfa6gea4f129076761dcba8ce5e1e406bd83af7b"
    */
   clientSecret: string
 }
@@ -10694,34 +11483,66 @@ export function fromWireJSONSchemaGrafanaAuthGoogle(w: any): JSONSchemaGrafanaAu
 export interface JSONSchemaGrafanaDateFormats {
   /**
    * Default time zone for user preferences. Value 'browser' uses browser local time zone.
+   *
+   * Max length 64, Pattern `^([a-zA-Z_]+/){1,2}[a-zA-Z_-]+$|^(Etc/)?([Uu][Tt][Cc]|[Gg][Mm][Tt])([+-](\d){1,2})?$|^([Ff][Aa][Cc][Tt][Oo][Rr][Yy])$|^([Bb][Rr][Oo][Ww][Ss][Ee][Rr])$`
+   *
+   * @example "Europe/Helsinki"
    */
   defaultTimezone?: string
   /**
    * Moment.js style format string for cases where full date is shown
+   *
+   * Max length 128, Pattern `^(([Hh]mm(ss)?|Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Qo?|N{1,5}|YYYYYY|YYYYY|YYYY|YY|y{2,4}|yo?|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|kk?|mm?|ss?|S{1,9}|x|X|zz?|ZZ?|LTS|LT|LL?L?L?|l{1,4}|[-+/T,;.: ]?)*)$`
+   *
+   * @example "YYYY MM DD"
    */
   fullDate?: string
   /**
    * Moment.js style format string used when a time requiring day accuracy is shown
+   *
+   * Max length 128, Pattern `^(([Hh]mm(ss)?|Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Qo?|N{1,5}|YYYYYY|YYYYY|YYYY|YY|y{2,4}|yo?|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|kk?|mm?|ss?|S{1,9}|x|X|zz?|ZZ?|LTS|LT|LL?L?L?|l{1,4}|[-+/T,;.: ]?)*)$`
+   *
+   * @example "MM/DD"
    */
   intervalDay?: string
   /**
    * Moment.js style format string used when a time requiring hour accuracy is shown
+   *
+   * Max length 128, Pattern `^(([Hh]mm(ss)?|Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Qo?|N{1,5}|YYYYYY|YYYYY|YYYY|YY|y{2,4}|yo?|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|kk?|mm?|ss?|S{1,9}|x|X|zz?|ZZ?|LTS|LT|LL?L?L?|l{1,4}|[-+/T,;.: ]?)*)$`
+   *
+   * @example "MM/DD HH:mm"
    */
   intervalHour?: string
   /**
    * Moment.js style format string used when a time requiring minute accuracy is shown
+   *
+   * Max length 128, Pattern `^(([Hh]mm(ss)?|Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Qo?|N{1,5}|YYYYYY|YYYYY|YYYY|YY|y{2,4}|yo?|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|kk?|mm?|ss?|S{1,9}|x|X|zz?|ZZ?|LTS|LT|LL?L?L?|l{1,4}|[-+/T,;.: ]?)*)$`
+   *
+   * @example "HH:mm"
    */
   intervalMinute?: string
   /**
    * Moment.js style format string used when a time requiring month accuracy is shown
+   *
+   * Max length 128, Pattern `^(([Hh]mm(ss)?|Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Qo?|N{1,5}|YYYYYY|YYYYY|YYYY|YY|y{2,4}|yo?|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|kk?|mm?|ss?|S{1,9}|x|X|zz?|ZZ?|LTS|LT|LL?L?L?|l{1,4}|[-+/T,;.: ]?)*)$`
+   *
+   * @example "YYYY-MM"
    */
   intervalMonth?: string
   /**
    * Moment.js style format string used when a time requiring second accuracy is shown
+   *
+   * Max length 128, Pattern `^(([Hh]mm(ss)?|Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Qo?|N{1,5}|YYYYYY|YYYYY|YYYY|YY|y{2,4}|yo?|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|kk?|mm?|ss?|S{1,9}|x|X|zz?|ZZ?|LTS|LT|LL?L?L?|l{1,4}|[-+/T,;.: ]?)*)$`
+   *
+   * @example "HH:mm:ss"
    */
   intervalSecond?: string
   /**
    * Moment.js style format string used when a time requiring year accuracy is shown
+   *
+   * Max length 128, Pattern `^(([Hh]mm(ss)?|Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Qo?|N{1,5}|YYYYYY|YYYYY|YYYY|YY|y{2,4}|yo?|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|kk?|mm?|ss?|S{1,9}|x|X|zz?|ZZ?|LTS|LT|LL?L?L?|l{1,4}|[-+/T,;.: ]?)*)$`
+   *
+   * @example "YYYY"
    */
   intervalYear?: string
 }
@@ -10762,34 +11583,62 @@ export function fromWireJSONSchemaGrafanaDateFormats(w: any): JSONSchemaGrafanaD
 export interface JSONSchemaGrafanaSMTPServer {
   /**
    * Address used for sending emails
+   *
+   * Max length 319, Pattern `^[A-Za-z0-9_\-\.+'&]+@(([\da-zA-Z])([_\w-]{0,62})\.){0,127}(([\da-zA-Z])[_\w-]{0,61})?([\da-zA-Z]\.((xn\-\-[a-zA-Z\d]+)|([a-zA-Z\d]{2,})))$`
+   *
+   * @example "yourgrafanauser@yourdomain.example.com"
    */
   fromAddress: string
   /**
    * Name used in outgoing emails, defaults to Grafana
+   *
+   * Max length 128, Pattern `^[^\x00-\x1F]+$`
+   *
+   * @example "Company Grafana"
    */
   fromName?: string | null
   /**
    * Server hostname or IP
+   *
+   * Max length 255
+   *
+   * @example "smtp.example.com"
    */
   host: string
   /**
    * Password for SMTP authentication
+   *
+   * Max length 255, Pattern `^[^\x00-\x1F]+$`
+   *
+   * @example "ein0eemeev5eeth3Ahfu"
    */
   password?: string | null
   /**
    * SMTP server port
+   *
+   * Min 1, Max 65535
+   *
+   * @example 25
    */
   port: number
   /**
    * Skip verifying server certificate. Defaults to false
+   *
+   * @example "false"
    */
   skipVerify?: boolean
   /**
    * Either OpportunisticStartTLS, MandatoryStartTLS or NoStartTLS. Default is OpportunisticStartTLS.
+   *
+   * @example "NoStartTLS"
    */
   starttlsPolicy?: 'OpportunisticStartTLS' | 'MandatoryStartTLS' | 'NoStartTLS'
   /**
    * Username for SMTP authentication
+   *
+   * Max length 255, Pattern `^[^\x00-\x1F]+$`
+   *
+   * @example "smtpuser"
    */
   username?: string | null
 }
@@ -10830,22 +11679,34 @@ export function fromWireJSONSchemaGrafanaSMTPServer(w: any): JSONSchemaGrafanaSM
 export interface JSONSchemaGrafana {
   /**
    * Enable or disable Grafana legacy alerting functionality. This should not be enabled with unified_alerting_enabled.
+   *
+   * @example true
    */
   alertingEnabled?: boolean
   /**
    * Default error or timeout setting for new alerting rules
+   *
+   * @example "alerting"
    */
   alertingErrorORTimeout?: 'alerting' | 'keep_state'
   /**
    * Max number of alert annotations that Grafana stores. 0 (default) keeps all alert annotations.
+   *
+   * Min 0, Max 1000000
+   *
+   * @example 0
    */
   alertingMaxAnnotationsToKeep?: number
   /**
    * Default value for 'no data or null values' for new alerting rules
+   *
+   * @example "ok"
    */
   alertingNodataORNullvalues?: 'alerting' | 'no_data' | 'keep_state' | 'ok'
   /**
    * Allow embedding Grafana dashboards with iframe/frame/object/embed tags. Disabled by default to limit impact of clickjacking
+   *
+   * @example false
    */
   allowEmbedding?: boolean
   /**
@@ -10854,6 +11715,8 @@ export interface JSONSchemaGrafana {
   authAzuread?: JSONSchemaGrafanaAuthAzuread
   /**
    * Enable or disable basic authentication form, used by Grafana built-in login
+   *
+   * @example true
    */
   authBasicEnabled?: boolean
   /**
@@ -10874,30 +11737,52 @@ export interface JSONSchemaGrafana {
   authGoogle?: JSONSchemaGrafanaAuthGoogle
   /**
    * Cookie SameSite attribute: 'strict' prevents sending cookie for cross-site requests, effectively disabling direct linking from other sites to Grafana. 'lax' is the default value.
+   *
+   * @example "lax"
    */
   cookieSamesite?: 'lax' | 'strict' | 'none'
   /**
    * Serve the web frontend using a custom CNAME pointing to the Aiven DNS name
+   *
+   * Max length 255
+   *
+   * @example "grafana.example.org"
    */
   customDomain?: string | null
   /**
    * This feature is new in Grafana 9 and is quite resource intensive. It may cause low-end plans to work more slowly while the dashboard previews are rendering.
+   *
+   * @example false
    */
   dashboardPreviewsEnabled?: boolean
   /**
    * Signed sequence of decimal numbers, followed by a unit suffix (ms, s, m, h, d), e.g. 30s, 1h
+   *
+   * Max length 16, Pattern `^[0-9]+(ms|s|m|h|d)$`
+   *
+   * @example "5s"
    */
   dashboardsMinRefreshInterval?: string
   /**
    * Dashboard versions to keep per dashboard
+   *
+   * Min 1, Max 100
+   *
+   * @example 20
    */
   dashboardsVersionsToKeep?: number
   /**
    * Send 'X-Grafana-User' header to data source
+   *
+   * @example false
    */
   dataproxySendUserHeader?: boolean
   /**
    * Timeout for data proxy requests in seconds
+   *
+   * Min 15, Max 90
+   *
+   * @example 30
    */
   dataproxyTimeout?: number
   /**
@@ -10906,26 +11791,40 @@ export interface JSONSchemaGrafana {
   dateFormats?: JSONSchemaGrafanaDateFormats
   /**
    * Set to true to disable gravatar. Defaults to false (gravatar is enabled)
+   *
+   * @example false
    */
   disableGravatar?: boolean
   /**
    * Editors can manage folders, teams and dashboards created by them
+   *
+   * @example false
    */
   editorsCanAdmin?: boolean
   /**
    * Google Analytics ID
+   *
+   * Max length 64, Pattern `^(G|UA|YT|MO)-[a-zA-Z0-9-]+$`
+   *
+   * @example "UA-123456-4"
    */
   googleAnalyticsUAID?: string
   /**
    * Enable Grafana /metrics endpoint
+   *
+   * @example true
    */
   metricsEnabled?: boolean
   /**
    * Enforce user lookup based on email instead of the unique ID provided by the IdP
+   *
+   * @example false
    */
   oauthAllowInsecureEmailLookup?: boolean
   /**
    * Store logs for the service so that they are available in the HTTP API and console.
+   *
+   * @example true
    */
   serviceLog?: boolean | null
   /**
@@ -10934,22 +11833,32 @@ export interface JSONSchemaGrafana {
   smtpServer?: JSONSchemaGrafanaSMTPServer
   /**
    * Enable or disable Grafana unified alerting functionality. By default this is enabled and any legacy alerts will be migrated on upgrade to Grafana 9+. To stay on legacy alerting, set unified_alerting_enabled to false and alerting_enabled to true. See https://grafana.com/docs/grafana/latest/alerting/set-up/migrating-alerts/ for more details.
+   *
+   * @example true
    */
   unifiedAlertingEnabled?: boolean
   /**
    * Auto-assign new users on signup to main organization. Defaults to false
+   *
+   * @example false
    */
   userAutoAssignOrg?: boolean
   /**
    * Set role for new signups. Defaults to Viewer
+   *
+   * @example "Viewer"
    */
   userAutoAssignOrgRole?: 'Viewer' | 'Admin' | 'Editor'
   /**
    * Users with view-only permission can edit but not save dashboards
+   *
+   * @example false
    */
   viewersCanEdit?: boolean
   /**
    * Setting to enable/disable Write-Ahead Logging. The default value is false (disabled).
+   *
+   * @example false
    */
   wal?: boolean
 }
@@ -11065,22 +11974,36 @@ export function fromWireJSONSchemaGrafana(w: any): JSONSchemaGrafana {
 export interface JSONSchemaKafkaLogCleanupAndCompaction {
   /**
    * How long are delete records retained?
+   *
+   * Min 0, Max 315569260000
+   *
+   * @example 86400000
    */
   logCleanerDeleteRetentionMS?: number
   /**
    * The maximum amount of time message will remain uncompacted. Only applicable for logs that are being compacted
+   *
+   * Min 30000, Max 9223372036854776000
    */
   logCleanerMaxCompactionLagMS?: number
   /**
    * Controls log compactor frequency. Larger value means more frequent compactions but also more space wasted for logs. Consider setting log.cleaner.max.compaction.lag.ms to enforce compactions sooner, instead of setting a very high value for this option.
+   *
+   * Min 0.2, Max 0.9
+   *
+   * @example 0.5
    */
   logCleanerMinCleanableRatio?: number
   /**
    * The minimum time a message will remain uncompacted in the log. Only applicable for logs that are being compacted.
+   *
+   * Min 0, Max 9223372036854776000
    */
   logCleanerMinCompactionLagMS?: number
   /**
    * The default cleanup policy for segments beyond the retention window
+   *
+   * @example "delete"
    */
   logCleanupPolicy?: string
 }
@@ -11125,6 +12048,8 @@ export function fromWireJSONSchemaKafkaLogCleanupAndCompaction(
 export interface JSONSchemaKafka {
   /**
    * Enable auto creation of topics
+   *
+   * @example true
    */
   autoCreateTopicsEnable?: boolean
   /**
@@ -11133,22 +12058,40 @@ export interface JSONSchemaKafka {
   compressionType?: 'gzip' | 'snappy' | 'lz4' | 'zstd' | 'uncompressed' | 'producer'
   /**
    * Idle connections timeout: the server socket processor threads close the connections that idle for longer than this.
+   *
+   * Min 1000, Max 3600000
+   *
+   * @example 540000
    */
   connectionsMaxIdleMS?: number
   /**
    * Replication factor for autocreated topics
+   *
+   * Min 1, Max 10
    */
   defaultReplicationFactor?: number
   /**
    * The amount of time, in milliseconds, the group coordinator will wait for more consumers to join a new group before performing the first rebalance. A longer delay means potentially fewer rebalances, but increases the time until processing begins. The default value for this is 3 seconds. During development and testing it might be desirable to set this to 0 in order to not delay test execution time.
+   *
+   * Min 0, Max 300000
+   *
+   * @example 3000
    */
   groupInitialRebalanceDelayMS?: number
   /**
    * The maximum allowed session timeout for registered consumers. Longer timeouts give consumers more time to process messages in between heartbeats at the cost of a longer time to detect failures.
+   *
+   * Min 0, Max 1800000
+   *
+   * @example 1800000
    */
   groupMaxSessionTimeoutMS?: number
   /**
    * The minimum allowed session timeout for registered consumers. Longer timeouts give consumers more time to process messages in between heartbeats at the cost of a longer time to detect failures.
+   *
+   * Min 0, Max 60000
+   *
+   * @example 6000
    */
   groupMinSessionTimeoutMS?: number
   /**
@@ -11157,34 +12100,56 @@ export interface JSONSchemaKafka {
   logCleanupAndCompaction?: JSONSchemaKafkaLogCleanupAndCompaction
   /**
    * The number of messages accumulated on a log partition before messages are flushed to disk
+   *
+   * Min 1, Max 9223372036854776000
+   *
+   * @example 9223372036854776000
    */
   logFlushIntervalMessages?: number
   /**
    * The maximum time in ms that a message in any topic is kept in memory before flushed to disk. If not set, the value in log.flush.scheduler.interval.ms is used
+   *
+   * Min 0, Max 9223372036854776000
    */
   logFlushIntervalMS?: number
   /**
    * The interval with which Kafka adds an entry to the offset index
+   *
+   * Min 0, Max 104857600
+   *
+   * @example 4096
    */
   logIndexIntervalBytes?: number
   /**
    * The maximum size in bytes of the offset index
+   *
+   * Min 1048576, Max 104857600
+   *
+   * @example 10485760
    */
   logIndexSizeMaxBytes?: number
   /**
    * The maximum size of local log segments that can grow for a partition before it gets eligible for deletion. If set to -2, the value of log.retention.bytes is used. The effective value should always be less than or equal to log.retention.bytes value.
+   *
+   * Min -2, Max 9223372036854776000
    */
   logLocalRetentionBytes?: number
   /**
    * The number of milliseconds to keep the local log segments before it gets eligible for deletion. If set to -2, the value of log.retention.ms is used. The effective value should always be less than or equal to log.retention.ms value.
+   *
+   * Min -2, Max 9223372036854776000
    */
   logLocalRetentionMS?: number
   /**
    * This configuration controls whether down-conversion of message formats is enabled to satisfy consume requests.
+   *
+   * @example true
    */
   logMessageDownconversionEnable?: boolean
   /**
    * The maximum difference allowed between the timestamp when a broker receives a message and the timestamp specified in the message
+   *
+   * Min 0, Max 9223372036854776000
    */
   logMessageTimestampDifferenceMaxMS?: number
   /**
@@ -11193,102 +12158,166 @@ export interface JSONSchemaKafka {
   logMessageTimestampType?: 'CreateTime' | 'LogAppendTime'
   /**
    * Should pre allocate file when create new segment?
+   *
+   * @example false
    */
   logPreallocate?: boolean
   /**
    * The maximum size of the log before deleting messages
+   *
+   * Min -1, Max 9223372036854776000
    */
   logRetentionBytes?: number
   /**
    * The number of hours to keep a log file before deleting it
+   *
+   * Min -1, Max 2147483647
    */
   logRetentionHours?: number
   /**
    * The number of milliseconds to keep a log file before deleting it (in milliseconds), If not set, the value in log.retention.minutes is used. If set to -1, no time limit is applied.
+   *
+   * Min -1, Max 9223372036854776000
    */
   logRetentionMS?: number
   /**
    * The maximum jitter to subtract from logRollTimeMillis (in milliseconds). If not set, the value in log.roll.jitter.hours is used
+   *
+   * Min 0, Max 9223372036854776000
    */
   logRollJitterMS?: number
   /**
    * The maximum time before a new log segment is rolled out (in milliseconds).
+   *
+   * Min 1, Max 9223372036854776000
    */
   logRollMS?: number
   /**
    * The maximum size of a single log file
+   *
+   * Min 10485760, Max 1073741824
    */
   logSegmentBytes?: number
   /**
    * The amount of time to wait before deleting a file from the filesystem
+   *
+   * Min 0, Max 3600000
+   *
+   * @example 60000
    */
   logSegmentDeleteDelayMS?: number
   /**
    * The maximum number of connections allowed from each ip address (defaults to 2147483647).
+   *
+   * Min 256, Max 2147483647
    */
   maxConnectionsPerIP?: number
   /**
    * The maximum number of incremental fetch sessions that the broker will maintain.
+   *
+   * Min 1000, Max 10000
+   *
+   * @example 1000
    */
   maxIncrementalFetchSessionCacheSlots?: number
   /**
    * The maximum size of message that the server can receive.
+   *
+   * Min 0, Max 100001200
+   *
+   * @example 1048588
    */
   messageMaxBytes?: number
   /**
    * When a producer sets acks to 'all' (or '-1'), min.insync.replicas specifies the minimum number of replicas that must acknowledge a write for the write to be considered successful.
+   *
+   * Min 1, Max 7
+   *
+   * @example 1
    */
   minInsyncReplicas?: number
   /**
    * Number of partitions for autocreated topics
+   *
+   * Min 1, Max 1000
    */
   numPartitions?: number
   /**
    * Log retention window in minutes for offsets topic
+   *
+   * Min 1, Max 2147483647
+   *
+   * @example 10080
    */
   offsetsRetentionMinutes?: number
   /**
    * The purge interval (in number of requests) of the producer request purgatory(defaults to 1000).
+   *
+   * Min 10, Max 10000
    */
   producerPurgatoryPurgeIntervalRequests?: number
   /**
    * The number of bytes of messages to attempt to fetch for each partition (defaults to 1048576). This is not an absolute maximum, if the first record batch in the first non-empty partition of the fetch is larger than this value, the record batch will still be returned to ensure that progress can be made.
+   *
+   * Min 1048576, Max 104857600
    */
   replicaFetchMaxBytes?: number
   /**
    * Maximum bytes expected for the entire fetch response (defaults to 10485760). Records are fetched in batches, and if the first record batch in the first non-empty partition of the fetch is larger than this value, the record batch will still be returned to ensure that progress can be made. As such, this is not an absolute maximum.
+   *
+   * Min 10485760, Max 1048576000
    */
   replicaFetchResponseMaxBytes?: number
   /**
    * The (optional) comma-delimited setting for the broker to use to verify that the JWT was issued for one of the expected audiences.
+   *
+   * Max length 128, Pattern `^[^\r\n]*$`
    */
   saslOauthbearerExpectedAudience?: string
   /**
    * Optional setting for the broker to use to verify that the JWT was created by the expected issuer.
+   *
+   * Max length 128, Pattern `^[^\r\n]*$`
    */
   saslOauthbearerExpectedIssuer?: string
   /**
    * OIDC JWKS endpoint URL. By setting this the SASL SSL OAuth2/OIDC authentication is enabled. See also other options for SASL OAuth2/OIDC.
+   *
+   * Max length 2048
    */
   saslOauthbearerJwksEndpointURL?: string
   /**
    * Name of the scope from which to extract the subject claim from the JWT. Defaults to sub.
+   *
+   * Max length 128, Pattern `^[^\r\n]*$`
    */
   saslOauthbearerSubClaimName?: string
   /**
    * The maximum number of bytes in a socket request (defaults to 104857600).
+   *
+   * Min 10485760, Max 209715200
    */
   socketRequestMaxBytes?: number
   /**
    * Enable verification that checks that the partition has been added to the transaction before writing transactional records to the partition
+   *
+   * @example true
    */
   transactionPartitionVerificationEnable?: boolean
   /**
    * The interval at which to remove transactions that have expired due to transactional.id.expiration.ms passing (defaults to 3600000 (1 hour)).
+   *
+   * Min 600000, Max 3600000
+   *
+   * @example 3600000
    */
   transactionRemoveExpiredTransactionCleanupIntervalMS?: number
   /**
    * The transaction topic segment bytes should be kept relatively small in order to facilitate faster log compaction and cache loads (defaults to 104857600 (100 mebibytes)).
+   *
+   * Min 1048576, Max 2147483647
+   *
+   * @example 104857600
    */
   transactionStateLogSegmentBytes?: number
 }
@@ -11460,6 +12489,10 @@ export interface JSONSchemaKafkaConnect {
   consumerAutoOffsetReset?: 'earliest' | 'latest'
   /**
    * Records are fetched in batches by the consumer, and if the first record batch in the first non-empty partition of the fetch is larger than this value, the record batch will still be returned to ensure that the consumer can make progress. As such, this is not a absolute maximum.
+   *
+   * Min 1048576, Max 104857600
+   *
+   * @example 52428800
    */
   consumerFetchMaxBytes?: number
   /**
@@ -11468,30 +12501,58 @@ export interface JSONSchemaKafkaConnect {
   consumerIsolationLevel?: 'read_uncommitted' | 'read_committed'
   /**
    * Records are fetched in batches by the consumer.If the first record batch in the first non-empty partition of the fetch is larger than this limit, the batch will still be returned to ensure that the consumer can make progress.
+   *
+   * Min 1048576, Max 104857600
+   *
+   * @example 1048576
    */
   consumerMaxPartitionFetchBytes?: number
   /**
    * The maximum delay in milliseconds between invocations of poll() when using consumer group management (defaults to 300000).
+   *
+   * Min 1, Max 2147483647
+   *
+   * @example 300000
    */
   consumerMaxPollIntervalMS?: number
   /**
    * The maximum number of records returned in a single call to poll() (defaults to 500).
+   *
+   * Min 1, Max 10000
+   *
+   * @example 500
    */
   consumerMaxPollRecords?: number
   /**
    * The interval at which to try committing offsets for tasks (defaults to 60000).
+   *
+   * Min 1, Max 100000000
+   *
+   * @example 60000
    */
   offsetFlushIntervalMS?: number
   /**
    * Maximum number of milliseconds to wait for records to flush and partition offset data to be committed to offset storage before cancelling the process and restoring the offset data to be committed in a future attempt (defaults to 5000).
+   *
+   * Min 1, Max 2147483647
+   *
+   * @example 5000
    */
   offsetFlushTimeoutMS?: number
   /**
    * This setting gives the upper bound of the batch size to be sent. If there are fewer than this many bytes accumulated for this partition, the producer will 'linger' for the linger.ms time waiting for more records to show up. A batch size of zero will disable batching entirely (defaults to 16384).
+   *
+   * Min 0, Max 5242880
+   *
+   * @example 1024
    */
   producerBatchSize?: number
   /**
    * The total bytes of memory the producer can use to buffer records waiting to be sent to the broker (defaults to 33554432).
+   *
+   * Min 5242880, Max 134217728
+   *
+   * @example 8388608
    */
   producerBufferMemory?: number
   /**
@@ -11500,18 +12561,34 @@ export interface JSONSchemaKafkaConnect {
   producerCompressionType?: 'gzip' | 'snappy' | 'lz4' | 'zstd' | 'none'
   /**
    * This setting gives the upper bound on the delay for batching: once there is batch.size worth of records for a partition it will be sent immediately regardless of this setting, however if there are fewer than this many bytes accumulated for this partition the producer will 'linger' for the specified time waiting for more records to show up. Defaults to 0.
+   *
+   * Min 0, Max 5000
+   *
+   * @example 100
    */
   producerLingerMS?: number
   /**
    * This setting will limit the number of record batches the producer will send in a single request to avoid sending huge requests.
+   *
+   * Min 131072, Max 67108864
+   *
+   * @example 1048576
    */
   producerMaxRequestSize?: number
   /**
    * The maximum delay that is scheduled in order to wait for the return of one or more departed workers before rebalancing and reassigning their connectors and tasks to the group. During this period the connectors and tasks of the departed workers remain unassigned. Defaults to 5 minutes.
+   *
+   * Min 0, Max 600000
+   *
+   * @example 300000
    */
   scheduledRebalanceMaxDelayMS?: number
   /**
    * The timeout in milliseconds used to detect failures when using Kafka’s group management facilities (defaults to 10000).
+   *
+   * Min 1, Max 2147483647
+   *
+   * @example 10000
    */
   sessionTimeoutMS?: number
 }
@@ -11588,26 +12665,40 @@ export function fromWireJSONSchemaKafkaConnect(w: any): JSONSchemaKafkaConnect {
 export interface JSONSchemaKafkaRest {
   /**
    * If true the consumer's offset will be periodically committed to Kafka in the background
+   *
+   * @defaultValue true
    */
   consumerEnableAutoCommit?: boolean
   /**
    * Maximum number of bytes in unencoded message keys and values by a single request
+   *
+   * Min 0, Max 671088640
+   *
+   * @defaultValue 67108864
    */
   consumerRequestMaxBytes?: number
   /**
    * The maximum total time to wait for messages for a request if the maximum number of messages has not yet been reached
+   *
+   * @defaultValue 1000
    */
   consumerRequestTimeoutMS?: 1000 | 15000 | 30000
   /**
    * Name strategy to use when selecting subject for storing schemas
+   *
+   * @defaultValue "topic_name"
    */
   nameStrategy?: 'topic_name' | 'record_name' | 'topic_record_name'
   /**
    * If true, validate that given schema is registered under expected subject name by the used name strategy when producing messages.
+   *
+   * @defaultValue true
    */
   nameStrategyValidation?: boolean
   /**
    * The number of acknowledgments the producer requires the leader to have received before considering a request complete. If set to 'all' or '-1', the leader will wait for the full set of in-sync replicas to acknowledge the record.
+   *
+   * @defaultValue "1"
    */
   producerAcks?: string
   /**
@@ -11616,14 +12707,26 @@ export interface JSONSchemaKafkaRest {
   producerCompressionType?: 'gzip' | 'snappy' | 'lz4' | 'zstd' | 'none'
   /**
    * Wait for up to the given delay to allow batching records together
+   *
+   * Min 0, Max 5000
+   *
+   * @defaultValue 0
    */
   producerLingerMS?: number
   /**
    * The maximum size of a request in bytes. Note that Kafka broker can also cap the record batch size.
+   *
+   * Min 0, Max 2147483647
+   *
+   * @defaultValue 1048576
    */
   producerMaxRequestSize?: number
   /**
    * Maximum number of SimpleConsumers that can be instantiated per broker
+   *
+   * Min 10, Max 250
+   *
+   * @defaultValue 25
    */
   simpleconsumerPoolSizeMax?: number
 }
@@ -11680,126 +12783,238 @@ export function fromWireJSONSchemaKafkaRest(w: any): JSONSchemaKafkaRest {
 export interface JSONSchemaMysql {
   /**
    * The number of seconds that the mysqld server waits for a connect packet before responding with Bad handshake
+   *
+   * Min 2, Max 3600
+   *
+   * @example 10
    */
   connectTimeout?: number
   /**
    * Default server time zone as an offset from UTC (from -12:00 to +12:00), a time zone name, or 'SYSTEM' to use the MySQL server default.
+   *
+   * Length 2-100, Pattern `^([-+][\d:]*|[\w/]*)$`
+   *
+   * @example "+03:00"
    */
   defaultTimeZone?: string
   /**
    * The maximum permitted result length in bytes for the GROUP_CONCAT() function.
+   *
+   * Min 4, Max 18446744073709552000
+   *
+   * @example 1024
    */
   groupConcatMaxLen?: number
   /**
    * The time, in seconds, before cached statistics expire
+   *
+   * Min 900, Max 31536000
+   *
+   * @example 86400
    */
   informationSchemaStatsExpiry?: number
   /**
    * Maximum size for the InnoDB change buffer, as a percentage of the total size of the buffer pool. Default is 25
+   *
+   * Min 0, Max 50
+   *
+   * @example 30
    */
   innodbChangeBufferMaxSize?: number
   /**
    * Specifies whether flushing a page from the InnoDB buffer pool also flushes other dirty pages in the same extent (default is 1): 0 - dirty pages in the same extent are not flushed, 1 - flush contiguous dirty pages in the same extent, 2 - flush dirty pages in the same extent
+   *
+   * Min 0, Max 2
+   *
+   * @example 0
    */
   innodbFlushNeighbors?: number
   /**
    * Minimum length of words that are stored in an InnoDB FULLTEXT index. Changing this parameter will lead to a restart of the MySQL service.
+   *
+   * Min 0, Max 16
+   *
+   * @example 3
    */
   innodbFTMinTokenSize?: number
   /**
    * This option is used to specify your own InnoDB FULLTEXT index stopword list for all InnoDB tables.
+   *
+   * Max length 1024, Pattern `^.+/.+$`
+   *
+   * @example "db_name/table_name"
    */
   innodbFTServerStopwordTable?: string | null
   /**
    * The length of time in seconds an InnoDB transaction waits for a row lock before giving up. Default is 120.
+   *
+   * Min 1, Max 3600
+   *
+   * @example 50
    */
   innodbLockWaitTimeout?: number
   /**
    * The size in bytes of the buffer that InnoDB uses to write to the log files on disk.
+   *
+   * Min 1048576, Max 4294967295
+   *
+   * @example 16777216
    */
   innodbLogBufferSize?: number
   /**
    * The upper limit in bytes on the size of the temporary log files used during online DDL operations for InnoDB tables.
+   *
+   * Min 65536, Max 1099511627776
+   *
+   * @example 134217728
    */
   innodbOnlineAlterLogMaxSize?: number
   /**
    * When enabled, information about all deadlocks in InnoDB user transactions is recorded in the error log. Disabled by default.
+   *
+   * @example true
    */
   innodbPrintAllDeadlocks?: boolean
   /**
    * The number of I/O threads for read operations in InnoDB. Default is 4. Changing this parameter will lead to a restart of the MySQL service.
+   *
+   * Min 1, Max 64
+   *
+   * @example 10
    */
   innodbReadIoThreads?: number
   /**
    * When enabled a transaction timeout causes InnoDB to abort and roll back the entire transaction. Changing this parameter will lead to a restart of the MySQL service.
+   *
+   * @example true
    */
   innodbRollbackOnTimeout?: boolean
   /**
    * Defines the maximum number of threads permitted inside of InnoDB. Default is 0 (infinite concurrency - no limit)
+   *
+   * Min 0, Max 1000
+   *
+   * @example 10
    */
   innodbThreadConcurrency?: number
   /**
    * The number of I/O threads for write operations in InnoDB. Default is 4. Changing this parameter will lead to a restart of the MySQL service.
+   *
+   * Min 1, Max 64
+   *
+   * @example 10
    */
   innodbWriteIoThreads?: number
   /**
    * The number of seconds the server waits for activity on an interactive connection before closing it.
+   *
+   * Min 30, Max 604800
+   *
+   * @example 3600
    */
   interactiveTimeout?: number
   /**
    * The storage engine for in-memory internal temporary tables.
+   *
+   * @example "TempTable"
    */
   internalTmpMemStorageEngine?: 'TempTable' | 'MEMORY'
   /**
    * The slow log output destination when slow_query_log is ON. To enable MySQL AI Insights, choose INSIGHTS. To use MySQL AI Insights and the mysql.slow_log table at the same time, choose INSIGHTS,TABLE. To only use the mysql.slow_log table, choose TABLE. To silence slow logs, choose NONE.
+   *
+   * @example "INSIGHTS"
    */
   logOutput?: string
   /**
    * The slow_query_logs work as SQL statements that take more than long_query_time seconds to execute. Default is 10s
+   *
+   * Min 0, Max 3600
+   *
+   * @example 10
    */
   longQueryTime?: number
   /**
    * Size of the largest message in bytes that can be received by the server. Default is 67108864 (64M)
+   *
+   * Min 102400, Max 1073741824
+   *
+   * @example 67108864
    */
   maxAllowedPacket?: number
   /**
    * Limits the size of internal in-memory tables. Also set tmp_table_size. Default is 16777216 (16M)
+   *
+   * Min 1048576, Max 1073741824
+   *
+   * @example 16777216
    */
   maxHeapTableSize?: number
   /**
    * Start sizes of connection buffer and result buffer. Default is 16384 (16K). Changing this parameter will lead to a restart of the MySQL service.
+   *
+   * Min 1024, Max 1048576
+   *
+   * @example 16384
    */
   netBufferLength?: number
   /**
    * The number of seconds to wait for more data from a connection before aborting the read.
+   *
+   * Min 1, Max 3600
+   *
+   * @example 30
    */
   netReadTimeout?: number
   /**
    * The number of seconds to wait for a block to be written to a connection before aborting the write.
+   *
+   * Min 1, Max 3600
+   *
+   * @example 30
    */
   netWriteTimeout?: number
   /**
    * Slow query log enables capturing of slow queries. Setting slow_query_log to false also truncates the mysql.slow_log table. Default is off
+   *
+   * @example true
    */
   slowQueryLog?: boolean
   /**
    * Sort buffer size in bytes for ORDER BY optimization. Default is 262144 (256K)
+   *
+   * Min 32768, Max 1073741824
+   *
+   * @example 262144
    */
   sortBufferSize?: number
   /**
    * Global SQL mode. Set to empty to use MySQL server defaults. When creating a new service and not setting this field Aiven default SQL mode (strict, SQL standard compliant) will be assigned.
+   *
+   * Max length 1024, Pattern `^[A-Z_]*(,[A-Z_]+)*$`
+   *
+   * @example "ANSI,TRADITIONAL"
    */
   sqlMode?: string
   /**
    * Require primary key to be defined for new tables or old tables modified with ALTER TABLE and fail if missing. It is recommended to always have primary keys because various functionality may break if any large table is missing them.
+   *
+   * @example true
    */
   sqlRequirePrimaryKey?: boolean
   /**
    * Limits the size of internal in-memory tables. Also set max_heap_table_size. Default is 16777216 (16M)
+   *
+   * Min 1048576, Max 1073741824
+   *
+   * @example 16777216
    */
   tmpTableSize?: number
   /**
    * The number of seconds the server waits for activity on a noninteractive connection before closing it.
+   *
+   * Min 1, Max 2147483
+   *
+   * @example 28800
    */
   waitTimeout?: number
 }
@@ -11906,30 +13121,58 @@ export function fromWireJSONSchemaMysql(w: any): JSONSchemaMysql {
 export interface JSONSchemaOpensearchAuthFailureListenersInternalAuthenticationBackendLimiting {
   /**
    * The number of login attempts allowed before login is blocked
+   *
+   * Min 0, Max 2147483647
+   *
+   * @example 10
    */
   allowedTries?: number
   /**
    * The internal backend. Enter `internal`
+   *
+   * Max length 1024
+   *
+   * @example "internal"
    */
   authenticationBackend?: 'internal'
   /**
    * The duration of time that login remains blocked after a failed login
+   *
+   * Min 0, Max 2147483647
+   *
+   * @example 600
    */
   blockExpirySeconds?: number
   /**
    * The maximum number of blocked IP addresses
+   *
+   * Min 0, Max 2147483647
+   *
+   * @example 100000
    */
   maxBlockedClients?: number
   /**
    * The maximum number of tracked IP addresses that have failed login
+   *
+   * Min 0, Max 2147483647
+   *
+   * @example 100000
    */
   maxTrackedClients?: number
   /**
    * The window of time in which the value for `allowed_tries` is enforced
+   *
+   * Min 0, Max 2147483647
+   *
+   * @example 3600
    */
   timeWindowSeconds?: number
   /**
    * The type of rate limiting
+   *
+   * Max length 1024
+   *
+   * @example "username"
    */
   type?: 'username'
 }
@@ -11971,26 +13214,50 @@ export function fromWireJSONSchemaOpensearchAuthFailureListenersInternalAuthenti
 export interface JSONSchemaOpensearchAuthFailureListenersIPRateLimiting {
   /**
    * The number of login attempts allowed before login is blocked
+   *
+   * Min 1, Max 2147483647
+   *
+   * @example 10
    */
   allowedTries?: number
   /**
    * The duration of time that login remains blocked after a failed login
+   *
+   * Min 1, Max 36000
+   *
+   * @example 600
    */
   blockExpirySeconds?: number
   /**
    * The maximum number of blocked IP addresses
+   *
+   * Min 0, Max 2147483647
+   *
+   * @example 100000
    */
   maxBlockedClients?: number
   /**
    * The maximum number of tracked IP addresses that have failed login
+   *
+   * Min 0, Max 2147483647
+   *
+   * @example 100000
    */
   maxTrackedClients?: number
   /**
    * The window of time in which the value for `allowed_tries` is enforced
+   *
+   * Min 1, Max 36000
+   *
+   * @example 3600
    */
   timeWindowSeconds?: number
   /**
    * The type of rate limiting
+   *
+   * Max length 1024
+   *
+   * @example "ip"
    */
   type?: 'ip'
 }
@@ -12077,14 +13344,26 @@ export function fromWireJSONSchemaOpensearchAuthFailureListeners(
 export interface JSONSchemaOpensearchEmailSender {
   /**
    * This should be identical to the Sender name defined in Opensearch dashboards
+   *
+   * Max length 40, Pattern `^[a-zA-Z0-9-_]+$`
+   *
+   * @example "alert-sender"
    */
   emailSenderName: string
   /**
    * Sender password for Opensearch alerts to authenticate with SMTP server
+   *
+   * Max length 1024, Pattern `^[^\x00-\x1F]+$`
+   *
+   * @example "very-secure-mail-password"
    */
   emailSenderPassword: string
   /**
    * Sender username for Opensearch alerts
+   *
+   * Max length 320, Pattern `^[^\x00-\x1F]+$`
+   *
+   * @example "jane@example.com"
    */
   emailSenderUsername: string
 }
@@ -12115,26 +13394,52 @@ export function fromWireJSONSchemaOpensearchEmailSender(w: any): JSONSchemaOpens
 export interface JSONSchemaOpensearchIsmHistory {
   /**
    * Specifies whether ISM is enabled or not
+   *
+   * @defaultValue true
+   * @example true
    */
   ismEnabled: boolean
   /**
    * Specifies whether audit history is enabled or not. The logs from ISM are automatically indexed to a logs document.
+   *
+   * @defaultValue true
+   * @example true
    */
   ismHistoryEnabled?: boolean
   /**
    * The maximum age before rolling over the audit history index in hours
+   *
+   * Min 1, Max 2147483647
+   *
+   * @defaultValue 24
+   * @example 24
    */
   ismHistoryMaxAge?: number
   /**
    * The maximum number of documents before rolling over the audit history index.
+   *
+   * Min 1, Max 9223372036854776000
+   *
+   * @defaultValue 2500000
+   * @example 2500000
    */
   ismHistoryMaxDocs?: number
   /**
    * The time between rollover checks for the audit history index in hours.
+   *
+   * Min 1, Max 2147483647
+   *
+   * @defaultValue 8
+   * @example 8
    */
   ismHistoryRolloverCheckPeriod?: number
   /**
    * How long audit history indices are kept in days.
+   *
+   * Min 1, Max 2147483647
+   *
+   * @defaultValue 30
+   * @example 30
    */
   ismHistoryRolloverRetentionPeriod?: number
 }
@@ -12175,14 +13480,20 @@ export function fromWireJSONSchemaOpensearchIsmHistory(w: any): JSONSchemaOpense
 export interface JSONSchemaOpensearchSearchBackpressureNodeDuress {
   /**
    * The CPU usage threshold (as a percentage) required for a node to be considered to be under duress. Default is 0.9
+   *
+   * Min 0, Max 1
    */
   cpuThreshold?: number
   /**
    * The heap usage threshold (as a percentage) required for a node to be considered to be under duress. Default is 0.7
+   *
+   * Min 0, Max 1
    */
   heapThreshold?: number
   /**
    * The number of successive limit breaches after which the node is considered to be under duress. Default is 3
+   *
+   * Min 1
    */
   numSuccessiveBreaches?: number
 }
@@ -12216,38 +13527,56 @@ export function fromWireJSONSchemaOpensearchSearchBackpressureNodeDuress(
 export interface JSONSchemaOpensearchSearchBackpressureSearchShardTask {
   /**
    * The maximum number of search tasks to cancel in a single iteration of the observer thread. Default is 10.0
+   *
+   * Min 1
    */
   cancellationBurst?: number
   /**
    * The maximum number of tasks to cancel per millisecond of elapsed time. Default is 0.003
+   *
+   * Min 0
    */
   cancellationRate?: number
   /**
    * The maximum number of tasks to cancel, as a percentage of successful task completions. Default is 0.1
+   *
+   * Min 0, Max 1
    */
   cancellationRatio?: number
   /**
    * The CPU usage threshold (in milliseconds) required for a single search shard task before it is considered for cancellation. Default is 15000
+   *
+   * Min 0
    */
   cpuTimeMillisThreshold?: number
   /**
    * The elapsed time threshold (in milliseconds) required for a single search shard task before it is considered for cancellation. Default is 30000
+   *
+   * Min 0
    */
   elapsedTimeMillisThreshold?: number
   /**
    * The number of previously completed search shard tasks to consider when calculating the rolling average of heap usage. Default is 100
+   *
+   * Min 0
    */
   heapMovingAverageWindowSize?: number
   /**
    * The heap usage threshold (as a percentage) required for a single search shard task before it is considered for cancellation. Default is 0.5
+   *
+   * Min 0, Max 1
    */
   heapPercentThreshold?: number
   /**
    * The minimum variance required for a single search shard task’s heap usage compared to the rolling average of previously completed tasks before it is considered for cancellation. Default is 2.0
+   *
+   * Min 0
    */
   heapVariance?: number
   /**
    * The heap usage threshold (as a percentage) required for the sum of heap usages of all search shard tasks before cancellation is applied. Default is 0.5
+   *
+   * Min 0, Max 1
    */
   totalHeapPercentThreshold?: number
 }
@@ -12301,38 +13630,56 @@ export function fromWireJSONSchemaOpensearchSearchBackpressureSearchShardTask(
 export interface JSONSchemaOpensearchSearchBackpressureSearchTask {
   /**
    * The maximum number of search tasks to cancel in a single iteration of the observer thread. Default is 5.0
+   *
+   * Min 1
    */
   cancellationBurst?: number
   /**
    * The maximum number of search tasks to cancel per millisecond of elapsed time. Default is 0.003
+   *
+   * Min 0
    */
   cancellationRate?: number
   /**
    * The maximum number of search tasks to cancel, as a percentage of successful search task completions. Default is 0.1
+   *
+   * Min 0, Max 1
    */
   cancellationRatio?: number
   /**
    * The CPU usage threshold (in milliseconds) required for an individual parent task before it is considered for cancellation. Default is 30000
+   *
+   * Min 0
    */
   cpuTimeMillisThreshold?: number
   /**
    * The elapsed time threshold (in milliseconds) required for an individual parent task before it is considered for cancellation. Default is 45000
+   *
+   * Min 0
    */
   elapsedTimeMillisThreshold?: number
   /**
    * The window size used to calculate the rolling average of the heap usage for the completed parent tasks. Default is 10
+   *
+   * Min 0
    */
   heapMovingAverageWindowSize?: number
   /**
    * The heap usage threshold (as a percentage) required for an individual parent task before it is considered for cancellation. Default is 0.2
+   *
+   * Min 0, Max 1
    */
   heapPercentThreshold?: number
   /**
    * The heap usage variance required for an individual parent task before it is considered for cancellation. A task is considered for cancellation when taskHeapUsage is greater than or equal to heapUsageMovingAverage * variance. Default is 2.0
+   *
+   * Min 0
    */
   heapVariance?: number
   /**
    * The heap usage threshold (as a percentage) required for the sum of heap usages of all search tasks before cancellation is applied. Default is 0.5
+   *
+   * Min 0, Max 1
    */
   totalHeapPercentThreshold?: number
 }
@@ -12442,14 +13789,20 @@ export function fromWireJSONSchemaOpensearchSearchBackpressure(
 export interface JSONSchemaOpensearchShardIndexingPressureOperatingFactor {
   /**
    * Specify the lower occupancy limit of the allocated quota of memory for the shard. If the total memory usage of a shard is below this limit, shard indexing backpressure decreases the current allocated memory for that shard. Default is 0.75
+   *
+   * Min 0
    */
   lower?: number
   /**
    * Specify the optimal occupancy of the allocated quota of memory for the shard. If the total memory usage of a shard is at this level, shard indexing backpressure doesn’t change the current allocated memory for that shard. Default is 0.85
+   *
+   * Min 0
    */
   optimal?: number
   /**
    * Specify the upper occupancy limit of the allocated quota of memory for the shard. If the total memory usage of a shard is above this limit, shard indexing backpressure increases the current allocated memory for that shard. Default is 0.95
+   *
+   * Min 0
    */
   upper?: number
 }
@@ -12479,6 +13832,8 @@ export function fromWireJSONSchemaOpensearchShardIndexingPressureOperatingFactor
 export interface JSONSchemaOpensearchShardIndexingPressurePrimaryParameterNode {
   /**
    * Define the percentage of the node-level memory threshold that acts as a soft indicator for strain on a node. Default is 0.7
+   *
+   * Min 0
    */
   softLimit?: number
 }
@@ -12504,6 +13859,8 @@ export function fromWireJSONSchemaOpensearchShardIndexingPressurePrimaryParamete
 export interface JSONSchemaOpensearchShardIndexingPressurePrimaryParameterShard {
   /**
    * Specify the minimum assigned quota for a new shard in any role (coordinator, primary, or replica). Shard indexing backpressure increases or decreases this allocated quota based on the inflow of traffic for the shard. Default is 0.001
+   *
+   * Min 0
    */
   minLimit?: number
 }
@@ -12622,10 +13979,14 @@ export function fromWireJSONSchemaOpensearchShardIndexingPressure(
 export interface JSONSchemaOpensearch {
   /**
    * Explicitly allow or block automatic creation of indices. Defaults to true
+   *
+   * @example false
    */
   actionAutoCreateIndexEnabled?: boolean
   /**
    * Require explicit index names when deleting
+   *
+   * @example true
    */
   actionDestructiveRequiresName?: boolean | null
   /**
@@ -12634,10 +13995,16 @@ export interface JSONSchemaOpensearch {
   authFailureListeners?: JSONSchemaOpensearchAuthFailureListeners
   /**
    * Controls the number of shards allowed in the cluster per data node
+   *
+   * Min 100, Max 10000
+   *
+   * @example 1000
    */
   clusterMaxShardsPerNode?: number
   /**
    * How many concurrent incoming/outgoing shard recoveries (normally replicas) are allowed to happen on a node. Defaults to 2.
+   *
+   * Min 2, Max 16
    */
   clusterRoutingAllocationNodeConcurrentRecoveries?: number
   /**
@@ -12646,50 +14013,79 @@ export interface JSONSchemaOpensearch {
   emailSender?: JSONSchemaOpensearchEmailSender
   /**
    * Enable/Disable security audit
+   *
+   * @defaultValue false
+   * @example true
    */
   enableSecurityAudit?: boolean
   /**
    * Maximum content length for HTTP requests to the OpenSearch HTTP API, in bytes.
+   *
+   * Min 1, Max 2147483647
    */
   httpMaxContentLength?: number
   /**
    * The max size of allowed headers, in bytes
+   *
+   * Min 1024, Max 262144
+   *
+   * @example 8192
    */
   httpMaxHeaderSize?: number
   /**
    * The max length of an HTTP URL, in bytes
+   *
+   * Min 1024, Max 65536
+   *
+   * @example 4096
    */
   httpMaxInitialLineLength?: number
   /**
    * Relative amount. Maximum amount of heap memory used for field data cache. This is an expert setting; decreasing the value too much will increase overhead of loading field data; too much memory used for field data cache will decrease amount of heap available for other operations.
+   *
+   * Min 3, Max 100
    */
   indicesFielddataCacheSize?: number | null
   /**
    * Percentage value. Default is 10%. Total amount of heap used for indexing buffer, before writing segments to disk. This is an expert setting. Too low value will slow down indexing; too high value will increase indexing performance but causes performance issues for query performance.
+   *
+   * Min 3, Max 40
    */
   indicesMemoryIndexBufferSize?: number
   /**
    * Absolute value. Default is unbound. Doesn't work without indices.memory.index_buffer_size. Maximum amount of heap used for query cache, an absolute indices.memory.index_buffer_size maximum hard limit.
+   *
+   * Min 3, Max 2048
    */
   indicesMemoryMaxIndexBufferSize?: number
   /**
    * Absolute value. Default is 48mb. Doesn't work without indices.memory.index_buffer_size. Minimum amount of heap used for query cache, an absolute indices.memory.index_buffer_size minimal hard limit.
+   *
+   * Min 3, Max 2048
    */
   indicesMemoryMinIndexBufferSize?: number
   /**
    * Percentage value. Default is 10%. Maximum amount of heap used for query cache. This is an expert setting. Too low value will decrease query performance and increase performance for other operations; too high value will cause issues with other OpenSearch functionality.
+   *
+   * Min 3, Max 40
    */
   indicesQueriesCacheSize?: number
   /**
    * Maximum number of clauses Lucene BooleanQuery can have. The default value (1024) is relatively high, and increasing it may cause performance issues. Investigate other approaches first before increasing this value.
+   *
+   * Min 64, Max 4096
    */
   indicesQueryBoolMaxClauseCount?: number
   /**
    * Limits total inbound and outbound recovery traffic for each node. Applies to both peer recoveries as well as snapshot recoveries (i.e., restores from a snapshot). Defaults to 40mb
+   *
+   * Min 40, Max 400
    */
   indicesRecoveryMaxBytesPerSec?: number
   /**
    * Number of file chunks sent in parallel for each recovery. Defaults to 2.
+   *
+   * Min 2, Max 5
    */
   indicesRecoveryMaxConcurrentFileChunks?: number
   /**
@@ -12698,26 +14094,42 @@ export interface JSONSchemaOpensearch {
   ismHistory?: JSONSchemaOpensearchIsmHistory
   /**
    * Enable or disable KNN memory circuit breaker. Defaults to true.
+   *
+   * @example true
    */
   knnMemoryCircuitBreakerEnabled?: boolean
   /**
    * Maximum amount of memory that can be used for KNN index. Defaults to 50% of the JVM heap size.
+   *
+   * Min 3, Max 100
+   *
+   * @example 50
    */
   knnMemoryCircuitBreakerLimit?: number
   /**
    * Compatibility mode sets OpenSearch to report its version as 7.10 so clients continue to work. Default is false
+   *
+   * @example true
    */
   overrideMainResponseVersion?: boolean
   /**
    * Enable or disable filtering of alerting by backend roles. Requires Security plugin. Defaults to false
+   *
+   * @example false
    */
   pluginsAlertingFilterByBackendRoles?: boolean
   /**
    * Whitelisted addresses for reindexing. Changing this value will cause all OpenSearch instances to restart.
+   *
+   * Max items 32
    */
   reindexRemoteWhitelist?: string[] | null
   /**
    * Script compilation circuit breaker limits the number of inline script compilations within a period of time. Default is use-context
+   *
+   * Max length 1024
+   *
+   * @example "75/5m"
    */
   scriptMaxCompilationsRate?: string
   /**
@@ -12726,6 +14138,10 @@ export interface JSONSchemaOpensearch {
   searchBackpressure?: JSONSchemaOpensearchSearchBackpressure
   /**
    * Maximum number of aggregation buckets allowed in a single response. OpenSearch default value is used when this is not defined.
+   *
+   * Min 1, Max 1000000
+   *
+   * @example 10000
    */
   searchMaxBuckets?: number | null
   /**
@@ -12734,46 +14150,68 @@ export interface JSONSchemaOpensearch {
   shardIndexingPressure?: JSONSchemaOpensearchShardIndexingPressure
   /**
    * Size for the thread pool queue. See documentation for exact details.
+   *
+   * Min 10, Max 2000
    */
   threadPoolAnalyzeQueueSize?: number
   /**
    * Size for the thread pool. See documentation for exact details. Do note this may have maximum value depending on CPU count - value is automatically lowered if set to higher than maximum value.
+   *
+   * Min 1, Max 128
    */
   threadPoolAnalyzeSize?: number
   /**
    * Size for the thread pool. See documentation for exact details. Do note this may have maximum value depending on CPU count - value is automatically lowered if set to higher than maximum value.
+   *
+   * Min 1, Max 128
    */
   threadPoolForceMergeSize?: number
   /**
    * Size for the thread pool queue. See documentation for exact details.
+   *
+   * Min 10, Max 2000
    */
   threadPoolGetQueueSize?: number
   /**
    * Size for the thread pool. See documentation for exact details. Do note this may have maximum value depending on CPU count - value is automatically lowered if set to higher than maximum value.
+   *
+   * Min 1, Max 128
    */
   threadPoolGetSize?: number
   /**
    * Size for the thread pool queue. See documentation for exact details.
+   *
+   * Min 10, Max 2000
    */
   threadPoolSearchQueueSize?: number
   /**
    * Size for the thread pool. See documentation for exact details. Do note this may have maximum value depending on CPU count - value is automatically lowered if set to higher than maximum value.
+   *
+   * Min 1, Max 128
    */
   threadPoolSearchSize?: number
   /**
    * Size for the thread pool queue. See documentation for exact details.
+   *
+   * Min 10, Max 2000
    */
   threadPoolSearchThrottledQueueSize?: number
   /**
    * Size for the thread pool. See documentation for exact details. Do note this may have maximum value depending on CPU count - value is automatically lowered if set to higher than maximum value.
+   *
+   * Min 1, Max 128
    */
   threadPoolSearchThrottledSize?: number
   /**
    * Size for the thread pool queue. See documentation for exact details.
+   *
+   * Min 10, Max 2000
    */
   threadPoolWriteQueueSize?: number
   /**
    * Size for the thread pool. See documentation for exact details. Do note this may have maximum value depending on CPU count - value is automatically lowered if set to higher than maximum value.
+   *
+   * Min 1, Max 128
    */
   threadPoolWriteSize?: number
 }
@@ -12953,42 +14391,64 @@ export function fromWireJSONSchemaOpensearch(w: any): JSONSchemaOpensearch {
 export interface JSONSchemaPGAutovacuum {
   /**
    * Specifies a fraction of the table size to add to autovacuum_analyze_threshold when deciding whether to trigger an ANALYZE (e.g. `0.2` for 20% of the table size). The default is `0.2`.
+   *
+   * Min 0, Max 1
    */
   autovacuumAnalyzeScaleFactor?: number
   /**
    * Specifies the minimum number of inserted, updated or deleted tuples needed to trigger an ANALYZE in any one table. The default is `50`.
+   *
+   * Min 0, Max 2147483647
    */
   autovacuumAnalyzeThreshold?: number
   /**
    * Specifies the maximum age (in transactions) that a table's pg_class.relfrozenxid field can attain before a VACUUM operation is forced to prevent transaction ID wraparound within the table. The system launches autovacuum processes to prevent wraparound even when autovacuum is otherwise disabled. Changing this parameter causes a service restart.
+   *
+   * Min 200000000, Max 1500000000
+   *
+   * @example 200000000
    */
   autovacuumFreezeMaxAge?: number
   /**
    * Specifies the maximum number of autovacuum processes (other than the autovacuum launcher) that may be running at any one time. The default is `3`. Changing this parameter causes a service restart.
+   *
+   * Min 1, Max 20
    */
   autovacuumMaxWorkers?: number
   /**
    * Specifies the minimum delay between autovacuum runs on any given database. The delay is measured in seconds. The default is `60`.
+   *
+   * Min 1, Max 86400
    */
   autovacuumNaptime?: number
   /**
    * Specifies the cost delay value that will be used in automatic VACUUM operations. If `-1` is specified, the regular vacuum_cost_delay value will be used. The default is `2` (upstream default).
+   *
+   * Min -1, Max 100
    */
   autovacuumVacuumCostDelay?: number
   /**
    * Specifies the cost limit value that will be used in automatic VACUUM operations. If `-1` is specified, the regular vacuum_cost_limit value will be used. The default is `-1` (upstream default).
+   *
+   * Min -1, Max 10000
    */
   autovacuumVacuumCostLimit?: number
   /**
    * Specifies a fraction of the table size to add to autovacuum_vacuum_threshold when deciding whether to trigger a VACUUM (e.g. `0.2` for 20% of the table size). The default is `0.2`.
+   *
+   * Min 0, Max 1
    */
   autovacuumVacuumScaleFactor?: number
   /**
    * Specifies the minimum number of updated or deleted tuples needed to trigger a VACUUM in any one table. The default is `50`.
+   *
+   * Min 0, Max 2147483647
    */
   autovacuumVacuumThreshold?: number
   /**
    * Causes each action executed by autovacuum to be logged if it ran for at least the specified number of milliseconds. Setting this to zero logs all autovacuum actions. Minus-one disables logging autovacuum actions. The default is `1000`.
+   *
+   * Min -1, Max 2147483647
    */
   logAutovacuumMinDuration?: number
 }
@@ -13048,18 +14508,34 @@ export function fromWireJSONSchemaPGAutovacuum(w: any): JSONSchemaPGAutovacuum {
 export interface JSONSchemaPGBGWriter {
   /**
    * Specifies the delay between activity rounds for the background writer in milliseconds. The default is `200`.
+   *
+   * Min 10, Max 10000
+   *
+   * @example 200
    */
   bgwriterDelay?: number
   /**
    * Whenever more than bgwriter_flush_after bytes have been written by the background writer, attempt to force the OS to issue these writes to the underlying storage. Specified in kilobytes. Setting of 0 disables forced writeback. The default is `512`.
+   *
+   * Min 0, Max 2048
+   *
+   * @example 512
    */
   bgwriterFlushAfter?: number
   /**
    * In each round, no more than this many buffers will be written by the background writer. Setting this to zero disables background writing. The default is `100`.
+   *
+   * Min 0, Max 1073741823
+   *
+   * @example 100
    */
   bgwriterLruMaxpages?: number
   /**
    * The average recent need for new buffers is multiplied by bgwriter_lru_multiplier to arrive at an estimate of the number that will be needed during the next round, (up to bgwriter_lru_maxpages). 1.0 represents a “just in time” policy of writing exactly the number of buffers predicted to be needed. Larger values provide some cushion against spikes in demand, while smaller values intentionally leave writes to be done by server processes. The default is `2.0`.
+   *
+   * Min 0, Max 10
+   *
+   * @example 2
    */
   bgwriterLruMultiplier?: number
 }
@@ -13091,18 +14567,28 @@ export function fromWireJSONSchemaPGBGWriter(w: any): JSONSchemaPGBGWriter {
 export interface JSONSchemaPGWal {
   /**
    * PostgreSQL maximum WAL size (MB) reserved for replication slots. If `-1` is specified, replication slots may retain an unlimited amount of WAL files. The default is `-1` (upstream default). wal_keep_size minimum WAL size setting takes precedence over this.
+   *
+   * Min -1, Max 2147483647
    */
   maxSlotWalKeepSize?: number
   /**
    * PostgreSQL maximum WAL senders. The default is `20`. Changing this parameter causes a service restart.
+   *
+   * Min 20, Max 256
    */
   maxWalSenders?: number
   /**
    * Terminate replication connections that are inactive for longer than this amount of time, in milliseconds.
+   *
+   * Min 0, Max 10800000
    */
   walSenderTimeout?: number
   /**
    * WAL flush interval in milliseconds. The default is `200`. Setting this parameter to a lower value may negatively impact performance.
+   *
+   * Min 10, Max 200
+   *
+   * @example 50
    */
   walWriterDelay?: number
 }
@@ -13141,38 +14627,66 @@ export interface JSONSchemaPG {
   bgWriter?: JSONSchemaPGBGWriter
   /**
    * This is the amount of time, in milliseconds, to wait on a lock before checking to see if there is a deadlock condition. The default is `1000` (upstream default).
+   *
+   * Min 500, Max 1800000
+   *
+   * @example 1000
    */
   deadlockTimeout?: number
   /**
    * Specifies the default TOAST compression method for values of compressible columns. The default is `lz4`. Only available for PostgreSQL 14+.
+   *
+   * @example "lz4"
    */
   defaultToastCompression?: 'lz4' | 'pglz'
   /**
    * Time out sessions with open transactions after this number of milliseconds
+   *
+   * Min 0, Max 604800000
    */
   idleInTransactionSessionTimeout?: number
   /**
    * EXPERIMENTAL: Controls the largest I/O size in operations that combine I/O in 8kB units. Version 17 and up only.
+   *
+   * Min 1, Max 32
+   *
+   * @defaultValue 16
    */
   ioCombineLimit?: number
   /**
    * EXPERIMENTAL: Controls the largest I/O size in operations that combine I/O in 8kB units, and silently limits the user-settable parameter io_combine_limit. Version 18 and up only. Changing this parameter causes a service restart.
+   *
+   * Min 1, Max 128
+   *
+   * @defaultValue 16
    */
   ioMaxCombineLimit?: number
   /**
    * EXPERIMENTAL: Controls the maximum number of I/O operations that one process can execute simultaneously. Version 18 and up only. Changing this parameter causes a service restart.
+   *
+   * Min -1, Max 1024
+   *
+   * @defaultValue -1
    */
   ioMaxConcurrency?: number
   /**
    * EXPERIMENTAL: Controls the maximum number of I/O operations that one process can execute simultaneously. Version 18 and up only. Changing this parameter causes a service restart.
+   *
+   * @defaultValue "worker"
    */
   ioMethod?: 'worker' | 'sync' | 'io_uring'
   /**
    * EXPERIMENTAL: Number of IO worker processes, for io_method=worker. Version 18 and up only. Changing this parameter causes a service restart.
+   *
+   * Min 1, Max 32
+   *
+   * @defaultValue 3
    */
   ioWorkers?: number
   /**
    * Controls system-wide use of Just-in-Time Compilation (JIT).
+   *
+   * @example true
    */
   jit?: boolean
   /**
@@ -13185,82 +14699,128 @@ export interface JSONSchemaPG {
   logLinePrefix?: string
   /**
    * Log statements that take more than this number of milliseconds to run, -1 disables
+   *
+   * Min -1, Max 86400000
    */
   logMinDurationStatement?: number
   /**
    * Log statements for each temporary file created larger than this number of kilobytes, -1 disables
+   *
+   * Min -1, Max 2147483647
    */
   logTempFiles?: number
   /**
    * PostgreSQL maximum number of files that can be open per process. The default is `1000` (upstream default). Changing this parameter causes a service restart.
+   *
+   * Min 1000, Max 4096
    */
   maxFilesPerProcess?: number
   /**
    * PostgreSQL maximum locks per transaction. Changing this parameter causes a service restart.
+   *
+   * Min 64, Max 6400
    */
   maxLocksPerTransaction?: number
   /**
    * PostgreSQL maximum logical replication workers (taken from the pool of max_parallel_workers). The default is `4` (upstream default). Changing this parameter causes a service restart.
+   *
+   * Min 4, Max 256
    */
   maxLogicalReplicationWorkers?: number
   /**
    * Sets the maximum number of workers that the system can support for parallel queries. The default is `8` (upstream default).
+   *
+   * Min 0, Max 96
    */
   maxParallelWorkers?: number
   /**
    * Sets the maximum number of workers that can be started by a single Gather or Gather Merge node. The default is `2` (upstream default).
+   *
+   * Min 0, Max 96
    */
   maxParallelWorkersPerGather?: number
   /**
    * PostgreSQL maximum predicate locks per transaction. The default is `64` (upstream default). Changing this parameter causes a service restart.
+   *
+   * Min 64, Max 5120
    */
   maxPredLocksPerTransaction?: number
   /**
    * PostgreSQL maximum prepared transactions. The default is `0`. Changing this parameter causes a service restart.
+   *
+   * Min 0, Max 10000
    */
   maxPreparedTransactions?: number
   /**
    * PostgreSQL maximum replication slots. The default is `20`. Changing this parameter causes a service restart.
+   *
+   * Min 8, Max 256
    */
   maxReplicationSlots?: number
   /**
    * Maximum depth of the stack in bytes. The default is `2097152` (upstream default).
+   *
+   * Min 2097152, Max 6291456
    */
   maxStackDepth?: number
   /**
    * Max standby archive delay in milliseconds. The default is `30000` (upstream default).
+   *
+   * Min 1, Max 43200000
    */
   maxStandbyArchiveDelay?: number
   /**
    * Max standby streaming delay in milliseconds. The default is `30000` (upstream default).
+   *
+   * Min 1, Max 43200000
    */
   maxStandbyStreamingDelay?: number
   /**
    * Maximum number of synchronization workers per subscription. The default is `2`.
+   *
+   * Min 2, Max 8
    */
   maxSyncWorkersPerSubscription?: number
   /**
    * Sets the maximum number of background processes that the system can support. The default is `8`. Changing this parameter causes a service restart.
+   *
+   * Min 8, Max 288
    */
   maxWorkerProcesses?: number
   /**
    * Chooses the algorithm for encrypting passwords.
+   *
+   * @example "scram-sha-256"
    */
   passwordEncryption?: 'md5' | 'scram-sha-256' | null
   /**
    * Sets the time interval in seconds to run pg_partman's scheduled tasks. The default is `3600`.
+   *
+   * Min 3600, Max 604800
+   *
+   * @example 3600
    */
   pgPartmanBgwInterval?: number
   /**
    * Controls which role to use for pg_partman's scheduled background tasks.
+   *
+   * Max length 64, Pattern `^[_A-Za-z0-9][-._A-Za-z0-9]{0,63}$`
+   *
+   * @example "myrolename"
    */
   pgPartmanBgwRole?: string
   /**
    * Enables or disables query plan monitoring. Changing this parameter causes a service restart. Only available for PostgreSQL 13+.
+   *
+   * @example false
    */
   pgStatMonitorPgsmEnableQueryPlan?: boolean
   /**
    * Sets the maximum number of buckets. Changing this parameter causes a service restart. Only available for PostgreSQL 13+.
+   *
+   * Min 1, Max 10
+   *
+   * @example 10
    */
   pgStatMonitorPgsmMaxBuckets?: number
   /**
@@ -13269,18 +14829,32 @@ export interface JSONSchemaPG {
   pgStatStatementsTrack?: 'all' | 'top' | 'none'
   /**
    * PostgreSQL temporary file limit in KiB, -1 for unlimited
+   *
+   * Min -1, Max 2147483647
+   *
+   * @example 5000000
    */
   tempFileLimit?: number
   /**
    * PostgreSQL service timezone
+   *
+   * Max length 64, Pattern `^[\w/]*$`
+   *
+   * @example "Europe/Helsinki"
    */
   timezone?: string
   /**
    * Specifies the number of bytes reserved to track the currently executing command for each active session. Changing this parameter causes a service restart.
+   *
+   * Min 1024, Max 10240
+   *
+   * @example 1024
    */
   trackActivityQuerySize?: number
   /**
    * Record commit time of transactions. Changing this parameter causes a service restart.
+   *
+   * @example "off"
    */
   trackCommitTimestamp?: 'off' | 'on'
   /**
@@ -13289,6 +14863,8 @@ export interface JSONSchemaPG {
   trackFunctions?: 'all' | 'pl' | 'none'
   /**
    * Enables timing of database I/O calls. The default is `off`. When on, it will repeatedly query the operating system for the current time, which may cause significant overhead on some platforms.
+   *
+   * @example "off"
    */
   trackIoTiming?: 'off' | 'on'
   /**
@@ -13429,6 +15005,8 @@ export function fromWireJSONSchemaPG(w: any): JSONSchemaPG {
 export interface JSONSchemaPgaudit {
   /**
    * Enable pgaudit extension. When enabled, pgaudit extension will be automatically installed.Otherwise, extension will be uninstalled but auditing configurations will be preserved.
+   *
+   * @defaultValue false
    */
   featureEnabled?: boolean
   /**
@@ -13438,56 +15016,82 @@ export interface JSONSchemaPgaudit {
   /**
    * Specifies that session logging should be enabled in the case where all relations
    * in a statement are in pg_catalog.
+   *
+   * @defaultValue true
    */
   logCatalog?: boolean
   /**
    * Specifies whether log messages will be visible to a client process such as psql.
+   *
+   * @defaultValue false
    */
   logClient?: boolean
   /**
    * Specifies the log level that will be used for log entries.
+   *
+   * @defaultValue "log"
    */
   logLevel?:
     'debug1' | 'debug2' | 'debug3' | 'debug4' | 'debug5' | 'info' | 'notice' | 'warning' | 'log'
   /**
    * Crop parameters representation and whole statements if they exceed this threshold.
    * A (default) value of -1 disable the truncation.
+   *
+   * Min -1, Max 102400
+   *
+   * @defaultValue -1
    */
   logMaxStringLength?: number
   /**
    * This GUC allows to turn off logging nested statements, that is, statements that are
    * executed as part of another ExecutorRun.
+   *
+   * @defaultValue true
    */
   logNestedStatements?: boolean
   /**
    * Specifies that audit logging should include the parameters that were passed with the statement.
+   *
+   * @defaultValue false
    */
   logParameter?: boolean
   /**
    * Specifies that parameter values longer than this setting (in bytes) should not be logged,
    * but replaced with <long param suppressed>.
+   *
+   * @defaultValue 0
    */
   logParameterMaxSize?: number
   /**
    * Specifies whether session audit logging should create a separate log entry
    * for each relation (TABLE, VIEW, etc.) referenced in a SELECT or DML statement.
+   *
+   * @defaultValue false
    */
   logRelation?: boolean
   /**
    * Log Rows
+   *
+   * @defaultValue false
    */
   logRows?: boolean
   /**
    * Specifies whether logging will include the statement text and parameters (if enabled).
+   *
+   * @defaultValue true
    */
   logStatement?: boolean
   /**
    * Specifies whether logging will include the statement text and parameters with
    * the first log entry for a statement/substatement combination or with every entry.
+   *
+   * @defaultValue false
    */
   logStatementOnce?: boolean
   /**
    * Specifies the master role to use for object audit logging.
+   *
+   * Max length 64, Pattern `^[_A-Za-z0-9][-._A-Za-z0-9]{0,63}$`
    */
   role?: string
 }
@@ -13538,42 +15142,86 @@ export function fromWireJSONSchemaPgaudit(w: any): JSONSchemaPgaudit {
 export interface JSONSchemaPgbouncer {
   /**
    * If the automatically created database pools have been unused this many seconds, they are freed. If 0 then timeout is disabled. [seconds]
+   *
+   * Min 0, Max 86400
+   *
+   * @defaultValue 3600
+   * @example 3600
    */
   autodbIdleTimeout?: number
   /**
    * Do not allow more than this many server connections per database (regardless of user). Setting it to 0 means unlimited.
+   *
+   * Min 0, Max 2147483647
+   *
+   * @example 0
    */
   autodbMaxDBConnections?: number
   /**
    * PGBouncer pool mode
+   *
+   * @defaultValue "transaction"
+   * @example "session"
    */
   autodbPoolMode?: 'transaction' | 'session' | 'statement'
   /**
    * If non-zero then create automatically a pool of that size per user when a pool doesn't exist.
+   *
+   * Min 0, Max 10000
+   *
+   * @defaultValue 0
+   * @example 0
    */
   autodbPoolSize?: number
   /**
    * List of parameters to ignore when given in startup packet
+   *
+   * Max items 32
+   *
+   * @example ["extra_float_digits","search_path"]
    */
   ignoreStartupParameters?: string[]
   /**
    * PgBouncer tracks protocol-level named prepared statements related commands sent by the client in transaction and statement pooling modes when max_prepared_statements is set to a non-zero value. Setting it to 0 disables prepared statements. max_prepared_statements defaults to 100, and its maximum is 3000.
+   *
+   * Min 0, Max 3000
+   *
+   * @defaultValue 100
+   * @example 100
    */
   maxPreparedStatements?: number
   /**
    * Add more server connections to pool if below this number. Improves behavior when usual load comes suddenly back after period of total inactivity. The value is effectively capped at the pool size.
+   *
+   * Min 0, Max 10000
+   *
+   * @defaultValue 0
+   * @example 0
    */
   minPoolSize?: number
   /**
    * If a server connection has been idle more than this many seconds it will be dropped. If 0 then timeout is disabled. [seconds]
+   *
+   * Min 0, Max 86400
+   *
+   * @defaultValue 600
+   * @example 600
    */
   serverIdleTimeout?: number
   /**
    * The pooler will close an unused server connection that has been connected longer than this. [seconds]
+   *
+   * Min 60, Max 86400
+   *
+   * @defaultValue 3600
+   * @example 3600
    */
   serverLifetime?: number
   /**
    * Run server_reset_query (DISCARD ALL) in all pooling modes
+   *
+   * @defaultValue false
+   * @example false
    */
   serverResetQueryAlways?: boolean
 }
@@ -13623,6 +15271,10 @@ export function fromWireJSONSchemaPgbouncer(w: any): JSONSchemaPgbouncer {
 export interface JSONSchemaPglookout {
   /**
    * Number of seconds of master unavailability before triggering database failover to standby
+   *
+   * Min 10, Max 9223372036854776000
+   *
+   * @defaultValue 60
    */
   maxFailoverReplicationTimeLag?: number
 }
@@ -13649,10 +15301,16 @@ export function fromWireJSONSchemaPglookout(w: any): JSONSchemaPglookout {
 export interface JSONSchemaSchemaRegistry {
   /**
    * If true, Karapace / Schema Registry on the service nodes can participate in leader election. It might be needed to disable this when the schemas topic is replicated to a secondary cluster and Karapace / Schema Registry there must not participate in leader election. Defaults to `true`.
+   *
+   * @example true
    */
   leaderEligibility?: boolean
   /**
    * The durable single partition topic that acts as the durable log for the data. This topic must be compacted to avoid losing data due to retention policy. Please note that changing this configuration in an existing Schema Registry / Karapace setup leads to previous schemas being inaccessible, data encoded with them potentially unreadable and schema ID sequence put out of order. It's only possible to do the switch while Schema Registry / Karapace is disabled. Defaults to `_schemas`.
+   *
+   * Length 1-249, Pattern `^(?!\.$|\.\.$)[-_.A-Za-z0-9]+$`
+   *
+   * @example "_schemas"
    */
   topicName?: string
 }
@@ -13681,6 +15339,8 @@ export function fromWireJSONSchemaSchemaRegistry(w: any): JSONSchemaSchemaRegist
 export interface JSONSchemaThanosCompactor {
   /**
    * Retention time for data in days for each resolution (5m, 1h, raw)
+   *
+   * Min 0
    */
   retentionDays?: number
 }
@@ -13707,26 +15367,50 @@ export function fromWireJSONSchemaThanosCompactor(w: any): JSONSchemaThanosCompa
 export interface JSONSchemaThanosQuery {
   /**
    * Set the default evaluation interval for subqueries.
+   *
+   * Max length 20
+   *
+   * @defaultValue "1m"
    */
   queryDefaultEvaluationInterval?: string
   /**
    * The maximum lookback duration for retrieving metrics during expression evaluations in PromQL. PromQL always evaluates the query for a certain timestamp, and it looks back for the given amount of time to get the latest sample. If it exceeds the maximum lookback delta, it assumes the series is stale and returns none (a gap). The lookback delta should be set to at least 2 times the slowest scrape interval. If unset, it will use the promql default of 5m.
+   *
+   * Max length 20
+   *
+   * @defaultValue "5m"
    */
   queryLookbackDelta?: string
   /**
    * The default metadata time range duration for retrieving labels through Labels and Series API when the range parameters are not specified. The zero value means the range covers the time since the beginning.
+   *
+   * Max length 20
+   *
+   * @defaultValue "0s"
    */
   queryMetadataDefaultTimeRange?: string
   /**
    * Maximum time to process a query by the query node.
+   *
+   * Max length 20
+   *
+   * @defaultValue "2m"
    */
   queryTimeout?: string
   /**
    * The maximum samples allowed for a single Series request. The Series call fails if this limit is exceeded. Set to 0 for no limit. NOTE: For efficiency, the limit is internally implemented as 'chunks limit' considering each chunk contains a maximum of 120 samples. The default value is 100 * store.limits.request-series.
+   *
+   * Min 0, Max 100000000
+   *
+   * @defaultValue 0
    */
   storeLimitsRequestSamples?: number
   /**
    * The maximum series allowed for a single Series request. The Series call fails if this limit is exceeded. Set to 0 for no limit. The default value is 1000 * cpu_count.
+   *
+   * Min 0, Max 100000000
+   *
+   * @defaultValue 0
    */
   storeLimitsRequestSeries?: number
 }
@@ -13769,6 +15453,8 @@ export function fromWireJSONSchemaThanosQuery(w: any): JSONSchemaThanosQuery {
 export interface JSONSchemaThanosQueryFrontend {
   /**
    * Whether to align the query range boundaries with the step. If enabled, the query range boundaries will be aligned to the step, providing more accurate results for queries with high-resolution data.
+   *
+   * @defaultValue true
    */
   queryRangeAlignRangeWithStep?: boolean
 }
@@ -13835,6 +15521,11 @@ export function fromWireJSONSchemaThanos(w: any): JSONSchemaThanos {
 export interface JSONSchemaTimescaledb {
   /**
    * The number of background workers for timescaledb operations. You should configure this setting to the sum of your number of databases and the total number of concurrent background workers you want running at any given point in time. Changing this parameter causes a service restart.
+   *
+   * Min 1, Max 4096
+   *
+   * @defaultValue 16
+   * @example 8
    */
   maxBackgroundWorkers?: number
 }
@@ -13864,26 +15555,46 @@ export interface JSONSchemaValkey {
   aclChannelsDefault?: 'allchannels' | 'resetchannels'
   /**
    * Valkey reclaims expired keys both when accessed and in the background. The background process scans for expired keys to free memory. Increasing the active-expire-effort setting (default 1, max 10) uses more CPU to reclaim expired keys faster, reducing memory usage but potentially increasing latency.
+   *
+   * Min 1, Max 10
+   *
+   * @defaultValue 1
    */
   activeExpireEffort?: number
   /**
    * When enabled, Valkey will create frequent local RDB snapshots. When disabled, Valkey will only take RDB snapshots when a backup is created, based on the backup schedule. This setting is ignored when `valkey_persistence` is set to `off`.
+   *
+   * @defaultValue true
    */
   frequentSnapshots?: boolean
   /**
    * Set Valkey IO thread count. Changing this will cause a restart of the Valkey service.
+   *
+   * Min 1, Max 32
+   *
+   * @example 1
    */
   ioThreads?: number
   /**
    * LFU maxmemory-policy counter decay time in minutes
+   *
+   * Min 1, Max 120
+   *
+   * @defaultValue 1
    */
   lfuDecayTime?: number
   /**
    * Counter logarithm factor for volatile-lfu and allkeys-lfu maxmemory-policies
+   *
+   * Min 0, Max 100
+   *
+   * @defaultValue 10
    */
   lfuLogFactor?: number
   /**
    * Valkey maxmemory-policy
+   *
+   * @defaultValue "noeviction"
    */
   maxmemoryPolicy?:
     | 'noeviction'
@@ -13897,10 +15608,18 @@ export interface JSONSchemaValkey {
     | null
   /**
    * Set notify-keyspace-events option
+   *
+   * Max length 32, Pattern `^[KEg\$lshzxentdmA]*$`
+   *
+   * @defaultValue ""
    */
   notifyKeyspaceEvents?: string
   /**
    * Set number of Valkey databases. Changing this will cause a restart of the Valkey service.
+   *
+   * Min 1, Max 128
+   *
+   * @example 16
    */
   numberOfDatabases?: number
   /**
@@ -13909,14 +15628,24 @@ export interface JSONSchemaValkey {
   persistence?: 'off' | 'rdb'
   /**
    * Set output buffer limit for pub / sub clients in MB. The value is the hard limit, the soft limit is 1/4 of the hard limit. When setting the limit, be mindful of the available memory in the selected service plan.
+   *
+   * Min 32, Max 512
+   *
+   * @example 64
    */
   pubsubClientOutputBufferLimit?: number
   /**
    * Require SSL to access Valkey
+   *
+   * @defaultValue true
    */
   ssl?: boolean
   /**
    * Valkey idle connection timeout in seconds
+   *
+   * Min 0, Max 31536000
+   *
+   * @defaultValue 300
    */
   timeout?: number
 }
@@ -14039,7 +15768,13 @@ export function fromWireKeyRotationConfig(w: any): KeyRotationConfig {
  * Kubelet image GC options
  */
 export interface KubeletImageGC {
+  /**
+   * Min 0
+   */
   highThreshold?: number
+  /**
+   * Min 0
+   */
   lowThreshold?: number
   minAge?: string
 }
@@ -14066,6 +15801,8 @@ export type Labels = Record<string, string>
 
 /**
  * List of AI API keys
+ *
+ * @example {"ai-api-keys":[{"updated-at":"2026-03-25T10:00:00Z","name":"default-public-key","scope":"public","id":"11111111-1111-1111-1111-111111111111","org-uuid":"22222222-2222-2222-2222-222222222222","created-at":"2026-03-25T10:00:00Z"}]}
  */
 export interface ListAIAPIKeysResponse {
   aiAPIKeys: ListAIAPIKeysResponseEntry[]
@@ -14092,10 +15829,14 @@ export function fromWireListAIAPIKeysResponse(w: any): ListAIAPIKeysResponse {
 export interface ListAIAPIKeysResponseEntry {
   /**
    * Creation timestamp
+   *
+   * Read-only
    */
   createdAT: Date
   /**
    * AI API key ID
+   *
+   * Read-only
    */
   id: string
   /**
@@ -14104,6 +15845,8 @@ export interface ListAIAPIKeysResponseEntry {
   name: string
   /**
    * Organization UUID that owns this key
+   *
+   * Read-only
    */
   orgUuid: string
   /**
@@ -14112,6 +15855,8 @@ export interface ListAIAPIKeysResponseEntry {
   scope: string
   /**
    * Last update timestamp
+   *
+   * Read-only
    */
   updatedAT: Date
 }
@@ -14194,6 +15939,8 @@ export function fromWireListDeploymentsResponse(w: any): ListDeploymentsResponse
 export interface ListDeploymentsResponseEntry {
   /**
    * Creation time
+   *
+   * Read-only
    */
   createdAT?: Date
   /**
@@ -14202,27 +15949,39 @@ export interface ListDeploymentsResponseEntry {
   deploymentURL: string
   /**
    * Number of GPUs
+   *
+   * Min 1
    */
   gpuCount?: number
   /**
    * GPU type family
+   *
+   * Min length 1
    */
   gpuType?: string
   /**
    * Deployment ID
+   *
+   * Read-only
    */
   id?: string
   model: ModelRef
   /**
    * Deployment name
+   *
+   * Min length 1
    */
   name: string
   /**
    * Number of replicas (>=0)
+   *
+   * Min 0
    */
   replicas?: number
   /**
    * Service level
+   *
+   * Min length 1
    */
   serviceLevel?: string
   /**
@@ -14231,6 +15990,8 @@ export interface ListDeploymentsResponseEntry {
   state: 'ready' | 'creating' | 'preparing' | 'error' | 'deploying' | 'scaling' | 'updating'
   /**
    * Update time
+   *
+   * Read-only
    */
   updatedAT?: Date
   /**
@@ -14474,18 +16235,26 @@ export function fromWireListModelsResponse(w: any): ListModelsResponse {
 export interface ListModelsResponseEntry {
   /**
    * Creation time
+   *
+   * Read-only
    */
   createdAT: Date
   /**
    * Model ID
+   *
+   * Read-only
    */
   id: string
   /**
    * Model size in bytes
+   *
+   * Min 0
    */
   modelSize: number
   /**
    * Model name
+   *
+   * Min length 1
    */
   name: string
   /**
@@ -14494,6 +16263,8 @@ export interface ListModelsResponseEntry {
   state: 'ready' | 'creating' | 'downloading' | 'error' | 'created'
   /**
    * Update time
+   *
+   * Read-only
    */
   updatedAT: Date
 }
@@ -14528,6 +16299,8 @@ export function fromWireListModelsResponseEntry(w: any): ListModelsResponseEntry
 export interface ListRouteEntry {
   /**
    * Route description
+   *
+   * Max length 4096
    */
   description?: string
   /**
@@ -14588,6 +16361,8 @@ export interface ListSubnetEntry {
   createdAT?: Date
   /**
    * Subnet description
+   *
+   * Max length 4096
    */
   description?: string
   /**
@@ -14604,6 +16379,8 @@ export interface ListSubnetEntry {
   labels?: Labels
   /**
    * Subnet name
+   *
+   * Length 1-255
    */
   name?: string
 }
@@ -14650,6 +16427,8 @@ export interface ListVpcEntry {
   default?: boolean
   /**
    * VPC description
+   *
+   * Max length 4096
    */
   description?: string
   /**
@@ -14662,6 +16441,8 @@ export interface ListVpcEntry {
   labels?: Labels
   /**
    * VPC name
+   *
+   * Length 1-255
    */
   name?: string
 }
@@ -14696,10 +16477,14 @@ export function fromWireListVpcEntry(w: any): ListVpcEntry {
 export interface LiveBalance {
   /**
    * Organization live balance
+   *
+   * Read-only
    */
   balance?: number
   /**
    * Organization currency
+   *
+   * Read-only
    */
   currency?: string
 }
@@ -14726,22 +16511,32 @@ export function fromWireLiveBalance(w: any): LiveBalance {
 export interface LoadBalancer {
   /**
    * Load Balancer address family
+   *
+   * Read-only
    */
   addressfamily?: 'inet4' | 'inet6'
   /**
    * Load Balancer creation date
+   *
+   * Read-only
    */
   createdAT?: Date
   /**
    * Load Balancer description
+   *
+   * Max length 255
    */
   description?: string
   /**
    * Load Balancer ID
+   *
+   * Read-only
    */
   id?: string
   /**
    * Load Balancer public IP
+   *
+   * Read-only
    */
   ip?: string
   /**
@@ -14750,6 +16545,8 @@ export interface LoadBalancer {
   labels?: Labels
   /**
    * Load Balancer name
+   *
+   * Length 1-255
    */
   name?: string
   /**
@@ -14758,6 +16555,8 @@ export interface LoadBalancer {
   services?: LoadBalancerService[]
   /**
    * Load Balancer state
+   *
+   * Read-only
    */
   state?: 'creating' | 'migrated' | 'deleting' | 'running' | 'migrating' | 'error'
 }
@@ -14831,6 +16630,8 @@ export function fromWireLoadBalancerServerStatus(w: any): LoadBalancerServerStat
 export interface LoadBalancerService {
   /**
    * Load Balancer Service description
+   *
+   * Max length 255
    */
   description?: string
   /**
@@ -14839,10 +16640,14 @@ export interface LoadBalancerService {
   healthcheck?: LoadBalancerServiceHealthcheck
   /**
    * Healthcheck status per backend server
+   *
+   * Read-only
    */
   healthcheckStatus?: LoadBalancerServerStatus[]
   /**
    * Load Balancer Service ID
+   *
+   * Read-only
    */
   id?: string
   /**
@@ -14851,10 +16656,14 @@ export interface LoadBalancerService {
   instancePool?: InstancePool
   /**
    * Load Balancer Service name
+   *
+   * Length 1-255
    */
   name?: string
   /**
    * Port exposed on the Load Balancer's public IP
+   *
+   * Min >0
    */
   port?: number
   /**
@@ -14863,6 +16672,8 @@ export interface LoadBalancerService {
   protocol?: 'tcp' | 'udp'
   /**
    * Load Balancer Service state
+   *
+   * Read-only
    */
   state?: 'creating' | 'deleting' | 'running' | 'updating' | 'error'
   /**
@@ -14871,6 +16682,8 @@ export interface LoadBalancerService {
   strategy?: 'round-robin' | 'maglev-hash' | 'source-hash'
   /**
    * Port on which the network traffic will be forwarded to on the receiving instance
+   *
+   * Min >0
    */
   targetPort?: number
 }
@@ -14921,6 +16734,8 @@ export function fromWireLoadBalancerService(w: any): LoadBalancerService {
 export interface LoadBalancerServiceHealthcheck {
   /**
    * Healthcheck interval (default: 10). Must be greater than or equal to Timeout
+   *
+   * Min 5, Max 300
    */
   interval?: number
   /**
@@ -14929,22 +16744,32 @@ export interface LoadBalancerServiceHealthcheck {
   mode?: 'tcp' | 'http' | 'https'
   /**
    * Healthcheck port
+   *
+   * Min 1, Max 65535
    */
   port?: number
   /**
    * Number of retries before considering a Service failed
+   *
+   * Min 1, Max 20
    */
   retries?: number
   /**
    * Healthcheck timeout value (default: 2). Must be lower than or equal to Interval
+   *
+   * Min 2, Max 60
    */
   timeout?: number
   /**
    * SNI domain for HTTPS healthchecks
+   *
+   * Length 1-255
    */
   tlsSNI?: string
   /**
    * An endpoint to use for the HTTP healthcheck, e.g. '/status'
+   *
+   * Length 1-255
    */
   uri?: string
 }
@@ -15017,6 +16842,8 @@ export interface ModelRef {
   id?: string
   /**
    * Associated model name
+   *
+   * Min length 1
    */
   name?: string
 }
@@ -15043,14 +16870,20 @@ export function fromWireModelRef(w: any): ModelRef {
 export interface ModelUsageCounters {
   /**
    * Number of inference calls in this flush window
+   *
+   * Min 1
    */
   callCount: number
   /**
    * Total prompt/input Unit Of Measurement (UOM) across all calls in this flush window (e.g., tokens for LLMs, minutes for TTS, pages for OCR)
+   *
+   * Min 0
    */
   inputUom: number
   /**
    * Total completion/output Unit Of Measurement (UOM) across all calls in this flush window (e.g., tokens for LLMs, minutes for TTS, pages for OCR)
+   *
+   * Min 0
    */
   outputUom: number
 }
@@ -15079,20 +16912,24 @@ export function fromWireModelUsageCounters(w: any): ModelUsageCounters {
 export interface Networking {
   /**
    * CIDR Range for Pods in cluster. This must not overlap with any IP ranges assigned to pods. Max of two, comma-separated, dual-stack CIDRs is allowed.
-   * If not specified, defaults to 192.168.0.0/16.
+   *               If not specified, defaults to 192.168.0.0/16.
    */
   clusterCidr?: string
   /**
    * Mask size for node cidr in cluster. It must be larger than, and at most 16 bits longer than, the Pod CIDR subnet mask. Defaults to 24
+   *
+   * Min >0
    */
   nodeCidrMaskSizeIpv4?: number
   /**
    * Mask size for node cidr in cluster. It must be larger than, and at most 16 bits longer than, the Pod CIDR subnet mask. Defaults to 64
+   *
+   * Min >0
    */
   nodeCidrMaskSizeIpv6?: number
   /**
    * CIDR range for service cluster IPs. This must not overlap with any IP ranges assigned to nodes or pods. Max of two, comma-separated, dual-stack CIDRs is allowed. The IPv6 range must be no larger than a /108 (upstream Kubernetes apiserver limit).
-   * If not specified, defaults to 10.96.0.0/12.
+   *               If not specified, defaults to 10.96.0.0/12.
    */
   serviceClusterIPRange?: string
 }
@@ -15176,6 +17013,8 @@ export function fromWireNvidiaMigProfiles(w: any): NvidiaMigProfiles {
 
 /**
  * Related resource reference
+ *
+ * Read-only
  */
 export interface OperationReference {
   /**
@@ -15188,6 +17027,8 @@ export interface OperationReference {
   id?: string
   /**
    * Link to the referenced resource
+   *
+   * Read-only
    */
   link?: string
 }
@@ -15216,14 +17057,20 @@ export function fromWireOperationReference(w: any): OperationReference {
 export interface Operation {
   /**
    * Operation ID
+   *
+   * Read-only
    */
   id?: string
   /**
    * Operation message
+   *
+   * Read-only
    */
   message?: string
   /**
    * Operation failure reason
+   *
+   * Read-only
    */
   reason?:
     | 'incorrect'
@@ -15239,10 +17086,14 @@ export interface Operation {
     | 'conflict'
   /**
    * Related resource reference
+   *
+   * Read-only
    */
   reference?: OperationReference
   /**
    * Operation status
+   *
+   * Read-only
    */
   state?: 'failure' | 'pending' | 'success' | 'timeout'
 }
@@ -15275,6 +17126,8 @@ export function fromWireOperation(w: any): Operation {
 export interface OrgConsumptionQuotaResponse {
   /**
    * Per-org Unit Of Measurement (UOM) consumption quota (UOM/min). Null means unlimited. UOM represents weighted units across different AI workloads (e.g., tokens for LLMs, minutes for TTS, pages for OCR).
+   *
+   * Min 0
    */
   quotaUomPerMinute?: string | null
 }
@@ -15302,34 +17155,52 @@ export function fromWireOrgConsumptionQuotaResponse(w: any): OrgConsumptionQuota
 export interface Organization {
   /**
    * Organization address
+   *
+   * Read-only
    */
   address?: string
   /**
    * Organization balance. DEPRECATED: use the dedicated `live-balance` endpoint
+   *
+   * Read-only
+   *
+   * @deprecated
    */
   balance?: number
   /**
    * Organization city
+   *
+   * Read-only
    */
   city?: string
   /**
    * Organization country
+   *
+   * Read-only
    */
   country?: string
   /**
    * Organization currency
+   *
+   * Read-only
    */
   currency?: string
   /**
    * Organization ID
+   *
+   * Read-only
    */
   id?: string
   /**
    * Organization name
+   *
+   * Read-only
    */
   name?: string
   /**
    * Organization postcode
+   *
+   * Read-only
    */
   postcode?: string
 }
@@ -15368,26 +17239,38 @@ export function fromWireOrganization(w: any): Organization {
 export interface OrganizationUsage {
   /**
    * Total GPU count (sum of all GPU types)
+   *
+   * Min 0
    */
   gpu: number
   /**
    * GPU3 count
+   *
+   * Min 0
    */
   gpu3?: number
   /**
    * GPU3080TI count
+   *
+   * Min 0
    */
   gpu3080ti?: number
   /**
    * GPUA30 count
+   *
+   * Min 0
    */
   gpua30?: number
   /**
    * GPUA5000 count
+   *
+   * Min 0
    */
   gpua5000?: number
   /**
    * GPURTX6000PRO count
+   *
+   * Min 0
    */
   gpurtx6000pro?: number
 }
@@ -15422,6 +17305,8 @@ export function fromWireOrganizationUsage(w: any): OrganizationUsage {
 export interface PrivateNetwork {
   /**
    * Private Network description
+   *
+   * Max length 255
    */
   description?: string
   /**
@@ -15430,6 +17315,8 @@ export interface PrivateNetwork {
   endIP?: string
   /**
    * Private Network ID
+   *
+   * Read-only
    */
   id?: string
   /**
@@ -15438,10 +17325,14 @@ export interface PrivateNetwork {
   labels?: Labels
   /**
    * Private Network leased IP addresses
+   *
+   * Read-only
    */
   leases?: PrivateNetworkLease[]
   /**
    * Private Network name
+   *
+   * Length 1-255
    */
   name?: string
   /**
@@ -15458,6 +17349,8 @@ export interface PrivateNetwork {
   startIP?: string
   /**
    * Private Network VXLAN ID
+   *
+   * Min >0
    */
   vni?: number
 }
@@ -15501,10 +17394,14 @@ export function fromWirePrivateNetwork(w: any): PrivateNetwork {
 export interface PrivateNetworkLease {
   /**
    * Attached instance ID
+   *
+   * Read-only
    */
   instanceID?: string
   /**
    * Private Network IP address
+   *
+   * Read-only
    */
   ip?: string
 }
@@ -15955,6 +17852,8 @@ export interface RevisionStamp {
   at: Date
   /**
    * Monotonically increasing sequencing value utilized for optimistic concurrency control locks.
+   *
+   * Min 0
    */
   seq: number
 }
@@ -15999,6 +17898,8 @@ export function fromWireRotateKmsKeyResponse(w: any): RotateKmsKeyResponse {
 export interface Route {
   /**
    * Route description
+   *
+   * Max length 4096
    */
   description?: string
   /**
@@ -16047,6 +17948,8 @@ export function fromWireRoute(w: any): Route {
 export interface ScaleDeploymentRequest {
   /**
    * Number of replicas (>=0)
+   *
+   * Min 0
    */
   replicas: number
 }
@@ -16068,6 +17971,10 @@ export function fromWireScaleDeploymentRequest(w: any): ScaleDeploymentRequest {
 export interface ScheduleKmsKeyDeletionRequest {
   /**
    * Number of days to wait until deletion is final.
+   *
+   * Min 7, Max 30
+   *
+   * @defaultValue 30
    */
   delayDays?: number
 }
@@ -16117,22 +18024,32 @@ export function fromWireScheduleKmsKeyDeletionResponse(w: any): ScheduleKmsKeyDe
 export interface SecurityGroup {
   /**
    * Security Group description
+   *
+   * Max length 255
    */
   description?: string
   /**
    * Security Group external sources
+   *
+   * Unique items
    */
   externalSources?: string[]
   /**
    * Security Group ID
+   *
+   * Read-only
    */
   id?: string
   /**
    * Security Group name
+   *
+   * Length 1-255
    */
   name?: string
   /**
    * Security Group rules
+   *
+   * Unique items
    */
   rules?: SecurityGroupRule[]
 }
@@ -16190,15 +18107,19 @@ export function fromWireSecurityGroupRef(w: any): SecurityGroupRef {
 export interface SecurityGroupResource {
   /**
    * Security Group ID
+   *
+   * Read-only
    */
   id?: string
   /**
    * Security Group name
+   *
+   * Length 1-255
    */
   name?: string
   /**
    * Whether this points to a public security group. This is only valid when in the context of
-   * a rule addition which uses a public security group as a source or destination.
+   *                    a rule addition which uses a public security group as a source or destination.
    */
   visibility?: 'private' | 'public'
 }
@@ -16225,7 +18146,13 @@ export function fromWireSecurityGroupResource(w: any): SecurityGroupResource {
  * ICMP details
  */
 export interface SecurityGroupRuleICMP {
+  /**
+   * Min -1, Max 254
+   */
   code?: number
+  /**
+   * Min -1, Max 254
+   */
   type?: number
 }
 
@@ -16251,10 +18178,14 @@ export function fromWireSecurityGroupRuleICMP(w: any): SecurityGroupRuleICMP {
 export interface SecurityGroupRule {
   /**
    * Security Group rule description
+   *
+   * Max length 255
    */
   description?: string
   /**
    * End port of the range
+   *
+   * Min 1, Max 65535
    */
   endPort?: number
   /**
@@ -16267,6 +18198,8 @@ export interface SecurityGroupRule {
   icmp?: SecurityGroupRuleICMP
   /**
    * Security Group rule ID
+   *
+   * Read-only
    */
   id?: string
   /**
@@ -16283,6 +18216,8 @@ export interface SecurityGroupRule {
   securityGroup?: SecurityGroupResource
   /**
    * Start port of the range
+   *
+   * Min 1, Max 65535
    */
   startPort?: number
 }
@@ -16325,6 +18260,8 @@ export function fromWireSecurityGroupRule(w: any): SecurityGroupRule {
 export interface SetOrgConsumptionQuotaRequest {
   /**
    * Per-org Unit Of Measurement (UOM) consumption quota (UOM/min). Pass null to remove the limit. UOM represents weighted units across different AI workloads (e.g., tokens for LLMs, minutes for TTS, pages for OCR).
+   *
+   * Min 0
    */
   quotaUomPerMinute?: string | null
 }
@@ -16382,6 +18319,9 @@ export function fromWireSKSAudit(w: any): SKSAudit {
   return v
 }
 
+/**
+ * Length 1-2000
+ */
 export type SKSAuditBearerToken = string
 
 /**
@@ -16420,8 +18360,14 @@ export function fromWireSKSAuditCreate(w: any): SKSAuditCreate {
   return v
 }
 
+/**
+ * Length 1-2000
+ */
 export type SKSAuditEndpoint = string
 
+/**
+ * Length 1-10
+ */
 export type SKSAuditInitialBackoff = string
 
 /**
@@ -16472,6 +18418,8 @@ export function fromWireSKSAuditUpdate(w: any): SKSAuditUpdate {
 export interface SKSCluster {
   /**
    * Cluster addons
+   *
+   * Unique items
    */
   addons?: string[]
   /**
@@ -16488,14 +18436,20 @@ export interface SKSCluster {
   cni?: 'calico' | 'cilium'
   /**
    * Cluster creation date
+   *
+   * Read-only
    */
   createdAT?: Date
   /**
    * Cluster default Security Group ID
+   *
+   * Read-only
    */
   defaultSecurityGroupID?: string | null
   /**
    * Cluster description
+   *
+   * Max length 255
    */
   description?: string
   /**
@@ -16508,6 +18462,8 @@ export interface SKSCluster {
   enableOperatorsCA?: boolean
   /**
    * Cluster endpoint
+   *
+   * Read-only
    */
   endpoint?: string
   /**
@@ -16516,6 +18472,8 @@ export interface SKSCluster {
   featureGates?: string[]
   /**
    * Cluster ID
+   *
+   * Read-only
    */
   id?: string
   /**
@@ -16528,10 +18486,14 @@ export interface SKSCluster {
   level?: 'starter' | 'pro'
   /**
    * Cluster name
+   *
+   * Length 1-255
    */
   name?: string
   /**
    * Cluster Nodepools
+   *
+   * Max items 16, Unique items, Read-only
    */
   nodepools?: SKSNodepool[]
   /**
@@ -16540,6 +18502,8 @@ export interface SKSCluster {
   oidc?: SKSOidc | null
   /**
    * Cluster state
+   *
+   * Read-only
    */
   state?:
     | 'rotating-csi-credentials'
@@ -16681,6 +18645,8 @@ export interface SKSKubeconfigRequest {
   groups: string[]
   /**
    * Validity in seconds of the Kubeconfig user certificate (default: 30 days)
+   *
+   * Min >0
    */
   ttl?: number
   /**
@@ -16713,14 +18679,20 @@ export function fromWireSKSKubeconfigRequest(w: any): SKSKubeconfigRequest {
 export interface SKSNodepool {
   /**
    * Nodepool addons
+   *
+   * Unique items
    */
   addons?: string[]
   /**
    * Nodepool Anti-affinity Groups
+   *
+   * Max items 8, Unique items
    */
   antiAffinityGroups?: AntiAffinityGroupRef[]
   /**
    * Nodepool creation date
+   *
+   * Read-only
    */
   createdAT?: Date
   /**
@@ -16729,14 +18701,20 @@ export interface SKSNodepool {
   deployTarget?: DeployTargetRef
   /**
    * Nodepool description
+   *
+   * Max length 255
    */
   description?: string
   /**
    * Nodepool instances disk size in GiB
+   *
+   * Min 20, Max 51200
    */
   diskSize?: number
   /**
    * Nodepool ID
+   *
+   * Read-only
    */
   id?: string
   /**
@@ -16745,6 +18723,8 @@ export interface SKSNodepool {
   instancePool?: InstancePoolRef
   /**
    * The instances created by the Nodepool will be prefixed with this value (default: pool)
+   *
+   * Length 1-30
    */
   instancePrefix?: string
   /**
@@ -16757,6 +18737,8 @@ export interface SKSNodepool {
   kubeletImageGC?: KubeletImageGC
   /**
    * Maximum number of pods per node. Set to use a value other than the kubelet default.
+   *
+   * Min 1, Max 65535
    */
   kubeletMaxPods?: number | null
   /**
@@ -16765,6 +18747,8 @@ export interface SKSNodepool {
   labels?: SKSNodepoolLabels
   /**
    * Nodepool name
+   *
+   * Length 1-255
    */
   name?: string
   /**
@@ -16773,24 +18757,33 @@ export interface SKSNodepool {
   nvidiaMigProfiles?: NvidiaMigProfiles
   /**
    * Nodepool Private Networks
+   *
+   * Max items 16, Unique items
    */
   privateNetworks?: PrivateNetworkRef[]
   /**
    * Nodepool public IP assignment of the Instances:
+   *
    * * IPv4 (`inet4`) addressing only;
    * * IPv4 and IPv6 (`dual`) addressing.
    */
   publicIPAssignment?: 'inet4' | 'dual'
   /**
    * Nodepool Security Groups
+   *
+   * Max items 16, Unique items
    */
   securityGroups?: SecurityGroupRef[]
   /**
    * Number of instances
+   *
+   * Min 0
    */
   size?: number
   /**
    * Nodepool state
+   *
+   * Read-only
    */
   state?:
     | 'renewing-token'
@@ -16811,6 +18804,8 @@ export interface SKSNodepool {
   template?: TemplateRef
   /**
    * Nodepool version
+   *
+   * Read-only
    */
   version?: string
 }
@@ -16897,6 +18892,8 @@ export interface SKSNodepoolTaint {
   effect: 'NoExecute' | 'NoSchedule' | 'PreferNoSchedule'
   /**
    * Nodepool taint value
+   *
+   * Length 1-255
    */
   value: string
 }
@@ -16937,18 +18934,26 @@ export function fromWireSKSNodepoolTaints(w: any): SKSNodepoolTaints {
 export interface SKSOidc {
   /**
    * OpenID client ID
+   *
+   * Length 1-255
    */
   clientID: string
   /**
    * JWT claim to use as the user's group
+   *
+   * Length 1-255
    */
   groupsClaim?: string
   /**
    * Prefix prepended to group claims
+   *
+   * Length 1-255
    */
   groupsPrefix?: string
   /**
    * OpenID provider URL
+   *
+   * Length 1-255
    */
   issuerURL: string
   /**
@@ -16957,10 +18962,14 @@ export interface SKSOidc {
   requiredClaim?: Record<string, string>
   /**
    * JWT claim to use as the user name
+   *
+   * Length 1-255
    */
   usernameClaim?: string
   /**
    * Prefix prepended to username claims
+   *
+   * Length 1-255
    */
   usernamePrefix?: string
 }
@@ -17027,10 +19036,14 @@ export function fromWireSnapshotExport(w: any): SnapshotExport {
 export interface Snapshot {
   /**
    * Indicates whether the snapshot was taken using an application-consistent method
+   *
+   * Read-only
    */
   applicationConsistent?: boolean
   /**
    * Snapshot creation date
+   *
+   * Read-only
    */
   createdAT?: Date
   /**
@@ -17039,6 +19052,8 @@ export interface Snapshot {
   export?: SnapshotExport
   /**
    * Snapshot ID
+   *
+   * Read-only
    */
   id?: string
   /**
@@ -17047,10 +19062,14 @@ export interface Snapshot {
   instance?: Instance
   /**
    * Snapshot name
+   *
+   * Length 1-255
    */
   name?: string
   /**
    * Snapshot size in GiB
+   *
+   * Min 10, Max 51200, Read-only
    */
   size?: number
   /**
@@ -17118,6 +19137,8 @@ export function fromWireSnapshotRef(w: any): SnapshotRef {
 export interface SOSBucketUsage {
   /**
    * SOS Bucket creation date
+   *
+   * Read-only
    */
   createdAT?: Date
   /**
@@ -17126,6 +19147,8 @@ export interface SOSBucketUsage {
   name?: string
   /**
    * SOS Bucket size in B
+   *
+   * Min 0, Read-only
    */
   size?: number
   /**
@@ -17160,10 +19183,14 @@ export function fromWireSOSBucketUsage(w: any): SOSBucketUsage {
 export interface SSHKey {
   /**
    * SSH key fingerprint
+   *
+   * Read-only
    */
   fingerprint?: string
   /**
    * SSH key name
+   *
+   * Length 1-255
    */
   name?: string
 }
@@ -17190,6 +19217,8 @@ export function fromWireSSHKey(w: any): SSHKey {
 export interface SSHKeyRef {
   /**
    * SSH key name
+   *
+   * Length 1-255
    */
   name?: string
 }
@@ -17262,6 +19291,8 @@ export interface Subnet {
   createdAT?: Date
   /**
    * Subnet description
+   *
+   * Max length 4096
    */
   description?: string
   /**
@@ -17282,6 +19313,8 @@ export interface Subnet {
   labels?: Labels
   /**
    * Subnet name
+   *
+   * Length 1-255
    */
   name?: string
 }
@@ -17318,6 +19351,9 @@ export function fromWireSubnet(w: any): Subnet {
 }
 
 export interface SuccessResponse {
+  /**
+   * @defaultValue "success"
+   */
   status: 'success' | 'target-registered' | 'already-applied'
 }
 
@@ -17349,6 +19385,8 @@ export interface Template {
   bootMode?: 'legacy' | 'uefi'
   /**
    * Template build
+   *
+   * Read-only
    */
   build?: string
   /**
@@ -17357,30 +19395,44 @@ export interface Template {
   checksum?: string
   /**
    * Template creation date
+   *
+   * Read-only
    */
   createdAT?: Date
   /**
    * Template default user
+   *
+   * Length 1-255
    */
   defaultUser?: string
   /**
    * Template description
+   *
+   * Max length 255
    */
   description?: string
   /**
    * Template family
+   *
+   * Read-only
    */
   family?: string
   /**
    * Template ID
+   *
+   * Read-only
    */
   id?: string
   /**
    * Template maintainer
+   *
+   * Read-only
    */
   maintainer?: string
   /**
    * Template name
+   *
+   * Length 1-255
    */
   name?: string
   /**
@@ -17389,6 +19441,8 @@ export interface Template {
   passwordEnabled?: boolean
   /**
    * Template size
+   *
+   * Min >0
    */
   size?: number
   /**
@@ -17401,10 +19455,14 @@ export interface Template {
   url?: string
   /**
    * Template version
+   *
+   * Read-only
    */
   version?: string
   /**
    * Template visibility
+   *
+   * Read-only
    */
   visibility?: 'private' | 'public'
 }
@@ -17492,6 +19550,8 @@ export interface UpdateDeploymentRequest {
   inferenceEngineVersion?: InferenceEngineVersion
   /**
    * Deployment name
+   *
+   * Min length 1
    */
   name?: string
 }
@@ -17524,14 +19584,20 @@ export function fromWireUpdateDeploymentRequest(w: any): UpdateDeploymentRequest
 export interface User {
   /**
    * User Email
+   *
+   * Read-only
    */
   email: string
   /**
    * User ID
+   *
+   * Read-only
    */
   id?: string
   /**
    * True if the user has not yet created an Exoscale account
+   *
+   * Read-only
    */
   pending?: boolean
   /**
@@ -17588,6 +19654,8 @@ export interface Vpc {
   default?: boolean
   /**
    * VPC description
+   *
+   * Max length 4096
    */
   description?: string
   /**
@@ -17600,6 +19668,8 @@ export interface Vpc {
   labels?: Labels
   /**
    * VPC name
+   *
+   * Length 1-255
    */
   name?: string
 }
@@ -17634,6 +19704,8 @@ export function fromWireVpc(w: any): Vpc {
 export interface Zone {
   /**
    * Zone API endpoint
+   *
+   * Read-only
    */
   apiEndpoint?: string
   /**
@@ -17642,6 +19714,8 @@ export interface Zone {
   name?: ZoneName
   /**
    * Zone SOS endpoint
+   *
+   * Read-only
    */
   sosEndpoint?: string
 }

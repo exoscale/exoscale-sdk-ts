@@ -2,7 +2,7 @@
 // schema, plus the toWire*/fromWire* wire transform functions.
 
 import type { Spec } from './model.js'
-import { renderDoc, toCamel } from './naming.js'
+import { toCamel } from './naming.js'
 import { renderNamedType, type RenderCtx, type TypeRegistry } from './types.js'
 
 export function generateSchemas(spec: Spec, registry: TypeRegistry): string {
@@ -16,7 +16,7 @@ export function generateSchemas(spec: Spec, registry: TypeRegistry): string {
   for (const kebab of [...spec.schemas.keys()].sort()) {
     const name = toCamel(kebab)
     const schema = spec.schemas.get(kebab)!
-    ctx.out.push(renderNamedType(name, schema, ctx, renderDoc(schema.description ?? schema.title)))
+    ctx.out.push(renderNamedType(name, schema, ctx, schema.description ?? schema.title))
   }
 
   return header + ctx.out.join('\n')

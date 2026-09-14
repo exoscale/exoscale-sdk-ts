@@ -26,7 +26,7 @@ import {
   type RenderCtx,
   type TypeRegistry,
 } from './types.js'
-import { renderDoc, toCamel, toLowerCamel } from './naming.js'
+import { docLines, renderDoc, renderDocBlock, toCamel, toLowerCamel } from './naming.js'
 
 interface ParamInfo {
   wireName: string
@@ -219,11 +219,36 @@ function inlineResponseType(
     trackTypes: usedTypes,
     trackWireFns: usedWireFns,
   }
-  const code = renderNamedType(name, schema, respCtx, '')
+  const code = renderNamedType(name, schema, respCtx, schema.description ?? schema.title)
   // fromWire<name> is defined in this same file (no import needed); it exists
   // only when the response type needs wire transforms.
   const decode = registry.hasWire(name) ? `fromWire${name}` : null
   return { retType: name, decode, typeCode: respCtx.out.join('\n') + code }
+}
+
+// operationDoc renders the JSDoc block for a method: its description, an
+// Errors section built from the non-2xx responses, and @see links to the
+// external docs of the operation's tags.
+function operationDoc(op: Operation, spec: Spec): string {
+  const groups: string[][] = [docLines(op.description || op.summary)]
+
+  if (op.errors.length > 0) {
+    const errors: string[] = ['Errors:']
+    for (const e of op.errors) {
+      errors.push('', `**${e.code}**`, ...docLines(e.description))
+    }
+    groups.push(errors)
+  }
+
+  const tags: string[] = []
+  for (const name of [...new Set(op.tags)].sort()) {
+    const docs = spec.tags.find((t) => t.name === name)?.externalDocs
+    const url = docs?.url
+    if (docs === undefined || typeof url !== 'string' || url === '') continue
+    tags.push(`@see ${url} ${docs.description ?? name}`)
+  }
+
+  return renderDocBlock([...groups, tags])
 }
 
 function renderOperation(
@@ -236,7 +261,7 @@ function renderOperation(
 ): OpCode {
   const typeName = toCamel(op.operationId)
   const funcName = toLowerCamel(op.operationId)
-  const doc = renderDoc(op.description || op.summary)
+  const doc = operationDoc(op, spec)
 
   const pathParams = op.parameters.filter((p) => p.in === 'path')
   const queryParams = op.parameters.filter((p) => p.in === 'query')

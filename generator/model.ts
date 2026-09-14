@@ -16,12 +16,25 @@ export interface Parameter {
   description?: string
 }
 
+export interface Tag {
+  name: string
+  description?: string
+  externalDocs?: { description?: string; url?: string }
+}
+
+export interface OperationError {
+  code: string
+  description?: string
+}
+
 export interface Operation {
   path: string
   method: string
   operationId: string
   summary?: string
   description?: string
+  tags: string[]
+  errors: OperationError[] // non-2xx responses with a description
   parameters: Parameter[]
   requestBody?: JSON // application/json body schema
   response200?: JSON // application/json 200 schema
@@ -34,6 +47,7 @@ export interface Spec {
   paths: Array<{ path: string; operations: Operation[] }>
   schemas: Map<string, JSON>
   operations: Operation[]
+  tags: Tag[]
 }
 
 const METHODS = ['delete', 'get', 'head', 'options', 'patch', 'post', 'put']
@@ -77,6 +91,12 @@ export function parseSpec(raw: JSON): Spec {
     }
   }
 
+  const tags: Tag[] = (raw.tags ?? []).map((t: JSON) => ({
+    name: t.name,
+    description: t.description,
+    externalDocs: t.externalDocs,
+  }))
+
   const paths: Spec['paths'] = []
   const operations: Operation[] = []
   const seenOpIds = new Map<string, string>()
@@ -102,6 +122,7 @@ export function parseSpec(raw: JSON): Spec {
     paths,
     schemas,
     operations,
+    tags,
   }
 }
 
@@ -174,18 +195,24 @@ function parseOperation(
 
   let response200: JSON | undefined
   let has200Content = false
+  const errors: OperationError[] = []
   const responses = op.responses ?? {}
-  for (const code of Object.keys(responses)) {
-    const content = responses[code].content
-    if (content === undefined) continue
-    for (const ct of Object.keys(content)) {
-      if (ct !== 'application/json') {
-        throw new Error(`${operationId}: unsupported response content type "${ct}"`)
+  for (const code of Object.keys(responses).sort()) {
+    const resp = responses[code]
+    const content = resp.content
+    if (content !== undefined) {
+      for (const ct of Object.keys(content)) {
+        if (ct !== 'application/json') {
+          throw new Error(`${operationId}: unsupported response content type "${ct}"`)
+        }
+      }
+      if (code === '200' && content['application/json']?.schema !== undefined) {
+        response200 = content['application/json'].schema
+        has200Content = true
       }
     }
-    if (code === '200' && content['application/json']?.schema !== undefined) {
-      response200 = content['application/json'].schema
-      has200Content = true
+    if (!code.startsWith('2') && typeof resp.description === 'string' && resp.description !== '') {
+      errors.push({ code, description: resp.description })
     }
   }
 
@@ -208,6 +235,8 @@ function parseOperation(
     operationId,
     summary: op.summary,
     description: op.description,
+    tags: (op.tags ?? []).filter((t: unknown): t is string => typeof t === 'string'),
+    errors,
     parameters,
     requestBody,
     response200,

@@ -8,8 +8,8 @@
 import type { JSON, Spec } from './model.js'
 import {
   isAlphanumeric,
-  renderDoc,
   renderReference,
+  schemaDoc,
   toCamel,
   toLowerCamel,
   validJsIdentifier,
@@ -232,7 +232,7 @@ export function buildPropDesc(
     tsName,
     required,
     nullable: isNullable(schema),
-    doc: renderDoc(schema.description ?? schema.title),
+    doc: schemaDoc(schema, schema.description ?? schema.title),
     typeExpr: tExpr,
     toExpr,
     fromExpr,
@@ -251,9 +251,7 @@ function typeExpr(schema: JSON, base: string, ctx: RenderCtx): string {
   const t = baseType(schema)
   if (t === 'object') {
     if (schema.properties && Object.keys(schema.properties).length > 0) {
-      ctx.out.push(
-        renderNamedType(base, schema, ctx, renderDoc(schema.description ?? schema.title)),
-      )
+      ctx.out.push(renderNamedType(base, schema, ctx, schema.description ?? schema.title))
       return base
     }
     if (schema.additionalProperties !== undefined) return recordExpr(schema, base, ctx)
@@ -270,7 +268,7 @@ function typeExpr(schema: JSON, base: string, ctx: RenderCtx): string {
     }
     const it = baseType(items)
     if (it === 'object' || it === 'array' || it === 'record') {
-      ctx.out.push(renderNamedType(base, items, ctx, renderDoc(items.description ?? items.title)))
+      ctx.out.push(renderNamedType(base, items, ctx, items.description ?? items.title))
       return `${base}[]`
     }
     return `${simpleExpr(items, false)}[]`
@@ -292,7 +290,7 @@ function recordExpr(schema: JSON, base: string, ctx: RenderCtx): string {
   }
   const vt = baseType(addl)
   if (vt === 'object' || vt === 'array' || vt === 'record') {
-    ctx.out.push(renderNamedType(base, addl, ctx, renderDoc(addl.description ?? addl.title)))
+    ctx.out.push(renderNamedType(base, addl, ctx, addl.description ?? addl.title))
     return `Record<string, ${base}>`
   }
   if (vt === null) return 'Record<string, unknown>'
@@ -418,13 +416,19 @@ function recordFromExpr(schema: JSON, base: string, wAccess: string, ctx: Render
 
 // renderNamedType renders the complete block for a named type: nested types
 // (post-order), the type definition, and its wire transform functions.
-export function renderNamedType(name: string, schema: JSON, ctx: RenderCtx, doc: string): string {
+export function renderNamedType(
+  name: string,
+  schema: JSON,
+  ctx: RenderCtx,
+  description: string | undefined,
+): string {
   if (schema.$ref !== undefined) {
     throw new Error(`pure $ref schemas are not supported: ${name}`)
   }
   ctx.registry.declare(name, schema)
 
   const t = baseType(schema)
+  const doc = schemaDoc(schema, description)
   const docStr = doc ? `${doc}\n` : ''
   const parts: string[] = []
 

@@ -441,10 +441,14 @@ export function fromWireListAntiAffinityGroupsResponse(w: any): ListAntiAffinity
 export interface CreateAntiAffinityGroupRequest {
   /**
    * Anti-affinity Group description
+   *
+   * Max length 255
    */
   description?: string
   /**
    * Anti-affinity Group name
+   *
+   * Length 1-255
    */
   name: string
 }
@@ -481,6 +485,8 @@ export function fromWireListAPIKeysResponse(w: any): ListAPIKeysResponse {
 export interface CreateAPIKeyRequest {
   /**
    * IAM API Key Name
+   *
+   * Length 1-255
    */
   name: string
   /**
@@ -532,11 +538,15 @@ export interface CreateBlockStorageVolumeRequest {
   labels?: Labels
   /**
    * Volume name
+   *
+   * Max length 255
    */
   name?: string
   /**
    * Volume size in GiB.
-   * When a snapshot ID is supplied, this defaults to the size of the source volume, but can be set to a larger value.
+   *                             When a snapshot ID is supplied, this defaults to the size of the source volume, but can be set to a larger value.
+   *
+   * Min 1
    */
   size?: number
 }
@@ -585,6 +595,8 @@ export interface UpdateBlockStorageSnapshotRequest {
   labels?: Labels | null
   /**
    * Snapshot name
+   *
+   * Max length 255
    */
   name?: string | null
 }
@@ -614,6 +626,8 @@ export interface UpdateBlockStorageVolumeRequest {
   labels?: Labels | null
   /**
    * Volume name
+   *
+   * Max length 255
    */
   name?: string | null
 }
@@ -651,6 +665,8 @@ export interface CreateBlockStorageSnapshotRequest {
   labels?: Labels
   /**
    * Snapshot name
+   *
+   * Length 1-255
    */
   name?: string
 }
@@ -672,6 +688,8 @@ export interface ResizeBlockStorageVolumeRequest {
   id: string
   /**
    * Volume size in GiB
+   *
+   * Min >0
    */
   size: number
 }
@@ -731,6 +749,8 @@ export interface CreateDBAASServiceClickhouseRequestMaintenance {
   dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
   /**
    * Time for installing updates, UTC
+   *
+   * Length 8-8
    */
   time: string
 }
@@ -764,10 +784,14 @@ export interface CreateDBAASServiceClickhouseRequest {
   maintenance?: CreateDBAASServiceClickhouseRequestMaintenance
   /**
    * Subscription plan
+   *
+   * Length 1-128
    */
   plan: string
   /**
    * Name of a backup to recover from for services that support backup names
+   *
+   * Min length 1
    */
   recoveryBackupName?: string
   /**
@@ -776,6 +800,8 @@ export interface CreateDBAASServiceClickhouseRequest {
   terminationProtection?: boolean
   /**
    * ClickHouse major version
+   *
+   * Min length 1
    */
   version?: string
 }
@@ -807,6 +833,8 @@ export interface UpdateDBAASServiceClickhouseRequestMaintenance {
   dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
   /**
    * Time for installing updates, UTC
+   *
+   * Length 8-8
    */
   time: string
 }
@@ -836,6 +864,8 @@ export interface UpdateDBAASServiceClickhouseRequest {
   maintenance?: UpdateDBAASServiceClickhouseRequestMaintenance
   /**
    * Subscription plan
+   *
+   * Length 1-128
    */
   plan?: string
   /**
@@ -844,6 +874,8 @@ export interface UpdateDBAASServiceClickhouseRequest {
   terminationProtection?: boolean
   /**
    * ClickHouse major version
+   *
+   * Min length 1
    */
   version?: string
 }
@@ -1131,6 +1163,8 @@ export interface CreateDBAASServiceGrafanaRequestMaintenance {
   dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
   /**
    * Time for installing updates, UTC
+   *
+   * Length 8-8
    */
   time: string
 }
@@ -1164,6 +1198,8 @@ export interface CreateDBAASServiceGrafanaRequest {
   maintenance?: CreateDBAASServiceGrafanaRequestMaintenance
   /**
    * Subscription plan
+   *
+   * Length 1-128
    */
   plan: string
   /**
@@ -1197,6 +1233,8 @@ export interface UpdateDBAASServiceGrafanaRequestMaintenance {
   dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
   /**
    * Time for installing updates, UTC
+   *
+   * Length 8-8
    */
   time: string
 }
@@ -1226,6 +1264,8 @@ export interface UpdateDBAASServiceGrafanaRequest {
   maintenance?: UpdateDBAASServiceGrafanaRequestMaintenance
   /**
    * Subscription plan
+   *
+   * Length 1-128
    */
   plan?: string
   /**
@@ -1429,6 +1469,8 @@ export interface CreateDBAASServiceKafkaRequestMaintenance {
   dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
   /**
    * Time for installing updates, UTC
+   *
+   * Length 8-8
    */
   time: string
 }
@@ -1478,6 +1520,8 @@ export interface CreateDBAASServiceKafkaRequest {
   maintenance?: CreateDBAASServiceKafkaRequestMaintenance
   /**
    * Subscription plan
+   *
+   * Length 1-128
    */
   plan: string
   /**
@@ -1494,6 +1538,8 @@ export interface CreateDBAASServiceKafkaRequest {
   terminationProtection?: boolean
   /**
    * Kafka major version
+   *
+   * Min length 1
    */
   version?: string
 }
@@ -1559,6 +1605,8 @@ export interface UpdateDBAASServiceKafkaRequestMaintenance {
   dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
   /**
    * Time for installing updates, UTC
+   *
+   * Length 8-8
    */
   time: string
 }
@@ -1608,6 +1656,8 @@ export interface UpdateDBAASServiceKafkaRequest {
   maintenance?: UpdateDBAASServiceKafkaRequestMaintenance
   /**
    * Subscription plan
+   *
+   * Length 1-128
    */
   plan?: string
   /**
@@ -1624,6 +1674,8 @@ export interface UpdateDBAASServiceKafkaRequest {
   terminationProtection?: boolean
   /**
    * Kafka major version
+   *
+   * Min length 1
    */
   version?: string
 }
@@ -1735,10 +1787,14 @@ export interface GetDBAASServiceMysqlRequest {
 export interface CreateDBAASServiceMysqlRequestBackupSchedule {
   /**
    * The hour of day (in UTC) when backup for the service is started. New backup is only started if previous backup has already completed.
+   *
+   * Min 0, Max 23
    */
   backupHour?: number | null
   /**
    * The minute of an hour when backup for the service is started. New backup is only started if previous backup has already completed.
+   *
+   * Min 0, Max 59
    */
   backupMinute?: number | null
 }
@@ -1795,6 +1851,8 @@ export interface CreateDBAASServiceMysqlRequestMaintenance {
   dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
   /**
    * Time for installing updates, UTC
+   *
+   * Length 8-8
    */
   time: string
 }
@@ -1815,14 +1873,20 @@ export function toWireCreateDBAASServiceMysqlRequestMaintenance(
 export interface CreateDBAASServiceMysqlRequestMigration {
   /**
    * Database name for bootstrapping the initial connection
+   *
+   * Length 1-63
    */
   dbname?: string
   /**
    * Hostname or IP address of the server where to migrate data from
+   *
+   * Length 1-255
    */
   host: string
   /**
    * Comma-separated list of databases, which should be ignored during migration (supported by MySQL only at the moment)
+   *
+   * Length 1-2048
    */
   ignoreDbs?: string
   /**
@@ -1831,10 +1895,14 @@ export interface CreateDBAASServiceMysqlRequestMigration {
   method?: EnumMigrationMethod
   /**
    * Password for authentication with the server where to migrate data from
+   *
+   * Length 1-255
    */
   password?: string
   /**
    * Port number of the server where to migrate data from
+   *
+   * Min 1, Max 65535
    */
   port: number
   /**
@@ -1843,6 +1911,8 @@ export interface CreateDBAASServiceMysqlRequestMigration {
   ssl?: boolean
   /**
    * User name for authentication with the server where to migrate data from
+   *
+   * Length 1-255
    */
   username?: string
 }
@@ -1870,11 +1940,15 @@ export interface CreateDBAASServiceMysqlRequest {
   adminPassword?: DBAASMysqlUserPassword
   /**
    * Custom username for admin user. This must be set only when a new service is being created.
+   *
+   * Length 1-64, Pattern `^[_A-Za-z0-9][-._A-Za-z0-9]{0,63}$`
    */
   adminUsername?: string
   backupSchedule?: CreateDBAASServiceMysqlRequestBackupSchedule
   /**
    * The minimum amount of time in seconds to keep binlog entries before deletion. This may be extended for services that require binlog entries for longer than the default for example if using the MySQL Debezium Kafka connector.
+   *
+   * Min 600, Max 86400
    */
   binlogRetentionPeriod?: number
   /**
@@ -1903,10 +1977,14 @@ export interface CreateDBAASServiceMysqlRequest {
   mysqlSettings?: JSONSchemaMysql
   /**
    * Subscription plan
+   *
+   * Length 1-128
    */
   plan: string
   /**
    * ISO time of a backup to recover from for services that support arbitrary times
+   *
+   * Min length 1
    */
   recoveryBackupTime?: string
   /**
@@ -1915,6 +1993,8 @@ export interface CreateDBAASServiceMysqlRequest {
   terminationProtection?: boolean
   /**
    * MySQL major version
+   *
+   * Min length 1
    */
   version?: string
 }
@@ -1949,10 +2029,14 @@ export function toWireCreateDBAASServiceMysqlRequest(
 export interface UpdateDBAASServiceMysqlRequestBackupSchedule {
   /**
    * The hour of day (in UTC) when backup for the service is started. New backup is only started if previous backup has already completed.
+   *
+   * Min 0, Max 23
    */
   backupHour?: number | null
   /**
    * The minute of an hour when backup for the service is started. New backup is only started if previous backup has already completed.
+   *
+   * Min 0, Max 59
    */
   backupMinute?: number | null
 }
@@ -1978,6 +2062,8 @@ export interface UpdateDBAASServiceMysqlRequestMaintenance {
   dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
   /**
    * Time for installing updates, UTC
+   *
+   * Length 8-8
    */
   time: string
 }
@@ -1998,14 +2084,20 @@ export function toWireUpdateDBAASServiceMysqlRequestMaintenance(
 export interface UpdateDBAASServiceMysqlRequestMigration {
   /**
    * Database name for bootstrapping the initial connection
+   *
+   * Length 1-63
    */
   dbname?: string
   /**
    * Hostname or IP address of the server where to migrate data from
+   *
+   * Length 1-255
    */
   host: string
   /**
    * Comma-separated list of databases, which should be ignored during migration (supported by MySQL only at the moment)
+   *
+   * Length 1-2048
    */
   ignoreDbs?: string
   /**
@@ -2014,10 +2106,14 @@ export interface UpdateDBAASServiceMysqlRequestMigration {
   method?: EnumMigrationMethod
   /**
    * Password for authentication with the server where to migrate data from
+   *
+   * Length 1-255
    */
   password?: string
   /**
    * Port number of the server where to migrate data from
+   *
+   * Min 1, Max 65535
    */
   port: number
   /**
@@ -2026,6 +2122,8 @@ export interface UpdateDBAASServiceMysqlRequestMigration {
   ssl?: boolean
   /**
    * User name for authentication with the server where to migrate data from
+   *
+   * Length 1-255
    */
   username?: string
 }
@@ -2050,6 +2148,8 @@ export interface UpdateDBAASServiceMysqlRequest {
   backupSchedule?: UpdateDBAASServiceMysqlRequestBackupSchedule
   /**
    * The minimum amount of time in seconds to keep binlog entries before deletion. This may be extended for services that require binlog entries for longer than the default for example if using the MySQL Debezium Kafka connector.
+   *
+   * Min 600, Max 86400
    */
   binlogRetentionPeriod?: number
   /**
@@ -2070,6 +2170,8 @@ export interface UpdateDBAASServiceMysqlRequest {
   mysqlSettings?: JSONSchemaMysql
   /**
    * Subscription plan
+   *
+   * Length 1-128
    */
   plan?: string
   /**
@@ -2198,10 +2300,14 @@ export interface GetDBAASServiceOpensearchRequest {
 export interface CreateDBAASServiceOpensearchRequestIndexPatterns {
   /**
    * Maximum number of indexes to keep
+   *
+   * Min 0
    */
   maxIndexCount?: number | null
   /**
    * fnmatch pattern
+   *
+   * Max length 1024
    */
   pattern?: string
   /**
@@ -2228,14 +2334,20 @@ export function toWireCreateDBAASServiceOpensearchRequestIndexPatterns(
 export interface CreateDBAASServiceOpensearchRequestIndexTemplate {
   /**
    * The maximum number of nested JSON objects that a single document can contain across all nested types. This limit helps to prevent out of memory errors when a document contains too many nested objects. Default is 10000.
+   *
+   * Min 0, Max 100000
    */
   mappingNestedObjectsLimit?: number | null
   /**
    * The number of replicas each primary shard has.
+   *
+   * Min 0, Max 29
    */
   numberOfReplicas?: number | null
   /**
    * The number of primary shards that an index should have.
+   *
+   * Min 1, Max 1024
    */
   numberOfShards?: number
 }
@@ -2264,6 +2376,8 @@ export interface CreateDBAASServiceOpensearchRequestMaintenance {
   dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
   /**
    * Time for installing updates, UTC
+   *
+   * Length 8-8
    */
   time: string
 }
@@ -2288,10 +2402,14 @@ export interface CreateDBAASServiceOpensearchRequestOpensearchDashboards {
   enabled?: boolean
   /**
    * Limits the maximum amount of memory (in MiB) the OpenSearch Dashboards process can use. This sets the max_old_space_size option of the nodejs running the OpenSearch Dashboards. Note: the memory reserved by OpenSearch Dashboards is not available for OpenSearch. (default: 128)
+   *
+   * Min 64, Max 1024
    */
   maxOldSpaceSize?: number
   /**
    * Timeout in milliseconds for requests made by OpenSearch Dashboards towards OpenSearch (default: 30000)
+   *
+   * Min 5000, Max 120000
    */
   opensearchRequestTimeout?: number
 }
@@ -2335,6 +2453,8 @@ export interface CreateDBAASServiceOpensearchRequest {
   maintenance?: CreateDBAASServiceOpensearchRequestMaintenance
   /**
    * Maximum number of indexes to keep before deleting the oldest one
+   *
+   * Min 0
    */
   maxIndexCount?: number | null
   /**
@@ -2347,10 +2467,14 @@ export interface CreateDBAASServiceOpensearchRequest {
   opensearchSettings?: JSONSchemaOpensearch
   /**
    * Subscription plan
+   *
+   * Length 1-128
    */
   plan: string
   /**
    * Name of a backup to recover from for services that support backup names
+   *
+   * Min length 1
    */
   recoveryBackupName?: string
   /**
@@ -2359,6 +2483,8 @@ export interface CreateDBAASServiceOpensearchRequest {
   terminationProtection?: boolean
   /**
    * OpenSearch major version
+   *
+   * Min length 1
    */
   version?: string
 }
@@ -2397,10 +2523,14 @@ export function toWireCreateDBAASServiceOpensearchRequest(
 export interface UpdateDBAASServiceOpensearchRequestIndexPatterns {
   /**
    * Maximum number of indexes to keep
+   *
+   * Min 0
    */
   maxIndexCount?: number | null
   /**
    * fnmatch pattern
+   *
+   * Max length 1024
    */
   pattern?: string
   /**
@@ -2427,14 +2557,20 @@ export function toWireUpdateDBAASServiceOpensearchRequestIndexPatterns(
 export interface UpdateDBAASServiceOpensearchRequestIndexTemplate {
   /**
    * The maximum number of nested JSON objects that a single document can contain across all nested types. This limit helps to prevent out of memory errors when a document contains too many nested objects. Default is 10000.
+   *
+   * Min 0, Max 100000
    */
   mappingNestedObjectsLimit?: number | null
   /**
    * The number of replicas each primary shard has.
+   *
+   * Min 0, Max 29
    */
   numberOfReplicas?: number | null
   /**
    * The number of primary shards that an index should have.
+   *
+   * Min 1, Max 1024
    */
   numberOfShards?: number
 }
@@ -2463,6 +2599,8 @@ export interface UpdateDBAASServiceOpensearchRequestMaintenance {
   dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
   /**
    * Time for installing updates, UTC
+   *
+   * Length 8-8
    */
   time: string
 }
@@ -2487,10 +2625,14 @@ export interface UpdateDBAASServiceOpensearchRequestOpensearchDashboards {
   enabled?: boolean
   /**
    * Limits the maximum amount of memory (in MiB) the OpenSearch Dashboards process can use. This sets the max_old_space_size option of the nodejs running the OpenSearch Dashboards. Note: the memory reserved by OpenSearch Dashboards is not available for OpenSearch. (default: 128)
+   *
+   * Min 64, Max 1024
    */
   maxOldSpaceSize?: number
   /**
    * Timeout in milliseconds for requests made by OpenSearch Dashboards towards OpenSearch (default: 30000)
+   *
+   * Min 5000, Max 120000
    */
   opensearchRequestTimeout?: number
 }
@@ -2530,6 +2672,8 @@ export interface UpdateDBAASServiceOpensearchRequest {
   maintenance?: UpdateDBAASServiceOpensearchRequestMaintenance
   /**
    * Maximum number of indexes to keep before deleting the oldest one
+   *
+   * Min 0
    */
   maxIndexCount?: number | null
   /**
@@ -2542,6 +2686,8 @@ export interface UpdateDBAASServiceOpensearchRequest {
   opensearchSettings?: JSONSchemaOpensearch
   /**
    * Subscription plan
+   *
+   * Length 1-128
    */
   plan?: string
   /**
@@ -2645,10 +2791,14 @@ export interface GetDBAASServicePGRequest {
 export interface CreateDBAASServicePGRequestBackupSchedule {
   /**
    * The hour of day (in UTC) when backup for the service is started. New backup is only started if previous backup has already completed.
+   *
+   * Min 0, Max 23
    */
   backupHour?: number | null
   /**
    * The minute of an hour when backup for the service is started. New backup is only started if previous backup has already completed.
+   *
+   * Min 0, Max 59
    */
   backupMinute?: number | null
 }
@@ -2705,6 +2855,8 @@ export interface CreateDBAASServicePGRequestMaintenance {
   dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
   /**
    * Time for installing updates, UTC
+   *
+   * Length 8-8
    */
   time: string
 }
@@ -2725,14 +2877,20 @@ export function toWireCreateDBAASServicePGRequestMaintenance(
 export interface CreateDBAASServicePGRequestMigration {
   /**
    * Database name for bootstrapping the initial connection
+   *
+   * Length 1-63
    */
   dbname?: string
   /**
    * Hostname or IP address of the server where to migrate data from
+   *
+   * Length 1-255
    */
   host: string
   /**
    * Comma-separated list of databases, which should be ignored during migration (supported by MySQL only at the moment)
+   *
+   * Length 1-2048
    */
   ignoreDbs?: string
   /**
@@ -2741,10 +2899,14 @@ export interface CreateDBAASServicePGRequestMigration {
   method?: EnumMigrationMethod
   /**
    * Password for authentication with the server where to migrate data from
+   *
+   * Length 1-255
    */
   password?: string
   /**
    * Port number of the server where to migrate data from
+   *
+   * Min 1, Max 65535
    */
   port: number
   /**
@@ -2753,6 +2915,8 @@ export interface CreateDBAASServicePGRequestMigration {
   ssl?: boolean
   /**
    * User name for authentication with the server where to migrate data from
+   *
+   * Length 1-255
    */
   username?: string
 }
@@ -2776,10 +2940,14 @@ export interface CreateDBAASServicePGRequest {
   name: DBAASServiceName
   /**
    * Custom password for admin user. Defaults to random string. This must be set only when a new service is being created.
+   *
+   * Length 8-256, Pattern `^[a-zA-Z0-9-_]+$`
    */
   adminPassword?: string
   /**
    * Custom username for admin user. This must be set only when a new service is being created.
+   *
+   * Length 1-64, Pattern `^[_A-Za-z0-9][-._A-Za-z0-9]{0,63}$`
    */
   adminUsername?: string
   backupSchedule?: CreateDBAASServicePGRequestBackupSchedule
@@ -2821,14 +2989,20 @@ export interface CreateDBAASServicePGRequest {
   pglookoutSettings?: JSONSchemaPglookout
   /**
    * Subscription plan
+   *
+   * Length 1-128
    */
   plan: string
   /**
    * ISO time of a backup to recover from for services that support arbitrary times
+   *
+   * Min length 1
    */
   recoveryBackupTime?: string
   /**
    * Percentage of total RAM that the database server uses for shared memory buffers. Valid range is 20-60 (float), which corresponds to 20% - 60%. This setting adjusts the shared_buffers configuration value.
+   *
+   * Min 20, Max 60
    */
   sharedBuffersPercentage?: number
   /**
@@ -2853,6 +3027,8 @@ export interface CreateDBAASServicePGRequest {
   version?: DBAASPGTargetVersions
   /**
    * Sets the maximum amount of memory to be used by a query operation (such as a sort or hash table) before writing to temporary disk files, in MB. Default is 1MB + 0.075% of total RAM (up to 32MB).
+   *
+   * Min 1, Max 1024
    */
   workMem?: number
 }
@@ -2898,10 +3074,14 @@ export function toWireCreateDBAASServicePGRequest(
 export interface UpdateDBAASServicePGRequestBackupSchedule {
   /**
    * The hour of day (in UTC) when backup for the service is started. New backup is only started if previous backup has already completed.
+   *
+   * Min 0, Max 23
    */
   backupHour?: number | null
   /**
    * The minute of an hour when backup for the service is started. New backup is only started if previous backup has already completed.
+   *
+   * Min 0, Max 59
    */
   backupMinute?: number | null
 }
@@ -2927,6 +3107,8 @@ export interface UpdateDBAASServicePGRequestMaintenance {
   dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
   /**
    * Time for installing updates, UTC
+   *
+   * Length 8-8
    */
   time: string
 }
@@ -2947,14 +3129,20 @@ export function toWireUpdateDBAASServicePGRequestMaintenance(
 export interface UpdateDBAASServicePGRequestMigration {
   /**
    * Database name for bootstrapping the initial connection
+   *
+   * Length 1-63
    */
   dbname?: string
   /**
    * Hostname or IP address of the server where to migrate data from
+   *
+   * Length 1-255
    */
   host: string
   /**
    * Comma-separated list of databases, which should be ignored during migration (supported by MySQL only at the moment)
+   *
+   * Length 1-2048
    */
   ignoreDbs?: string
   /**
@@ -2963,10 +3151,14 @@ export interface UpdateDBAASServicePGRequestMigration {
   method?: EnumMigrationMethod
   /**
    * Password for authentication with the server where to migrate data from
+   *
+   * Length 1-255
    */
   password?: string
   /**
    * Port number of the server where to migrate data from
+   *
+   * Min 1, Max 65535
    */
   port: number
   /**
@@ -2975,6 +3167,8 @@ export interface UpdateDBAASServicePGRequestMigration {
   ssl?: boolean
   /**
    * User name for authentication with the server where to migrate data from
+   *
+   * Length 1-255
    */
   username?: string
 }
@@ -3027,10 +3221,14 @@ export interface UpdateDBAASServicePGRequest {
   pglookoutSettings?: JSONSchemaPglookout
   /**
    * Subscription plan
+   *
+   * Length 1-128
    */
   plan?: string
   /**
    * Percentage of total RAM that the database server uses for shared memory buffers. Valid range is 20-60 (float), which corresponds to 20% - 60%. This setting adjusts the shared_buffers configuration value.
+   *
+   * Min 20, Max 60
    */
   sharedBuffersPercentage?: number
   /**
@@ -3055,6 +3253,8 @@ export interface UpdateDBAASServicePGRequest {
   version?: string
   /**
    * Sets the maximum amount of memory to be used by a query operation (such as a sort or hash table) before writing to temporary disk files, in MB. Default is 1MB + 0.075% of total RAM (up to 32MB).
+   *
+   * Min 1, Max 1024
    */
   workMem?: number
 }
@@ -3180,10 +3380,14 @@ export interface CreateDBAASPGDatabaseRequest {
   databaseName: DBAASDatabaseName
   /**
    * Default string sort order (LC_COLLATE) for PostgreSQL database
+   *
+   * Max length 128
    */
   lcCollate?: string
   /**
    * Default character classification (LC_CTYPE) for PostgreSQL database
+   *
+   * Max length 128
    */
   lcCtype?: string
 }
@@ -3294,6 +3498,8 @@ export interface GetDBAASServiceLogsRequest {
   serviceName: string
   /**
    * How many log entries to receive at most, up to 500 (default: 100)
+   *
+   * Min 1, Max 500
    */
   limit?: number
   /**
@@ -3941,6 +4147,8 @@ export interface CreateDBAASTaskMigrationCheckRequest {
   service: DBAASServiceName
   /**
    * Comma-separated list of databases, which should be ignored during migration (supported by MySQL only at the moment)
+   *
+   * Length 1-2048
    */
   ignoreDbs?: string
   /**
@@ -3949,6 +4157,8 @@ export interface CreateDBAASTaskMigrationCheckRequest {
   method?: EnumMigrationMethod
   /**
    * Service URI of the source MySQL or PostgreSQL database with admin credentials.
+   *
+   * Length 1-512
    */
   sourceServiceURI: string
 }
@@ -3986,6 +4196,8 @@ export interface CreateDBAASServiceThanosRequestMaintenance {
   dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
   /**
    * Time for installing updates, UTC
+   *
+   * Length 8-8
    */
   time: string
 }
@@ -4011,6 +4223,8 @@ export interface CreateDBAASServiceThanosRequest {
   maintenance?: CreateDBAASServiceThanosRequestMaintenance
   /**
    * Subscription plan
+   *
+   * Length 1-128
    */
   plan: string
   /**
@@ -4047,6 +4261,8 @@ export interface UpdateDBAASServiceThanosRequestMaintenance {
   dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
   /**
    * Time for installing updates, UTC
+   *
+   * Length 8-8
    */
   time: string
 }
@@ -4072,6 +4288,8 @@ export interface UpdateDBAASServiceThanosRequest {
   maintenance?: UpdateDBAASServiceThanosRequestMaintenance
   /**
    * Subscription plan
+   *
+   * Length 1-128
    */
   plan?: string
   /**
@@ -4125,6 +4343,8 @@ export interface CreateDBAASServiceValkeyRequestMaintenance {
   dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
   /**
    * Time for installing updates, UTC
+   *
+   * Length 8-8
    */
   time: string
 }
@@ -4145,14 +4365,20 @@ export function toWireCreateDBAASServiceValkeyRequestMaintenance(
 export interface CreateDBAASServiceValkeyRequestMigration {
   /**
    * Database name for bootstrapping the initial connection
+   *
+   * Length 1-63
    */
   dbname?: string
   /**
    * Hostname or IP address of the server where to migrate data from
+   *
+   * Length 1-255
    */
   host: string
   /**
    * Comma-separated list of databases, which should be ignored during migration (supported by MySQL only at the moment)
+   *
+   * Length 1-2048
    */
   ignoreDbs?: string
   /**
@@ -4161,10 +4387,14 @@ export interface CreateDBAASServiceValkeyRequestMigration {
   method?: EnumMigrationMethod
   /**
    * Password for authentication with the server where to migrate data from
+   *
+   * Length 1-255
    */
   password?: string
   /**
    * Port number of the server where to migrate data from
+   *
+   * Min 1, Max 65535
    */
   port: number
   /**
@@ -4173,6 +4403,8 @@ export interface CreateDBAASServiceValkeyRequestMigration {
   ssl?: boolean
   /**
    * User name for authentication with the server where to migrate data from
+   *
+   * Length 1-255
    */
   username?: string
 }
@@ -4212,10 +4444,14 @@ export interface CreateDBAASServiceValkeyRequest {
   migration?: CreateDBAASServiceValkeyRequestMigration
   /**
    * Subscription plan
+   *
+   * Length 1-128
    */
   plan: string
   /**
    * Name of a backup to recover from for services that support backup names
+   *
+   * Min length 1
    */
   recoveryBackupName?: string
   /**
@@ -4228,6 +4464,8 @@ export interface CreateDBAASServiceValkeyRequest {
   valkeySettings?: JSONSchemaValkey
   /**
    * Valkey major version
+   *
+   * Min length 1
    */
   version?: string
 }
@@ -4261,6 +4499,8 @@ export interface UpdateDBAASServiceValkeyRequestMaintenance {
   dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
   /**
    * Time for installing updates, UTC
+   *
+   * Length 8-8
    */
   time: string
 }
@@ -4281,14 +4521,20 @@ export function toWireUpdateDBAASServiceValkeyRequestMaintenance(
 export interface UpdateDBAASServiceValkeyRequestMigration {
   /**
    * Database name for bootstrapping the initial connection
+   *
+   * Length 1-63
    */
   dbname?: string
   /**
    * Hostname or IP address of the server where to migrate data from
+   *
+   * Length 1-255
    */
   host: string
   /**
    * Comma-separated list of databases, which should be ignored during migration (supported by MySQL only at the moment)
+   *
+   * Length 1-2048
    */
   ignoreDbs?: string
   /**
@@ -4297,10 +4543,14 @@ export interface UpdateDBAASServiceValkeyRequestMigration {
   method?: EnumMigrationMethod
   /**
    * Password for authentication with the server where to migrate data from
+   *
+   * Length 1-255
    */
   password?: string
   /**
    * Port number of the server where to migrate data from
+   *
+   * Min 1, Max 65535
    */
   port: number
   /**
@@ -4309,6 +4559,8 @@ export interface UpdateDBAASServiceValkeyRequestMigration {
   ssl?: boolean
   /**
    * User name for authentication with the server where to migrate data from
+   *
+   * Length 1-255
    */
   username?: string
 }
@@ -4344,6 +4596,8 @@ export interface UpdateDBAASServiceValkeyRequest {
   migration?: UpdateDBAASServiceValkeyRequestMigration
   /**
    * Subscription plan
+   *
+   * Length 1-128
    */
   plan?: string
   /**
@@ -4356,6 +4610,8 @@ export interface UpdateDBAASServiceValkeyRequest {
   valkeySettings?: JSONSchemaValkey
   /**
    * Valkey major version
+   *
+   * Min length 1
    */
   version?: string
 }
@@ -4518,10 +4774,14 @@ export interface CreateDNSDomainRecordRequest {
   name: string
   /**
    * DNS domain record priority
+   *
+   * Min 0
    */
   priority?: number
   /**
    * DNS domain record TTL
+   *
+   * Min 0
    */
   ttl?: number
   /**
@@ -4579,10 +4839,14 @@ export interface UpdateDNSDomainRecordRequest {
   name?: string
   /**
    * DNS domain record priority
+   *
+   * Min >0
    */
   priority?: number
   /**
    * DNS domain record TTL
+   *
+   * Min >0
    */
   ttl?: number
 }
@@ -4639,6 +4903,8 @@ export interface CreateElasticIPRequest {
   addressfamily?: 'inet4' | 'inet6'
   /**
    * Elastic IP description
+   *
+   * Max length 255
    */
   description?: string
   /**
@@ -4672,6 +4938,8 @@ export interface UpdateElasticIPRequest {
   id: string
   /**
    * Elastic IP description
+   *
+   * Max length 255
    */
   description?: string
   /**
@@ -4808,6 +5076,8 @@ export interface CreateIAMRoleRequest {
   assumeRolePolicy?: IAMAssumeRolePolicy
   /**
    * IAM Role description
+   *
+   * Length 1-255
    */
   description?: string
   /**
@@ -4820,14 +5090,20 @@ export interface CreateIAMRoleRequest {
   labels?: Labels
   /**
    * Maximum TTL requester is allowed to ask for when assuming a role
+   *
+   * Min >0
    */
   maxSessionTtl?: number
   /**
    * IAM Role name
+   *
+   * Length 1-191
    */
   name: string
   /**
    * IAM Role permissions
+   *
+   * Unique items
    */
   permissions?: string[]
   /**
@@ -4866,6 +5142,8 @@ export interface UpdateIAMRoleRequest {
   assumeRolePolicy?: IAMAssumeRolePolicy
   /**
    * IAM Role description
+   *
+   * Length 1-255
    */
   description?: string
   /**
@@ -4874,10 +5152,14 @@ export interface UpdateIAMRoleRequest {
   labels?: Labels
   /**
    * Maximum TTL requester is allowed to ask for when assuming a role
+   *
+   * Min >0
    */
   maxSessionTtl?: number
   /**
    * IAM Role permissions
+   *
+   * Unique items
    */
   permissions?: string[]
 }
@@ -4901,6 +5183,8 @@ export interface AssumeIAMRoleRequest {
   orgID?: string
   /**
    * TTL in seconds for the generated access key (cannot exceed the max TTL defined in the targeted assume role)
+   *
+   * Min >0
    */
   ttl: number
 }
@@ -4996,6 +5280,8 @@ export interface ListInstancesResponseInstances {
   manager?: Manager
   /**
    * Instance name
+   *
+   * Length 1-255
    */
   name?: string
   /**
@@ -5073,6 +5359,8 @@ export function fromWireListInstancesResponse(w: any): ListInstancesResponse {
 export interface CreateInstanceRequest {
   /**
    * Instance Anti-affinity Groups
+   *
+   * Unique items
    */
   antiAffinityGroups?: AntiAffinityGroupRef[]
   /**
@@ -5089,6 +5377,8 @@ export interface CreateInstanceRequest {
   deployTarget?: DeployTargetRef
   /**
    * Instance disk size in GiB
+   *
+   * Min 10, Max 51200
    */
   diskSize: number
   /**
@@ -5109,6 +5399,8 @@ export interface CreateInstanceRequest {
   labels?: Labels
   /**
    * Instance name
+   *
+   * Length 1-255
    */
   name?: string
   /**
@@ -5121,6 +5413,8 @@ export interface CreateInstanceRequest {
   securebootEnabled?: boolean
   /**
    * Instance Security Groups
+   *
+   * Unique items
    */
   securityGroups?: SecurityGroupRef[]
   /**
@@ -5129,6 +5423,8 @@ export interface CreateInstanceRequest {
   sshKey?: SSHKeyRef
   /**
    * Instance SSH Keys
+   *
+   * Unique items
    */
   sshKeys?: SSHKeyRef[]
   /**
@@ -5141,6 +5437,8 @@ export interface CreateInstanceRequest {
   tpmEnabled?: boolean
   /**
    * Instance Cloud-init user-data (base64 encoded)
+   *
+   * Length 1-32768
    */
   userData?: string
 }
@@ -5186,6 +5484,8 @@ export function fromWireListInstancePoolsResponse(w: any): ListInstancePoolsResp
 export interface CreateInstancePoolRequest {
   /**
    * Instance Pool Anti-affinity Groups
+   *
+   * Unique items
    */
   antiAffinityGroups?: AntiAffinityGroupRef[]
   /**
@@ -5198,18 +5498,26 @@ export interface CreateInstancePoolRequest {
   deployTarget?: DeployTargetRef
   /**
    * Instance Pool description
+   *
+   * Max length 255
    */
   description?: string
   /**
    * Instances disk size in GiB
+   *
+   * Min 10, Max 51200
    */
   diskSize: number
   /**
    * Instances Elastic IPs
+   *
+   * Unique items
    */
   elasticIPS?: ElasticIPRef[]
   /**
    * Prefix to apply to Instances names (default: pool)
+   *
+   * Length 1-30
    */
   instancePrefix?: string
   /**
@@ -5226,14 +5534,20 @@ export interface CreateInstancePoolRequest {
   labels?: Labels
   /**
    * Minimum number of running Instances
+   *
+   * Min 0
    */
   minAvailable?: number
   /**
    * Instance Pool name
+   *
+   * Length 1-255
    */
   name: string
   /**
    * Instance Pool Private Networks
+   *
+   * Unique items
    */
   privateNetworks?: PrivateNetworkRef[]
   /**
@@ -5242,10 +5556,14 @@ export interface CreateInstancePoolRequest {
   publicIPAssignment?: 'inet4' | 'dual' | 'none'
   /**
    * Instance Pool Security Groups
+   *
+   * Unique items
    */
   securityGroups?: SecurityGroupRef[]
   /**
    * Number of Instances
+   *
+   * Min >0
    */
   size: number
   /**
@@ -5254,6 +5572,8 @@ export interface CreateInstancePoolRequest {
   sshKey?: SSHKeyRef
   /**
    * Instances SSH Keys
+   *
+   * Unique items
    */
   sshKeys?: SSHKeyRef[]
   /**
@@ -5262,6 +5582,8 @@ export interface CreateInstancePoolRequest {
   template: TemplateRef
   /**
    * Instances Cloud-init user-data
+   *
+   * Length 1-32768
    */
   userData?: string
 }
@@ -5309,6 +5631,8 @@ export interface UpdateInstancePoolRequest {
   id: string
   /**
    * Instance Pool Anti-affinity Groups
+   *
+   * Unique items
    */
   antiAffinityGroups?: AntiAffinityGroupRef[] | null
   /**
@@ -5321,10 +5645,14 @@ export interface UpdateInstancePoolRequest {
   deployTarget?: DeployTargetRef | null
   /**
    * Instance Pool description
+   *
+   * Max length 255
    */
   description?: string
   /**
    * Instances disk size in GiB
+   *
+   * Min 10, Max 51200
    */
   diskSize?: number
   /**
@@ -5349,14 +5677,20 @@ export interface UpdateInstancePoolRequest {
   labels?: Labels
   /**
    * Minimum number of running Instances
+   *
+   * Min 0
    */
   minAvailable?: number | null
   /**
    * Instance Pool name
+   *
+   * Length 1-255
    */
   name?: string
   /**
    * Instance Pool Private Networks
+   *
+   * Unique items
    */
   privateNetworks?: PrivateNetworkRef[] | null
   /**
@@ -5365,6 +5699,8 @@ export interface UpdateInstancePoolRequest {
   publicIPAssignment?: 'inet4' | 'dual'
   /**
    * Instance Pool Security Groups
+   *
+   * Unique items
    */
   securityGroups?: SecurityGroupRef[] | null
   /**
@@ -5373,6 +5709,8 @@ export interface UpdateInstancePoolRequest {
   sshKey?: SSHKeyRef | null
   /**
    * Instances SSH keys
+   *
+   * Unique items
    */
   sshKeys?: SSHKeyRef[] | null
   /**
@@ -5381,6 +5719,8 @@ export interface UpdateInstancePoolRequest {
   template?: TemplateRef
   /**
    * Instances Cloud-init user-data
+   *
+   * Min length 1
    */
   userData?: string | null
 }
@@ -5457,6 +5797,8 @@ export interface ScaleInstancePoolRequest {
   id: string
   /**
    * Number of managed Instances
+   *
+   * Min 0
    */
   size: number
 }
@@ -5505,6 +5847,8 @@ export interface UpdateInstanceRequest {
   labels?: Labels | null
   /**
    * Instance name
+   *
+   * Length 1-255
    */
   name?: string
   /**
@@ -5513,6 +5857,8 @@ export interface UpdateInstanceRequest {
   publicIPAssignment?: PublicIPAssignment
   /**
    * Instance Cloud-init user-data (base64 encoded)
+   *
+   * Length 1-32768
    */
   userData?: string
 }
@@ -5561,6 +5907,8 @@ export interface ResetInstanceRequest {
   id: string
   /**
    * Instance disk size in GiB
+   *
+   * Min 10, Max 51200
    */
   diskSize?: number
   /**
@@ -5584,6 +5932,8 @@ export interface ResizeInstanceDiskRequest {
   id: string
   /**
    * Instance disk size in GiB
+   *
+   * Min 10, Max 51200
    */
   diskSize: number
 }
@@ -5691,6 +6041,8 @@ export interface CreateLoadBalancerRequest {
   addressfamily?: 'inet4' | 'inet6'
   /**
    * Load Balancer description
+   *
+   * Max length 255
    */
   description?: string
   /**
@@ -5699,6 +6051,8 @@ export interface CreateLoadBalancerRequest {
   labels?: Labels
   /**
    * Load Balancer name
+   *
+   * Length 1-255
    */
   name: string
 }
@@ -5726,11 +6080,15 @@ export interface UpdateLoadBalancerRequest {
   id: string
   /**
    * Load Balancer description
+   *
+   * Max length 255
    */
   description?: string
   labels?: Labels
   /**
    * Load Balancer name
+   *
+   * Length 1-255
    */
   name?: string
 }
@@ -5749,6 +6107,8 @@ export interface AddServiceToLoadBalancerRequest {
   id: string
   /**
    * Load Balancer Service description
+   *
+   * Max length 255
    */
   description?: string
   /**
@@ -5761,10 +6121,14 @@ export interface AddServiceToLoadBalancerRequest {
   instancePool: InstancePool
   /**
    * Load Balancer Service name
+   *
+   * Length 1-255
    */
   name: string
   /**
    * Port exposed on the Load Balancer's public IP
+   *
+   * Min 1, Max 65535
    */
   port: number
   /**
@@ -5777,6 +6141,8 @@ export interface AddServiceToLoadBalancerRequest {
   strategy: 'round-robin' | 'maglev-hash' | 'source-hash'
   /**
    * Port on which the network traffic will be forwarded to on the receiving instance
+   *
+   * Min 1, Max 65535
    */
   targetPort: number
 }
@@ -5812,6 +6178,8 @@ export interface UpdateLoadBalancerServiceRequest {
   serviceID: string
   /**
    * Load Balancer Service description
+   *
+   * Max length 255
    */
   description?: string
   /**
@@ -5820,10 +6188,14 @@ export interface UpdateLoadBalancerServiceRequest {
   healthcheck?: LoadBalancerServiceHealthcheck
   /**
    * Load Balancer Service name
+   *
+   * Max length 255
    */
   name?: string
   /**
    * Port exposed on the Load Balancer's public IP
+   *
+   * Min 1, Max 65535
    */
   port?: number
   /**
@@ -5836,6 +6208,8 @@ export interface UpdateLoadBalancerServiceRequest {
   strategy?: 'round-robin' | 'maglev-hash' | 'source-hash'
   /**
    * Port on which the network traffic will be forwarded to on the receiving instance
+   *
+   * Min 1, Max 65535
    */
   targetPort?: number
 }
@@ -5885,6 +6259,8 @@ export function fromWireListPrivateNetworksResponse(w: any): ListPrivateNetworks
 export interface CreatePrivateNetworkRequest {
   /**
    * Private Network description
+   *
+   * Max length 255
    */
   description?: string
   /**
@@ -5897,6 +6273,8 @@ export interface CreatePrivateNetworkRequest {
   labels?: Labels
   /**
    * Private Network name
+   *
+   * Length 1-255
    */
   name: string
   /**
@@ -5939,6 +6317,8 @@ export interface UpdatePrivateNetworkRequest {
   id: string
   /**
    * Private Network description
+   *
+   * Max length 255
    */
   description?: string
   /**
@@ -5951,6 +6331,8 @@ export interface UpdatePrivateNetworkRequest {
   labels?: Labels
   /**
    * Private Network name
+   *
+   * Length 1-255
    */
   name?: string
   /**
@@ -6101,6 +6483,9 @@ export interface GetReverseDNSElasticIPRequest {
 
 export interface UpdateReverseDNSElasticIPRequest {
   id: string
+  /**
+   * Length 1-253
+   */
   domainName?: string
 }
 /** @internal */
@@ -6122,6 +6507,9 @@ export interface GetReverseDNSInstanceRequest {
 
 export interface UpdateReverseDNSInstanceRequest {
   id: string
+  /**
+   * Length 1-253
+   */
   domainName?: string
 }
 /** @internal */
@@ -6151,10 +6539,14 @@ export function fromWireListSecurityGroupsResponse(w: any): ListSecurityGroupsRe
 export interface CreateSecurityGroupRequest {
   /**
    * Security Group description
+   *
+   * Max length 255
    */
   description?: string
   /**
    * Security Group name
+   *
+   * Length 1-255
    */
   name: string
 }
@@ -6180,7 +6572,13 @@ export interface GetSecurityGroupRequest {
  * ICMP details (default: -1 (ANY))
  */
 export interface AddRuleToSecurityGroupRequestICMP {
+  /**
+   * Min -1, Max 254
+   */
   code?: number | null
+  /**
+   * Min -1, Max 254
+   */
   type?: number | null
 }
 
@@ -6197,10 +6595,14 @@ export interface AddRuleToSecurityGroupRequest {
   id: string
   /**
    * Security Group rule description
+   *
+   * Max length 255
    */
   description?: string
   /**
    * End port of the range
+   *
+   * Min 1, Max 65535
    */
   endPort?: number
   /**
@@ -6225,6 +6627,8 @@ export interface AddRuleToSecurityGroupRequest {
   securityGroup?: SecurityGroupResource
   /**
    * Start port of the range
+   *
+   * Min 1, Max 65535
    */
   startPort?: number
 }
@@ -6329,6 +6733,8 @@ export function fromWireListSKSClustersResponse(w: any): ListSKSClustersResponse
 export interface CreateSKSClusterRequest {
   /**
    * Cluster addons
+   *
+   * Unique items
    */
   addons?: string[]
   /**
@@ -6349,6 +6755,8 @@ export interface CreateSKSClusterRequest {
   createDefaultSecurityGroup?: boolean | null
   /**
    * Cluster description
+   *
+   * Max length 255
    */
   description?: string | null
   /**
@@ -6357,6 +6765,8 @@ export interface CreateSKSClusterRequest {
   enableKubeProxy?: boolean
   /**
    * A list of Kubernetes-only Alpha features to enable for API server component
+   *
+   * Unique items
    */
   featureGates?: string[]
   /**
@@ -6369,6 +6779,8 @@ export interface CreateSKSClusterRequest {
   level: 'starter' | 'pro'
   /**
    * Cluster name
+   *
+   * Length 1-255
    */
   name: string
   /**
@@ -6449,6 +6861,8 @@ export interface UpdateSKSClusterRequest {
   id: string
   /**
    * Cluster addons
+   *
+   * Unique items
    */
   addons?: string[]
   /**
@@ -6461,6 +6875,8 @@ export interface UpdateSKSClusterRequest {
   autoUpgrade?: boolean
   /**
    * Cluster description
+   *
+   * Max length 255
    */
   description?: string | null
   /**
@@ -6469,6 +6885,8 @@ export interface UpdateSKSClusterRequest {
   enableOperatorsCA?: boolean
   /**
    * A list of Kubernetes-only Alpha features to enable for API server component
+   *
+   * Unique items
    */
   featureGates?: string[] | null
   /**
@@ -6477,6 +6895,8 @@ export interface UpdateSKSClusterRequest {
   labels?: SKSClusterLabels
   /**
    * Cluster name
+   *
+   * Length 1-255
    */
   name?: string
   /**
@@ -6558,10 +6978,14 @@ export interface CreateSKSNodepoolRequest {
   id: string
   /**
    * Nodepool addons
+   *
+   * Unique items
    */
   addons?: string[]
   /**
    * Nodepool Anti-affinity Groups
+   *
+   * Max items 8, Unique items
    */
   antiAffinityGroups?: AntiAffinityGroupRef[]
   /**
@@ -6570,14 +6994,20 @@ export interface CreateSKSNodepoolRequest {
   deployTarget?: DeployTargetRef
   /**
    * Nodepool description
+   *
+   * Max length 255
    */
   description?: string
   /**
    * Nodepool instances disk size in GiB
+   *
+   * Min 20, Max 51200
    */
   diskSize: number
   /**
    * Prefix to apply to instances names (default: pool), lowercase only
+   *
+   * Length 1-30
    */
   instancePrefix?: string
   /**
@@ -6590,6 +7020,8 @@ export interface CreateSKSNodepoolRequest {
   kubeletImageGC?: KubeletImageGC
   /**
    * Maximum number of pods per node (kubelet setting)
+   *
+   * Min 1, Max 65535
    */
   kubeletMaxPods?: number | null
   /**
@@ -6598,6 +7030,8 @@ export interface CreateSKSNodepoolRequest {
   labels?: SKSNodepoolLabels
   /**
    * Nodepool name, lowercase only
+   *
+   * Length 1-255
    */
   name: string
   /**
@@ -6606,20 +7040,27 @@ export interface CreateSKSNodepoolRequest {
   nvidiaMigProfiles?: NvidiaMigProfiles
   /**
    * Nodepool Private Networks
+   *
+   * Max items 16, Unique items
    */
   privateNetworks?: PrivateNetworkRef[]
   /**
    * Configures public IP assignment of the Instances with:
+   *
    * * IPv4 (`inet4`) addressing only (default);
    * * both IPv4 and IPv6 (`dual`) addressing.
    */
   publicIPAssignment?: 'inet4' | 'dual'
   /**
    * Nodepool Security Groups
+   *
+   * Max items 16, Unique items
    */
   securityGroups?: SecurityGroupRef[]
   /**
    * Number of instances
+   *
+   * Min >0
    */
   size: number
   /**
@@ -6672,6 +7113,8 @@ export interface UpdateSKSNodepoolRequest {
   sksNodepoolID: string
   /**
    * Nodepool Anti-affinity Groups
+   *
+   * Max items 8, Unique items
    */
   antiAffinityGroups?: AntiAffinityGroupRef[]
   /**
@@ -6680,14 +7123,20 @@ export interface UpdateSKSNodepoolRequest {
   deployTarget?: DeployTargetRef | null
   /**
    * Nodepool description
+   *
+   * Max length 255
    */
   description?: string
   /**
    * Nodepool instances disk size in GiB
+   *
+   * Min 20, Max 51200
    */
   diskSize?: number
   /**
    * Prefix to apply to managed instances names (default: pool), lowercase only
+   *
+   * Length 1-30
    */
   instancePrefix?: string
   /**
@@ -6700,6 +7149,8 @@ export interface UpdateSKSNodepoolRequest {
   kubeletImageGC?: KubeletImageGC
   /**
    * Maximum number of pods per node (kubelet setting)
+   *
+   * Min 1, Max 65535
    */
   kubeletMaxPods?: number | null
   /**
@@ -6708,6 +7159,8 @@ export interface UpdateSKSNodepoolRequest {
   labels?: SKSNodepoolLabels
   /**
    * Nodepool name, lowercase only
+   *
+   * Length 1-255
    */
   name?: string
   /**
@@ -6716,16 +7169,21 @@ export interface UpdateSKSNodepoolRequest {
   nvidiaMigProfiles?: NvidiaMigProfiles | null
   /**
    * Nodepool Private Networks
+   *
+   * Max items 16, Unique items
    */
   privateNetworks?: PrivateNetworkRef[]
   /**
    * Configures public IP assignment of the Instances with:
+   *
    * * IPv4 (`inet4`) addressing only;
    * * both IPv4 and IPv6 (`dual`) addressing.
    */
   publicIPAssignment?: 'inet4' | 'dual'
   /**
    * Nodepool Security Groups
+   *
+   * Max items 16, Unique items
    */
   securityGroups?: SecurityGroupRef[]
   /**
@@ -6766,6 +7224,9 @@ export function toWireUpdateSKSNodepoolRequest(
 export interface EvictSKSNodepoolMembersRequest {
   id: string
   sksNodepoolID: string
+  /**
+   * Unique items
+   */
   instances?: string[]
 }
 /** @internal */
@@ -6782,6 +7243,8 @@ export interface ScaleSKSNodepoolRequest {
   sksNodepoolID: string
   /**
    * Number of instances
+   *
+   * Min 0
    */
   size: number
 }
@@ -6873,14 +7336,20 @@ export interface PromoteSnapshotToTemplateRequest {
   id: string
   /**
    * Template default user
+   *
+   * Length 1-255
    */
   defaultUser?: string
   /**
    * Template description
+   *
+   * Max length 4096
    */
   description?: string
   /**
    * Template name
+   *
+   * Length 1-255
    */
   name: string
   /**
@@ -6947,6 +7416,8 @@ export function fromWireListSSHKeysResponse(w: any): ListSSHKeysResponse {
 export interface RegisterSSHKeyRequest {
   /**
    * SSH key name
+   *
+   * Pattern `^[a-zA-Z0-9]{1}[a-zA-Z0-9._-]{0,254}$`
    */
   name: string
   /**
@@ -6997,26 +7468,38 @@ export interface RegisterTemplateRequest {
   bootMode?: 'legacy' | 'uefi'
   /**
    * Template build
+   *
+   * Length 1-255
    */
   build?: string
   /**
    * Template MD5 checksum
+   *
+   * Min length 1
    */
   checksum: string
   /**
    * Template default user
+   *
+   * Length 1-255
    */
   defaultUser?: string
   /**
    * Template description
+   *
+   * Max length 255
    */
   description?: string
   /**
    * Template maintainer
+   *
+   * Length 1-255
    */
   maintainer?: string
   /**
    * Template name
+   *
+   * Length 1-255
    */
   name: string
   /**
@@ -7025,6 +7508,8 @@ export interface RegisterTemplateRequest {
   passwordEnabled: boolean
   /**
    * Template size
+   *
+   * Min >0
    */
   size?: number
   /**
@@ -7033,10 +7518,14 @@ export interface RegisterTemplateRequest {
   sshKeyEnabled: boolean
   /**
    * Template source URL
+   *
+   * Min length 1
    */
   url: string
   /**
    * Template version
+   *
+   * Length 1-255
    */
   version?: string
 }
@@ -7086,10 +7575,14 @@ export interface UpdateTemplateRequest {
   id: string
   /**
    * Template Description
+   *
+   * Max length 255
    */
   description?: string
   /**
    * Template name
+   *
+   * Length 1-255
    */
   name?: string
 }
@@ -7110,30 +7603,44 @@ export interface GetUsageReportRequest {
 export interface GetUsageReportResponseUsage {
   /**
    * Description
+   *
+   * Read-only
    */
   description?: string
   /**
    * Period Start Date
+   *
+   * Read-only
    */
   from?: string
   /**
    * Product
+   *
+   * Read-only
    */
   product?: string
   /**
    * Quantity
+   *
+   * Read-only
    */
   quantity?: string
   /**
    * Period End Date
+   *
+   * Read-only
    */
   to?: string
   /**
    * Unit
+   *
+   * Read-only
    */
   unit?: string
   /**
    * Variable
+   *
+   * Read-only
    */
   variable?: string
 }
@@ -7223,6 +7730,8 @@ export function fromWireListVpcsResponse(w: any): ListVpcsResponse {
 export interface CreateVpcRequest {
   /**
    * VPC description
+   *
+   * Max length 4096
    */
   description?: string
   /**
@@ -7231,6 +7740,8 @@ export interface CreateVpcRequest {
   labels?: Labels
   /**
    * VPC name
+   *
+   * Length 1-255
    */
   name: string
 }
@@ -7255,6 +7766,8 @@ export interface UpdateVpcRequest {
   id: string
   /**
    * VPC description
+   *
+   * Max length 4096
    */
   description?: string | null
   /**
@@ -7263,6 +7776,8 @@ export interface UpdateVpcRequest {
   labels?: Labels | null
   /**
    * VPC name
+   *
+   * Length 1-255
    */
   name?: string | null
 }
@@ -7317,6 +7832,8 @@ export interface CreateSubnetRequest {
   addressfamily: 'inet4'
   /**
    * Subnet description
+   *
+   * Max length 4096
    */
   description?: string
   /**
@@ -7329,6 +7846,8 @@ export interface CreateSubnetRequest {
   labels?: Labels
   /**
    * Subnet name
+   *
+   * Length 1-255
    */
   name: string
 }
@@ -7359,6 +7878,8 @@ export interface UpdateSubnetRequest {
   id: string
   /**
    * Subnet description
+   *
+   * Max length 4096
    */
   description?: string | null
   /**
@@ -7367,6 +7888,8 @@ export interface UpdateSubnetRequest {
   labels?: Labels | null
   /**
    * Subnet name
+   *
+   * Length 1-255
    */
   name?: string | null
 }
@@ -7439,6 +7962,8 @@ export interface CreateRouteRequest {
   subnetID: string
   /**
    * Route description
+   *
+   * Max length 4096
    */
   description?: string
   /**
@@ -7481,6 +8006,13 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List AI API keys for an organization
+   *
+   * Errors:
+   *
+   * **403**
+   * Forbidden
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/managed-inference/ Read more
    */
   listAIAPIKeys(): Promise<ListAIAPIKeysResponse> {
     return this.core.request('GET', '/ai/api-key', { decode: fromWireListAIAPIKeysResponse })
@@ -7488,6 +8020,19 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a new AI API key
+   *
+   * Errors:
+   *
+   * **400**
+   * Bad Request
+   *
+   * **403**
+   * Forbidden
+   *
+   * **404**
+   * Not Found
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/managed-inference/ Read more
    */
   createAIAPIKey(params: CreateAIAPIKeyRequest): Promise<CreateAIAPIKeyResponse> {
     const body = toWireCreateAIAPIKeyRequest(params)
@@ -7499,6 +8044,16 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete AI API key
+   *
+   * Errors:
+   *
+   * **403**
+   * Forbidden
+   *
+   * **404**
+   * Not Found
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/managed-inference/ Read more
    */
   deleteAIAPIKey(params: DeleteAIAPIKeyRequest): Promise<Operation> {
     const path = `/ai/api-key/${encodeURIComponent(params.id)}`
@@ -7507,6 +8062,16 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Get AI API key metadata
+   *
+   * Errors:
+   *
+   * **403**
+   * Forbidden
+   *
+   * **404**
+   * Not Found
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/managed-inference/ Read more
    */
   getAIAPIKey(params: GetAIAPIKeyRequest): Promise<GetAIAPIKeyResponse> {
     const path = `/ai/api-key/${encodeURIComponent(params.id)}`
@@ -7515,6 +8080,13 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List Deployments
+   *
+   * Errors:
+   *
+   * **400**
+   * Bad Request
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
    */
   listDeployments(params?: ListDeploymentsRequest): Promise<ListDeploymentsResponse> {
     const query: Record<string, string> = {}
@@ -7527,6 +8099,19 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Deploy a model on an inference server
+   *
+   * Errors:
+   *
+   * **400**
+   * Bad Request
+   *
+   * **403**
+   * Forbidden
+   *
+   * **412**
+   * 412 (probably insufficient GPUs)
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
    */
   createDeployment(params: CreateDeploymentRequest): Promise<Operation> {
     const body = toWireCreateDeploymentRequest(params)
@@ -7535,6 +8120,19 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete Deployment
+   *
+   * Errors:
+   *
+   * **403**
+   * Forbidden
+   *
+   * **404**
+   * Not Found
+   *
+   * **409**
+   * Conflict
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
    */
   deleteDeployment(params: DeleteDeploymentRequest): Promise<Operation> {
     const path = `/ai/deployment/${encodeURIComponent(params.id)}`
@@ -7543,6 +8141,13 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Get Deployment details
+   *
+   * Errors:
+   *
+   * **404**
+   * Not Found
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
    */
   getDeployment(params: GetDeploymentRequest): Promise<GetDeploymentResponse> {
     const path = `/ai/deployment/${encodeURIComponent(params.id)}`
@@ -7551,6 +8156,22 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Update AI deployment
+   *
+   * Errors:
+   *
+   * **400**
+   * Bad Request
+   *
+   * **403**
+   * Forbidden
+   *
+   * **404**
+   * Not Found
+   *
+   * **409**
+   * Conflict
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
    */
   updateDeployment(
     params: UpdateDeploymentRequest & {
@@ -7564,6 +8185,13 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Get Deployment API Key
+   *
+   * Errors:
+   *
+   * **404**
+   * Not Found
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
    */
   revealDeploymentAPIKey(
     params: RevealDeploymentAPIKeyRequest,
@@ -7574,6 +8202,19 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Return logs for the vLLM deployment (deploy/<release-name>--deployment-vllm). Optional ?stream=true to request streaming (may not be supported).
+   *
+   * Errors:
+   *
+   * **400**
+   * Bad Request
+   *
+   * **404**
+   * Not Found
+   *
+   * **500**
+   * Internal Server Error
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
    */
   getDeploymentLogs(params: GetDeploymentLogsRequest): Promise<GetDeploymentLogsResponse> {
     const path = `/ai/deployment/${encodeURIComponent(params.id)}/logs`
@@ -7585,6 +8226,22 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Scale Deployment
+   *
+   * Errors:
+   *
+   * **403**
+   * Forbidden
+   *
+   * **404**
+   * Not Found
+   *
+   * **409**
+   * Conflict
+   *
+   * **412**
+   * Precondition Failed
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
    */
   scaleDeployment(
     params: ScaleDeploymentRequest & {
@@ -7598,6 +8255,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Get list of allowed inference engine parameters with their descriptions and allowed values
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
    */
   getInferenceEngineHelp(
     params?: GetInferenceEngineHelpRequest,
@@ -7612,6 +8271,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List available instance types with authorization status based on GPU availability
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
    */
   listAIInstanceTypes(): Promise<ListAIInstanceTypesResponse> {
     return this.core.request('GET', '/ai/instance-type', {
@@ -7621,6 +8282,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List Models
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
    */
   listModels(): Promise<ListModelsResponse> {
     return this.core.request('GET', '/ai/model', { decode: fromWireListModelsResponse })
@@ -7628,8 +8291,17 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Model files will be downloaded from Huggingface.
+   *
    * Name must be the exact name of the model on huggingface (ex: openai/gpt-oss-120b or ggml-org/gpt-oss-120b-GGUF).
+   *
    * If the model is under a license then you must provide a Huggingface access token for an account that signed the license agreement
+   *
+   * Errors:
+   *
+   * **403**
+   * Forbidden
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
    */
   createModel(params: CreateModelRequest): Promise<Operation> {
     const body = toWireCreateModelRequest(params)
@@ -7638,6 +8310,19 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete Model
+   *
+   * Errors:
+   *
+   * **403**
+   * Forbidden
+   *
+   * **404**
+   * Not Found
+   *
+   * **412**
+   * Precondition Failed
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
    */
   deleteModel(params: DeleteModelRequest): Promise<Operation> {
     const path = `/ai/model/${encodeURIComponent(params.id)}`
@@ -7646,6 +8331,13 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Get Model details
+   *
+   * Errors:
+   *
+   * **404**
+   * Not Found
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
    */
   getModel(params: GetModelRequest): Promise<GetModelResponse> {
     const path = `/ai/model/${encodeURIComponent(params.id)}`
@@ -7654,6 +8346,13 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Get per-org Unit Of Measurement (UOM) consumption quota (UOM/min). Null means unlimited. UOM represents weighted units across different AI workloads (e.g., tokens for LLMs, minutes for TTS, pages for OCR).
+   *
+   * Errors:
+   *
+   * **404**
+   * Not Found
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/managed-inference/ Read more
    */
   getUserOrgConsumptionQuota(): Promise<OrgConsumptionQuotaResponse> {
     return this.core.request('GET', '/ai/quota', { decode: fromWireOrgConsumptionQuotaResponse })
@@ -7661,6 +8360,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List Anti-affinity Groups
+   *
+   * @see https://community.exoscale.com/product/compute/instances/how-to/anti-affinity/ Read more
    */
   listAntiAffinityGroups(): Promise<ListAntiAffinityGroupsResponse> {
     return this.core.request('GET', '/anti-affinity-group', {
@@ -7670,6 +8371,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create an Anti-affinity Group
+   *
+   * @see https://community.exoscale.com/product/compute/instances/how-to/anti-affinity/ Read more
    */
   createAntiAffinityGroup(params: CreateAntiAffinityGroupRequest): Promise<Operation> {
     const body = toWireCreateAntiAffinityGroupRequest(params)
@@ -7678,6 +8381,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete an Anti-affinity Group
+   *
+   * @see https://community.exoscale.com/product/compute/instances/how-to/anti-affinity/ Read more
    */
   deleteAntiAffinityGroup(params: DeleteAntiAffinityGroupRequest): Promise<Operation> {
     const path = `/anti-affinity-group/${encodeURIComponent(params.id)}`
@@ -7686,6 +8391,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Retrieve Anti-affinity Group details
+   *
+   * @see https://community.exoscale.com/product/compute/instances/how-to/anti-affinity/ Read more
    */
   getAntiAffinityGroup(params: GetAntiAffinityGroupRequest): Promise<AntiAffinityGroup> {
     const path = `/anti-affinity-group/${encodeURIComponent(params.id)}`
@@ -7694,6 +8401,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List API keys
+   *
+   * @see https://community.exoscale.com/product/iam/how-to/key-mgmt/ Read more
    */
   listAPIKeys(): Promise<ListAPIKeysResponse> {
     return this.core.request('GET', '/api-key', { decode: fromWireListAPIKeysResponse })
@@ -7701,6 +8410,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a new API key
+   *
+   * @see https://community.exoscale.com/product/iam/how-to/key-mgmt/ Read more
    */
   createAPIKey(params: CreateAPIKeyRequest): Promise<IAMAPIKeyCreated> {
     const body = toWireCreateAPIKeyRequest(params)
@@ -7709,6 +8420,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete an API key
+   *
+   * @see https://community.exoscale.com/product/iam/how-to/key-mgmt/ Read more
    */
   deleteAPIKey(params: DeleteAPIKeyRequest): Promise<Operation> {
     const path = `/api-key/${encodeURIComponent(params.id)}`
@@ -7717,6 +8430,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Get API key
+   *
+   * @see https://community.exoscale.com/product/iam/how-to/key-mgmt/ Read more
    */
   getAPIKey(params: GetAPIKeyRequest): Promise<IAMAPIKey> {
     const path = `/api-key/${encodeURIComponent(params.id)}`
@@ -7725,6 +8440,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List block storage volumes
+   *
+   * @see https://community.exoscale.com/documentation/block-storage/ Read more
    */
   listBlockStorageVolumes(
     params?: ListBlockStorageVolumesRequest,
@@ -7739,6 +8456,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a block storage volume
+   *
+   * @see https://community.exoscale.com/documentation/block-storage/ Read more
    */
   createBlockStorageVolume(params: CreateBlockStorageVolumeRequest): Promise<Operation> {
     const body = toWireCreateBlockStorageVolumeRequest(params)
@@ -7747,6 +8466,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List block storage snapshots
+   *
+   * @see https://community.exoscale.com/documentation/block-storage/ Read more
    */
   listBlockStorageSnapshots(): Promise<ListBlockStorageSnapshotsResponse> {
     return this.core.request('GET', '/block-storage-snapshot', {
@@ -7756,6 +8477,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a block storage snapshot, data will be unrecoverable
+   *
+   * @see https://community.exoscale.com/documentation/block-storage/ Read more
    */
   deleteBlockStorageSnapshot(params: DeleteBlockStorageSnapshotRequest): Promise<Operation> {
     const path = `/block-storage-snapshot/${encodeURIComponent(params.id)}`
@@ -7764,6 +8487,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Retrieve block storage snapshot details
+   *
+   * @see https://community.exoscale.com/documentation/block-storage/ Read more
    */
   getBlockStorageSnapshot(params: GetBlockStorageSnapshotRequest): Promise<BlockStorageSnapshot> {
     const path = `/block-storage-snapshot/${encodeURIComponent(params.id)}`
@@ -7772,6 +8497,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Update block storage volume snapshot
+   *
+   * @see https://community.exoscale.com/documentation/block-storage/ Read more
    */
   updateBlockStorageSnapshot(params: UpdateBlockStorageSnapshotRequest): Promise<Operation> {
     const path = `/block-storage-snapshot/${encodeURIComponent(params.id)}`
@@ -7781,6 +8508,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a block storage volume, data will be unrecoverable
+   *
+   * @see https://community.exoscale.com/documentation/block-storage/ Read more
    */
   deleteBlockStorageVolume(params: DeleteBlockStorageVolumeRequest): Promise<Operation> {
     const path = `/block-storage/${encodeURIComponent(params.id)}`
@@ -7789,6 +8518,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Retrieve block storage volume details
+   *
+   * @see https://community.exoscale.com/documentation/block-storage/ Read more
    */
   getBlockStorageVolume(params: GetBlockStorageVolumeRequest): Promise<BlockStorageVolume> {
     const path = `/block-storage/${encodeURIComponent(params.id)}`
@@ -7797,6 +8528,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Update block storage volume
+   *
+   * @see https://community.exoscale.com/documentation/block-storage/ Read more
    */
   updateBlockStorageVolume(params: UpdateBlockStorageVolumeRequest): Promise<Operation> {
     const path = `/block-storage/${encodeURIComponent(params.id)}`
@@ -7806,6 +8539,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Attach block storage volume to an instance
+   *
+   * @see https://community.exoscale.com/documentation/block-storage/ Read more
    */
   attachBlockStorageVolumeToInstance(
     params: AttachBlockStorageVolumeToInstanceRequest,
@@ -7817,6 +8552,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a block storage snapshot
+   *
+   * @see https://community.exoscale.com/documentation/block-storage/ Read more
    */
   createBlockStorageSnapshot(params: CreateBlockStorageSnapshotRequest): Promise<Operation> {
     const path = `/block-storage/${encodeURIComponent(params.id)}:create-snapshot`
@@ -7826,6 +8563,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Detach block storage volume
+   *
+   * @see https://community.exoscale.com/documentation/block-storage/ Read more
    */
   detachBlockStorageVolume(params: DetachBlockStorageVolumeRequest): Promise<Operation> {
     const path = `/block-storage/${encodeURIComponent(params.id)}:detach`
@@ -7834,6 +8573,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * This operation resizes a Block storage volume. Note: the volume can only grow, cannot be shrunk. Only detached volumes or volumes attached to stopped instances can be resized.
+   *
+   * @see https://community.exoscale.com/documentation/block-storage/ Read more
    */
   resizeBlockStorageVolume(params: ResizeBlockStorageVolumeRequest): Promise<BlockStorageVolume> {
     const path = `/block-storage/${encodeURIComponent(params.id)}:resize-volume`
@@ -7843,6 +8584,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Retrieve signed url valid for 60 seconds to connect via console-proxy websocket to VM VNC console.
+   *
+   * @see https://www.exoscale.com/compute/ Read more
    */
   getConsoleProxyURL(params: GetConsoleProxyURLRequest): Promise<GetConsoleProxyURLResponse> {
     const path = `/console/${encodeURIComponent(params.id)}`
@@ -7851,6 +8594,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Returns a CA Certificate required to reach a DBaaS service through a TLS-protected connection.
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASCACertificate(): Promise<GetDBAASCACertificateResponse> {
     return this.core.request('GET', '/dbaas-ca-certificate', {
@@ -7860,6 +8605,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a ClickHouse service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   deleteDBAASServiceClickhouse(params: DeleteDBAASServiceClickhouseRequest): Promise<Operation> {
     const path = `/dbaas-clickhouse/${encodeURIComponent(params.name)}`
@@ -7868,6 +8615,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Get a DBaaS ClickHouse service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASServiceClickhouse(
     params: GetDBAASServiceClickhouseRequest,
@@ -7878,6 +8627,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a DBaaS ClickHouse service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   createDBAASServiceClickhouse(params: CreateDBAASServiceClickhouseRequest): Promise<Operation> {
     const path = `/dbaas-clickhouse/${encodeURIComponent(params.name)}`
@@ -7887,6 +8638,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Update a DBaaS ClickHouse service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   updateDBAASServiceClickhouse(params: UpdateDBAASServiceClickhouseRequest): Promise<Operation> {
     const path = `/dbaas-clickhouse/${encodeURIComponent(params.name)}`
@@ -7896,6 +8649,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Initiate ClickHouse maintenance update
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   startDBAASClickhouseMaintenance(
     params: StartDBAASClickhouseMaintenanceRequest,
@@ -7906,6 +8661,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Get DBaaS ClickHouse ACL configuration
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASClickhouseAclConfig(
     params: GetDBAASClickhouseAclConfigRequest,
@@ -7916,6 +8673,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List DBaaS ClickHouse roles
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   listDBAASClickhouseRoles(params: ListDBAASClickhouseRolesRequest): Promise<DBAASClickhouseRoles> {
     const path = `/dbaas-clickhouse/${encodeURIComponent(params.serviceName)}/role`
@@ -7924,6 +8683,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a DBaaS ClickHouse role
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   deleteDBAASClickhouseRole(params: DeleteDBAASClickhouseRoleRequest): Promise<Operation> {
     const path = `/dbaas-clickhouse/${encodeURIComponent(params.serviceName)}/role/${encodeURIComponent(params.roleUuid)}`
@@ -7932,6 +8693,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List DBaaS ClickHouse users
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   listDBAASClickhouseUsers(params: ListDBAASClickhouseUsersRequest): Promise<DBAASClickhouseUsers> {
     const path = `/dbaas-clickhouse/${encodeURIComponent(params.serviceName)}/user`
@@ -7940,6 +8703,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a DBaaS ClickHouse user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   createDBAASClickhouseUser(
     params: CreateDBAASClickhouseUserRequest,
@@ -7951,6 +8716,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a DBaaS ClickHouse user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   deleteDBAASClickhouseUser(params: DeleteDBAASClickhouseUserRequest): Promise<Operation> {
     const path = `/dbaas-clickhouse/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.userUuid)}`
@@ -7959,6 +8726,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Reset the credentials of a DBaaS ClickHouse user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   resetDBAASClickhouseUserPassword(
     params: ResetDBAASClickhouseUserPasswordRequest,
@@ -7970,6 +8739,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Reveal the secrets of a DBaaS ClickHouse user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   revealDBAASClickhouseUserPassword(
     params: RevealDBAASClickhouseUserPasswordRequest,
@@ -7980,6 +8751,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Delete DataDog external integration endpoint
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   deleteDBAASExternalEndpointDatadog(
     params: DeleteDBAASExternalEndpointDatadogRequest,
@@ -7990,6 +8763,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Get DataDog external endpoint settings
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASExternalEndpointDatadog(
     params: GetDBAASExternalEndpointDatadogRequest,
@@ -8000,6 +8775,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Update DataDog external integration endpoint
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   updateDBAASExternalEndpointDatadog(
     params: DBAASEndpointDatadogInputUpdate & {
@@ -8013,6 +8790,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Create DataDog external integration endpoint
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   createDBAASExternalEndpointDatadog(
     params: DBAASEndpointDatadogInputCreate & {
@@ -8026,6 +8805,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Delete ElasticSearch logs external integration endpoint
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   deleteDBAASExternalEndpointElasticsearch(
     params: DeleteDBAASExternalEndpointElasticsearchRequest,
@@ -8036,6 +8817,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Get ElasticSearch Logs external integration endpoint settings
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASExternalEndpointElasticsearch(
     params: GetDBAASExternalEndpointElasticsearchRequest,
@@ -8046,6 +8829,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Update ElasticSearch Logs external integration endpoint
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   updateDBAASExternalEndpointElasticsearch(
     params: DBAASEndpointElasticsearchInputUpdate & {
@@ -8059,6 +8844,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Create ElasticSearch Logs external integration endpoint
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   createDBAASExternalEndpointElasticsearch(
     params: DBAASEndpointElasticsearchInputCreate & {
@@ -8072,6 +8859,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Delete OpenSearch logs external integration endpoint
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   deleteDBAASExternalEndpointOpensearch(
     params: DeleteDBAASExternalEndpointOpensearchRequest,
@@ -8082,6 +8871,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Get OpenSearch Logs external integration endpoint settings
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASExternalEndpointOpensearch(
     params: GetDBAASExternalEndpointOpensearchRequest,
@@ -8092,6 +8883,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Update OpenSearch Logs external integration endpoint
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   updateDBAASExternalEndpointOpensearch(
     params: DBAASEndpointOpensearchInputUpdate & {
@@ -8105,6 +8898,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Create OpenSearch Logs external integration endpoint
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   createDBAASExternalEndpointOpensearch(
     params: DBAASEndpointOpensearchInputCreate & {
@@ -8118,6 +8913,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Delete Prometheus external integration endpoint
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   deleteDBAASExternalEndpointPrometheus(
     params: DeleteDBAASExternalEndpointPrometheusRequest,
@@ -8128,6 +8925,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Get Prometheus external integration endpoint settings
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASExternalEndpointPrometheus(
     params: GetDBAASExternalEndpointPrometheusRequest,
@@ -8138,6 +8937,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Update Prometheus external integration endpoint
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   updateDBAASExternalEndpointPrometheus(
     params: DBAASEndpointPrometheusPayload & {
@@ -8151,6 +8952,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Create Prometheus external integration endpoint
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   createDBAASExternalEndpointPrometheus(
     params: DBAASEndpointPrometheusPayload & {
@@ -8164,6 +8967,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Delete RSyslog external integration endpoint
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   deleteDBAASExternalEndpointRsyslog(
     params: DeleteDBAASExternalEndpointRsyslogRequest,
@@ -8174,6 +8979,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Get RSyslog external integration endpoint settings
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASExternalEndpointRsyslog(
     params: GetDBAASExternalEndpointRsyslogRequest,
@@ -8184,6 +8991,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Update RSyslog external integration endpoint
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   updateDBAASExternalEndpointRsyslog(
     params: DBAASEndpointRsyslogInputUpdate & {
@@ -8197,6 +9006,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Create RSyslog external integration endpoint
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   createDBAASExternalEndpointRsyslog(
     params: DBAASEndpointRsyslogInputCreate & {
@@ -8210,6 +9021,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] List available external endpoint types and their schemas for DBaaS external integrations
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   listDBAASExternalEndpointTypes(): Promise<ListDBAASExternalEndpointTypesResponse> {
     return this.core.request('GET', '/dbaas-external-endpoint-types', {
@@ -8219,6 +9032,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Create a new DBaaS connection between a DBaaS service and an external service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   attachDBAASServiceToEndpoint(params: AttachDBAASServiceToEndpointRequest): Promise<Operation> {
     const path = `/dbaas-external-endpoint/${encodeURIComponent(params.sourceServiceName)}/attach`
@@ -8228,6 +9043,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Detach a DBaaS external integration from a service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   detachDBAASServiceFromEndpoint(
     params: DetachDBAASServiceFromEndpointRequest,
@@ -8239,6 +9056,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] List available external endpoints for integrations
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   listDBAASExternalEndpoints(): Promise<ListDBAASExternalEndpointsResponse> {
     return this.core.request('GET', '/dbaas-external-endpoints', {
@@ -8248,6 +9067,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Get Datadog integration settings
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASExternalIntegrationSettingsDatadog(
     params: GetDBAASExternalIntegrationSettingsDatadogRequest,
@@ -8260,6 +9081,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Manage Datadog integration settings
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   updateDBAASExternalIntegrationSettingsDatadog(
     params: UpdateDBAASExternalIntegrationSettingsDatadogRequest,
@@ -8271,6 +9094,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Get a DBaaS external integration
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASExternalIntegration(
     params: GetDBAASExternalIntegrationRequest,
@@ -8281,6 +9106,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] List all DBaaS connections between services and external endpoints
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   listDBAASExternalIntegrations(
     params: ListDBAASExternalIntegrationsRequest,
@@ -8291,6 +9118,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a Grafana service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   deleteDBAASServiceGrafana(params: DeleteDBAASServiceGrafanaRequest): Promise<Operation> {
     const path = `/dbaas-grafana/${encodeURIComponent(params.name)}`
@@ -8299,6 +9128,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Get a DBaaS Grafana service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASServiceGrafana(params: GetDBAASServiceGrafanaRequest): Promise<DBAASServiceGrafana> {
     const path = `/dbaas-grafana/${encodeURIComponent(params.name)}`
@@ -8307,6 +9138,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a DBaaS Grafana service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   createDBAASServiceGrafana(params: CreateDBAASServiceGrafanaRequest): Promise<Operation> {
     const path = `/dbaas-grafana/${encodeURIComponent(params.name)}`
@@ -8316,6 +9149,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Update a DBaaS Grafana service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   updateDBAASServiceGrafana(params: UpdateDBAASServiceGrafanaRequest): Promise<Operation> {
     const path = `/dbaas-grafana/${encodeURIComponent(params.name)}`
@@ -8325,6 +9160,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Initiate Grafana maintenance update
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   startDBAASGrafanaMaintenance(params: StartDBAASGrafanaMaintenanceRequest): Promise<Operation> {
     const path = `/dbaas-grafana/${encodeURIComponent(params.name)}/maintenance/start`
@@ -8333,6 +9170,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * If no password is provided one will be generated automatically.
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   resetDBAASGrafanaUserPassword(params: ResetDBAASGrafanaUserPasswordRequest): Promise<Operation> {
     const path = `/dbaas-grafana/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reset`
@@ -8342,6 +9181,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Reveal the secrets of a DBaaS Grafana user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   revealDBAASGrafanaUserPassword(
     params: RevealDBAASGrafanaUserPasswordRequest,
@@ -8352,6 +9193,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Create a new DBaaS integration between two services
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   createDBAASIntegration(params: CreateDBAASIntegrationRequest): Promise<Operation> {
     const body = toWireCreateDBAASIntegrationRequest(params)
@@ -8360,6 +9203,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Get DBaaS integration settings
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   listDBAASIntegrationSettings(
     params: ListDBAASIntegrationSettingsRequest,
@@ -8370,6 +9215,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Get DBaaS integration types
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   listDBAASIntegrationTypes(): Promise<ListDBAASIntegrationTypesResponse> {
     return this.core.request('GET', '/dbaas-integration-types', {
@@ -8379,6 +9226,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Delete a DBaaS Integration
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   deleteDBAASIntegration(params: DeleteDBAASIntegrationRequest): Promise<Operation> {
     const path = `/dbaas-integration/${encodeURIComponent(params.id)}`
@@ -8387,6 +9236,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Get a DBaaS Integration
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASIntegration(params: GetDBAASIntegrationRequest): Promise<DBAASIntegration> {
     const path = `/dbaas-integration/${encodeURIComponent(params.id)}`
@@ -8395,6 +9246,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Update a existing DBaaS integration
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   updateDBAASIntegration(params: UpdateDBAASIntegrationRequest): Promise<Operation> {
     const path = `/dbaas-integration/${encodeURIComponent(params.id)}`
@@ -8404,6 +9257,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a Kafka service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   deleteDBAASServiceKafka(params: DeleteDBAASServiceKafkaRequest): Promise<Operation> {
     const path = `/dbaas-kafka/${encodeURIComponent(params.name)}`
@@ -8412,6 +9267,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Get a DBaaS Kafka service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASServiceKafka(params: GetDBAASServiceKafkaRequest): Promise<DBAASServiceKafka> {
     const path = `/dbaas-kafka/${encodeURIComponent(params.name)}`
@@ -8420,6 +9277,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a DBaaS Kafka service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   createDBAASServiceKafka(params: CreateDBAASServiceKafkaRequest): Promise<Operation> {
     const path = `/dbaas-kafka/${encodeURIComponent(params.name)}`
@@ -8429,6 +9288,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Update a DBaaS Kafka service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   updateDBAASServiceKafka(params: UpdateDBAASServiceKafkaRequest): Promise<Operation> {
     const path = `/dbaas-kafka/${encodeURIComponent(params.name)}`
@@ -8438,6 +9299,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Get DBaaS kafka ACL configuration
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASKafkaAclConfig(params: GetDBAASKafkaAclConfigRequest): Promise<DBAASKafkaAcls> {
     const path = `/dbaas-kafka/${encodeURIComponent(params.name)}/acl-config`
@@ -8446,6 +9309,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Initiate Kafka maintenance update
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   startDBAASKafkaMaintenance(params: StartDBAASKafkaMaintenanceRequest): Promise<Operation> {
     const path = `/dbaas-kafka/${encodeURIComponent(params.name)}/maintenance/start`
@@ -8454,6 +9319,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Add a Kafka Schema Registry ACL entry
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   createDBAASKafkaSchemaRegistryAclConfig(
     params: DBAASKafkaSchemaRegistryAclEntry & {
@@ -8467,6 +9334,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a Kafka ACL entry
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   deleteDBAASKafkaSchemaRegistryAclConfig(
     params: DeleteDBAASKafkaSchemaRegistryAclConfigRequest,
@@ -8477,6 +9346,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Add a Kafka topic ACL entry
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   createDBAASKafkaTopicAclConfig(
     params: DBAASKafkaTopicAclEntry & {
@@ -8490,6 +9361,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a Kafka ACL entry
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   deleteDBAASKafkaTopicAclConfig(
     params: DeleteDBAASKafkaTopicAclConfigRequest,
@@ -8500,6 +9373,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Reveal the secrets for DBaaS Kafka Connect
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   revealDBAASKafkaConnectPassword(
     params: RevealDBAASKafkaConnectPasswordRequest,
@@ -8510,6 +9385,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a DBaaS Kafka user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   createDBAASKafkaUser(params: CreateDBAASKafkaUserRequest): Promise<Operation> {
     const path = `/dbaas-kafka/${encodeURIComponent(params.serviceName)}/user`
@@ -8519,6 +9396,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a DBaaS kafka user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   deleteDBAASKafkaUser(params: DeleteDBAASKafkaUserRequest): Promise<Operation> {
     const path = `/dbaas-kafka/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}`
@@ -8527,6 +9406,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * If no password is provided one will be generated automatically.
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   resetDBAASKafkaUserPassword(params: ResetDBAASKafkaUserPasswordRequest): Promise<Operation> {
     const path = `/dbaas-kafka/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reset`
@@ -8536,6 +9417,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Reveal the secrets of a DBaaS Kafka user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   revealDBAASKafkaUserPassword(
     params: RevealDBAASKafkaUserPasswordRequest,
@@ -8546,6 +9429,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Get a DBaaS migration status
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASMigrationStatus(params: GetDBAASMigrationStatusRequest): Promise<DBAASMigrationStatus> {
     const path = `/dbaas-migration-status/${encodeURIComponent(params.name)}`
@@ -8554,6 +9439,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a MySQL service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   deleteDBAASServiceMysql(params: DeleteDBAASServiceMysqlRequest): Promise<Operation> {
     const path = `/dbaas-mysql/${encodeURIComponent(params.name)}`
@@ -8562,6 +9449,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Get a DBaaS MySQL service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASServiceMysql(params: GetDBAASServiceMysqlRequest): Promise<DBAASServiceMysql> {
     const path = `/dbaas-mysql/${encodeURIComponent(params.name)}`
@@ -8570,6 +9459,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a DBaaS MySQL service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   createDBAASServiceMysql(params: CreateDBAASServiceMysqlRequest): Promise<Operation> {
     const path = `/dbaas-mysql/${encodeURIComponent(params.name)}`
@@ -8579,6 +9470,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Update a DBaaS MySQL service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   updateDBAASServiceMysql(params: UpdateDBAASServiceMysqlRequest): Promise<Operation> {
     const path = `/dbaas-mysql/${encodeURIComponent(params.name)}`
@@ -8588,6 +9481,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Temporarily enable writes for MySQL services in read-only mode due to filled up storage
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   enableDBAASMysqlWrites(params: EnableDBAASMysqlWritesRequest): Promise<Operation> {
     const path = `/dbaas-mysql/${encodeURIComponent(params.name)}/enable/writes`
@@ -8596,6 +9491,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Initiate MySQL maintenance update
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   startDBAASMysqlMaintenance(params: StartDBAASMysqlMaintenanceRequest): Promise<Operation> {
     const path = `/dbaas-mysql/${encodeURIComponent(params.name)}/maintenance/start`
@@ -8604,6 +9501,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Stop a DBaaS MySQL migration
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   stopDBAASMysqlMigration(params: StopDBAASMysqlMigrationRequest): Promise<Operation> {
     const path = `/dbaas-mysql/${encodeURIComponent(params.name)}/migration/stop`
@@ -8612,6 +9511,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a DBaaS MySQL database
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   createDBAASMysqlDatabase(params: CreateDBAASMysqlDatabaseRequest): Promise<Operation> {
     const path = `/dbaas-mysql/${encodeURIComponent(params.serviceName)}/database`
@@ -8621,6 +9522,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a DBaaS MySQL database
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   deleteDBAASMysqlDatabase(params: DeleteDBAASMysqlDatabaseRequest): Promise<Operation> {
     const path = `/dbaas-mysql/${encodeURIComponent(params.serviceName)}/database/${encodeURIComponent(params.databaseName)}`
@@ -8629,6 +9532,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a DBaaS MySQL user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   createDBAASMysqlUser(params: CreateDBAASMysqlUserRequest): Promise<Operation> {
     const path = `/dbaas-mysql/${encodeURIComponent(params.serviceName)}/user`
@@ -8638,6 +9543,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a DBaaS MySQL user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   deleteDBAASMysqlUser(params: DeleteDBAASMysqlUserRequest): Promise<Operation> {
     const path = `/dbaas-mysql/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}`
@@ -8646,6 +9553,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * If no password is provided one will be generated automatically.
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   resetDBAASMysqlUserPassword(params: ResetDBAASMysqlUserPasswordRequest): Promise<Operation> {
     const path = `/dbaas-mysql/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reset`
@@ -8655,6 +9564,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Reveal the secrets of a DBaaS MySQL user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   revealDBAASMysqlUserPassword(
     params: RevealDBAASMysqlUserPasswordRequest,
@@ -8665,6 +9576,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a OpenSearch service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   deleteDBAASServiceOpensearch(params: DeleteDBAASServiceOpensearchRequest): Promise<Operation> {
     const path = `/dbaas-opensearch/${encodeURIComponent(params.name)}`
@@ -8673,6 +9586,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Get a DBaaS OpenSearch service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASServiceOpensearch(
     params: GetDBAASServiceOpensearchRequest,
@@ -8683,6 +9598,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a DBaaS OpenSearch service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   createDBAASServiceOpensearch(params: CreateDBAASServiceOpensearchRequest): Promise<Operation> {
     const path = `/dbaas-opensearch/${encodeURIComponent(params.name)}`
@@ -8692,6 +9609,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Update a DBaaS OpenSearch service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   updateDBAASServiceOpensearch(params: UpdateDBAASServiceOpensearchRequest): Promise<Operation> {
     const path = `/dbaas-opensearch/${encodeURIComponent(params.name)}`
@@ -8701,6 +9620,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Get DBaaS OpenSearch ACL configuration
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASOpensearchAclConfig(
     params: GetDBAASOpensearchAclConfigRequest,
@@ -8711,6 +9632,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a DBaaS OpenSearch ACL configuration
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   updateDBAASOpensearchAclConfig(
     params: DBAASOpensearchAclConfig & {
@@ -8724,6 +9647,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Initiate OpenSearch maintenance update
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   startDBAASOpensearchMaintenance(
     params: StartDBAASOpensearchMaintenanceRequest,
@@ -8734,6 +9659,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a DBaaS OpenSearch user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   createDBAASOpensearchUser(params: CreateDBAASOpensearchUserRequest): Promise<Operation> {
     const path = `/dbaas-opensearch/${encodeURIComponent(params.serviceName)}/user`
@@ -8743,6 +9670,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a DBaaS OpenSearch user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   deleteDBAASOpensearchUser(params: DeleteDBAASOpensearchUserRequest): Promise<Operation> {
     const path = `/dbaas-opensearch/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}`
@@ -8751,6 +9680,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * If no password is provided one will be generated automatically.
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   resetDBAASOpensearchUserPassword(
     params: ResetDBAASOpensearchUserPasswordRequest,
@@ -8762,6 +9693,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Reveal the secrets of a DBaaS OpenSearch user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   revealDBAASOpensearchUserPassword(
     params: RevealDBAASOpensearchUserPasswordRequest,
@@ -8772,6 +9705,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a Postgres service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   deleteDBAASServicePG(params: DeleteDBAASServicePGRequest): Promise<Operation> {
     const path = `/dbaas-postgres/${encodeURIComponent(params.name)}`
@@ -8780,6 +9715,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Get a DBaaS PostgreSQL service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASServicePG(params: GetDBAASServicePGRequest): Promise<DBAASServicePG> {
     const path = `/dbaas-postgres/${encodeURIComponent(params.name)}`
@@ -8788,6 +9725,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a DBaaS PostgreSQL service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   createDBAASServicePG(params: CreateDBAASServicePGRequest): Promise<Operation> {
     const path = `/dbaas-postgres/${encodeURIComponent(params.name)}`
@@ -8797,6 +9736,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Update a DBaaS PostgreSQL service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   updateDBAASServicePG(params: UpdateDBAASServicePGRequest): Promise<Operation> {
     const path = `/dbaas-postgres/${encodeURIComponent(params.name)}`
@@ -8806,6 +9747,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Initiate PostgreSQL maintenance update
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   startDBAASPGMaintenance(params: StartDBAASPGMaintenanceRequest): Promise<Operation> {
     const path = `/dbaas-postgres/${encodeURIComponent(params.name)}/maintenance/start`
@@ -8814,6 +9757,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Stop a DBaaS PostgreSQL migration
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   stopDBAASPGMigration(params: StopDBAASPGMigrationRequest): Promise<Operation> {
     const path = `/dbaas-postgres/${encodeURIComponent(params.name)}/migration/stop`
@@ -8822,6 +9767,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a DBaaS PostgreSQL connection pool
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   createDBAASPGConnectionPool(params: CreateDBAASPGConnectionPoolRequest): Promise<Operation> {
     const path = `/dbaas-postgres/${encodeURIComponent(params.serviceName)}/connection-pool`
@@ -8831,6 +9778,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a DBaaS PostgreSQL connection pool
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   deleteDBAASPGConnectionPool(params: DeleteDBAASPGConnectionPoolRequest): Promise<Operation> {
     const path = `/dbaas-postgres/${encodeURIComponent(params.serviceName)}/connection-pool/${encodeURIComponent(params.connectionPoolName)}`
@@ -8839,6 +9788,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Update a DBaaS PostgreSQL connection pool
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   updateDBAASPGConnectionPool(params: UpdateDBAASPGConnectionPoolRequest): Promise<Operation> {
     const path = `/dbaas-postgres/${encodeURIComponent(params.serviceName)}/connection-pool/${encodeURIComponent(params.connectionPoolName)}`
@@ -8848,6 +9799,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a DBaaS Postgres database
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   createDBAASPGDatabase(params: CreateDBAASPGDatabaseRequest): Promise<Operation> {
     const path = `/dbaas-postgres/${encodeURIComponent(params.serviceName)}/database`
@@ -8857,6 +9810,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a DBaaS Postgres database
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   deleteDBAASPGDatabase(params: DeleteDBAASPGDatabaseRequest): Promise<Operation> {
     const path = `/dbaas-postgres/${encodeURIComponent(params.serviceName)}/database/${encodeURIComponent(params.databaseName)}`
@@ -8865,6 +9820,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a DBaaS Postgres user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   createDBAASPostgresUser(params: CreateDBAASPostgresUserRequest): Promise<Operation> {
     const path = `/dbaas-postgres/${encodeURIComponent(params.serviceName)}/user`
@@ -8874,6 +9831,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a DBaaS Postgres user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   deleteDBAASPostgresUser(params: DeleteDBAASPostgresUserRequest): Promise<Operation> {
     const path = `/dbaas-postgres/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}`
@@ -8882,6 +9841,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Update access control for one service user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   updateDBAASPostgresAllowReplication(
     params: UpdateDBAASPostgresAllowReplicationRequest,
@@ -8893,6 +9854,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * If no password is provided one will be generated automatically.
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   resetDBAASPostgresUserPassword(
     params: ResetDBAASPostgresUserPasswordRequest,
@@ -8904,6 +9867,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Reveal the secrets of a DBaaS Postgres user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   revealDBAASPostgresUserPassword(
     params: RevealDBAASPostgresUserPasswordRequest,
@@ -8914,6 +9879,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Check whether you can upgrade Postgres service to a newer version
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   createDBAASPGUpgradeCheck(params: CreateDBAASPGUpgradeCheckRequest): Promise<DBAASTask> {
     const path = `/dbaas-postgres/${encodeURIComponent(params.service)}/upgrade-check`
@@ -8923,6 +9890,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List DBaaS services
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   listDBAASServices(): Promise<ListDBAASServicesResponse> {
     return this.core.request('GET', '/dbaas-service', { decode: fromWireListDBAASServicesResponse })
@@ -8930,6 +9899,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Get logs of DBaaS service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASServiceLogs(params: GetDBAASServiceLogsRequest): Promise<DBAASServiceLogs> {
     const path = `/dbaas-service-logs/${encodeURIComponent(params.serviceName)}`
@@ -8939,6 +9910,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Get metrics of DBaaS service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASServiceMetrics(
     params: GetDBAASServiceMetricsRequest,
@@ -8950,6 +9923,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List available service types for DBaaS
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   listDBAASServiceTypes(): Promise<ListDBAASServiceTypesResponse> {
     return this.core.request('GET', '/dbaas-service-type', {
@@ -8959,6 +9934,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Get a DBaaS service type
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASServiceType(params: GetDBAASServiceTypeRequest): Promise<DBAASServiceType> {
     const path = `/dbaas-service-type/${encodeURIComponent(params.serviceTypeName)}`
@@ -8967,6 +9944,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a DBaaS service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   deleteDBAASService(params: DeleteDBAASServiceRequest): Promise<Operation> {
     const path = `/dbaas-service/${encodeURIComponent(params.name)}`
@@ -8975,6 +9954,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Get DBaaS ClickHouse settings
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASSettingsClickhouse(): Promise<GetDBAASSettingsClickhouseResponse> {
     return this.core.request('GET', '/dbaas-settings-clickhouse', {
@@ -8984,6 +9965,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Get DBaaS Grafana settings
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASSettingsGrafana(): Promise<GetDBAASSettingsGrafanaResponse> {
     return this.core.request('GET', '/dbaas-settings-grafana', {
@@ -8993,6 +9976,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Get DBaaS Kafka settings
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASSettingsKafka(): Promise<GetDBAASSettingsKafkaResponse> {
     return this.core.request('GET', '/dbaas-settings-kafka', {
@@ -9002,6 +9987,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Get DBaaS MySQL settings
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASSettingsMysql(): Promise<GetDBAASSettingsMysqlResponse> {
     return this.core.request('GET', '/dbaas-settings-mysql', {
@@ -9011,6 +9998,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Get DBaaS OpenSearch settings
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASSettingsOpensearch(): Promise<GetDBAASSettingsOpensearchResponse> {
     return this.core.request('GET', '/dbaas-settings-opensearch', {
@@ -9020,6 +10009,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Get DBaaS PostgreSQL settings
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASSettingsPG(): Promise<GetDBAASSettingsPGResponse> {
     return this.core.request('GET', '/dbaas-settings-pg', {
@@ -9029,6 +10020,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Get DBaaS Thanos settings
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASSettingsThanos(): Promise<GetDBAASSettingsThanosResponse> {
     return this.core.request('GET', '/dbaas-settings-thanos', {
@@ -9038,6 +10031,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Returns the default settings for Valkey.
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASSettingsValkey(): Promise<GetDBAASSettingsValkeyResponse> {
     return this.core.request('GET', '/dbaas-settings-valkey', {
@@ -9047,6 +10042,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a DBaaS task to check migration
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   createDBAASTaskMigrationCheck(params: CreateDBAASTaskMigrationCheckRequest): Promise<Operation> {
     const path = `/dbaas-task-migration-check/${encodeURIComponent(params.service)}`
@@ -9056,6 +10053,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Get a DBaaS task
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASTask(params: GetDBAASTaskRequest): Promise<DBAASTask> {
     const path = `/dbaas-task/${encodeURIComponent(params.service)}/${encodeURIComponent(params.id)}`
@@ -9064,6 +10063,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a Thanos service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   deleteDBAASServiceThanos(params: DeleteDBAASServiceThanosRequest): Promise<Operation> {
     const path = `/dbaas-thanos/${encodeURIComponent(params.name)}`
@@ -9072,6 +10073,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Get a DBaaS Thanos service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASServiceThanos(params: GetDBAASServiceThanosRequest): Promise<DBAASServiceThanos> {
     const path = `/dbaas-thanos/${encodeURIComponent(params.name)}`
@@ -9080,6 +10083,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a DBaaS Thanos service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   createDBAASServiceThanos(params: CreateDBAASServiceThanosRequest): Promise<Operation> {
     const path = `/dbaas-thanos/${encodeURIComponent(params.name)}`
@@ -9089,6 +10094,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Update a DBaaS Thanos service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   updateDBAASServiceThanos(params: UpdateDBAASServiceThanosRequest): Promise<Operation> {
     const path = `/dbaas-thanos/${encodeURIComponent(params.name)}`
@@ -9098,6 +10105,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Initiate Thanos maintenance update
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   startDBAASThanosMaintenance(params: StartDBAASThanosMaintenanceRequest): Promise<Operation> {
     const path = `/dbaas-thanos/${encodeURIComponent(params.name)}/maintenance/start`
@@ -9106,6 +10115,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Reveal the secrets of a DBaaS Thanos user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   revealDBAASThanosUserPassword(
     params: RevealDBAASThanosUserPasswordRequest,
@@ -9116,6 +10127,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a Valkey service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   deleteDBAASServiceValkey(params: DeleteDBAASServiceValkeyRequest): Promise<Operation> {
     const path = `/dbaas-valkey/${encodeURIComponent(params.name)}`
@@ -9124,6 +10137,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Get a DBaaS Valkey service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   getDBAASServiceValkey(params: GetDBAASServiceValkeyRequest): Promise<DBAASServiceValkey> {
     const path = `/dbaas-valkey/${encodeURIComponent(params.name)}`
@@ -9132,6 +10147,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a DBaaS Valkey service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   createDBAASServiceValkey(params: CreateDBAASServiceValkeyRequest): Promise<Operation> {
     const path = `/dbaas-valkey/${encodeURIComponent(params.name)}`
@@ -9141,6 +10158,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Update a DBaaS Valkey service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   updateDBAASServiceValkey(params: UpdateDBAASServiceValkeyRequest): Promise<Operation> {
     const path = `/dbaas-valkey/${encodeURIComponent(params.name)}`
@@ -9150,6 +10169,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Initiate Valkey maintenance update
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   startDBAASValkeyMaintenance(params: StartDBAASValkeyMaintenanceRequest): Promise<Operation> {
     const path = `/dbaas-valkey/${encodeURIComponent(params.name)}/maintenance/start`
@@ -9158,6 +10179,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Stop a DBaaS Valkey migration
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   stopDBAASValkeyMigration(params: StopDBAASValkeyMigrationRequest): Promise<Operation> {
     const path = `/dbaas-valkey/${encodeURIComponent(params.name)}/migration/stop`
@@ -9166,6 +10189,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List DBaaS Valkey users with ACL configuration
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   listDBAASValkeyUsers(params: ListDBAASValkeyUsersRequest): Promise<DBAASValkeyUsers> {
     const path = `/dbaas-valkey/${encodeURIComponent(params.serviceName)}/user`
@@ -9174,6 +10199,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a DBaaS Valkey user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   createDBAASValkeyUser(params: CreateDBAASValkeyUserRequest): Promise<Operation> {
     const path = `/dbaas-valkey/${encodeURIComponent(params.serviceName)}/user`
@@ -9183,6 +10210,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a DBaaS Valkey user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   deleteDBAASValkeyUser(params: DeleteDBAASValkeyUserRequest): Promise<Operation> {
     const path = `/dbaas-valkey/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}`
@@ -9191,6 +10220,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Update access control for one DBaaS Valkey service user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   updateDBAASValkeyUserAccessControl(
     params: UpdateDBAASValkeyUserAccessControlRequest,
@@ -9202,6 +10233,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * If no password is provided one will be generated automatically.
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   resetDBAASValkeyUserPassword(params: ResetDBAASValkeyUserPasswordRequest): Promise<Operation> {
     const path = `/dbaas-valkey/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reset`
@@ -9211,6 +10244,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Reveal the secrets of a DBaaS Valkey user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
    */
   revealDBAASValkeyUserPassword(
     params: RevealDBAASValkeyUserPasswordRequest,
@@ -9221,6 +10256,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List Deploy Targets
+   *
+   * @see https://www.exoscale.com/virtual-private-cloud/ Read more
    */
   listDeployTargets(): Promise<ListDeployTargetsResponse> {
     return this.core.request('GET', '/deploy-target', { decode: fromWireListDeployTargetsResponse })
@@ -9228,6 +10265,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Retrieve Deploy Target details
+   *
+   * @see https://www.exoscale.com/virtual-private-cloud/ Read more
    */
   getDeployTarget(params: GetDeployTargetRequest): Promise<DeployTarget> {
     const path = `/deploy-target/${encodeURIComponent(params.id)}`
@@ -9236,6 +10275,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List DNS domains
+   *
+   * @see https://community.exoscale.com/product/networking/dns/quick-start/ Read more
    */
   listDNSDomains(): Promise<ListDNSDomainsResponse> {
     return this.core.request('GET', '/dns-domain', { decode: fromWireListDNSDomainsResponse })
@@ -9243,6 +10284,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create DNS domain
+   *
+   * @see https://community.exoscale.com/product/networking/dns/quick-start/ Read more
    */
   createDNSDomain(params: CreateDNSDomainRequest): Promise<Operation> {
     const body = toWireCreateDNSDomainRequest(params)
@@ -9251,6 +10294,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List DNS domain records
+   *
+   * @see https://community.exoscale.com/product/networking/dns/overview/ Read more
    */
   listDNSDomainRecords(params: ListDNSDomainRecordsRequest): Promise<ListDNSDomainRecordsResponse> {
     const path = `/dns-domain/${encodeURIComponent(params.domainID)}/record`
@@ -9259,6 +10304,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create DNS domain record
+   *
+   * @see https://community.exoscale.com/product/networking/dns/overview/ Read more
    */
   createDNSDomainRecord(params: CreateDNSDomainRecordRequest): Promise<Operation> {
     const path = `/dns-domain/${encodeURIComponent(params.domainID)}/record`
@@ -9268,6 +10315,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete DNS domain record
+   *
+   * @see https://community.exoscale.com/product/networking/dns/overview/ Read more
    */
   deleteDNSDomainRecord(params: DeleteDNSDomainRecordRequest): Promise<Operation> {
     const path = `/dns-domain/${encodeURIComponent(params.domainID)}/record/${encodeURIComponent(params.recordID)}`
@@ -9276,6 +10325,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Retrieve DNS domain record details
+   *
+   * @see https://community.exoscale.com/product/networking/dns/overview/ Read more
    */
   getDNSDomainRecord(params: GetDNSDomainRecordRequest): Promise<DNSDomainRecord> {
     const path = `/dns-domain/${encodeURIComponent(params.domainID)}/record/${encodeURIComponent(params.recordID)}`
@@ -9284,6 +10335,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Update DNS domain record
+   *
+   * @see https://community.exoscale.com/product/networking/dns/overview/ Read more
    */
   updateDNSDomainRecord(params: UpdateDNSDomainRecordRequest): Promise<Operation> {
     const path = `/dns-domain/${encodeURIComponent(params.domainID)}/record/${encodeURIComponent(params.recordID)}`
@@ -9293,6 +10346,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete DNS Domain
+   *
+   * @see https://community.exoscale.com/product/networking/dns/quick-start/ Read more
    */
   deleteDNSDomain(params: DeleteDNSDomainRequest): Promise<Operation> {
     const path = `/dns-domain/${encodeURIComponent(params.id)}`
@@ -9301,6 +10356,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Retrieve DNS domain details
+   *
+   * @see https://community.exoscale.com/product/networking/dns/quick-start/ Read more
    */
   getDNSDomain(params: GetDNSDomainRequest): Promise<DNSDomain> {
     const path = `/dns-domain/${encodeURIComponent(params.id)}`
@@ -9309,6 +10366,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Retrieve DNS domain zone file
+   *
+   * @see https://community.exoscale.com/product/networking/dns/quick-start/ Read more
    */
   getDNSDomainZoneFile(params: GetDNSDomainZoneFileRequest): Promise<GetDNSDomainZoneFileResponse> {
     const path = `/dns-domain/${encodeURIComponent(params.id)}/zone`
@@ -9317,6 +10376,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List Elastic IPs
+   *
+   * @see https://community.exoscale.com/product/networking/eip/ Read more
    */
   listElasticIPS(): Promise<ListElasticIPSResponse> {
     return this.core.request('GET', '/elastic-ip', { decode: fromWireListElasticIPSResponse })
@@ -9324,6 +10385,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create an Elastic IP
+   *
+   * @see https://community.exoscale.com/product/networking/eip/ Read more
    */
   createElasticIP(params: CreateElasticIPRequest): Promise<Operation> {
     const body = toWireCreateElasticIPRequest(params)
@@ -9332,6 +10395,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete an Elastic IP
+   *
+   * @see https://community.exoscale.com/product/networking/eip/ Read more
    */
   deleteElasticIP(params: DeleteElasticIPRequest): Promise<Operation> {
     const path = `/elastic-ip/${encodeURIComponent(params.id)}`
@@ -9340,6 +10405,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Retrieve Elastic IP details
+   *
+   * @see https://community.exoscale.com/product/networking/eip/ Read more
    */
   getElasticIP(params: GetElasticIPRequest): Promise<ElasticIP> {
     const path = `/elastic-ip/${encodeURIComponent(params.id)}`
@@ -9348,6 +10415,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Update an Elastic IP
+   *
+   * @see https://community.exoscale.com/product/networking/eip/ Read more
    */
   updateElasticIP(params: UpdateElasticIPRequest): Promise<Operation> {
     const path = `/elastic-ip/${encodeURIComponent(params.id)}`
@@ -9357,6 +10426,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Reset an Elastic IP field to its default value
+   *
+   * @see https://community.exoscale.com/product/networking/eip/ Read more
    */
   resetElasticIPField(params: ResetElasticIPFieldRequest): Promise<Operation> {
     const path = `/elastic-ip/${encodeURIComponent(params.id)}/${encodeURIComponent(params.field)}`
@@ -9365,6 +10436,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Attach a Compute instance to an Elastic IP
+   *
+   * @see https://community.exoscale.com/product/networking/eip/ Read more
    */
   attachInstanceToElasticIP(params: AttachInstanceToElasticIPRequest): Promise<Operation> {
     const path = `/elastic-ip/${encodeURIComponent(params.id)}:attach`
@@ -9374,6 +10447,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Detach a Compute instance from an Elastic IP
+   *
+   * @see https://community.exoscale.com/product/networking/eip/ Read more
    */
   detachInstanceFromElasticIP(params: DetachInstanceFromElasticIPRequest): Promise<Operation> {
     const path = `/elastic-ip/${encodeURIComponent(params.id)}:detach`
@@ -9391,6 +10466,16 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Returns an estimate of the impact of a unit of usage of one or more products, e.g. the impact of using a standard medium instance for one hour in ch-gva-2
+   *
+   * Errors:
+   *
+   * **400**
+   * Invalid request (e.g. product does not exist)
+   *
+   * **500**
+   * Internal server error
+   *
+   * @see https://www.exoscale.com/sustainability/ Read more
    */
   getImpactEstimate(params: GetImpactEstimateRequest): Promise<GetImpactEstimateResponse> {
     const body = toWireGetImpactEstimateRequest(params)
@@ -9402,6 +10487,16 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Returns a breakdown of the impact of your organization's usage over the given period
+   *
+   * Errors:
+   *
+   * **400**
+   * Invalid request (e.g. to date before from date)
+   *
+   * **500**
+   * Internal server error
+   *
+   * @see https://www.exoscale.com/sustainability/ Read more
    */
   getImpactReport(params?: GetImpactReportRequest): Promise<ImpactBreakdown> {
     const query: Record<string, string> = {}
@@ -9415,8 +10510,10 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Retrieve Mutation Events for a given date range. Defaults to retrieving Events for the past 24 hours.
-   * Both a `from` and `to` arguments can be specified to filter Events over a specific period.
-   * Events will be the the most descriptive possible but not all fields are mandatory
+   *          Both a `from` and `to` arguments can be specified to filter Events over a specific period.
+   *          Events will be the the most descriptive possible but not all fields are mandatory
+   *
+   * @see https://community.exoscale.com/platform/audit-trail/ Read more
    */
   listEvents(params?: ListEventsRequest): Promise<Event[]> {
     const query: Record<string, string> = {}
@@ -9430,6 +10527,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Retrieve IAM Organization Policy
+   *
+   * @see https://community.exoscale.com/product/iam/operation/roles-policies/ Read more
    */
   getIAMOrganizationPolicy(): Promise<IAMPolicy> {
     return this.core.request('GET', '/iam-organization-policy', { decode: fromWireIAMPolicy })
@@ -9437,6 +10536,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Update IAM Organization Policy
+   *
+   * @see https://community.exoscale.com/product/iam/operation/roles-policies/ Read more
    */
   updateIAMOrganizationPolicy(params: IAMPolicy): Promise<Operation> {
     const body = toWireIAMPolicy(params)
@@ -9445,6 +10546,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Reset IAM Organization Policy
+   *
+   * @see https://community.exoscale.com/product/iam/operation/roles-policies/ Read more
    */
   resetIAMOrganizationPolicy(): Promise<Operation> {
     return this.core.request('POST', '/iam-organization-policy:reset', {
@@ -9454,6 +10557,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List IAM Roles
+   *
+   * @see https://community.exoscale.com/product/iam/operation/role-mgmt/ Read more
    */
   listIAMRoles(): Promise<ListIAMRolesResponse> {
     return this.core.request('GET', '/iam-role', { decode: fromWireListIAMRolesResponse })
@@ -9461,6 +10566,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create IAM Role
+   *
+   * @see https://community.exoscale.com/product/iam/operation/role-mgmt/ Read more
    */
   createIAMRole(params: CreateIAMRoleRequest): Promise<Operation> {
     const body = toWireCreateIAMRoleRequest(params)
@@ -9469,6 +10576,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete IAM Role
+   *
+   * @see https://community.exoscale.com/product/iam/operation/role-mgmt/ Read more
    */
   deleteIAMRole(params: DeleteIAMRoleRequest): Promise<Operation> {
     const path = `/iam-role/${encodeURIComponent(params.id)}`
@@ -9477,6 +10586,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Retrieve IAM Role
+   *
+   * @see https://community.exoscale.com/product/iam/operation/role-mgmt/ Read more
    */
   getIAMRole(params: GetIAMRoleRequest): Promise<IAMRole> {
     const path = `/iam-role/${encodeURIComponent(params.id)}`
@@ -9485,6 +10596,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Update IAM Role
+   *
+   * @see https://community.exoscale.com/product/iam/operation/role-mgmt/ Read more
    */
   updateIAMRole(params: UpdateIAMRoleRequest): Promise<Operation> {
     const path = `/iam-role/${encodeURIComponent(params.id)}`
@@ -9494,6 +10607,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Request generation of key/secret that allow caller to assume target role
+   *
+   * @see https://community.exoscale.com/product/iam/operation/role-mgmt/ Read more
    */
   assumeIAMRole(params: AssumeIAMRoleRequest): Promise<AssumeIAMRoleResponse> {
     const path = `/iam-role/${encodeURIComponent(params.id)}/assume`
@@ -9503,6 +10618,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Update IAM Role Policy
+   *
+   * @see https://community.exoscale.com/product/iam/operation/role-mgmt/ Read more
    */
   updateIAMRolePolicy(
     params: IAMPolicy & {
@@ -9516,6 +10633,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List Compute instances
+   *
+   * @see https://www.exoscale.com/compute/ Read more
    */
   listInstances(params?: ListInstancesRequest): Promise<ListInstancesResponse> {
     const query: Record<string, string> = {}
@@ -9528,6 +10647,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a Compute instance
+   *
+   * @see https://www.exoscale.com/compute/ Read more
    */
   createInstance(params: CreateInstanceRequest): Promise<Operation> {
     const body = toWireCreateInstanceRequest(params)
@@ -9536,6 +10657,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List Instance Pools
+   *
+   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
    */
   listInstancePools(): Promise<ListInstancePoolsResponse> {
     return this.core.request('GET', '/instance-pool', { decode: fromWireListInstancePoolsResponse })
@@ -9543,6 +10666,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create an Instance Pool
+   *
+   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
    */
   createInstancePool(params: CreateInstancePoolRequest): Promise<Operation> {
     const body = toWireCreateInstancePoolRequest(params)
@@ -9551,6 +10676,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete an Instance Pool
+   *
+   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
    */
   deleteInstancePool(params: DeleteInstancePoolRequest): Promise<Operation> {
     const path = `/instance-pool/${encodeURIComponent(params.id)}`
@@ -9559,6 +10686,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Retrieve Instance Pool details
+   *
+   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
    */
   getInstancePool(params: GetInstancePoolRequest): Promise<InstancePool> {
     const path = `/instance-pool/${encodeURIComponent(params.id)}`
@@ -9567,6 +10696,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Update an Instance Pool
+   *
+   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
    */
   updateInstancePool(params: UpdateInstancePoolRequest): Promise<Operation> {
     const path = `/instance-pool/${encodeURIComponent(params.id)}`
@@ -9576,6 +10707,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Reset an Instance Pool field to its default value
+   *
+   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
    */
   resetInstancePoolField(params: ResetInstancePoolFieldRequest): Promise<Operation> {
     const path = `/instance-pool/${encodeURIComponent(params.id)}/${encodeURIComponent(params.field)}`
@@ -9584,6 +10717,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * This operation evicts the specified Compute instances member from the Instance Pool, shrinking it to `&lt;current pool size&gt; - &lt;# evicted members&gt;`.
+   *
+   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
    */
   evictInstancePoolMembers(params: EvictInstancePoolMembersRequest): Promise<Operation> {
     const path = `/instance-pool/${encodeURIComponent(params.id)}:evict`
@@ -9593,6 +10728,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Scale an Instance Pool
+   *
+   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
    */
   scaleInstancePool(params: ScaleInstancePoolRequest): Promise<Operation> {
     const path = `/instance-pool/${encodeURIComponent(params.id)}:scale`
@@ -9602,6 +10739,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List Compute instance Types
+   *
+   * @see https://www.exoscale.com/pricing/ Read more
    */
   listInstanceTypes(): Promise<ListInstanceTypesResponse> {
     return this.core.request('GET', '/instance-type', { decode: fromWireListInstanceTypesResponse })
@@ -9609,6 +10748,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Retrieve Instance Type details
+   *
+   * @see https://www.exoscale.com/pricing/ Read more
    */
   getInstanceType(params: GetInstanceTypeRequest): Promise<InstanceType> {
     const path = `/instance-type/${encodeURIComponent(params.id)}`
@@ -9617,6 +10758,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a Compute instance
+   *
+   * @see https://www.exoscale.com/compute/ Read more
    */
   deleteInstance(params: DeleteInstanceRequest): Promise<Operation> {
     const path = `/instance/${encodeURIComponent(params.id)}`
@@ -9625,6 +10768,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Retrieve Compute instance details
+   *
+   * @see https://www.exoscale.com/compute/ Read more
    */
   getInstance(params: GetInstanceRequest): Promise<Instance> {
     const path = `/instance/${encodeURIComponent(params.id)}`
@@ -9633,6 +10778,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Update a Compute instance
+   *
+   * @see https://www.exoscale.com/compute/ Read more
    */
   updateInstance(params: UpdateInstanceRequest): Promise<Operation> {
     const path = `/instance/${encodeURIComponent(params.id)}`
@@ -9642,6 +10789,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Reset Instance field
+   *
+   * @see https://www.exoscale.com/compute/ Read more
    */
   resetInstanceField(params: ResetInstanceFieldRequest): Promise<Operation> {
     const path = `/instance/${encodeURIComponent(params.id)}/${encodeURIComponent(params.field)}`
@@ -9650,6 +10799,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Set instance destruction protection
+   *
+   * @see https://www.exoscale.com/compute/ Read more
    */
   addInstanceProtection(params: AddInstanceProtectionRequest): Promise<Operation> {
     const path = `/instance/${encodeURIComponent(params.id)}:add-protection`
@@ -9658,6 +10809,9 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a Snapshot of a Compute instance
+   *
+   * @see https://www.exoscale.com/compute/ Read more
+   * @see https://community.exoscale.com/documentation/compute/snapshots/ Read more
    */
   createSnapshot(params: CreateSnapshotRequest): Promise<Operation> {
     const path = `/instance/${encodeURIComponent(params.id)}:create-snapshot`
@@ -9666,6 +10820,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Enable tpm for the instance.
+   *
+   * @see https://www.exoscale.com/compute/ Read more
    */
   enableTpm(params: EnableTpmRequest): Promise<Operation> {
     const path = `/instance/${encodeURIComponent(params.id)}:enable-tpm`
@@ -9674,10 +10830,13 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Reveal the password used during instance creation or the latest password reset.
-   * This is only available for VMs created against templates having the `password-enabled`
-   * property set to `true`.
-   * Passwords are transiently stored for at most 24 hours and intended to be retrieved shortly after
-   * creation or resets.
+   *             This is only available for VMs created against templates having the `password-enabled`
+   *             property set to `true`.
+   *
+   *             Passwords are transiently stored for at most 24 hours and intended to be retrieved shortly after
+   *             creation or resets.
+   *
+   * @see https://www.exoscale.com/compute/ Read more
    */
   revealInstancePassword(params: RevealInstancePasswordRequest): Promise<InstancePassword> {
     const path = `/instance/${encodeURIComponent(params.id)}:password`
@@ -9686,6 +10845,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Reboot a Compute instance
+   *
+   * @see https://www.exoscale.com/compute/ Read more
    */
   rebootInstance(params: RebootInstanceRequest): Promise<Operation> {
     const path = `/instance/${encodeURIComponent(params.id)}:reboot`
@@ -9694,6 +10855,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Remove instance destruction protection
+   *
+   * @see https://www.exoscale.com/compute/ Read more
    */
   removeInstanceProtection(params: RemoveInstanceProtectionRequest): Promise<Operation> {
     const path = `/instance/${encodeURIComponent(params.id)}:remove-protection`
@@ -9702,6 +10865,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * This operation re-installs a Compute instance to a base template. If target template is provided it will be used to recreated instance from. Warning: the operation wipes all data stored on the disk.
+   *
+   * @see https://www.exoscale.com/compute/ Read more
    */
   resetInstance(params: ResetInstanceRequest): Promise<Operation> {
     const path = `/instance/${encodeURIComponent(params.id)}:reset`
@@ -9711,6 +10876,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Reset a compute instance password
+   *
+   * @see https://www.exoscale.com/compute/ Read more
    */
   resetInstancePassword(params: ResetInstancePasswordRequest): Promise<Operation> {
     const path = `/instance/${encodeURIComponent(params.id)}:reset-password`
@@ -9719,6 +10886,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * This operation resizes a Compute instance's disk volume. Note: the disk can only grow, cannot be shrunk.
+   *
+   * @see https://www.exoscale.com/compute/ Read more
    */
   resizeInstanceDisk(params: ResizeInstanceDiskRequest): Promise<Operation> {
     const path = `/instance/${encodeURIComponent(params.id)}:resize-disk`
@@ -9728,6 +10897,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * This operation changes the Compute instance's type. Note: the new Instance Type must be within the same family (e.g. a standard instance cannot be scaled to gpu2 or storage).
+   *
+   * @see https://www.exoscale.com/compute/ Read more
    */
   scaleInstance(params: ScaleInstanceRequest): Promise<Operation> {
     const path = `/instance/${encodeURIComponent(params.id)}:scale`
@@ -9737,6 +10908,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * This operation starts a virtual machine, potentially using a rescue profile if specified
+   *
+   * @see https://www.exoscale.com/compute/ Read more
    */
   startInstance(params: StartInstanceRequest): Promise<Operation> {
     const path = `/instance/${encodeURIComponent(params.id)}:start`
@@ -9746,6 +10919,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Stop a Compute instance
+   *
+   * @see https://www.exoscale.com/compute/ Read more
    */
   stopInstance(params: StopInstanceRequest): Promise<Operation> {
     const path = `/instance/${encodeURIComponent(params.id)}:stop`
@@ -9755,6 +10930,8 @@ export abstract class GeneratedExoscaleClient {
   /**
    * This operation reverts the snapshot to the Compute instance volume, restoring stored data as it was at the time of the snapshot.
    * The Compute instance must be previously stopped.
+   *
+   * @see https://www.exoscale.com/compute/ Read more
    */
   revertInstanceToSnapshot(params: RevertInstanceToSnapshotRequest): Promise<Operation> {
     const path = `/instance/${encodeURIComponent(params.instanceID)}:revert-snapshot`
@@ -9764,6 +10941,15 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Lists all KMS Keys in your organization in a given zone.
+   *
+   * Errors:
+   *
+   * **400**
+   * ### Errors
+   *
+   * Bad Request: The request was rejected because of an invalid request body or path parameter.
+   *
+   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
    */
   listKmsKeys(): Promise<ListKmsKeysResponse> {
     return this.core.request('GET', '/kms-key', { decode: fromWireListKmsKeysResponse })
@@ -9771,6 +10957,17 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a customer-managed unique KMS Key in your organization. A KMS Key is a logical representation of a cryptographic key material. It also includes metadata such as a UUID, a name and its state.
+   *
+   * Errors:
+   *
+   * **400**
+   * ### Errors
+   *
+   * Name Conflict: The request was rejected because a key with the same name already exists in the target zone.
+   *
+   * Bad Request: The request was rejected because of an invalid request body or path parameter.
+   *
+   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
    */
   createKmsKey(params: CreateKmsKeyRequest): Promise<CreateKmsKeyResponse> {
     const body = toWireCreateKmsKeyRequest(params)
@@ -9779,6 +10976,15 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Retrieve KMS Key details.
+   *
+   * Errors:
+   *
+   * **400**
+   * ### Errors
+   *
+   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
+   *
+   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
    */
   getKmsKey(params: GetKmsKeyRequest): Promise<GetKmsKeyResponse> {
     const path = `/kms-key/${encodeURIComponent(params.id)}`
@@ -9787,6 +10993,19 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Cancels the scheduled deletion of a KMS Key.
+   *
+   * Errors:
+   *
+   * **400**
+   * ### Errors
+   *
+   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
+   *
+   * Not on Replica: The request was rejected because the operation is not allowed on a replica.
+   *
+   * Not Pending Deletion: The request was rejected because the key is not pending deletion.
+   *
+   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
    */
   cancelKmsKeyDeletion(params: CancelKmsKeyDeletionRequest): Promise<SuccessResponse> {
     const path = `/kms-key/${encodeURIComponent(params.id)}/cancel-deletion`
@@ -9795,6 +11014,19 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Decrypts a ciphertext.
+   *
+   * Errors:
+   *
+   * **400**
+   * ### Errors
+   *
+   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
+   *
+   * Key is Disabled: The request was rejected because the specified KMS key is disabled.
+   *
+   * Invalid Usage: The request was rejected because the operation is only allowed on symmetric keys with usage "encrypt-decrypt".
+   *
+   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
    */
   decrypt(
     params: DecryptRequest & {
@@ -9808,6 +11040,19 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Disables a KMS Key by setting its state to "disabled". This prevents the use of the KMS key for cryptographic and key lifecycle operations.
+   *
+   * Errors:
+   *
+   * **400**
+   * ### Errors
+   *
+   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
+   *
+   * Key is Pending Deletion: The request was rejected because it was performed on a key that is pending deletion.
+   *
+   * Not on Default: The request was rejected because the operation is not allowed on the default key.
+   *
+   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
    */
   disableKmsKey(params: DisableKmsKeyRequest): Promise<SuccessResponse> {
     const path = `/kms-key/${encodeURIComponent(params.id)}/disable`
@@ -9816,6 +11061,29 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Disable the periodic rotation of a KMS Key.
+   *
+   * Errors:
+   *
+   * **400**
+   * ### Errors
+   *
+   * Invalid Origin: The request was rejected because automatic key rotation can only be enabled on a KMS key with origin "exoscale-kms".
+   *
+   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
+   *
+   * Not on Default: The request was rejected because the operation is not allowed on the default key.
+   *
+   * Not on Replica: The request was rejected because the operation is not allowed on a replica.
+   *
+   * Key is Pending Deletion: The request was rejected because it was performed on a key that is pending deletion.
+   *
+   * Key is Disabled: The request was rejected because the specified KMS key is disabled.
+   *
+   * Invalid Usage: The request was rejected because the operation is only allowed on symmetric keys with usage "encrypt-decrypt".
+   *
+   * Conflict: The request was rejected because the automatic rotation is already enabled for this KMS Key.
+   *
+   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
    */
   disableKmsKeyRotation(
     params: DisableKmsKeyRotationRequest,
@@ -9826,6 +11094,17 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Enables a KMS Key by setting its state to "enabled". It restores the ability to fully use the KMS key for cryptographic operations and key lifecycle operations.
+   *
+   * Errors:
+   *
+   * **400**
+   * ### Errors
+   *
+   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
+   *
+   * Key is Pending Deletion: The request was rejected because it was performed on a key that is pending deletion.
+   *
+   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
    */
   enableKmsKey(params: EnableKmsKeyRequest): Promise<SuccessResponse> {
     const path = `/kms-key/${encodeURIComponent(params.id)}/enable`
@@ -9834,6 +11113,31 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Enable the periodic rotation of a KMS Key.
+   *
+   * Errors:
+   *
+   * **400**
+   * ### Errors
+   *
+   * Invalid Origin: The request was rejected because automatic key rotation can only be enabled on a KMS key with origin "exoscale-kms".
+   *
+   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
+   *
+   * Not on Default: The request was rejected because the operation is not allowed on the default key.
+   *
+   * Not on Replica: The request was rejected because the operation is not allowed on a replica.
+   *
+   * Key is Pending Deletion: The request was rejected because it was performed on a key that is pending deletion.
+   *
+   * Key is Disabled: The request was rejected because the specified KMS key is disabled.
+   *
+   * Invalid Usage: The request was rejected because the operation is only allowed on symmetric keys with usage "encrypt-decrypt".
+   *
+   * Conflict: The request was rejected because the automatic rotation is already enabled for this KMS Key.
+   *
+   * Bad Request: The request was rejected because of an invalid request body or path parameter.
+   *
+   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
    */
   enableKmsKeyRotation(
     params: EnableKmsKeyRotationRequest & {
@@ -9847,6 +11151,19 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Encrypts a plaintext.
+   *
+   * Errors:
+   *
+   * **400**
+   * ### Errors
+   *
+   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
+   *
+   * Key is Disabled: The request was rejected because the specified KMS key is disabled.
+   *
+   * Invalid Usage: The request was rejected because the operation is only allowed on symmetric keys with usage "encrypt-decrypt".
+   *
+   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
    */
   encrypt(
     params: EncryptRequest & {
@@ -9860,6 +11177,19 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Generate a Data Encryption Key from a given KMS Key.
+   *
+   * Errors:
+   *
+   * **400**
+   * ### Errors
+   *
+   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
+   *
+   * Key is Disabled: The request was rejected because the specified KMS key is disabled.
+   *
+   * Invalid Usage: The request was rejected because the operation is only allowed on symmetric keys with usage "encrypt-decrypt".
+   *
+   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
    */
   generateDataKey(
     params: GenerateDataKeyRequest & {
@@ -9873,6 +11203,15 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List all the key material versions of a KMS Key.
+   *
+   * Errors:
+   *
+   * **400**
+   * ### Errors
+   *
+   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
+   *
+   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
    */
   listKmsKeyRotations(params: ListKmsKeyRotationsRequest): Promise<ListKmsKeyRotationsResponse> {
     const path = `/kms-key/${encodeURIComponent(params.id)}/list-key-rotations`
@@ -9881,6 +11220,21 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Decrypts an existing ciphertext using its original key material and re-encrypts the underlying plaintext using a specified KMS key or the latest key material of the same KMS Key.
+   *
+   * Errors:
+   *
+   * **400**
+   * ### Errors
+   *
+   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
+   *
+   * Key is Disabled: The request was rejected because the specified KMS key is disabled.
+   *
+   * Not on Default: The request was rejected because the operation is not allowed on the default key.
+   *
+   * Bad Request: The request was rejected because of an invalid request body or path parameter.
+   *
+   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
    */
   reEncrypt(
     params: ReEncryptRequest & {
@@ -9894,6 +11248,25 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Replicate a KMS key to a target zone.
+   *
+   * Errors:
+   *
+   * **400**
+   * ### Errors
+   *
+   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
+   *
+   * Key is Pending Deletion: The request was rejected because it was performed on a key that is pending deletion.
+   *
+   * Not on Default: The request was rejected because the operation is not allowed on the default key.
+   *
+   * Not Multizone: The request was rejected because the KMS key is not a multi-zone key.
+   *
+   * Conflict: The request was rejected because the key is already replicated in the target zone.
+   *
+   * Invalid Argument: The request was rejected because the target zone is invalid.
+   *
+   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
    */
   replicateKmsKey(
     params: ReplicateKmsKeyRequest & {
@@ -9907,6 +11280,25 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Performs an immediate rotation of the key material for a symmetric key.
+   *
+   * Errors:
+   *
+   * **400**
+   * ### Errors
+   *
+   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
+   *
+   * Key is Pending Deletion: The request was rejected because it was performed on a key that is pending deletion.
+   *
+   * Not on a Replica: The request was rejected because the operation is not allowed on a replica.
+   *
+   * Invalid Usage: The request was rejected because the operation is only allowed on symmetric keys with usage "encrypt-decrypt".
+   *
+   * Key is Disabled: The request was rejected because the specified KMS key is disabled.
+   *
+   * Manual Rotation Limit: The request was rejected because you reached your limit of 10 manual rotations per key for this KMS key.
+   *
+   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
    */
   rotateKmsKey(params: RotateKmsKeyRequest): Promise<RotateKmsKeyResponse> {
     const path = `/kms-key/${encodeURIComponent(params.id)}/rotate`
@@ -9915,6 +11307,21 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Schedules a KMS key for deletion after a delay. You can specify a delay of 7-30 days.
+   *
+   * Errors:
+   *
+   * **400**
+   * ### Errors
+   *
+   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
+   *
+   * Not on Default: The request was rejected because the operation is not allowed on the default key.
+   *
+   * Not on Replica: The request was rejected because the operation is not allowed on a replica.
+   *
+   * Bad Request: The request was rejected because of an invalid request body or path parameter.
+   *
+   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
    */
   scheduleKmsKeyDeletion(
     params: ScheduleKmsKeyDeletionRequest & {
@@ -9928,6 +11335,11 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Returns the live-balance of the current organization.
+   *
+   * Errors:
+   *
+   * **429**
+   * 429
    */
   getLiveBalance(): Promise<LiveBalance> {
     return this.core.request('GET', '/live-balance', { decode: fromWireLiveBalance })
@@ -9935,6 +11347,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List Load Balancers
+   *
+   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
    */
   listLoadBalancers(): Promise<ListLoadBalancersResponse> {
     return this.core.request('GET', '/load-balancer', { decode: fromWireListLoadBalancersResponse })
@@ -9942,6 +11356,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a Load Balancer
+   *
+   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
    */
   createLoadBalancer(params: CreateLoadBalancerRequest): Promise<Operation> {
     const body = toWireCreateLoadBalancerRequest(params)
@@ -9950,6 +11366,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a Load Balancer
+   *
+   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
    */
   deleteLoadBalancer(params: DeleteLoadBalancerRequest): Promise<Operation> {
     const path = `/load-balancer/${encodeURIComponent(params.id)}`
@@ -9958,6 +11376,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Retrieve Load Balancer details
+   *
+   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
    */
   getLoadBalancer(params: GetLoadBalancerRequest): Promise<LoadBalancer> {
     const path = `/load-balancer/${encodeURIComponent(params.id)}`
@@ -9966,6 +11386,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Update a Load Balancer
+   *
+   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
    */
   updateLoadBalancer(params: UpdateLoadBalancerRequest): Promise<Operation> {
     const path = `/load-balancer/${encodeURIComponent(params.id)}`
@@ -9975,6 +11397,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Add a Load Balancer Service
+   *
+   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
    */
   addServiceToLoadBalancer(params: AddServiceToLoadBalancerRequest): Promise<Operation> {
     const path = `/load-balancer/${encodeURIComponent(params.id)}/service`
@@ -9984,6 +11408,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a Load Balancer Service
+   *
+   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
    */
   deleteLoadBalancerService(params: DeleteLoadBalancerServiceRequest): Promise<Operation> {
     const path = `/load-balancer/${encodeURIComponent(params.id)}/service/${encodeURIComponent(params.serviceID)}`
@@ -9992,6 +11418,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Retrieve Load Balancer Service details
+   *
+   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
    */
   getLoadBalancerService(params: GetLoadBalancerServiceRequest): Promise<LoadBalancerService> {
     const path = `/load-balancer/${encodeURIComponent(params.id)}/service/${encodeURIComponent(params.serviceID)}`
@@ -10000,6 +11428,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Update a Load Balancer Service
+   *
+   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
    */
   updateLoadBalancerService(params: UpdateLoadBalancerServiceRequest): Promise<Operation> {
     const path = `/load-balancer/${encodeURIComponent(params.id)}/service/${encodeURIComponent(params.serviceID)}`
@@ -10009,6 +11439,9 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Reset a Load Balancer Service field to its default value
+   *
+   * @see https://community.exoscale.com/documentation/compute/ Read more
+   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
    */
   resetLoadBalancerServiceField(params: ResetLoadBalancerServiceFieldRequest): Promise<Operation> {
     const path = `/load-balancer/${encodeURIComponent(params.id)}/service/${encodeURIComponent(params.serviceID)}/${encodeURIComponent(params.field)}`
@@ -10017,6 +11450,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Reset a Load Balancer field to its default value
+   *
+   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
    */
   resetLoadBalancerField(params: ResetLoadBalancerFieldRequest): Promise<Operation> {
     const path = `/load-balancer/${encodeURIComponent(params.id)}/${encodeURIComponent(params.field)}`
@@ -10025,6 +11460,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Retrieve Operation details
+   *
+   * @see https://community.exoscale.com/ Read more
    */
   getOperation(params: GetOperationRequest): Promise<Operation> {
     const path = `/operation/${encodeURIComponent(params.id)}`
@@ -10040,6 +11477,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List Private Networks
+   *
+   * @see https://community.exoscale.com/product/networking/private-network/ Read more
    */
   listPrivateNetworks(): Promise<ListPrivateNetworksResponse> {
     return this.core.request('GET', '/private-network', {
@@ -10049,6 +11488,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a Private Network
+   *
+   * @see https://community.exoscale.com/product/networking/private-network/ Read more
    */
   createPrivateNetwork(params: CreatePrivateNetworkRequest): Promise<Operation> {
     const body = toWireCreatePrivateNetworkRequest(params)
@@ -10057,6 +11498,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a Private Network
+   *
+   * @see https://community.exoscale.com/product/networking/private-network/ Read more
    */
   deletePrivateNetwork(params: DeletePrivateNetworkRequest): Promise<Operation> {
     const path = `/private-network/${encodeURIComponent(params.id)}`
@@ -10065,6 +11508,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Retrieve Private Network details
+   *
+   * @see https://community.exoscale.com/product/networking/private-network/ Read more
    */
   getPrivateNetwork(params: GetPrivateNetworkRequest): Promise<PrivateNetwork> {
     const path = `/private-network/${encodeURIComponent(params.id)}`
@@ -10073,6 +11518,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Update a Private Network
+   *
+   * @see https://community.exoscale.com/product/networking/private-network/ Read more
    */
   updatePrivateNetwork(params: UpdatePrivateNetworkRequest): Promise<Operation> {
     const path = `/private-network/${encodeURIComponent(params.id)}`
@@ -10082,6 +11529,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Reset Private Network field
+   *
+   * @see https://community.exoscale.com/product/networking/private-network/ Read more
    */
   resetPrivateNetworkField(params: ResetPrivateNetworkFieldRequest): Promise<Operation> {
     const path = `/private-network/${encodeURIComponent(params.id)}/${encodeURIComponent(params.field)}`
@@ -10090,6 +11539,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Attach a Compute instance to a Private Network
+   *
+   * @see https://community.exoscale.com/product/networking/private-network/ Read more
    */
   attachInstanceToPrivateNetwork(
     params: AttachInstanceToPrivateNetworkRequest,
@@ -10101,6 +11552,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Detach a Compute instance from a Private Network
+   *
+   * @see https://community.exoscale.com/product/networking/private-network/ Read more
    */
   detachInstanceFromPrivateNetwork(
     params: DetachInstanceFromPrivateNetworkRequest,
@@ -10112,6 +11565,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Update the IP address of an instance attached to a managed private network
+   *
+   * @see https://community.exoscale.com/product/networking/private-network/ Read more
    */
   updatePrivateNetworkInstanceIP(
     params: UpdatePrivateNetworkInstanceIPRequest,
@@ -10138,6 +11593,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete the PTR DNS record for an elastic IP
+   *
+   * @see https://community.exoscale.com/product/compute/instances/ Read more
    */
   deleteReverseDNSElasticIP(params: DeleteReverseDNSElasticIPRequest): Promise<Operation> {
     const path = `/reverse-dns/elastic-ip/${encodeURIComponent(params.id)}`
@@ -10146,6 +11603,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Query the PTR DNS records for an elastic IP
+   *
+   * @see https://community.exoscale.com/product/compute/instances/ Read more
    */
   getReverseDNSElasticIP(params: GetReverseDNSElasticIPRequest): Promise<ReverseDNSRecord> {
     const path = `/reverse-dns/elastic-ip/${encodeURIComponent(params.id)}`
@@ -10154,6 +11613,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Update/Create the PTR DNS record for an elastic IP
+   *
+   * @see https://community.exoscale.com/product/compute/instances/ Read more
    */
   updateReverseDNSElasticIP(params: UpdateReverseDNSElasticIPRequest): Promise<Operation> {
     const path = `/reverse-dns/elastic-ip/${encodeURIComponent(params.id)}`
@@ -10163,6 +11624,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete the PTR DNS record for an instance
+   *
+   * @see https://community.exoscale.com/product/compute/instances/ Read more
    */
   deleteReverseDNSInstance(params: DeleteReverseDNSInstanceRequest): Promise<Operation> {
     const path = `/reverse-dns/instance/${encodeURIComponent(params.id)}`
@@ -10171,6 +11634,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Query the PTR DNS records for an instance
+   *
+   * @see https://community.exoscale.com/product/compute/instances/ Read more
    */
   getReverseDNSInstance(params: GetReverseDNSInstanceRequest): Promise<ReverseDNSRecord> {
     const path = `/reverse-dns/instance/${encodeURIComponent(params.id)}`
@@ -10179,6 +11644,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Update/Create the PTR DNS record for an instance
+   *
+   * @see https://community.exoscale.com/product/compute/instances/ Read more
    */
   updateReverseDNSInstance(params: UpdateReverseDNSInstanceRequest): Promise<Operation> {
     const path = `/reverse-dns/instance/${encodeURIComponent(params.id)}`
@@ -10191,6 +11658,8 @@ export abstract class GeneratedExoscaleClient {
    * Public security groups are objects maintained by Exoscale which contain source addresses for
    * relevant services hosted by Exoscale. They can be used a source in ingress rules and as a destination
    * in egress rules.
+   *
+   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
    */
   listSecurityGroups(params?: ListSecurityGroupsRequest): Promise<ListSecurityGroupsResponse> {
     const query: Record<string, string> = {}
@@ -10203,6 +11672,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a Security Group
+   *
+   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
    */
   createSecurityGroup(params: CreateSecurityGroupRequest): Promise<Operation> {
     const body = toWireCreateSecurityGroupRequest(params)
@@ -10211,6 +11682,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a Security Group
+   *
+   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
    */
   deleteSecurityGroup(params: DeleteSecurityGroupRequest): Promise<Operation> {
     const path = `/security-group/${encodeURIComponent(params.id)}`
@@ -10219,6 +11692,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Retrieve Security Group details
+   *
+   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
    */
   getSecurityGroup(params: GetSecurityGroupRequest): Promise<SecurityGroup> {
     const path = `/security-group/${encodeURIComponent(params.id)}`
@@ -10227,6 +11702,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a Security Group rule
+   *
+   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
    */
   addRuleToSecurityGroup(params: AddRuleToSecurityGroupRequest): Promise<Operation> {
     const path = `/security-group/${encodeURIComponent(params.id)}/rules`
@@ -10236,6 +11713,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a Security Group rule
+   *
+   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
    */
   deleteRuleFromSecurityGroup(params: DeleteRuleFromSecurityGroupRequest): Promise<Operation> {
     const path = `/security-group/${encodeURIComponent(params.id)}/rules/${encodeURIComponent(params.ruleID)}`
@@ -10244,6 +11723,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Add an external source as a member of a Security Group
+   *
+   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
    */
   addExternalSourceToSecurityGroup(
     params: AddExternalSourceToSecurityGroupRequest,
@@ -10255,6 +11736,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Attach a Compute instance to a Security Group
+   *
+   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
    */
   attachInstanceToSecurityGroup(params: AttachInstanceToSecurityGroupRequest): Promise<Operation> {
     const path = `/security-group/${encodeURIComponent(params.id)}:attach`
@@ -10264,6 +11747,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Detach a Compute instance from a Security Group
+   *
+   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
    */
   detachInstanceFromSecurityGroup(
     params: DetachInstanceFromSecurityGroupRequest,
@@ -10275,6 +11760,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Remove an external source from a Security Group
+   *
+   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
    */
   removeExternalSourceFromSecurityGroup(
     params: RemoveExternalSourceFromSecurityGroupRequest,
@@ -10286,6 +11773,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List SKS clusters
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
    */
   listSKSClusters(): Promise<ListSKSClustersResponse> {
     return this.core.request('GET', '/sks-cluster', { decode: fromWireListSKSClustersResponse })
@@ -10293,6 +11782,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create an SKS cluster
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
    */
   createSKSCluster(params: CreateSKSClusterRequest): Promise<Operation> {
     const body = toWireCreateSKSClusterRequest(params)
@@ -10301,6 +11792,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * This operation returns the deprecated resources for a given cluster
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
    */
   listSKSClusterDeprecatedResources(
     params: ListSKSClusterDeprecatedResourcesRequest,
@@ -10313,6 +11806,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * This operation returns a Kubeconfig file encoded in base64.
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
    */
   generateSKSClusterKubeconfig(
     params: SKSKubeconfigRequest & {
@@ -10329,6 +11824,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List available versions for SKS clusters
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
    */
   listSKSClusterVersions(
     params?: ListSKSClusterVersionsRequest,
@@ -10344,6 +11841,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete an SKS cluster
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
    */
   deleteSKSCluster(params: DeleteSKSClusterRequest): Promise<Operation> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}`
@@ -10352,6 +11851,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Retrieve SKS cluster details
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
    */
   getSKSCluster(params: GetSKSClusterRequest): Promise<SKSCluster> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}`
@@ -10360,6 +11861,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Update an SKS cluster
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
    */
   updateSKSCluster(params: UpdateSKSClusterRequest): Promise<Operation> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}`
@@ -10369,6 +11872,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * This operation returns the certificate for the given SKS cluster authority encoded in base64.
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
    */
   getSKSClusterAuthorityCert(
     params: GetSKSClusterAuthorityCertRequest,
@@ -10379,6 +11884,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Generate a Karpenter ExoscaleNodeClass manifest for an SKS cluster, including its default security group and feature flags if present
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
    */
   generateSKSKarpenterExoscaleNodeclass(
     params: GenerateSKSKarpenterExoscaleNodeclassRequest,
@@ -10391,6 +11898,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Generate a Karpenter NodePool manifest with minimal configuration for an SKS cluster
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
    */
   generateSKSKarpenterNodepool(
     params: GenerateSKSKarpenterNodepoolRequest,
@@ -10401,6 +11910,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Helps troubleshoot common problems when deploying a kubernetes cluster. Inspections run every couple of minutes.
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
    */
   getSKSClusterInspection(
     params: GetSKSClusterInspectionRequest,
@@ -10411,6 +11922,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a new SKS Nodepool
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
    */
   createSKSNodepool(params: CreateSKSNodepoolRequest): Promise<Operation> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}/nodepool`
@@ -10420,6 +11933,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete an SKS Nodepool
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
    */
   deleteSKSNodepool(params: DeleteSKSNodepoolRequest): Promise<Operation> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}/nodepool/${encodeURIComponent(params.sksNodepoolID)}`
@@ -10428,6 +11943,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Retrieve SKS Nodepool details
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
    */
   getSKSNodepool(params: GetSKSNodepoolRequest): Promise<SKSNodepool> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}/nodepool/${encodeURIComponent(params.sksNodepoolID)}`
@@ -10436,6 +11953,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Update an SKS Nodepool
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
    */
   updateSKSNodepool(params: UpdateSKSNodepoolRequest): Promise<Operation> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}/nodepool/${encodeURIComponent(params.sksNodepoolID)}`
@@ -10445,6 +11964,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * This operation evicts the specified Compute instances member from the Nodepool, shrinking it to `&lt;current nodepool size&gt; - &lt;# evicted members&gt;`.
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
    */
   evictSKSNodepoolMembers(params: EvictSKSNodepoolMembersRequest): Promise<Operation> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}/nodepool/${encodeURIComponent(params.sksNodepoolID)}:evict`
@@ -10454,6 +11975,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Scale a SKS Nodepool
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
    */
   scaleSKSNodepool(params: ScaleSKSNodepoolRequest): Promise<Operation> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}/nodepool/${encodeURIComponent(params.sksNodepoolID)}:scale`
@@ -10463,6 +11986,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Rotate Exoscale CCM credentials
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
    */
   rotateSKSCcmCredentials(params: RotateSKSCcmCredentialsRequest): Promise<Operation> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}/rotate-ccm-credentials`
@@ -10471,6 +11996,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Rotate Exoscale CSI credentials
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
    */
   rotateSKSCsiCredentials(params: RotateSKSCsiCredentialsRequest): Promise<Operation> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}/rotate-csi-credentials`
@@ -10479,6 +12006,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Rotate Exoscale Karpenter credentials
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
    */
   rotateSKSKarpenterCredentials(params: RotateSKSKarpenterCredentialsRequest): Promise<Operation> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}/rotate-karpenter-credentials`
@@ -10487,6 +12016,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Rotate operators certificate authority
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
    */
   rotateSKSOperatorsCA(params: RotateSKSOperatorsCARequest): Promise<Operation> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}/rotate-operators-ca`
@@ -10495,6 +12026,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Upgrade an SKS cluster
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
    */
   upgradeSKSCluster(params: UpgradeSKSClusterRequest): Promise<Operation> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}/upgrade`
@@ -10504,6 +12037,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Upgrade a SKS cluster to pro
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
    */
   upgradeSKSClusterServiceLevel(params: UpgradeSKSClusterServiceLevelRequest): Promise<Operation> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}/upgrade-service-level`
@@ -10512,6 +12047,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Get the active template for a given kube version and variant (standard | nvidia)
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
    */
   getActiveNodepoolTemplate(
     params: GetActiveNodepoolTemplateRequest,
@@ -10522,6 +12059,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List Snapshots
+   *
+   * @see https://community.exoscale.com/documentation/compute/snapshots/ Read more
    */
   listSnapshots(): Promise<ListSnapshotsResponse> {
     return this.core.request('GET', '/snapshot', { decode: fromWireListSnapshotsResponse })
@@ -10529,6 +12068,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a Snapshot
+   *
+   * @see https://community.exoscale.com/documentation/compute/snapshots/ Read more
    */
   deleteSnapshot(params: DeleteSnapshotRequest): Promise<Operation> {
     const path = `/snapshot/${encodeURIComponent(params.id)}`
@@ -10537,6 +12078,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Retrieve Snapshot details
+   *
+   * @see https://community.exoscale.com/documentation/compute/snapshots/ Read more
    */
   getSnapshot(params: GetSnapshotRequest): Promise<Snapshot> {
     const path = `/snapshot/${encodeURIComponent(params.id)}`
@@ -10545,6 +12088,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Export a Snapshot
+   *
+   * @see https://community.exoscale.com/documentation/compute/snapshots/ Read more
    */
   exportSnapshot(params: ExportSnapshotRequest): Promise<Operation> {
     const path = `/snapshot/${encodeURIComponent(params.id)}:export`
@@ -10553,6 +12098,9 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Promote a Snapshot to a Template
+   *
+   * @see https://community.exoscale.com/documentation/compute/snapshots/ Read more
+   * @see https://www.exoscale.com/templates/ Read more
    */
   promoteSnapshotToTemplate(params: PromoteSnapshotToTemplateRequest): Promise<Operation> {
     const path = `/snapshot/${encodeURIComponent(params.id)}:promote`
@@ -10562,6 +12110,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List SOS Buckets Usage
+   *
+   * @see https://community.exoscale.com/product/storage/object-storage/ Read more
    */
   listSOSBucketsUsage(): Promise<ListSOSBucketsUsageResponse> {
     return this.core.request('GET', '/sos-buckets-usage', {
@@ -10571,6 +12121,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Generates Presigned Download URL for SOS object
+   *
+   * @see https://community.exoscale.com/product/storage/object-storage/ Read more
    */
   getSOSPresignedURL(params: GetSOSPresignedURLRequest): Promise<GetSOSPresignedURLResponse> {
     const path = `/sos/${encodeURIComponent(params.bucket)}/presigned-url`
@@ -10581,6 +12133,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List SSH keys
+   *
+   * @see https://community.exoscale.com/documentation/compute/ssh-keypairs/ Read more
    */
   listSSHKeys(): Promise<ListSSHKeysResponse> {
     return this.core.request('GET', '/ssh-key', { decode: fromWireListSSHKeysResponse })
@@ -10588,6 +12142,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Import SSH key
+   *
+   * @see https://community.exoscale.com/documentation/compute/ssh-keypairs/ Read more
    */
   registerSSHKey(params: RegisterSSHKeyRequest): Promise<Operation> {
     const body = toWireRegisterSSHKeyRequest(params)
@@ -10596,6 +12152,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a SSH key
+   *
+   * @see https://community.exoscale.com/documentation/compute/ssh-keypairs/ Read more
    */
   deleteSSHKey(params: DeleteSSHKeyRequest): Promise<Operation> {
     const path = `/ssh-key/${encodeURIComponent(params.name)}`
@@ -10604,6 +12162,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Retrieve SSH key details
+   *
+   * @see https://community.exoscale.com/documentation/compute/ssh-keypairs/ Read more
    */
   getSSHKey(params: GetSSHKeyRequest): Promise<SSHKey> {
     const path = `/ssh-key/${encodeURIComponent(params.name)}`
@@ -10612,6 +12172,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List Templates
+   *
+   * @see https://www.exoscale.com/templates/ Read more
    */
   listTemplates(params?: ListTemplatesRequest): Promise<ListTemplatesResponse> {
     const query: Record<string, string> = {}
@@ -10622,6 +12184,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Register a Template
+   *
+   * @see https://www.exoscale.com/templates/ Read more
    */
   registerTemplate(params: RegisterTemplateRequest): Promise<Operation> {
     const body = toWireRegisterTemplateRequest(params)
@@ -10630,6 +12194,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete a Template
+   *
+   * @see https://www.exoscale.com/templates/ Read more
    */
   deleteTemplate(params: DeleteTemplateRequest): Promise<Operation> {
     const path = `/template/${encodeURIComponent(params.id)}`
@@ -10638,6 +12204,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Retrieve Template details
+   *
+   * @see https://www.exoscale.com/templates/ Read more
    */
   getTemplate(params: GetTemplateRequest): Promise<Template> {
     const path = `/template/${encodeURIComponent(params.id)}`
@@ -10646,6 +12214,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Copy a Template from a zone to another
+   *
+   * @see https://www.exoscale.com/templates/ Read more
    */
   copyTemplate(params: CopyTemplateRequest): Promise<Operation> {
     const path = `/template/${encodeURIComponent(params.id)}`
@@ -10655,6 +12225,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Update template attributes
+   *
+   * @see https://www.exoscale.com/templates/ Read more
    */
   updateTemplate(params: UpdateTemplateRequest): Promise<Operation> {
     const path = `/template/${encodeURIComponent(params.id)}`
@@ -10676,6 +12248,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List Users
+   *
+   * @see https://community.exoscale.com/product/iam/operation/users-keys/ Read more
    */
   listUsers(): Promise<ListUsersResponse> {
     return this.core.request('GET', '/user', { decode: fromWireListUsersResponse })
@@ -10683,6 +12257,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Create a User
+   *
+   * @see https://community.exoscale.com/product/iam/operation/users-keys/ Read more
    */
   createUser(params: CreateUserRequest): Promise<Operation> {
     const body = toWireCreateUserRequest(params)
@@ -10691,6 +12267,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Delete User
+   *
+   * @see https://community.exoscale.com/product/iam/operation/users-keys/ Read more
    */
   deleteUser(params: DeleteUserRequest): Promise<Operation> {
     const path = `/user/${encodeURIComponent(params.id)}`
@@ -10699,6 +12277,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * Update a User's IAM role
+   *
+   * @see https://community.exoscale.com/product/iam/operation/users-keys/ Read more
    */
   updateUserRole(params: UpdateUserRoleRequest): Promise<Operation> {
     const path = `/user/${encodeURIComponent(params.id)}`
@@ -10708,6 +12288,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] List VPCs
+   *
+   * @see https://community.exoscale.com/product/networking/vpc Read more
    */
   listVpcs(): Promise<ListVpcsResponse> {
     return this.core.request('GET', '/vpc', { decode: fromWireListVpcsResponse })
@@ -10715,6 +12297,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Create a VPC
+   *
+   * @see https://community.exoscale.com/product/networking/vpc Read more
    */
   createVpc(params: CreateVpcRequest): Promise<Operation> {
     const body = toWireCreateVpcRequest(params)
@@ -10723,6 +12307,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Delete a VPC
+   *
+   * @see https://community.exoscale.com/product/networking/vpc Read more
    */
   deleteVpc(params: DeleteVpcRequest): Promise<void> {
     const path = `/vpc/${encodeURIComponent(params.id)}`
@@ -10731,6 +12317,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Retrieve VPC details
+   *
+   * @see https://community.exoscale.com/product/networking/vpc Read more
    */
   getVpc(params: GetVpcRequest): Promise<Vpc> {
     const path = `/vpc/${encodeURIComponent(params.id)}`
@@ -10739,6 +12327,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Update a VPC
+   *
+   * @see https://community.exoscale.com/product/networking/vpc Read more
    */
   updateVpc(params: UpdateVpcRequest): Promise<Vpc> {
     const path = `/vpc/${encodeURIComponent(params.id)}`
@@ -10748,6 +12338,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] List VPC routes
+   *
+   * @see https://community.exoscale.com/product/networking/vpc Read more
    */
   listVpcRoutes(params: ListVpcRoutesRequest): Promise<ListVpcRoutesResponse> {
     const path = `/vpc/${encodeURIComponent(params.vpcID)}/route`
@@ -10756,6 +12348,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] List Subnets
+   *
+   * @see https://community.exoscale.com/product/networking/vpc Read more
    */
   listSubnets(params: ListSubnetsRequest): Promise<ListSubnetsResponse> {
     const path = `/vpc/${encodeURIComponent(params.vpcID)}/subnet`
@@ -10764,6 +12358,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Create a Subnet
+   *
+   * @see https://community.exoscale.com/product/networking/vpc Read more
    */
   createSubnet(params: CreateSubnetRequest): Promise<Operation> {
     const path = `/vpc/${encodeURIComponent(params.vpcID)}/subnet`
@@ -10773,6 +12369,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Delete a Subnet
+   *
+   * @see https://community.exoscale.com/product/networking/vpc Read more
    */
   deleteSubnet(params: DeleteSubnetRequest): Promise<void> {
     const path = `/vpc/${encodeURIComponent(params.vpcID)}/subnet/${encodeURIComponent(params.id)}`
@@ -10781,6 +12379,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Retrieve Subnet details
+   *
+   * @see https://community.exoscale.com/product/networking/vpc Read more
    */
   getSubnet(params: GetSubnetRequest): Promise<Subnet> {
     const path = `/vpc/${encodeURIComponent(params.vpcID)}/subnet/${encodeURIComponent(params.id)}`
@@ -10789,6 +12389,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Update a Subnet
+   *
+   * @see https://community.exoscale.com/product/networking/vpc Read more
    */
   updateSubnet(params: UpdateSubnetRequest): Promise<Subnet> {
     const path = `/vpc/${encodeURIComponent(params.vpcID)}/subnet/${encodeURIComponent(params.id)}`
@@ -10798,6 +12400,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Attach a Compute instance to a Subnet
+   *
+   * @see https://community.exoscale.com/product/networking/vpc Read more
    */
   attachInstanceToSubnet(params: AttachInstanceToSubnetRequest): Promise<Operation> {
     const path = `/vpc/${encodeURIComponent(params.vpcID)}/subnet/${encodeURIComponent(params.subnetID)}/attach`
@@ -10807,6 +12411,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Detach a Compute instance from a Subnet
+   *
+   * @see https://community.exoscale.com/product/networking/vpc Read more
    */
   detachInstanceFromSubnet(params: DetachInstanceFromSubnetRequest): Promise<Operation> {
     const path = `/vpc/${encodeURIComponent(params.vpcID)}/subnet/${encodeURIComponent(params.subnetID)}/detach`
@@ -10816,6 +12422,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] List Subnet routes
+   *
+   * @see https://community.exoscale.com/product/networking/vpc Read more
    */
   listRoutes(params: ListRoutesRequest): Promise<ListRoutesResponse> {
     const path = `/vpc/${encodeURIComponent(params.vpcID)}/subnet/${encodeURIComponent(params.subnetID)}/route`
@@ -10824,6 +12432,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Create a route
+   *
+   * @see https://community.exoscale.com/product/networking/vpc Read more
    */
   createRoute(params: CreateRouteRequest): Promise<Route> {
     const path = `/vpc/${encodeURIComponent(params.vpcID)}/subnet/${encodeURIComponent(params.subnetID)}/route`
@@ -10833,6 +12443,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * [BETA] Delete a route
+   *
+   * @see https://community.exoscale.com/product/networking/vpc Read more
    */
   deleteRoute(params: DeleteRouteRequest): Promise<void> {
     const path = `/vpc/${encodeURIComponent(params.vpcID)}/subnet/${encodeURIComponent(params.subnetID)}/route/${encodeURIComponent(params.id)}`
@@ -10841,6 +12453,8 @@ export abstract class GeneratedExoscaleClient {
 
   /**
    * List Zones
+   *
+   * @see https://www.exoscale.com/datacenters/ Read more
    */
   listZones(): Promise<ListZonesResponse> {
     return this.core.request('GET', '/zone', { decode: fromWireListZonesResponse, skipAuth: true })

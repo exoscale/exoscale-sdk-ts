@@ -1,0 +1,54 @@
+name: spec-sync
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: spec-sync
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run pull-spec
+      - run: npm run generate
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --exit-code --quiet; then
+            echo changed=false >> "$GITHUB_OUTPUT"
+          else
+            echo changed=true >> "$GITHUB_OUTPUT"
+          fi
+      - name: Commit and push
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add spec/openapi.json src/generated
+          git commit -m "chore: sync OpenAPI spec"
+          # Dedicated bot branch: always one commit on top of main, so force-push is safe
+          git push --force origin HEAD:refs/heads/chore/spec-sync
+      - name: Create PR if none open
+        if: steps.changes.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -z "$(gh pr list --head chore/spec-sync --state open --json number -q '.[0]')" ]; then
+            gh pr create --base main --head chore/spec-sync \
+              --title "chore: sync OpenAPI spec" \
+              --body "Daily sync of spec/openapi.json from api-ch-gva-2 plus regenerated SDK. Updated in place by the spec-sync workflow."
+          fi

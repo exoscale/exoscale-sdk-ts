@@ -28,6 +28,7 @@ export interface ExoscaleClientOptions {
   apiSecret?: string
   /** Zone API endpoint, defaults to ch-gva-2. */
   endpoint?: string
+  /** Custom User-Agent. Node.js only; ignored in browsers. */
   userAgent?: string
   /** fetch implementation override (default: global fetch). */
   fetch?: typeof fetch

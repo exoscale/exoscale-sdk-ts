@@ -35,6 +35,10 @@ export function isoDateTime(d: Date): string {
   return d.toISOString().replace(/\.\d{3}Z$/, 'Z')
 }
 
+function isNode(): boolean {
+  return typeof process !== 'undefined' && process.versions?.node !== undefined
+}
+
 export class ClientCore {
   private opts: ClientCoreOptions
 
@@ -51,7 +55,10 @@ export class ClientCore {
     // on the wire, which includes any path prefix in the endpoint (e.g. /v2).
     const wirePath = new URL(url).pathname
 
-    const headers: Record<string, string> = { 'User-Agent': this.opts.userAgent }
+    // User-Agent is a CORS forbidden header: browsers set it themselves and
+    // refuse to let JS override it, so only send it from Node.js.
+    const headers: Record<string, string> = {}
+    if (isNode()) headers['User-Agent'] = this.opts.userAgent
     if (body !== undefined) headers['Content-Type'] = 'application/json'
     if (!skipAuth) {
       const custom =

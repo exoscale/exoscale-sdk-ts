@@ -1,5 +1,5 @@
 import { createHmac } from 'node:crypto'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { ClientCore } from '../src/core.js'
 import { APIError } from '../src/errors.js'
 
@@ -47,6 +47,19 @@ describe('ClientCore.request', () => {
     )
     expect(headers['Content-Type']).toBeUndefined()
     expect(captured[0].init.body).toBeUndefined()
+  })
+
+  it('does not send User-Agent in the browser (no process global)', async () => {
+    vi.stubGlobal('process', undefined)
+    try {
+      const captured: Captured[] = []
+      const c = core(mockFetch(200, '{"id":"abc"}', captured))
+      await c.request('GET', '/instance/abc')
+      const headers = captured[0].init.headers as Record<string, string>
+      expect(headers['User-Agent']).toBeUndefined()
+    } finally {
+      vi.unstubAllGlobals()
+    }
   })
 
   it('signs the full wire path including the endpoint prefix', async () => {

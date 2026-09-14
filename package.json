@@ -1,0 +1,52 @@
+{
+  "name": "@exoscale/sdk",
+  "version": "0.1.0",
+  "description": "Exoscale API TypeScript SDK, generated from the Exoscale OpenAPI specification",
+  "keywords": [
+    "exoscale",
+    "sdk",
+    "cloud",
+    "openapi"
+  ],
+  "type": "module",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/exoscale/exoscale-sdk-ts"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "generate": "tsx generator/main.ts spec/openapi.json src/generated",
+    "pull-spec": "curl -fsSL https://api-ch-gva-2.exoscale.com/v2/openapi.json -o spec/openapi.json",
+    "typecheck": "tsc --noEmit",
+    "docs": "typedoc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "prettier": "^3.4.0",
+    "tsup": "^8.3.0",
+    "tsx": "^4.19.0",
+    "typedoc": "^0.28.20",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
+}

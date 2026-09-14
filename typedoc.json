@@ -1,0 +1,11 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "name": "@exoscale/sdk",
+  "entryPoints": ["src/index.ts"],
+  "tsconfig": "./tsconfig.json",
+  "out": "docs",
+  "excludeInternal": true,
+  "excludeProtected": true,
+  "excludePrivate": true,
+  "readme": "none"
+}

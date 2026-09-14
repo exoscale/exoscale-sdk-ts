@@ -64,6 +64,29 @@ describe('waitForOperation', () => {
     await assertion
   })
 
+  it('rejects by default when the final state is not success', async () => {
+    vi.useFakeTimers()
+    const { client } = pollingClient(['pending', 'failure'], [])
+    const p = client.waitForOperation({ id: 'op-1', state: 'pending' })
+    // Attach the rejection handler before advancing timers.
+    const assertion = expect(p).rejects.toThrow(/state: failure/)
+    for (let i = 0; i < 5; i++) {
+      await vi.advanceTimersByTimeAsync(5000)
+    }
+    await assertion
+  })
+
+  it('accepts any final state when given an empty states list', async () => {
+    vi.useFakeTimers()
+    const { client } = pollingClient(['pending', 'failure'], [])
+    const p = client.waitForOperation({ id: 'op-1', state: 'pending' }, [])
+    for (let i = 0; i < 5; i++) {
+      await vi.advanceTimersByTimeAsync(5000)
+    }
+    const op = await p
+    expect(op.state).toBe('failure')
+  })
+
   it('aborts after 5 consecutive polling errors', async () => {
     vi.useFakeTimers()
     const calls: string[] = []

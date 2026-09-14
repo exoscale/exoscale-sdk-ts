@@ -87,9 +87,13 @@ export class ExoscaleClient extends GeneratedExoscaleClient {
 
   /**
    * waitForOperation polls getOperation until the operation reaches a final
-   * state. When states are given, the final state must be one of them.
+   * state. The final state must be one of states (default: ['success']);
+   * pass an empty list to accept any final state.
    */
-  async waitForOperation(op: Operation, states?: OperationState[]): Promise<Operation> {
+  async waitForOperation(
+    op: Operation,
+    states: OperationState[] = ['success'],
+  ): Promise<Operation> {
     if (op === undefined || op === null) {
       throw new Error('waitForOperation: operation is nil')
     }
@@ -109,7 +113,7 @@ export class ExoscaleClient extends GeneratedExoscaleClient {
       }
       subsequentErrors = 0
       if (current.state === 'pending') continue
-      if (states !== undefined && states.length > 0 && !states.includes(current.state!)) {
+      if (states.length > 0 && !states.includes(current.state!)) {
         const ref = current.reference?.id
         const refPart = ref !== undefined ? ` ${ref}` : ''
         throw new Error(

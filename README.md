@@ -34,8 +34,8 @@ const op = await client.createInstance({
   instanceType: { id: 'e00-c3' },
 })
 
-// Wait until the operation reaches a final state:
-const done = await client.waitForOperation(op, ['success'])
+// Wait until the operation succeeds (rejects on failure/timeout):
+const done = await client.waitForOperation(op)
 const instance = await client.getInstance({ id: done.reference!.id! })
 ```
 

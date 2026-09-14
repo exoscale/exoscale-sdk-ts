@@ -41,13 +41,10 @@ const instance = await client.getInstance({ id: done.reference!.id! })
 
 ### Zones
 
-The default endpoint is `ch-gva-2`. Other zones:
+The default endpoint is `ch-gva-2`. `ENDPOINTS` maps zone names to API endpoints:
 
 ```ts
 const client = new ExoscaleClient({ endpoint: ENDPOINTS['de-fra-1'] })
-// or discover them dynamically:
-const name = await client.getZoneName('https://api-ch-dk-2.exoscale.com/v2') // 'ch-dk-2'
-const endpoint = await client.getZoneAPIEndpoint('de-fra-1')
 ```
 
 ### IAM Assume-role

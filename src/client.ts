@@ -1,11 +1,10 @@
 // ExoscaleClient: the public client. Extends the generated base class (one
-// flat method per operationId) and adds hand-written helpers: withRole,
-// waitForOperation, and zone discovery.
+// flat method per operationId) and adds hand-written helpers: withRole and
+// waitForOperation.
 
 import { ClientCore } from './core.js'
-import { APIError } from './errors.js'
 import { GeneratedExoscaleClient } from './generated/operations.js'
-import type { Operation, Zone, ZoneName } from './generated/schemas.js'
+import type { Operation, ZoneName } from './generated/schemas.js'
 
 const VERSION = '0.1.0'
 
@@ -124,33 +123,6 @@ export class ExoscaleClient extends GeneratedExoscaleClient {
       }
       return current
     }
-  }
-
-  /** getZoneName returns the zone name matching a zone API endpoint. */
-  async getZoneName(endpoint: string): Promise<ZoneName> {
-    const zone = await this.lookupZone((z) => z.apiEndpoint === endpoint)
-    if (zone.name === undefined) {
-      throw new APIError(500, `zone for endpoint ${endpoint} has no name`)
-    }
-    return zone.name
-  }
-
-  /** getZoneAPIEndpoint returns the API endpoint of a zone name. */
-  async getZoneAPIEndpoint(zoneName: ZoneName): Promise<string> {
-    const zone = await this.lookupZone((z) => z.name === zoneName)
-    if (zone.apiEndpoint === undefined) {
-      throw new APIError(500, `zone ${zoneName} has no API endpoint`)
-    }
-    return zone.apiEndpoint
-  }
-
-  private async lookupZone(match: (z: Zone) => boolean): Promise<Zone> {
-    const zones = (await this.listZones()).zones ?? []
-    const zone = zones.find(match)
-    if (zone === undefined) {
-      throw new APIError(404, 'zone not found')
-    }
-    return zone
   }
 }
 

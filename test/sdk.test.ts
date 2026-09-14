@@ -171,37 +171,6 @@ describe('authHeader', () => {
   })
 })
 
-describe('zone helpers', () => {
-  const zonesBody = JSON.stringify({
-    zones: [
-      { name: 'ch-gva-2', 'api-endpoint': 'https://api-ch-gva-2.exoscale.com/v2' },
-      { name: 'de-fra-1', 'api-endpoint': 'https://api-de-fra-1.exoscale.com/v2' },
-    ],
-  })
-
-  it('getZoneName resolves a zone by API endpoint', async () => {
-    const c = client(capture([], 200, zonesBody))
-    await expect(c.getZoneName('https://api-de-fra-1.exoscale.com/v2')).resolves.toBe('de-fra-1')
-  })
-
-  it('getZoneAPIEndpoint resolves an endpoint by zone name', async () => {
-    const c = client(capture([], 200, zonesBody))
-    await expect(c.getZoneAPIEndpoint('ch-gva-2')).resolves.toBe(
-      'https://api-ch-gva-2.exoscale.com/v2',
-    )
-  })
-
-  it('throws APIError 404 for unknown zones', async () => {
-    const c = client(capture([], 200, zonesBody))
-    try {
-      await c.getZoneName('https://unknown.example.com/v2')
-      expect.unreachable()
-    } catch (e) {
-      expect(APIError.isNotFound(e)).toBe(true)
-    }
-  })
-})
-
 describe('withRole', () => {
   it('assumes the role and returns a client with the ephemeral credentials', async () => {
     const captured: Captured[] = []

@@ -1,6 +1,6 @@
 // Generator entry point.
 //
-// Usage: tsx generator/main.ts <openapi-spec.json> <out-dir>
+// Usage: tsx generator/main.ts <openapi-spec.json> <overrides.json> <out-dir>
 //
 // Deterministic by construction: sorted iteration everywhere, fixed header,
 // no timestamps, and output normalized with a pinned prettier configuration.
@@ -10,7 +10,7 @@ import { pathToFileURL } from 'node:url'
 import { join } from 'node:path'
 import * as prettier from 'prettier'
 
-import { loadSpec } from './model.js'
+import { loadEffectiveSpec } from './model.js'
 import { generateSchemas } from './schemas.js'
 import { generateOperations } from './operations.js'
 import { TypeRegistry } from './types.js'
@@ -25,8 +25,12 @@ const PRETTIER_OPTIONS = {
   arrowParens: 'always',
 } as const
 
-export async function generate(specFile: string, outDir: string): Promise<void> {
-  const spec = loadSpec(specFile)
+export async function generate(
+  specFile: string,
+  overridesFile: string,
+  outDir: string,
+): Promise<void> {
+  const spec = loadEffectiveSpec(specFile, overridesFile)
   const registry = new TypeRegistry(spec)
   const schemas = generateSchemas(spec, registry)
   const operations = generateOperations(spec, registry)
@@ -46,12 +50,12 @@ const isMain =
   process.argv[1] !== undefined && import.meta.url === pathToFileURL(process.argv[1]).href
 
 if (isMain) {
-  const [specFile, outDir] = process.argv.slice(2)
-  if (specFile === undefined || outDir === undefined) {
-    console.error('usage: main.ts <openapi-spec.json> <out-dir>')
+  const [specFile, overridesFile, outDir] = process.argv.slice(2)
+  if (specFile === undefined || overridesFile === undefined || outDir === undefined) {
+    console.error('usage: main.ts <openapi-spec.json> <overrides.json> <out-dir>')
     process.exit(1)
   }
-  generate(specFile, outDir).catch((e: unknown) => {
+  generate(specFile, overridesFile, outDir).catch((e: unknown) => {
     console.error(e)
     process.exit(1)
   })

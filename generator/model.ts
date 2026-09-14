@@ -4,6 +4,8 @@
 
 import { readFileSync } from 'node:fs'
 
+import { applyPatch } from './overrides.js'
+
 export type JSON = Record<string, any>
 
 export interface Parameter {
@@ -45,6 +47,14 @@ export const IGNORED_SCHEMAS = new Set(['snapshot-export'])
 export function loadSpec(file: string): Spec {
   const raw = JSON.parse(readFileSync(file, 'utf8')) as JSON
   return parseSpec(raw)
+}
+
+// loadEffectiveSpec loads the upstream spec, applies the overrides patch, and
+// parses the result. This is what generation (and the tests) operate on.
+export function loadEffectiveSpec(specFile: string, overridesFile: string): Spec {
+  const raw = JSON.parse(readFileSync(specFile, 'utf8')) as JSON
+  const overrides = JSON.parse(readFileSync(overridesFile, 'utf8'))
+  return parseSpec(applyPatch(raw, overrides))
 }
 
 export function parseSpec(raw: JSON): Spec {

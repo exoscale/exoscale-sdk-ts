@@ -17407,10 +17407,6 @@ export interface Template {
    * Template visibility
    */
   visibility?: 'private' | 'public'
-  /**
-   * Zones availability
-   */
-  zones?: ZoneName[]
 }
 
 /** @internal */

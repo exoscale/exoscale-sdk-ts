@@ -81,7 +81,7 @@ try {
 ```sh
 npm install
 npm run pull-spec   # refresh spec/openapi.json from the API
-npm run generate    # regenerate src/generated/
+npm run generate    # regenerate src/generated/ from spec + overrides
 npm test            # unit + generator tests (live tests need credentials)
 npm run build       # bundle to dist/
 ```
@@ -92,9 +92,17 @@ instance and only run when `EXOSCALE_API_KEY` and `EXOSCALE_API_SECRET` are set.
 ## How generation works
 
 `generator/` is a small TypeScript generator (dev-only, run via `tsx`) that
-reads the committed `spec/openapi.json` and emits `src/generated/schemas.ts`
-(types + wire transforms) and `src/generated/operations.ts` (the
-`GeneratedExoscaleClient` base class with one method per operation).
+reads the committed `spec/openapi.json`, applies `spec/overrides.json`, and
+emits `src/generated/schemas.ts` (types + wire transforms) and
+`src/generated/operations.ts` (the `GeneratedExoscaleClient` base class with
+one method per operation).
+
+`spec/openapi.json` is a verbatim copy of the upstream spec (refreshed by
+`npm run pull-spec`). Known upstream spec inaccuracies are not fixed there;
+they are recorded in `spec/overrides.json` as an RFC 6902 JSON Patch — a small
+set of `add`/`remove`/`replace` ops, each carrying a `reason`. The generator
+fails if an override no longer matches the upstream spec, so stale overrides
+get removed as soon as upstream is fixed.
 
 Generation is deterministic: sorted iteration everywhere, no timestamps, and
 output normalized with a pinned Prettier configuration. `test/generator.test.ts`

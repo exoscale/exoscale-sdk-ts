@@ -4,18 +4,20 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { generate } from '../generator/main.js'
-import { IGNORED_SCHEMAS, loadSpec } from '../generator/model.js'
+import { applyPatch } from '../generator/overrides.js'
+import { IGNORED_SCHEMAS, loadEffectiveSpec } from '../generator/model.js'
 import { toCamel, toLowerCamel } from '../generator/naming.js'
 
 const ROOT = join(fileURLToPath(import.meta.url), '..', '..')
 const SPEC_FILE = join(ROOT, 'spec', 'openapi.json')
+const OVERRIDES_FILE = join(ROOT, 'spec', 'overrides.json')
 
 describe('generator', () => {
   it('is deterministic: two runs produce byte-identical output', async () => {
     const dir1 = mkdtempSync(join(tmpdir(), 'exo-gen-'))
     const dir2 = mkdtempSync(join(tmpdir(), 'exo-gen-'))
-    await generate(SPEC_FILE, dir1)
-    await generate(SPEC_FILE, dir2)
+    await generate(SPEC_FILE, OVERRIDES_FILE, dir1)
+    await generate(SPEC_FILE, OVERRIDES_FILE, dir2)
     for (const name of ['schemas.ts', 'operations.ts']) {
       expect(readFileSync(join(dir1, name), 'utf8')).toBe(readFileSync(join(dir2, name), 'utf8'))
     }
@@ -23,10 +25,10 @@ describe('generator', () => {
 
   it('covers every operation and schema from the spec', async () => {
     const dir = mkdtempSync(join(tmpdir(), 'exo-gen-'))
-    await generate(SPEC_FILE, dir)
+    await generate(SPEC_FILE, OVERRIDES_FILE, dir)
     const operations = readFileSync(join(dir, 'operations.ts'), 'utf8')
     const schemas = readFileSync(join(dir, 'schemas.ts'), 'utf8')
-    const spec = loadSpec(SPEC_FILE)
+    const spec = loadEffectiveSpec(SPEC_FILE, OVERRIDES_FILE)
 
     // Every operationId becomes a method.
     expect(spec.operations.length).toBe(371)
@@ -47,10 +49,56 @@ describe('generator', () => {
 
   it('keeps the committed generated code in sync with the spec', async () => {
     const dir = mkdtempSync(join(tmpdir(), 'exo-gen-'))
-    await generate(SPEC_FILE, dir)
+    await generate(SPEC_FILE, OVERRIDES_FILE, dir)
     for (const name of ['schemas.ts', 'operations.ts']) {
       const expected = readFileSync(join(ROOT, 'src', 'generated', name), 'utf8')
       expect(readFileSync(join(dir, name), 'utf8')).toBe(expected)
     }
+  })
+})
+
+describe('spec overrides', () => {
+  it('leaves the upstream spec untouched but patches the effective spec', () => {
+    const raw = JSON.parse(readFileSync(SPEC_FILE, 'utf8'))
+    expect(raw.components.schemas.template.properties.zones).toBeDefined()
+    const spec = loadEffectiveSpec(SPEC_FILE, OVERRIDES_FILE)
+    expect(spec.schemas.get('template')!.properties.zones).toBeUndefined()
+  })
+
+  it('applies add, remove and replace ops without mutating the input', () => {
+    const doc = { a: { b: 'x', c: 1 }, list: ['x'] }
+    const patched = applyPatch(doc, [
+      { op: 'remove', path: '/a/b' },
+      { op: 'add', path: '/a/d', value: true },
+      { op: 'replace', path: '/a/c', value: 2 },
+      { op: 'replace', path: '/list/0', value: 'y' },
+    ])
+    expect(patched).toEqual({ a: { c: 2, d: true }, list: ['y'] })
+    expect(doc).toEqual({ a: { b: 'x', c: 1 }, list: ['x'] })
+  })
+
+  it('ignores extra keys such as reason', () => {
+    const patched = applyPatch({ a: 1 }, [{ op: 'add', path: '/b', value: 2, reason: 'because' }])
+    expect(patched).toEqual({ a: 1, b: 2 })
+  })
+
+  it('fails on invalid or stale overrides', () => {
+    const doc = { a: { b: 1 } }
+    expect(() => applyPatch(doc, 'nope')).toThrow(/JSON array of operations/)
+    expect(() => applyPatch(doc, [42])).toThrow(/must be an object/)
+    expect(() => applyPatch(doc, [{ op: 'move', path: '/a', from: '/b' }])).toThrow(
+      /unsupported op "move"/,
+    )
+    expect(() => applyPatch(doc, [{ op: 'remove', path: 'a/b' }])).toThrow(/invalid path/)
+    expect(() => applyPatch(doc, [{ op: 'add', path: '/a/c' }])).toThrow(/requires a "value"/)
+    expect(() => applyPatch(doc, [{ op: 'remove', path: '/a/missing' }])).toThrow(
+      /cannot remove "\/a\/missing": not present in spec/,
+    )
+    expect(() => applyPatch(doc, [{ op: 'replace', path: '/a/missing', value: 2 }])).toThrow(
+      /cannot replace "\/a\/missing": not present in spec/,
+    )
+    expect(() => applyPatch(doc, [{ op: 'remove', path: '/nope/deep' }])).toThrow(
+      /path "\/nope\/deep" not found in spec/,
+    )
   })
 })

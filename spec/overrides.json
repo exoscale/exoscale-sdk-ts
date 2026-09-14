@@ -1,0 +1,7 @@
+[
+  {
+    "op": "remove",
+    "path": "/components/schemas/template/properties/zones",
+    "reason": "API does not return zones on templates (upstream spec inaccuracy)"
+  }
+]

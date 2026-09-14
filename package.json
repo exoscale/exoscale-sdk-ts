@@ -31,7 +31,7 @@
   ],
   "scripts": {
     "build": "tsup",
-    "generate": "tsx generator/main.ts spec/openapi.json src/generated",
+    "generate": "tsx generator/main.ts spec/openapi.json spec/overrides.json src/generated",
     "pull-spec": "curl -fsSL https://api-ch-gva-2.exoscale.com/v2/openapi.json -o spec/openapi.json",
     "typecheck": "tsc --noEmit",
     "docs": "typedoc",

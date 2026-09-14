@@ -6,8 +6,8 @@ API reference: <https://exoscale.github.io/exoscale-sdk-ts/>
 
 - Exposes a flat `ExoscaleClient` with one method per API operation, driven by
   the upstream API spec.
-- Zero runtime dependencies (built on `node:crypto` and global `fetch`)
-- ESM only, `Node >= 18`
+- Zero runtime dependencies (built on Web Crypto and global `fetch`)
+- ESM only, `Node >= 22`
 
 ## Install
 

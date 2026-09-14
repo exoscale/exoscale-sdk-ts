@@ -1,5 +1,18 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import type { webcrypto } from 'node:crypto'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ExoscaleClient } from '../src/index.js'
+
+// Web Crypto ops (subtle.importKey/sign) settle through real event-loop
+// work whose turn count under fake timers is nondeterministic (measured
+// 2-100), which stalls the polling loops below. Stub them with
+// microtask-resolving mocks so signRequest still runs (payload, header)
+// while the fake clock stays in control. Real-crypto correctness is
+// covered by test/signing.test.ts against reference vectors.
+beforeEach(() => {
+  const subtle = globalThis.crypto.subtle
+  vi.spyOn(subtle, 'importKey').mockResolvedValue({} as webcrypto.CryptoKey)
+  vi.spyOn(subtle, 'sign').mockResolvedValue(new ArrayBuffer(32))
+})
 
 function wireOp(state: string, id = 'op-1', extra: Record<string, unknown> = {}) {
   return JSON.stringify({ id, state, ...extra })
@@ -24,6 +37,7 @@ function pollingClient(states: string[], capturedUrls: string[] = []) {
 
 afterEach(() => {
   vi.useRealTimers()
+  vi.restoreAllMocks()
 })
 
 describe('waitForOperation', () => {

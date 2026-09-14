@@ -95,6 +95,31 @@ describe('ClientCore.request', () => {
     expect(headers['Authorization']).toBeUndefined()
   })
 
+  it('sends the authHeader even on skipAuth requests', async () => {
+    const captured: Captured[] = []
+    const c = new ClientCore({
+      endpoint: 'https://api-ch-gva-2.exoscale.com/v2',
+      userAgent: 'test-agent',
+      fetchImpl: mockFetch(200, '{"zones":[]}', captured),
+      authHeader: () => 'token-123',
+    })
+    await c.request('GET', '/zone', { skipAuth: true })
+    const headers = captured[0].init.headers as Record<string, string>
+    expect(headers['Authorization']).toBe('token-123')
+  })
+
+  it('does not require credentials for skipAuth requests', async () => {
+    const captured: Captured[] = []
+    const c = new ClientCore({
+      endpoint: 'https://api-ch-gva-2.exoscale.com/v2',
+      userAgent: 'test-agent',
+      fetchImpl: mockFetch(200, '{"zones":[]}', captured),
+    })
+    await c.request('GET', '/zone', { skipAuth: true })
+    const headers = captured[0].init.headers as Record<string, string>
+    expect(headers['Authorization']).toBeUndefined()
+  })
+
   it('sends a static authHeader value verbatim, without credentials', async () => {
     const captured: Captured[] = []
     const c = new ClientCore({

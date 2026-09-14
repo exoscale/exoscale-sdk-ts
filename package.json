@@ -15,7 +15,7 @@
     "url": "https://github.com/exoscale/exoscale-sdk-ts"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "sideEffects": false,
   "main": "./dist/index.js",

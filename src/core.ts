@@ -23,7 +23,11 @@ export interface RequestOptions {
   query?: Record<string, string>
   /** Decodes the parsed JSON response into the returned type. */
   decode?: (w: any) => any
-  /** When true, the request is sent without credentials (list-zones). */
+  /**
+   * When true, credentials are not required: without a custom authHeader the
+   * request is sent anonymously (no signing, no missing-credentials error).
+   * A configured authHeader is still sent (list-zones).
+   */
   skipAuth?: boolean
 }
 
@@ -55,34 +59,37 @@ export class ClientCore {
     // on the wire, which includes any path prefix in the endpoint (e.g. /v2).
     const wirePath = new URL(url).pathname
 
-    // User-Agent is a CORS forbidden header: browsers set it themselves and
-    // refuse to let JS override it, so only send it from Node.js.
+    // User-Agent is only sent from Node.js: browser requests already carry
+    // the browser's own User-Agent (and Origin), which identifies the client
+    // better than a static SDK string would.
     const headers: Record<string, string> = {}
     if (isNode()) headers['User-Agent'] = this.opts.userAgent
     if (body !== undefined) headers['Content-Type'] = 'application/json'
-    if (!skipAuth) {
-      const custom =
-        this.opts.authHeader === undefined
-          ? undefined
-          : typeof this.opts.authHeader === 'function'
-            ? this.opts.authHeader()
-            : this.opts.authHeader
-      if (custom !== undefined) {
-        headers['Authorization'] = custom
-      } else {
-        if (this.opts.apiKey === undefined || this.opts.apiSecret === undefined) {
-          throw new Error('missing API credentials: apiKey and apiSecret are required')
-        }
-        headers['Authorization'] = await signRequest({
-          method,
-          path: wirePath,
-          body: bodyStr,
-          query: query ?? {},
-          apiKey: this.opts.apiKey,
-          apiSecret: this.opts.apiSecret,
-          expires: Math.floor(Date.now() / 1000) + 600,
-        })
+    // A custom auth header applies to every request — including skipAuth
+    // ones — so an authenticated client keeps sending its credentials on
+    // endpoints that also allow anonymous access. skipAuth only relaxes the
+    // requirement: without a custom header the request goes out anonymously.
+    const custom =
+      this.opts.authHeader === undefined
+        ? undefined
+        : typeof this.opts.authHeader === 'function'
+          ? this.opts.authHeader()
+          : this.opts.authHeader
+    if (custom !== undefined) {
+      headers['Authorization'] = custom
+    } else if (!skipAuth) {
+      if (this.opts.apiKey === undefined || this.opts.apiSecret === undefined) {
+        throw new Error('missing API credentials: apiKey and apiSecret are required')
       }
+      headers['Authorization'] = await signRequest({
+        method,
+        path: wirePath,
+        body: bodyStr,
+        query: query ?? {},
+        apiKey: this.opts.apiKey,
+        apiSecret: this.opts.apiSecret,
+        expires: Math.floor(Date.now() / 1000) + 600,
+      })
     }
 
     const fetchImpl = this.opts.fetchImpl ?? fetch
@@ -125,11 +132,18 @@ export async function signRequest(args: {
   const payload = [`${args.method} ${args.path}`, args.body, values, '', String(args.expires)].join(
     '\n',
   )
-  // Imported lazily so that consumers who never sign (e.g. browser bundles
-  // using a custom authHeader) do not load node:crypto at module-evaluation
-  // time.
-  const { createHmac } = await import('node:crypto')
-  const signature = createHmac('sha256', args.apiSecret).update(payload, 'utf8').digest('base64')
+  // Web Crypto (globalThis.crypto.subtle) is available in every supported
+  // runtime (Node >= 22, browsers) without a node:crypto dependency.
+  const enc = new TextEncoder()
+  const key = await globalThis.crypto.subtle.importKey(
+    'raw',
+    enc.encode(args.apiSecret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  )
+  const sig = new Uint8Array(await globalThis.crypto.subtle.sign('HMAC', key, enc.encode(payload)))
+  const signature = btoa(String.fromCharCode(...sig))
 
   const parts = [`EXO2-HMAC-SHA256 credential=${args.apiKey}`]
   if (names.length > 0) parts.push(`signed-query-args=${names.join(';')}`)

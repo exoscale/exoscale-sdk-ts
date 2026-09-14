@@ -1,3 +1,4 @@
+import { createHmac } from 'node:crypto'
 import { describe, expect, it } from 'vitest'
 import { ClientCore } from '../src/core.js'
 import { APIError } from '../src/errors.js'
@@ -46,6 +47,21 @@ describe('ClientCore.request', () => {
     )
     expect(headers['Content-Type']).toBeUndefined()
     expect(captured[0].init.body).toBeUndefined()
+  })
+
+  it('signs the full wire path including the endpoint prefix', async () => {
+    const captured: Captured[] = []
+    const c = core(mockFetch(200, '[]', captured))
+    await c.request('GET', '/instance')
+    const headers = captured[0].init.headers as Record<string, string>
+    const match = headers['Authorization']!.match(
+      /^EXO2-HMAC-SHA256 credential=key,expires=(\d+),signature=([A-Za-z0-9+/=]+)$/,
+    )
+    expect(match).not.toBeNull()
+    const expected = createHmac('sha256', 'secret')
+      .update(['GET /v2/instance', '', '', '', match![1]].join('\n'), 'utf8')
+      .digest('base64')
+    expect(match![2]).toBe(expected)
   })
 
   it('sends the body as JSON with Content-Type', async () => {

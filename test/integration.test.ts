@@ -45,15 +45,16 @@ describe.runIf(hasCreds)('integration (live API)', () => {
       .sort((a, b) => (a.memory ?? 0) - (b.memory ?? 0))[0]
     expect(type, 'no authorized instance type in ' + ZONE).toBeDefined()
 
-    // Pick a template available in the zone.
+    // Pick a public template.
     const templates = (await client.listTemplates()).templates ?? []
-    const template = templates.find((t) => t.zones?.includes(ZONE))
-    expect(template, 'no template in ' + ZONE).toBeDefined()
+    const template = templates.find((t) => t.visibility === 'public')
+    expect(template, 'no public template').toBeDefined()
 
     const name = `exoscale-sdk-it-${Date.now()}`
     const op = await client.createInstance({
       name,
-      diskSize: Math.max(template!.size ?? 10, 10),
+      // template size is in bytes; disk-size is in GiB (min 10)
+      diskSize: Math.max(Math.ceil((template!.size ?? 0) / 2 ** 30), 10),
       template: { id: template!.id! },
       instanceType: { id: type!.id! },
     })

@@ -42,6 +42,9 @@ export class ClientCore {
     const bodyStr = body === undefined ? '' : JSON.stringify(body)
     const qs = buildQueryString(query)
     const url = this.opts.endpoint + path + (qs !== '' ? `?${qs}` : '')
+    // The API verifies the signature against the full request path as received
+    // on the wire, which includes any path prefix in the endpoint (e.g. /v2).
+    const wirePath = new URL(url).pathname
 
     const headers: Record<string, string> = { 'User-Agent': this.opts.userAgent }
     if (body !== undefined) headers['Content-Type'] = 'application/json'
@@ -51,7 +54,7 @@ export class ClientCore {
       }
       headers['Authorization'] = signRequest({
         method,
-        path,
+        path: wirePath,
         body: bodyStr,
         query: query ?? {},
         apiKey: this.opts.apiKey,
@@ -83,6 +86,8 @@ export class ClientCore {
  * The signed payload is
  * "<METHOD> <path>\n<body>\n<concatenated single-valued query params sorted by
  * name>\n\n<expires-unix>" and the header lists the sorted signed-query-args.
+ * path must be the full request path as sent on the wire, including any
+ * path prefix in the endpoint (e.g. /v2).
  */
 export function signRequest(args: {
   method: string

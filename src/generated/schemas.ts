@@ -17434,7 +17434,6 @@ export function toWireTemplate(v: Template): Record<string, unknown> {
   if (v.url !== undefined) o['url'] = v.url
   if (v.version !== undefined) o['version'] = v.version
   if (v.visibility !== undefined) o['visibility'] = v.visibility
-  if (v.zones !== undefined) o['zones'] = v.zones
   return o
 }
 
@@ -17459,7 +17458,6 @@ export function fromWireTemplate(w: any): Template {
   if (w['url'] !== undefined) v.url = w['url']
   if (w['version'] !== undefined) v.version = w['version']
   if (w['visibility'] !== undefined) v.visibility = w['visibility']
-  if (w['zones'] !== undefined) v.zones = w['zones']
   return v
 }
 

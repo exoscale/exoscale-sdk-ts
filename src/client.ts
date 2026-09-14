@@ -31,10 +31,25 @@ export interface ExoscaleClientOptions {
   userAgent?: string
   /** fetch implementation override (default: global fetch). */
   fetch?: typeof fetch
+  /**
+   * When set, the value (or the getter's return) is used verbatim as the
+   * Authorization header instead of EXO2-HMAC-SHA256 signing with
+   * apiKey/apiSecret. A getter that returns undefined falls back to signing.
+   */
+  authHeader?: string | (() => string | undefined)
+}
+
+/** env reads an environment variable when running on Node.js, else undefined. */
+function env(name: string): string | undefined {
+  return typeof process !== 'undefined' ? process.env[name] : undefined
 }
 
 function defaultUserAgent(): string {
-  return `exoscale-sdk/${VERSION} (node/${process.version}; ${process.platform}/${process.arch})`
+  const node =
+    typeof process !== 'undefined'
+      ? ` (node/${process.version}; ${process.platform}/${process.arch})`
+      : ''
+  return `exoscale-sdk/${VERSION}${node}`
 }
 
 export class ExoscaleClient extends GeneratedExoscaleClient {
@@ -44,12 +59,13 @@ export class ExoscaleClient extends GeneratedExoscaleClient {
     super()
     this.core = new ClientCore({
       // Fall back to the EXOSCALE_API_KEY/EXOSCALE_API_SECRET environment
-      // variables when credentials are not passed explicitly.
-      apiKey: opts.apiKey ?? process.env.EXOSCALE_API_KEY,
-      apiSecret: opts.apiSecret ?? process.env.EXOSCALE_API_SECRET,
+      // variables when credentials are not passed explicitly (Node.js only).
+      apiKey: opts.apiKey ?? env('EXOSCALE_API_KEY'),
+      apiSecret: opts.apiSecret ?? env('EXOSCALE_API_SECRET'),
       endpoint: opts.endpoint ?? ENDPOINTS['ch-gva-2'],
       userAgent: opts.userAgent ?? defaultUserAgent(),
       fetchImpl: opts.fetch,
+      authHeader: opts.authHeader,
     })
   }
 

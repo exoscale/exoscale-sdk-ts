@@ -141,6 +141,36 @@ describe('generated operations', () => {
   })
 })
 
+describe('authHeader', () => {
+  it('is used as the Authorization header without API credentials', async () => {
+    const captured: Captured[] = []
+    const c = new ExoscaleClient({
+      authHeader: () => 'session-token',
+      fetch: capture(captured, 200, JSON.stringify({ id: 'i-1', name: 'x' })),
+    })
+    await c.getInstance({ id: 'i-1' })
+    const headers = captured[0].init.headers as Record<string, string>
+    expect(headers['Authorization']).toBe('session-token')
+    expect(headers['Authorization']).not.toContain('EXO2-HMAC-SHA256')
+  })
+
+  it('is re-read per request, so a rotated token is picked up', async () => {
+    const captured: Captured[] = []
+    let token = 't-1'
+    const c = new ExoscaleClient({
+      authHeader: () => token,
+      fetch: capture(captured, 200, JSON.stringify({ id: 'i-1', name: 'x' })),
+    })
+    await c.getInstance({ id: 'i-1' })
+    token = 't-2'
+    await c.getInstance({ id: 'i-1' })
+    const h0 = captured[0].init.headers as Record<string, string>
+    const h1 = captured[1].init.headers as Record<string, string>
+    expect(h0['Authorization']).toBe('t-1')
+    expect(h1['Authorization']).toBe('t-2')
+  })
+})
+
 describe('zone helpers', () => {
   const zonesBody = JSON.stringify({
     zones: [

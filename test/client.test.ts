@@ -82,6 +82,50 @@ describe('ClientCore.request', () => {
     expect(headers['Authorization']).toBeUndefined()
   })
 
+  it('sends a static authHeader value verbatim, without credentials', async () => {
+    const captured: Captured[] = []
+    const c = new ClientCore({
+      endpoint: 'https://api-ch-gva-2.exoscale.com/v2',
+      userAgent: 'test-agent',
+      fetchImpl: mockFetch(200, '{"zones":[]}', captured),
+      authHeader: 'token-123',
+    })
+    await c.request('GET', '/instance')
+    const headers = captured[0].init.headers as Record<string, string>
+    expect(headers['Authorization']).toBe('token-123')
+  })
+
+  it('re-reads an authHeader getter on every request', async () => {
+    const captured: Captured[] = []
+    let token = 'token-1'
+    const c = new ClientCore({
+      endpoint: 'https://api-ch-gva-2.exoscale.com/v2',
+      userAgent: 'test-agent',
+      fetchImpl: mockFetch(200, '{"zones":[]}', captured),
+      authHeader: () => token,
+    })
+    await c.request('GET', '/instance')
+    token = 'token-2'
+    await c.request('GET', '/instance')
+    expect((captured[0].init.headers as Record<string, string>)['Authorization']).toBe('token-1')
+    expect((captured[1].init.headers as Record<string, string>)['Authorization']).toBe('token-2')
+  })
+
+  it('falls back to signing when the authHeader getter returns undefined', async () => {
+    const captured: Captured[] = []
+    const c = new ClientCore({
+      apiKey: 'key',
+      apiSecret: 'secret',
+      endpoint: 'https://api-ch-gva-2.exoscale.com/v2',
+      userAgent: 'test-agent',
+      fetchImpl: mockFetch(200, '[]', captured),
+      authHeader: () => undefined,
+    })
+    await c.request('GET', '/instance')
+    const headers = captured[0].init.headers as Record<string, string>
+    expect(headers['Authorization']).toMatch(/^EXO2-HMAC-SHA256 /)
+  })
+
   it('builds the query string sorted and percent-encoded', async () => {
     const captured: Captured[] = []
     const c = core(mockFetch(200, '[]', captured))

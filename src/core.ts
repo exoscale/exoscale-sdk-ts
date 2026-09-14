@@ -1,6 +1,5 @@
 // HTTP core: request building, EXO2-HMAC-SHA256 signing, response decoding.
 
-import { createHmac } from 'node:crypto'
 import { APIError, type APIErrorEntry } from './errors.js'
 
 export interface ClientCoreOptions {
@@ -9,6 +8,12 @@ export interface ClientCoreOptions {
   endpoint: string
   userAgent: string
   fetchImpl?: typeof fetch
+  /**
+   * When set, the value (or the getter's return) is used verbatim as the
+   * Authorization header instead of EXO2-HMAC-SHA256 signing with
+   * apiKey/apiSecret. A getter that returns undefined falls back to signing.
+   */
+  authHeader?: string | (() => string | undefined)
 }
 
 export interface RequestOptions {
@@ -49,18 +54,28 @@ export class ClientCore {
     const headers: Record<string, string> = { 'User-Agent': this.opts.userAgent }
     if (body !== undefined) headers['Content-Type'] = 'application/json'
     if (!skipAuth) {
-      if (this.opts.apiKey === undefined || this.opts.apiSecret === undefined) {
-        throw new Error('missing API credentials: apiKey and apiSecret are required')
+      const custom =
+        this.opts.authHeader === undefined
+          ? undefined
+          : typeof this.opts.authHeader === 'function'
+            ? this.opts.authHeader()
+            : this.opts.authHeader
+      if (custom !== undefined) {
+        headers['Authorization'] = custom
+      } else {
+        if (this.opts.apiKey === undefined || this.opts.apiSecret === undefined) {
+          throw new Error('missing API credentials: apiKey and apiSecret are required')
+        }
+        headers['Authorization'] = await signRequest({
+          method,
+          path: wirePath,
+          body: bodyStr,
+          query: query ?? {},
+          apiKey: this.opts.apiKey,
+          apiSecret: this.opts.apiSecret,
+          expires: Math.floor(Date.now() / 1000) + 600,
+        })
       }
-      headers['Authorization'] = signRequest({
-        method,
-        path: wirePath,
-        body: bodyStr,
-        query: query ?? {},
-        apiKey: this.opts.apiKey,
-        apiSecret: this.opts.apiSecret,
-        expires: Math.floor(Date.now() / 1000) + 600,
-      })
     }
 
     const fetchImpl = this.opts.fetchImpl ?? fetch
@@ -89,7 +104,7 @@ export class ClientCore {
  * path must be the full request path as sent on the wire, including any
  * path prefix in the endpoint (e.g. /v2).
  */
-export function signRequest(args: {
+export async function signRequest(args: {
   method: string
   path: string
   body: string
@@ -97,12 +112,16 @@ export function signRequest(args: {
   apiKey: string
   apiSecret: string
   expires: number
-}): string {
+}): Promise<string> {
   const names = Object.keys(args.query).sort()
   const values = names.map((n) => args.query[n]).join('')
   const payload = [`${args.method} ${args.path}`, args.body, values, '', String(args.expires)].join(
     '\n',
   )
+  // Imported lazily so that consumers who never sign (e.g. browser bundles
+  // using a custom authHeader) do not load node:crypto at module-evaluation
+  // time.
+  const { createHmac } = await import('node:crypto')
   const signature = createHmac('sha256', args.apiSecret).update(payload, 'utf8').digest('base64')
 
   const parts = [`EXO2-HMAC-SHA256 credential=${args.apiKey}`]

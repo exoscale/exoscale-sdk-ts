@@ -98,13 +98,13 @@ const VECTORS: Array<{ name: string; header: string; args: Parameters<typeof sig
 
 describe('signRequest (EXO2-HMAC-SHA256)', () => {
   for (const v of VECTORS) {
-    it(`matches Go vector: ${v.name}`, () => {
-      expect(signRequest(v.args)).toBe(v.header)
+    it(`matches Go vector: ${v.name}`, async () => {
+      expect(await signRequest(v.args)).toBe(v.header)
     })
   }
 
-  it('sorts query parameter names in the signature', () => {
-    const header = signRequest({
+  it('sorts query parameter names in the signature', async () => {
+    const header = await signRequest({
       method: 'GET',
       path: '/instance',
       body: '',
@@ -116,8 +116,8 @@ describe('signRequest (EXO2-HMAC-SHA256)', () => {
     expect(header).toContain('signed-query-args=alpha;mid;zebra')
   })
 
-  it('omits signed-query-args when there is no query', () => {
-    const header = signRequest({
+  it('omits signed-query-args when there is no query', async () => {
+    const header = await signRequest({
       method: 'GET',
       path: '/zone',
       body: '',

@@ -15,7 +15,7 @@
     "url": "https://github.com/exoscale/exoscale-sdk-ts"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=18"
   },
   "sideEffects": false,
   "main": "./dist/index.js",
@@ -43,11 +43,15 @@
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
+    "happy-dom": "^20.14.5",
     "prettier": "^3.4.0",
     "tsup": "^8.3.0",
     "tsx": "^4.19.0",
     "typedoc": "^0.28.20",
     "typescript": "^5.7.0",
     "vitest": "^3.0.0"
+  },
+  "dependencies": {
+    "@noble/hashes": "^2.4.0"
   }
 }

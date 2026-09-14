@@ -1,5 +1,7 @@
 // HTTP core: request building, EXO2-HMAC-SHA256 signing, response decoding.
 
+import { hmac } from '@noble/hashes/hmac.js'
+import { sha256 } from '@noble/hashes/sha2.js'
 import { APIError, type APIErrorEntry } from './errors.js'
 
 export interface ClientCoreOptions {
@@ -81,7 +83,7 @@ export class ClientCore {
       if (this.opts.apiKey === undefined || this.opts.apiSecret === undefined) {
         throw new Error('missing API credentials: apiKey and apiSecret are required')
       }
-      headers['Authorization'] = await signRequest({
+      headers['Authorization'] = signRequest({
         method,
         path: wirePath,
         body: bodyStr,
@@ -118,7 +120,7 @@ export class ClientCore {
  * path must be the full request path as sent on the wire, including any
  * path prefix in the endpoint (e.g. /v2).
  */
-export async function signRequest(args: {
+export function signRequest(args: {
   method: string
   path: string
   body: string
@@ -126,23 +128,16 @@ export async function signRequest(args: {
   apiKey: string
   apiSecret: string
   expires: number
-}): Promise<string> {
+}): string {
   const names = Object.keys(args.query).sort()
   const values = names.map((n) => args.query[n]).join('')
   const payload = [`${args.method} ${args.path}`, args.body, values, '', String(args.expires)].join(
     '\n',
   )
-  // Web Crypto (globalThis.crypto.subtle) is available in every supported
-  // runtime (Node >= 22, browsers) without a node:crypto dependency.
+  // @noble/hashes is pure JS: synchronous HMAC-SHA256 in every environment
+  // (Node and browsers) with no platform crypto dependency.
   const enc = new TextEncoder()
-  const key = await globalThis.crypto.subtle.importKey(
-    'raw',
-    enc.encode(args.apiSecret),
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['sign'],
-  )
-  const sig = new Uint8Array(await globalThis.crypto.subtle.sign('HMAC', key, enc.encode(payload)))
+  const sig = hmac(sha256, enc.encode(args.apiSecret), enc.encode(payload))
   const signature = btoa(String.fromCharCode(...sig))
 
   const parts = [`EXO2-HMAC-SHA256 credential=${args.apiKey}`]

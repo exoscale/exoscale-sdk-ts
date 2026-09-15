@@ -3212,10 +3212,6 @@ export function toWireCreateVpcRequest(v: CreateVpcRequest): Record<string, unkn
   return o
 }
 
-export interface DeleteAIAPIKeyRequest {
-  id: string
-}
-
 export interface DeleteAntiAffinityGroupRequest {
   id: string
 }
@@ -4966,10 +4962,6 @@ export function fromWireListDeployTargetsResponse(w: any): ListDeployTargetsResp
   return v
 }
 
-export interface ListDeploymentsRequest {
-  visibility?: string
-}
-
 export interface ListDNSDomainRecordsRequest {
   domainID: string
 }
@@ -5204,6 +5196,10 @@ export function fromWireListLoadBalancersResponse(w: any): ListLoadBalancersResp
   if (w['load-balancers'] !== undefined)
     v.loadBalancers = (w['load-balancers'] as any[]).map((x) => fromWireLoadBalancer(x))
   return v
+}
+
+export interface ListModelsRequest {
+  visibility?: string
 }
 
 export interface ListPrivateNetworksResponse {
@@ -5875,6 +5871,10 @@ export function toWireRevertInstanceToSnapshotRequest(
   const o: Record<string, unknown> = {}
   if (v.id !== undefined) o['id'] = v.id
   return o
+}
+
+export interface RevokeAIAPIKeyRequest {
+  id: string
 }
 
 export interface RotateKmsKeyRequest {
@@ -8804,24 +8804,6 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * Delete AI API key
-   *
-   * Errors:
-   *
-   * **403**
-   * Forbidden
-   *
-   * **404**
-   * Not Found
-   *
-   * @see https://www.exoscale.com/ai-cloud-infrastructure/managed-inference/ Read more
-   */
-  deleteAIAPIKey(params: DeleteAIAPIKeyRequest): Promise<Operation> {
-    const path = `/ai/api-key/${encodeURIComponent(params.id)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
    * Delete an Anti-affinity Group
    *
    * @see https://community.exoscale.com/product/compute/instances/how-to/anti-affinity/ Read more
@@ -10311,7 +10293,7 @@ export abstract class GeneratedExoscaleClient {
    * **500**
    * Internal server error
    *
-   * @see https://www.exoscale.com/sustainability/ Read more
+   * @see https://community.exoscale.com/platform/environmental-impact/ Read more
    */
   getImpactEstimate(params: GetImpactEstimateRequest): Promise<GetImpactEstimateResponse> {
     const body = toWireGetImpactEstimateRequest(params)
@@ -10332,7 +10314,7 @@ export abstract class GeneratedExoscaleClient {
    * **500**
    * Internal server error
    *
-   * @see https://www.exoscale.com/sustainability/ Read more
+   * @see https://community.exoscale.com/platform/environmental-impact/ Read more
    */
   getImpactReport(params?: GetImpactReportRequest): Promise<ImpactBreakdown> {
     const query: Record<string, string> = {}
@@ -10849,13 +10831,8 @@ export abstract class GeneratedExoscaleClient {
    *
    * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
    */
-  listDeployments(params?: ListDeploymentsRequest): Promise<ListDeploymentsResponse> {
-    const query: Record<string, string> = {}
-    if (params?.visibility !== undefined) query['visibility'] = params?.visibility
-    return this.core.request('GET', '/ai/deployment', {
-      query,
-      decode: fromWireListDeploymentsResponse,
-    })
+  listDeployments(): Promise<ListDeploymentsResponse> {
+    return this.core.request('GET', '/ai/deployment', { decode: fromWireListDeploymentsResponse })
   }
 
   /**
@@ -10991,8 +10968,10 @@ export abstract class GeneratedExoscaleClient {
    *
    * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
    */
-  listModels(): Promise<ListModelsResponse> {
-    return this.core.request('GET', '/ai/model', { decode: fromWireListModelsResponse })
+  listModels(params?: ListModelsRequest): Promise<ListModelsResponse> {
+    const query: Record<string, string> = {}
+    if (params?.visibility !== undefined) query['visibility'] = params?.visibility
+    return this.core.request('GET', '/ai/model', { query, decode: fromWireListModelsResponse })
   }
 
   /**
@@ -11641,6 +11620,27 @@ export abstract class GeneratedExoscaleClient {
     const path = `/instance/${encodeURIComponent(params.instanceID)}:revert-snapshot`
     const body = toWireRevertInstanceToSnapshotRequest(params)
     return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Revoke an AI API key. Key will be deleted after 30 days of retention
+   *
+   * Errors:
+   *
+   * **403**
+   * Forbidden
+   *
+   * **404**
+   * Not Found
+   *
+   * **500**
+   * Internal Server Error
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/managed-inference/ Read more
+   */
+  revokeAIAPIKey(params: RevokeAIAPIKeyRequest): Promise<Operation> {
+    const path = `/ai/api-key/${encodeURIComponent(params.id)}/revoke`
+    return this.core.request('POST', path, { decode: fromWireOperation })
   }
 
   /**

@@ -382,60 +382,355 @@ import type {
 } from './schemas.js'
 import { isoDateTime, type ClientCore } from '../core.js'
 
-export interface DeleteAIAPIKeyRequest {
+export interface AddExternalSourceToSecurityGroupRequest {
+  id: string
+  /**
+   * CIDR-formatted network to add
+   */
+  cidr: string
+}
+/** @internal */
+export function toWireAddExternalSourceToSecurityGroupRequest(
+  v: AddExternalSourceToSecurityGroupRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.cidr !== undefined) o['cidr'] = v.cidr
+  return o
+}
+
+export interface AddInstanceProtectionRequest {
   id: string
 }
 
-export interface GetAIAPIKeyRequest {
-  id: string
-}
-
-export interface ListDeploymentsRequest {
-  visibility?: string
-}
-
-export interface DeleteDeploymentRequest {
-  id: string
-}
-
-export interface GetDeploymentRequest {
-  id: string
-}
-
-export interface RevealDeploymentAPIKeyRequest {
-  id: string
-}
-
-export interface GetDeploymentLogsRequest {
-  id: string
-  stream?: boolean
-  tail?: number
-}
-
-export interface GetInferenceEngineHelpRequest {
-  version?: string
-}
-
-export interface DeleteModelRequest {
-  id: string
-}
-
-export interface GetModelRequest {
-  id: string
-}
-
-export interface ListAntiAffinityGroupsResponse {
-  antiAffinityGroups?: AntiAffinityGroup[]
+/**
+ * ICMP details (default: -1 (ANY))
+ */
+export interface AddRuleToSecurityGroupRequestICMP {
+  /**
+   * Min -1, Max 254
+   */
+  code?: number | null
+  /**
+   * Min -1, Max 254
+   */
+  type?: number | null
 }
 
 /** @internal */
-export function fromWireListAntiAffinityGroupsResponse(w: any): ListAntiAffinityGroupsResponse {
-  const v = {} as ListAntiAffinityGroupsResponse
-  if (w['anti-affinity-groups'] !== undefined)
-    v.antiAffinityGroups = (w['anti-affinity-groups'] as any[]).map((x) =>
-      fromWireAntiAffinityGroup(x),
-    )
+export function toWireAddRuleToSecurityGroupRequestICMP(
+  v: AddRuleToSecurityGroupRequestICMP,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.code !== undefined) o['code'] = v.code === null ? null : v.code
+  if (v.type !== undefined) o['type'] = v.type === null ? null : v.type
+  return o
+}
+export interface AddRuleToSecurityGroupRequest {
+  id: string
+  /**
+   * Security Group rule description
+   *
+   * Max length 255
+   */
+  description?: string
+  /**
+   * End port of the range
+   *
+   * Min 1, Max 65535
+   */
+  endPort?: number
+  /**
+   * Network flow direction to match
+   */
+  flowDirection: 'egress' | 'ingress'
+  /**
+   * ICMP details (default: -1 (ANY))
+   */
+  icmp?: AddRuleToSecurityGroupRequestICMP
+  /**
+   * CIDR-formatted network allowed
+   */
+  network?: string
+  /**
+   * Network protocol
+   */
+  protocol: 'ah' | 'all' | 'esp' | 'gre' | 'icmp' | 'icmpv6' | 'ipip' | 'tcp' | 'udp'
+  /**
+   * Security Group allowed
+   */
+  securityGroup?: SecurityGroupResource
+  /**
+   * Start port of the range
+   *
+   * Min 1, Max 65535
+   */
+  startPort?: number
+}
+/** @internal */
+export function toWireAddRuleToSecurityGroupRequest(
+  v: AddRuleToSecurityGroupRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.description !== undefined) o['description'] = v.description
+  if (v.endPort !== undefined) o['end-port'] = v.endPort
+  if (v.flowDirection !== undefined) o['flow-direction'] = v.flowDirection
+  if (v.icmp !== undefined) o['icmp'] = toWireAddRuleToSecurityGroupRequestICMP(v.icmp)
+  if (v.network !== undefined) o['network'] = v.network
+  if (v.protocol !== undefined) o['protocol'] = v.protocol
+  if (v.securityGroup !== undefined)
+    o['security-group'] = toWireSecurityGroupResource(v.securityGroup)
+  if (v.startPort !== undefined) o['start-port'] = v.startPort
+  return o
+}
+
+export interface AddServiceToLoadBalancerRequest {
+  id: string
+  /**
+   * Load Balancer Service description
+   *
+   * Max length 255
+   */
+  description?: string
+  /**
+   * Healthcheck configuration
+   */
+  healthcheck: LoadBalancerServiceHealthcheck
+  /**
+   * Instance Pool to forward traffic to
+   */
+  instancePool: InstancePool
+  /**
+   * Load Balancer Service name
+   *
+   * Length 1-255
+   */
+  name: string
+  /**
+   * Port exposed on the Load Balancer's public IP
+   *
+   * Min 1, Max 65535
+   */
+  port: number
+  /**
+   * Network traffic protocol
+   */
+  protocol: 'tcp' | 'udp'
+  /**
+   * Load balancing strategy
+   */
+  strategy: 'maglev-hash' | 'round-robin' | 'source-hash'
+  /**
+   * Port on which the network traffic will be forwarded to on the receiving instance
+   *
+   * Min 1, Max 65535
+   */
+  targetPort: number
+}
+/** @internal */
+export function toWireAddServiceToLoadBalancerRequest(
+  v: AddServiceToLoadBalancerRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.description !== undefined) o['description'] = v.description
+  if (v.healthcheck !== undefined)
+    o['healthcheck'] = toWireLoadBalancerServiceHealthcheck(v.healthcheck)
+  if (v.instancePool !== undefined) o['instance-pool'] = toWireInstancePool(v.instancePool)
+  if (v.name !== undefined) o['name'] = v.name
+  if (v.port !== undefined) o['port'] = v.port
+  if (v.protocol !== undefined) o['protocol'] = v.protocol
+  if (v.strategy !== undefined) o['strategy'] = v.strategy
+  if (v.targetPort !== undefined) o['target-port'] = v.targetPort
+  return o
+}
+
+export interface AssumeIAMRoleRequest {
+  id: string
+  /**
+   * Organization ID target of the assume role action
+   */
+  orgID?: string
+  /**
+   * TTL in seconds for the generated access key (cannot exceed the max TTL defined in the targeted assume role)
+   *
+   * Min >0
+   */
+  ttl: number
+}
+/** @internal */
+export function toWireAssumeIAMRoleRequest(v: AssumeIAMRoleRequest): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.orgID !== undefined) o['org-id'] = v.orgID
+  if (v.ttl !== undefined) o['ttl'] = v.ttl
+  return o
+}
+export interface AssumeIAMRoleResponse {
+  expiresAT?: string
+  key?: string
+  name?: string
+  orgID?: string
+  roleID?: string
+  secret?: string
+}
+
+/** @internal */
+export function fromWireAssumeIAMRoleResponse(w: any): AssumeIAMRoleResponse {
+  const v = {} as AssumeIAMRoleResponse
+  if (w['expires-at'] !== undefined) v.expiresAT = w['expires-at']
+  if (w['key'] !== undefined) v.key = w['key']
+  if (w['name'] !== undefined) v.name = w['name']
+  if (w['org-id'] !== undefined) v.orgID = w['org-id']
+  if (w['role-id'] !== undefined) v.roleID = w['role-id']
+  if (w['secret'] !== undefined) v.secret = w['secret']
   return v
+}
+
+export interface AttachBlockStorageVolumeToInstanceRequest {
+  id: string
+  /**
+   * Instance to attach to, this can only be done if the volume is not currently attached
+   */
+  instance: InstanceRef
+}
+/** @internal */
+export function toWireAttachBlockStorageVolumeToInstanceRequest(
+  v: AttachBlockStorageVolumeToInstanceRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.instance !== undefined) o['instance'] = toWireInstanceRef(v.instance)
+  return o
+}
+
+export interface AttachDBAASServiceToEndpointRequest {
+  sourceServiceName: DBAASServiceName
+  /**
+   * External endpoint id
+   */
+  destEndpointID: string
+  /**
+   * External endpoint type
+   */
+  type: EnumExternalEndpointTypes
+}
+/** @internal */
+export function toWireAttachDBAASServiceToEndpointRequest(
+  v: AttachDBAASServiceToEndpointRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.destEndpointID !== undefined) o['dest-endpoint-id'] = v.destEndpointID
+  if (v.type !== undefined) o['type'] = v.type
+  return o
+}
+
+export interface AttachInstanceToElasticIPRequest {
+  id: string
+  /**
+   * Compute instance
+   */
+  instance: InstanceRef
+}
+/** @internal */
+export function toWireAttachInstanceToElasticIPRequest(
+  v: AttachInstanceToElasticIPRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.instance !== undefined) o['instance'] = toWireInstanceRef(v.instance)
+  return o
+}
+
+/**
+ * Compute instance
+ */
+export interface AttachInstanceToPrivateNetworkRequestInstance {
+  /**
+   * Instance ID
+   */
+  id?: string
+}
+
+/** @internal */
+export function toWireAttachInstanceToPrivateNetworkRequestInstance(
+  v: AttachInstanceToPrivateNetworkRequestInstance,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.id !== undefined) o['id'] = v.id
+  return o
+}
+export interface AttachInstanceToPrivateNetworkRequest {
+  id: string
+  /**
+   * Compute instance
+   */
+  instance: AttachInstanceToPrivateNetworkRequestInstance
+  /**
+   * Static IP address lease for the corresponding network interface
+   */
+  ip?: string
+}
+/** @internal */
+export function toWireAttachInstanceToPrivateNetworkRequest(
+  v: AttachInstanceToPrivateNetworkRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.instance !== undefined)
+    o['instance'] = toWireAttachInstanceToPrivateNetworkRequestInstance(v.instance)
+  if (v.ip !== undefined) o['ip'] = v.ip
+  return o
+}
+
+export interface AttachInstanceToSecurityGroupRequest {
+  id: string
+  /**
+   * Compute instance
+   */
+  instance: Instance
+}
+/** @internal */
+export function toWireAttachInstanceToSecurityGroupRequest(
+  v: AttachInstanceToSecurityGroupRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.instance !== undefined) o['instance'] = toWireInstance(v.instance)
+  return o
+}
+
+export interface AttachInstanceToSubnetRequest {
+  subnetID: string
+  vpcID: string
+  /**
+   * Compute instance
+   */
+  instance: InstanceRef
+  /**
+   * Instance IPv4
+   */
+  ipv4?: string
+}
+/** @internal */
+export function toWireAttachInstanceToSubnetRequest(
+  v: AttachInstanceToSubnetRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.instance !== undefined) o['instance'] = toWireInstanceRef(v.instance)
+  if (v.ipv4 !== undefined) o['ipv4'] = v.ipv4
+  return o
+}
+
+export interface CancelKmsKeyDeletionRequest {
+  id: string
+}
+
+export interface CopyTemplateRequest {
+  id: string
+  /**
+   * Target Zone name
+   */
+  targetZone: Zone
+}
+/** @internal */
+export function toWireCopyTemplateRequest(v: CopyTemplateRequest): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.targetZone !== undefined) o['target-zone'] = toWireZone(v.targetZone)
+  return o
 }
 
 export interface CreateAntiAffinityGroupRequest {
@@ -462,26 +757,6 @@ export function toWireCreateAntiAffinityGroupRequest(
   return o
 }
 
-export interface DeleteAntiAffinityGroupRequest {
-  id: string
-}
-
-export interface GetAntiAffinityGroupRequest {
-  id: string
-}
-
-export interface ListAPIKeysResponse {
-  apiKeys?: IAMAPIKey[]
-}
-
-/** @internal */
-export function fromWireListAPIKeysResponse(w: any): ListAPIKeysResponse {
-  const v = {} as ListAPIKeysResponse
-  if (w['api-keys'] !== undefined)
-    v.apiKeys = (w['api-keys'] as any[]).map((x) => fromWireIAMAPIKey(x))
-  return v
-}
-
 export interface CreateAPIKeyRequest {
   /**
    * IAM API Key Name
@@ -502,29 +777,27 @@ export function toWireCreateAPIKeyRequest(v: CreateAPIKeyRequest): Record<string
   return o
 }
 
-export interface DeleteAPIKeyRequest {
+export interface CreateBlockStorageSnapshotRequest {
   id: string
+  /**
+   * Resource labels
+   */
+  labels?: Labels
+  /**
+   * Snapshot name
+   *
+   * Length 1-255
+   */
+  name?: string
 }
-
-export interface GetAPIKeyRequest {
-  id: string
-}
-
-export interface ListBlockStorageVolumesRequest {
-  instanceID?: string
-}
-export interface ListBlockStorageVolumesResponse {
-  blockStorageVolumes?: BlockStorageVolume[]
-}
-
 /** @internal */
-export function fromWireListBlockStorageVolumesResponse(w: any): ListBlockStorageVolumesResponse {
-  const v = {} as ListBlockStorageVolumesResponse
-  if (w['block-storage-volumes'] !== undefined)
-    v.blockStorageVolumes = (w['block-storage-volumes'] as any[]).map((x) =>
-      fromWireBlockStorageVolume(x),
-    )
-  return v
+export function toWireCreateBlockStorageSnapshotRequest(
+  v: CreateBlockStorageSnapshotRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.labels !== undefined) o['labels'] = v.labels
+  if (v.name !== undefined) o['name'] = v.name
+  return o
 }
 
 export interface CreateBlockStorageVolumeRequest {
@@ -563,180 +836,229 @@ export function toWireCreateBlockStorageVolumeRequest(
   return o
 }
 
-export interface ListBlockStorageSnapshotsResponse {
-  blockStorageSnapshots?: BlockStorageSnapshot[]
-}
-
-/** @internal */
-export function fromWireListBlockStorageSnapshotsResponse(
-  w: any,
-): ListBlockStorageSnapshotsResponse {
-  const v = {} as ListBlockStorageSnapshotsResponse
-  if (w['block-storage-snapshots'] !== undefined)
-    v.blockStorageSnapshots = (w['block-storage-snapshots'] as any[]).map((x) =>
-      fromWireBlockStorageSnapshot(x),
-    )
-  return v
-}
-
-export interface DeleteBlockStorageSnapshotRequest {
-  id: string
-}
-
-export interface GetBlockStorageSnapshotRequest {
-  id: string
-}
-
-export interface UpdateBlockStorageSnapshotRequest {
-  id: string
+export interface CreateDBAASClickhouseUserRequest {
+  serviceName: DBAASServiceName
   /**
-   * Resource labels
+   * Password
    */
-  labels?: Labels | null
+  password?: DBAASUserPassword
   /**
-   * Snapshot name
-   *
-   * Max length 255
+   * ClickHouse roles to grant to the user
    */
-  name?: string | null
+  roles?: DBAASClickhouseUserRoleInput[]
+  /**
+   * Username
+   */
+  username: DBAASUserUsername
 }
 /** @internal */
-export function toWireUpdateBlockStorageSnapshotRequest(
-  v: UpdateBlockStorageSnapshotRequest,
+export function toWireCreateDBAASClickhouseUserRequest(
+  v: CreateDBAASClickhouseUserRequest,
 ): Record<string, unknown> {
   const o: Record<string, unknown> = {}
-  if (v.labels !== undefined) o['labels'] = v.labels === null ? null : v.labels
-  if (v.name !== undefined) o['name'] = v.name === null ? null : v.name
+  if (v.password !== undefined) o['password'] = v.password
+  if (v.roles !== undefined) o['roles'] = v.roles.map((x) => toWireDBAASClickhouseUserRoleInput(x))
+  if (v.username !== undefined) o['username'] = v.username
   return o
 }
 
-export interface DeleteBlockStorageVolumeRequest {
-  id: string
-}
-
-export interface GetBlockStorageVolumeRequest {
-  id: string
-}
-
-export interface UpdateBlockStorageVolumeRequest {
-  id: string
+export interface CreateDBAASIntegrationRequest {
   /**
-   * Resource labels
+   * A destination service
    */
-  labels?: Labels | null
+  destService: DBAASServiceName
   /**
-   * Volume name
-   *
-   * Max length 255
+   * Integration type
    */
-  name?: string | null
+  integrationType: EnumIntegrationTypes
+  /**
+   * Integration settings
+   */
+  settings?: Record<string, unknown>
+  /**
+   * A source service
+   */
+  sourceService: DBAASServiceName
 }
 /** @internal */
-export function toWireUpdateBlockStorageVolumeRequest(
-  v: UpdateBlockStorageVolumeRequest,
+export function toWireCreateDBAASIntegrationRequest(
+  v: CreateDBAASIntegrationRequest,
 ): Record<string, unknown> {
   const o: Record<string, unknown> = {}
-  if (v.labels !== undefined) o['labels'] = v.labels === null ? null : v.labels
-  if (v.name !== undefined) o['name'] = v.name === null ? null : v.name
+  if (v.destService !== undefined) o['dest-service'] = v.destService
+  if (v.integrationType !== undefined) o['integration-type'] = v.integrationType
+  if (v.settings !== undefined) o['settings'] = v.settings
+  if (v.sourceService !== undefined) o['source-service'] = v.sourceService
   return o
 }
 
-export interface AttachBlockStorageVolumeToInstanceRequest {
-  id: string
+export interface CreateDBAASKafkaUserRequest {
+  serviceName: DBAASServiceName
   /**
-   * Instance to attach to, this can only be done if the volume is not currently attached
+   * Username
    */
-  instance: InstanceRef
+  username: DBAASUserUsername
 }
 /** @internal */
-export function toWireAttachBlockStorageVolumeToInstanceRequest(
-  v: AttachBlockStorageVolumeToInstanceRequest,
+export function toWireCreateDBAASKafkaUserRequest(
+  v: CreateDBAASKafkaUserRequest,
 ): Record<string, unknown> {
   const o: Record<string, unknown> = {}
-  if (v.instance !== undefined) o['instance'] = toWireInstanceRef(v.instance)
+  if (v.username !== undefined) o['username'] = v.username
   return o
 }
 
-export interface CreateBlockStorageSnapshotRequest {
-  id: string
+export interface CreateDBAASMysqlDatabaseRequest {
+  serviceName: DBAASServiceName
   /**
-   * Resource labels
+   * Service database name
    */
-  labels?: Labels
-  /**
-   * Snapshot name
-   *
-   * Length 1-255
-   */
-  name?: string
+  databaseName: DBAASDatabaseName
 }
 /** @internal */
-export function toWireCreateBlockStorageSnapshotRequest(
-  v: CreateBlockStorageSnapshotRequest,
+export function toWireCreateDBAASMysqlDatabaseRequest(
+  v: CreateDBAASMysqlDatabaseRequest,
 ): Record<string, unknown> {
   const o: Record<string, unknown> = {}
-  if (v.labels !== undefined) o['labels'] = v.labels
+  if (v.databaseName !== undefined) o['database-name'] = v.databaseName
+  return o
+}
+
+export interface CreateDBAASMysqlUserRequest {
+  serviceName: DBAASServiceName
+  /**
+   * Authentication option
+   */
+  authentication?: EnumMysqlAuthenticationPlugin
+  /**
+   * Username
+   */
+  username: DBAASUserUsername
+}
+/** @internal */
+export function toWireCreateDBAASMysqlUserRequest(
+  v: CreateDBAASMysqlUserRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.authentication !== undefined) o['authentication'] = v.authentication
+  if (v.username !== undefined) o['username'] = v.username
+  return o
+}
+
+export interface CreateDBAASOpensearchUserRequest {
+  serviceName: DBAASServiceName
+  /**
+   * Username
+   */
+  username: DBAASUserUsername
+}
+/** @internal */
+export function toWireCreateDBAASOpensearchUserRequest(
+  v: CreateDBAASOpensearchUserRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.username !== undefined) o['username'] = v.username
+  return o
+}
+
+export interface CreateDBAASPGConnectionPoolRequest {
+  serviceName: DBAASServiceName
+  /**
+   * Service database name
+   */
+  databaseName: DBAASDatabaseName
+  /**
+   * PGBouncer pool mode
+   */
+  mode?: EnumPGPoolMode
+  /**
+   * Connection pool name
+   */
+  name: DBAASPGPoolName
+  /**
+   * Size of PGBouncer's PostgreSQL side connection pool
+   */
+  size?: DBAASPGPoolSize
+  /**
+   * Pool username
+   */
+  username?: DBAASPGPoolUsername
+}
+/** @internal */
+export function toWireCreateDBAASPGConnectionPoolRequest(
+  v: CreateDBAASPGConnectionPoolRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.databaseName !== undefined) o['database-name'] = v.databaseName
+  if (v.mode !== undefined) o['mode'] = v.mode
   if (v.name !== undefined) o['name'] = v.name
+  if (v.size !== undefined) o['size'] = v.size
+  if (v.username !== undefined) o['username'] = v.username
   return o
 }
 
-export interface DetachBlockStorageVolumeRequest {
-  id: string
-}
-
-export interface ResizeBlockStorageVolumeRequest {
-  id: string
+export interface CreateDBAASPGDatabaseRequest {
+  serviceName: DBAASServiceName
   /**
-   * Volume size in GiB
-   *
-   * Min >0
+   * Service database name
    */
-  size: number
+  databaseName: DBAASDatabaseName
+  /**
+   * Default string sort order (LC_COLLATE) for PostgreSQL database
+   *
+   * Max length 128
+   */
+  lcCollate?: string
+  /**
+   * Default character classification (LC_CTYPE) for PostgreSQL database
+   *
+   * Max length 128
+   */
+  lcCtype?: string
 }
 /** @internal */
-export function toWireResizeBlockStorageVolumeRequest(
-  v: ResizeBlockStorageVolumeRequest,
+export function toWireCreateDBAASPGDatabaseRequest(
+  v: CreateDBAASPGDatabaseRequest,
 ): Record<string, unknown> {
   const o: Record<string, unknown> = {}
-  if (v.size !== undefined) o['size'] = v.size
+  if (v.databaseName !== undefined) o['database-name'] = v.databaseName
+  if (v.lcCollate !== undefined) o['lc-collate'] = v.lcCollate
+  if (v.lcCtype !== undefined) o['lc-ctype'] = v.lcCtype
   return o
 }
 
-export interface GetConsoleProxyURLRequest {
-  id: string
+export interface CreateDBAASPGUpgradeCheckRequest {
+  service: DBAASServiceName
+  /**
+   * Target version for upgrade
+   */
+  targetVersion: DBAASPGTargetVersions
 }
-export interface GetConsoleProxyURLResponse {
-  host?: string
-  path?: string
-  url?: string
-}
-
 /** @internal */
-export function fromWireGetConsoleProxyURLResponse(w: any): GetConsoleProxyURLResponse {
-  const v = {} as GetConsoleProxyURLResponse
-  if (w['host'] !== undefined) v.host = w['host']
-  if (w['path'] !== undefined) v.path = w['path']
-  if (w['url'] !== undefined) v.url = w['url']
-  return v
+export function toWireCreateDBAASPGUpgradeCheckRequest(
+  v: CreateDBAASPGUpgradeCheckRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.targetVersion !== undefined) o['target-version'] = v.targetVersion
+  return o
 }
 
-export interface GetDBAASCACertificateResponse {
-  certificate?: string
+export interface CreateDBAASPostgresUserRequest {
+  serviceName: DBAASServiceName
+  allowReplication?: boolean
+  /**
+   * Username
+   */
+  username: DBAASUserUsername
 }
-
 /** @internal */
-export function fromWireGetDBAASCACertificateResponse(w: any): GetDBAASCACertificateResponse {
-  const v = {} as GetDBAASCACertificateResponse
-  if (w['certificate'] !== undefined) v.certificate = w['certificate']
-  return v
-}
-
-export interface DeleteDBAASServiceClickhouseRequest {
-  name: string
-}
-
-export interface GetDBAASServiceClickhouseRequest {
-  name: DBAASServiceName
+export function toWireCreateDBAASPostgresUserRequest(
+  v: CreateDBAASPostgresUserRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.allowReplication !== undefined) o['allow-replication'] = v.allowReplication
+  if (v.username !== undefined) o['username'] = v.username
+  return o
 }
 
 /**
@@ -826,336 +1148,6 @@ export function toWireCreateDBAASServiceClickhouseRequest(
 /**
  * Automatic maintenance settings
  */
-export interface UpdateDBAASServiceClickhouseRequestMaintenance {
-  /**
-   * Day of week for installing updates
-   */
-  dow: 'friday' | 'monday' | 'never' | 'saturday' | 'sunday' | 'thursday' | 'tuesday' | 'wednesday'
-  /**
-   * Time for installing updates, UTC
-   *
-   * Length 8-8
-   */
-  time: string
-}
-
-/** @internal */
-export function toWireUpdateDBAASServiceClickhouseRequestMaintenance(
-  v: UpdateDBAASServiceClickhouseRequestMaintenance,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.dow !== undefined) o['dow'] = v.dow
-  if (v.time !== undefined) o['time'] = v.time
-  return o
-}
-export interface UpdateDBAASServiceClickhouseRequest {
-  name: DBAASServiceName
-  /**
-   * ClickHouse-specific settings
-   */
-  clickhouseSettings?: JSONSchemaClickhouse
-  /**
-   * Allow incoming connections from CIDR address block, e.g. '10.20.0.0/16'
-   */
-  ipFilter?: string[]
-  /**
-   * Automatic maintenance settings
-   */
-  maintenance?: UpdateDBAASServiceClickhouseRequestMaintenance
-  /**
-   * Subscription plan
-   *
-   * Length 1-128
-   */
-  plan?: string
-  /**
-   * Service is protected against termination and powering off
-   */
-  terminationProtection?: boolean
-  /**
-   * ClickHouse major version
-   *
-   * Min length 1
-   */
-  version?: string
-}
-/** @internal */
-export function toWireUpdateDBAASServiceClickhouseRequest(
-  v: UpdateDBAASServiceClickhouseRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.clickhouseSettings !== undefined)
-    o['clickhouse-settings'] = toWireJSONSchemaClickhouse(v.clickhouseSettings)
-  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter
-  if (v.maintenance !== undefined)
-    o['maintenance'] = toWireUpdateDBAASServiceClickhouseRequestMaintenance(v.maintenance)
-  if (v.plan !== undefined) o['plan'] = v.plan
-  if (v.terminationProtection !== undefined) o['termination-protection'] = v.terminationProtection
-  if (v.version !== undefined) o['version'] = v.version
-  return o
-}
-
-export interface StartDBAASClickhouseMaintenanceRequest {
-  name: DBAASServiceName
-}
-
-export interface GetDBAASClickhouseAclConfigRequest {
-  serviceName: DBAASServiceName
-}
-
-export interface ListDBAASClickhouseRolesRequest {
-  serviceName: DBAASServiceName
-}
-
-export interface DeleteDBAASClickhouseRoleRequest {
-  roleUuid: string
-  serviceName: DBAASServiceName
-}
-
-export interface ListDBAASClickhouseUsersRequest {
-  serviceName: DBAASServiceName
-}
-
-export interface CreateDBAASClickhouseUserRequest {
-  serviceName: DBAASServiceName
-  /**
-   * Password
-   */
-  password?: DBAASUserPassword
-  /**
-   * ClickHouse roles to grant to the user
-   */
-  roles?: DBAASClickhouseUserRoleInput[]
-  /**
-   * Username
-   */
-  username: DBAASUserUsername
-}
-/** @internal */
-export function toWireCreateDBAASClickhouseUserRequest(
-  v: CreateDBAASClickhouseUserRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.password !== undefined) o['password'] = v.password
-  if (v.roles !== undefined) o['roles'] = v.roles.map((x) => toWireDBAASClickhouseUserRoleInput(x))
-  if (v.username !== undefined) o['username'] = v.username
-  return o
-}
-
-export interface DeleteDBAASClickhouseUserRequest {
-  serviceName: DBAASServiceName
-  userUuid: string
-}
-
-export interface ResetDBAASClickhouseUserPasswordRequest {
-  serviceName: DBAASServiceName
-  username: DBAASUserUsername
-  /**
-   * New password
-   */
-  password?: DBAASUserPassword
-}
-/** @internal */
-export function toWireResetDBAASClickhouseUserPasswordRequest(
-  v: ResetDBAASClickhouseUserPasswordRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.password !== undefined) o['password'] = v.password
-  return o
-}
-
-export interface RevealDBAASClickhouseUserPasswordRequest {
-  serviceName: DBAASServiceName
-  username: DBAASUserUsername
-}
-
-export interface DeleteDBAASExternalEndpointDatadogRequest {
-  endpointID: string
-}
-
-export interface GetDBAASExternalEndpointDatadogRequest {
-  endpointID: string
-}
-
-export interface DeleteDBAASExternalEndpointElasticsearchRequest {
-  endpointID: string
-}
-
-export interface GetDBAASExternalEndpointElasticsearchRequest {
-  endpointID: string
-}
-
-export interface DeleteDBAASExternalEndpointOpensearchRequest {
-  endpointID: string
-}
-
-export interface GetDBAASExternalEndpointOpensearchRequest {
-  endpointID: string
-}
-
-export interface DeleteDBAASExternalEndpointPrometheusRequest {
-  endpointID: string
-}
-
-export interface GetDBAASExternalEndpointPrometheusRequest {
-  endpointID: string
-}
-
-export interface DeleteDBAASExternalEndpointRsyslogRequest {
-  endpointID: string
-}
-
-export interface GetDBAASExternalEndpointRsyslogRequest {
-  endpointID: string
-}
-
-export interface ListDBAASExternalEndpointTypesResponseEndpointTypes {
-  serviceTypes?: string[]
-  title?: string
-  type?: EnumExternalEndpointTypes
-}
-
-/** @internal */
-export function fromWireListDBAASExternalEndpointTypesResponseEndpointTypes(
-  w: any,
-): ListDBAASExternalEndpointTypesResponseEndpointTypes {
-  const v = {} as ListDBAASExternalEndpointTypesResponseEndpointTypes
-  if (w['service-types'] !== undefined) v.serviceTypes = w['service-types']
-  if (w['title'] !== undefined) v.title = w['title']
-  if (w['type'] !== undefined) v.type = w['type']
-  return v
-}
-export interface ListDBAASExternalEndpointTypesResponse {
-  endpointTypes?: ListDBAASExternalEndpointTypesResponseEndpointTypes[]
-}
-
-/** @internal */
-export function fromWireListDBAASExternalEndpointTypesResponse(
-  w: any,
-): ListDBAASExternalEndpointTypesResponse {
-  const v = {} as ListDBAASExternalEndpointTypesResponse
-  if (w['endpoint-types'] !== undefined)
-    v.endpointTypes = (w['endpoint-types'] as any[]).map((x) =>
-      fromWireListDBAASExternalEndpointTypesResponseEndpointTypes(x),
-    )
-  return v
-}
-
-export interface AttachDBAASServiceToEndpointRequest {
-  sourceServiceName: DBAASServiceName
-  /**
-   * External endpoint id
-   */
-  destEndpointID: string
-  /**
-   * External endpoint type
-   */
-  type: EnumExternalEndpointTypes
-}
-/** @internal */
-export function toWireAttachDBAASServiceToEndpointRequest(
-  v: AttachDBAASServiceToEndpointRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.destEndpointID !== undefined) o['dest-endpoint-id'] = v.destEndpointID
-  if (v.type !== undefined) o['type'] = v.type
-  return o
-}
-
-export interface DetachDBAASServiceFromEndpointRequest {
-  sourceServiceName: DBAASServiceName
-  /**
-   * External Integration ID
-   */
-  integrationID: string
-}
-/** @internal */
-export function toWireDetachDBAASServiceFromEndpointRequest(
-  v: DetachDBAASServiceFromEndpointRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.integrationID !== undefined) o['integration-id'] = v.integrationID
-  return o
-}
-
-export interface ListDBAASExternalEndpointsResponse {
-  dbaasEndpoints?: DBAASExternalEndpoint[]
-}
-
-/** @internal */
-export function fromWireListDBAASExternalEndpointsResponse(
-  w: any,
-): ListDBAASExternalEndpointsResponse {
-  const v = {} as ListDBAASExternalEndpointsResponse
-  if (w['dbaas-endpoints'] !== undefined)
-    v.dbaasEndpoints = (w['dbaas-endpoints'] as any[]).map((x) => fromWireDBAASExternalEndpoint(x))
-  return v
-}
-
-export interface GetDBAASExternalIntegrationSettingsDatadogRequest {
-  integrationID: string
-}
-export interface GetDBAASExternalIntegrationSettingsDatadogResponse {
-  settings?: DBAASIntegrationSettingsDatadog
-}
-
-/** @internal */
-export function fromWireGetDBAASExternalIntegrationSettingsDatadogResponse(
-  w: any,
-): GetDBAASExternalIntegrationSettingsDatadogResponse {
-  const v = {} as GetDBAASExternalIntegrationSettingsDatadogResponse
-  if (w['settings'] !== undefined)
-    v.settings = fromWireDBAASIntegrationSettingsDatadog(w['settings'])
-  return v
-}
-
-export interface UpdateDBAASExternalIntegrationSettingsDatadogRequest {
-  integrationID: string
-  settings?: DBAASIntegrationSettingsDatadog
-}
-/** @internal */
-export function toWireUpdateDBAASExternalIntegrationSettingsDatadogRequest(
-  v: UpdateDBAASExternalIntegrationSettingsDatadogRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.settings !== undefined) o['settings'] = toWireDBAASIntegrationSettingsDatadog(v.settings)
-  return o
-}
-
-export interface GetDBAASExternalIntegrationRequest {
-  integrationID: string
-}
-
-export interface ListDBAASExternalIntegrationsRequest {
-  serviceName: DBAASServiceName
-}
-export interface ListDBAASExternalIntegrationsResponse {
-  externalIntegrations?: DBAASExternalIntegration[]
-}
-
-/** @internal */
-export function fromWireListDBAASExternalIntegrationsResponse(
-  w: any,
-): ListDBAASExternalIntegrationsResponse {
-  const v = {} as ListDBAASExternalIntegrationsResponse
-  if (w['external-integrations'] !== undefined)
-    v.externalIntegrations = (w['external-integrations'] as any[]).map((x) =>
-      fromWireDBAASExternalIntegration(x),
-    )
-  return v
-}
-
-export interface DeleteDBAASServiceGrafanaRequest {
-  name: string
-}
-
-export interface GetDBAASServiceGrafanaRequest {
-  name: DBAASServiceName
-}
-
-/**
- * Automatic maintenance settings
- */
 export interface CreateDBAASServiceGrafanaRequestMaintenance {
   /**
    * Day of week for installing updates
@@ -1221,218 +1213,6 @@ export function toWireCreateDBAASServiceGrafanaRequest(
   if (v.plan !== undefined) o['plan'] = v.plan
   if (v.terminationProtection !== undefined) o['termination-protection'] = v.terminationProtection
   return o
-}
-
-/**
- * Automatic maintenance settings
- */
-export interface UpdateDBAASServiceGrafanaRequestMaintenance {
-  /**
-   * Day of week for installing updates
-   */
-  dow: 'friday' | 'monday' | 'never' | 'saturday' | 'sunday' | 'thursday' | 'tuesday' | 'wednesday'
-  /**
-   * Time for installing updates, UTC
-   *
-   * Length 8-8
-   */
-  time: string
-}
-
-/** @internal */
-export function toWireUpdateDBAASServiceGrafanaRequestMaintenance(
-  v: UpdateDBAASServiceGrafanaRequestMaintenance,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.dow !== undefined) o['dow'] = v.dow
-  if (v.time !== undefined) o['time'] = v.time
-  return o
-}
-export interface UpdateDBAASServiceGrafanaRequest {
-  name: DBAASServiceName
-  /**
-   * Grafana specific settings
-   */
-  grafanaSettings?: JSONSchemaGrafana
-  /**
-   * Allowed CIDR address blocks for incoming connections
-   */
-  ipFilter?: string[]
-  /**
-   * Automatic maintenance settings
-   */
-  maintenance?: UpdateDBAASServiceGrafanaRequestMaintenance
-  /**
-   * Subscription plan
-   *
-   * Length 1-128
-   */
-  plan?: string
-  /**
-   * Service is protected against termination and powering off
-   */
-  terminationProtection?: boolean
-}
-/** @internal */
-export function toWireUpdateDBAASServiceGrafanaRequest(
-  v: UpdateDBAASServiceGrafanaRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.grafanaSettings !== undefined)
-    o['grafana-settings'] = toWireJSONSchemaGrafana(v.grafanaSettings)
-  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter
-  if (v.maintenance !== undefined)
-    o['maintenance'] = toWireUpdateDBAASServiceGrafanaRequestMaintenance(v.maintenance)
-  if (v.plan !== undefined) o['plan'] = v.plan
-  if (v.terminationProtection !== undefined) o['termination-protection'] = v.terminationProtection
-  return o
-}
-
-export interface StartDBAASGrafanaMaintenanceRequest {
-  name: DBAASServiceName
-}
-
-export interface ResetDBAASGrafanaUserPasswordRequest {
-  serviceName: DBAASServiceName
-  username: DBAASUserUsername
-  /**
-   * New password
-   */
-  password?: DBAASUserPassword
-}
-/** @internal */
-export function toWireResetDBAASGrafanaUserPasswordRequest(
-  v: ResetDBAASGrafanaUserPasswordRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.password !== undefined) o['password'] = v.password
-  return o
-}
-
-export interface RevealDBAASGrafanaUserPasswordRequest {
-  serviceName: DBAASServiceName
-  username: DBAASUserUsername
-}
-
-export interface CreateDBAASIntegrationRequest {
-  /**
-   * A destination service
-   */
-  destService: DBAASServiceName
-  /**
-   * Integration type
-   */
-  integrationType: EnumIntegrationTypes
-  /**
-   * Integration settings
-   */
-  settings?: Record<string, unknown>
-  /**
-   * A source service
-   */
-  sourceService: DBAASServiceName
-}
-/** @internal */
-export function toWireCreateDBAASIntegrationRequest(
-  v: CreateDBAASIntegrationRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.destService !== undefined) o['dest-service'] = v.destService
-  if (v.integrationType !== undefined) o['integration-type'] = v.integrationType
-  if (v.settings !== undefined) o['settings'] = v.settings
-  if (v.sourceService !== undefined) o['source-service'] = v.sourceService
-  return o
-}
-
-export interface ListDBAASIntegrationSettingsRequest {
-  destType: string
-  integrationType: string
-  sourceType: string
-}
-/**
- * The JSON schema representing the settings for the given integration type, source, and destination service types.
- */
-export interface ListDBAASIntegrationSettingsResponseSettings {
-  additionalproperties?: boolean
-  properties?: Record<string, unknown>
-  title?: string
-  type?: string
-}
-
-/** @internal */
-export function fromWireListDBAASIntegrationSettingsResponseSettings(
-  w: any,
-): ListDBAASIntegrationSettingsResponseSettings {
-  const v = {} as ListDBAASIntegrationSettingsResponseSettings
-  if (w['additionalProperties'] !== undefined) v.additionalproperties = w['additionalProperties']
-  if (w['properties'] !== undefined) v.properties = w['properties']
-  if (w['title'] !== undefined) v.title = w['title']
-  if (w['type'] !== undefined) v.type = w['type']
-  return v
-}
-export interface ListDBAASIntegrationSettingsResponse {
-  /**
-   * The JSON schema representing the settings for the given integration type, source, and destination service types.
-   */
-  settings?: ListDBAASIntegrationSettingsResponseSettings
-}
-
-/** @internal */
-export function fromWireListDBAASIntegrationSettingsResponse(
-  w: any,
-): ListDBAASIntegrationSettingsResponse {
-  const v = {} as ListDBAASIntegrationSettingsResponse
-  if (w['settings'] !== undefined)
-    v.settings = fromWireListDBAASIntegrationSettingsResponseSettings(w['settings'])
-  return v
-}
-
-export interface ListDBAASIntegrationTypesResponse {
-  dbaasIntegrationTypes?: DBAASIntegrationType[]
-}
-
-/** @internal */
-export function fromWireListDBAASIntegrationTypesResponse(
-  w: any,
-): ListDBAASIntegrationTypesResponse {
-  const v = {} as ListDBAASIntegrationTypesResponse
-  if (w['dbaas-integration-types'] !== undefined)
-    v.dbaasIntegrationTypes = (w['dbaas-integration-types'] as any[]).map((x) =>
-      fromWireDBAASIntegrationType(x),
-    )
-  return v
-}
-
-export interface DeleteDBAASIntegrationRequest {
-  id: string
-}
-
-export interface GetDBAASIntegrationRequest {
-  id: string
-}
-
-export interface UpdateDBAASIntegrationRequest {
-  id: string
-  /**
-   * Integration settings
-   */
-  settings: Record<string, unknown>
-}
-/** @internal */
-export function toWireUpdateDBAASIntegrationRequest(
-  v: UpdateDBAASIntegrationRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.settings !== undefined) o['settings'] = v.settings
-  return o
-}
-
-export interface DeleteDBAASServiceKafkaRequest {
-  name: string
-}
-
-export interface GetDBAASServiceKafkaRequest {
-  name: DBAASServiceName
 }
 
 /**
@@ -1569,219 +1349,6 @@ export function toWireCreateDBAASServiceKafkaRequest(
   if (v.terminationProtection !== undefined) o['termination-protection'] = v.terminationProtection
   if (v.version !== undefined) o['version'] = v.version
   return o
-}
-
-/**
- * Kafka authentication methods
- */
-export interface UpdateDBAASServiceKafkaRequestAuthenticationMethods {
-  /**
-   * Enable certificate/SSL authentication
-   */
-  certificate?: boolean
-  /**
-   * Enable SASL authentication
-   */
-  sasl?: boolean
-}
-
-/** @internal */
-export function toWireUpdateDBAASServiceKafkaRequestAuthenticationMethods(
-  v: UpdateDBAASServiceKafkaRequestAuthenticationMethods,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.certificate !== undefined) o['certificate'] = v.certificate
-  if (v.sasl !== undefined) o['sasl'] = v.sasl
-  return o
-}
-
-/**
- * Automatic maintenance settings
- */
-export interface UpdateDBAASServiceKafkaRequestMaintenance {
-  /**
-   * Day of week for installing updates
-   */
-  dow: 'friday' | 'monday' | 'never' | 'saturday' | 'sunday' | 'thursday' | 'tuesday' | 'wednesday'
-  /**
-   * Time for installing updates, UTC
-   *
-   * Length 8-8
-   */
-  time: string
-}
-
-/** @internal */
-export function toWireUpdateDBAASServiceKafkaRequestMaintenance(
-  v: UpdateDBAASServiceKafkaRequestMaintenance,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.dow !== undefined) o['dow'] = v.dow
-  if (v.time !== undefined) o['time'] = v.time
-  return o
-}
-export interface UpdateDBAASServiceKafkaRequest {
-  name: DBAASServiceName
-  /**
-   * Kafka authentication methods
-   */
-  authenticationMethods?: UpdateDBAASServiceKafkaRequestAuthenticationMethods
-  /**
-   * Allow incoming connections from CIDR address block, e.g. '10.20.0.0/16'
-   */
-  ipFilter?: string[]
-  /**
-   * Allow clients to connect to kafka_connect from the public internet for service nodes that are in a project VPC or another type of private network
-   */
-  kafkaConnectEnabled?: boolean
-  /**
-   * Kafka Connect configuration values
-   */
-  kafkaConnectSettings?: JSONSchemaKafkaConnect
-  /**
-   * Enable Kafka-REST service
-   */
-  kafkaRestEnabled?: boolean
-  /**
-   * Kafka REST configuration
-   */
-  kafkaRestSettings?: JSONSchemaKafkaRest
-  /**
-   * Kafka-specific settings
-   */
-  kafkaSettings?: JSONSchemaKafka
-  /**
-   * Automatic maintenance settings
-   */
-  maintenance?: UpdateDBAASServiceKafkaRequestMaintenance
-  /**
-   * Subscription plan
-   *
-   * Length 1-128
-   */
-  plan?: string
-  /**
-   * Enable Schema-Registry service
-   */
-  schemaRegistryEnabled?: boolean
-  /**
-   * Schema Registry configuration
-   */
-  schemaRegistrySettings?: JSONSchemaSchemaRegistry
-  /**
-   * Service is protected against termination and powering off
-   */
-  terminationProtection?: boolean
-  /**
-   * Kafka major version
-   *
-   * Min length 1
-   */
-  version?: string
-}
-/** @internal */
-export function toWireUpdateDBAASServiceKafkaRequest(
-  v: UpdateDBAASServiceKafkaRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.authenticationMethods !== undefined)
-    o['authentication-methods'] = toWireUpdateDBAASServiceKafkaRequestAuthenticationMethods(
-      v.authenticationMethods,
-    )
-  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter
-  if (v.kafkaConnectEnabled !== undefined) o['kafka-connect-enabled'] = v.kafkaConnectEnabled
-  if (v.kafkaConnectSettings !== undefined)
-    o['kafka-connect-settings'] = toWireJSONSchemaKafkaConnect(v.kafkaConnectSettings)
-  if (v.kafkaRestEnabled !== undefined) o['kafka-rest-enabled'] = v.kafkaRestEnabled
-  if (v.kafkaRestSettings !== undefined)
-    o['kafka-rest-settings'] = toWireJSONSchemaKafkaRest(v.kafkaRestSettings)
-  if (v.kafkaSettings !== undefined) o['kafka-settings'] = toWireJSONSchemaKafka(v.kafkaSettings)
-  if (v.maintenance !== undefined)
-    o['maintenance'] = toWireUpdateDBAASServiceKafkaRequestMaintenance(v.maintenance)
-  if (v.plan !== undefined) o['plan'] = v.plan
-  if (v.schemaRegistryEnabled !== undefined) o['schema-registry-enabled'] = v.schemaRegistryEnabled
-  if (v.schemaRegistrySettings !== undefined)
-    o['schema-registry-settings'] = toWireJSONSchemaSchemaRegistry(v.schemaRegistrySettings)
-  if (v.terminationProtection !== undefined) o['termination-protection'] = v.terminationProtection
-  if (v.version !== undefined) o['version'] = v.version
-  return o
-}
-
-export interface GetDBAASKafkaAclConfigRequest {
-  name: DBAASServiceName
-}
-
-export interface StartDBAASKafkaMaintenanceRequest {
-  name: DBAASServiceName
-}
-
-export interface DeleteDBAASKafkaSchemaRegistryAclConfigRequest {
-  aclID: DBAASKafkaAclID
-  name: DBAASServiceName
-}
-
-export interface DeleteDBAASKafkaTopicAclConfigRequest {
-  aclID: DBAASKafkaAclID
-  name: DBAASServiceName
-}
-
-export interface RevealDBAASKafkaConnectPasswordRequest {
-  serviceName: DBAASServiceName
-}
-
-export interface CreateDBAASKafkaUserRequest {
-  serviceName: DBAASServiceName
-  /**
-   * Username
-   */
-  username: DBAASUserUsername
-}
-/** @internal */
-export function toWireCreateDBAASKafkaUserRequest(
-  v: CreateDBAASKafkaUserRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.username !== undefined) o['username'] = v.username
-  return o
-}
-
-export interface DeleteDBAASKafkaUserRequest {
-  serviceName: DBAASServiceName
-  username: DBAASUserUsername
-}
-
-export interface ResetDBAASKafkaUserPasswordRequest {
-  serviceName: DBAASServiceName
-  username: DBAASUserUsername
-  /**
-   * New password
-   */
-  password?: DBAASUserPassword
-}
-/** @internal */
-export function toWireResetDBAASKafkaUserPasswordRequest(
-  v: ResetDBAASKafkaUserPasswordRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.password !== undefined) o['password'] = v.password
-  return o
-}
-
-export interface RevealDBAASKafkaUserPasswordRequest {
-  serviceName: DBAASServiceName
-  username: DBAASUserUsername
-}
-
-export interface GetDBAASMigrationStatusRequest {
-  name: DBAASServiceName
-}
-
-export interface DeleteDBAASServiceMysqlRequest {
-  name: string
-}
-
-export interface GetDBAASServiceMysqlRequest {
-  name: DBAASServiceName
 }
 
 export interface CreateDBAASServiceMysqlRequestBackupSchedule {
@@ -2026,277 +1593,6 @@ export function toWireCreateDBAASServiceMysqlRequest(
   return o
 }
 
-export interface UpdateDBAASServiceMysqlRequestBackupSchedule {
-  /**
-   * The hour of day (in UTC) when backup for the service is started. New backup is only started if previous backup has already completed.
-   *
-   * Min 0, Max 23
-   */
-  backupHour?: number | null
-  /**
-   * The minute of an hour when backup for the service is started. New backup is only started if previous backup has already completed.
-   *
-   * Min 0, Max 59
-   */
-  backupMinute?: number | null
-}
-
-/** @internal */
-export function toWireUpdateDBAASServiceMysqlRequestBackupSchedule(
-  v: UpdateDBAASServiceMysqlRequestBackupSchedule,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.backupHour !== undefined) o['backup-hour'] = v.backupHour === null ? null : v.backupHour
-  if (v.backupMinute !== undefined)
-    o['backup-minute'] = v.backupMinute === null ? null : v.backupMinute
-  return o
-}
-
-/**
- * Automatic maintenance settings
- */
-export interface UpdateDBAASServiceMysqlRequestMaintenance {
-  /**
-   * Day of week for installing updates
-   */
-  dow: 'friday' | 'monday' | 'never' | 'saturday' | 'sunday' | 'thursday' | 'tuesday' | 'wednesday'
-  /**
-   * Time for installing updates, UTC
-   *
-   * Length 8-8
-   */
-  time: string
-}
-
-/** @internal */
-export function toWireUpdateDBAASServiceMysqlRequestMaintenance(
-  v: UpdateDBAASServiceMysqlRequestMaintenance,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.dow !== undefined) o['dow'] = v.dow
-  if (v.time !== undefined) o['time'] = v.time
-  return o
-}
-
-/**
- * Migrate data from existing server
- */
-export interface UpdateDBAASServiceMysqlRequestMigration {
-  /**
-   * Database name for bootstrapping the initial connection
-   *
-   * Length 1-63
-   */
-  dbname?: string
-  /**
-   * Hostname or IP address of the server where to migrate data from
-   *
-   * Length 1-255
-   */
-  host: string
-  /**
-   * Comma-separated list of databases, which should be ignored during migration (supported by MySQL only at the moment)
-   *
-   * Length 1-2048
-   */
-  ignoreDbs?: string
-  /**
-   * The migration method to be used
-   */
-  method?: EnumMigrationMethod
-  /**
-   * Password for authentication with the server where to migrate data from
-   *
-   * Length 1-255
-   */
-  password?: string
-  /**
-   * Port number of the server where to migrate data from
-   *
-   * Min 1, Max 65535
-   */
-  port: number
-  /**
-   * The server where to migrate data from is secured with SSL
-   */
-  ssl?: boolean
-  /**
-   * User name for authentication with the server where to migrate data from
-   *
-   * Length 1-255
-   */
-  username?: string
-}
-
-/** @internal */
-export function toWireUpdateDBAASServiceMysqlRequestMigration(
-  v: UpdateDBAASServiceMysqlRequestMigration,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.dbname !== undefined) o['dbname'] = v.dbname
-  if (v.host !== undefined) o['host'] = v.host
-  if (v.ignoreDbs !== undefined) o['ignore-dbs'] = v.ignoreDbs
-  if (v.method !== undefined) o['method'] = v.method
-  if (v.password !== undefined) o['password'] = v.password
-  if (v.port !== undefined) o['port'] = v.port
-  if (v.ssl !== undefined) o['ssl'] = v.ssl
-  if (v.username !== undefined) o['username'] = v.username
-  return o
-}
-export interface UpdateDBAASServiceMysqlRequest {
-  name: DBAASServiceName
-  backupSchedule?: UpdateDBAASServiceMysqlRequestBackupSchedule
-  /**
-   * The minimum amount of time in seconds to keep binlog entries before deletion. This may be extended for services that require binlog entries for longer than the default for example if using the MySQL Debezium Kafka connector.
-   *
-   * Min 600, Max 86400
-   */
-  binlogRetentionPeriod?: number
-  /**
-   * Allow incoming connections from CIDR address block, e.g. '10.20.0.0/16'
-   */
-  ipFilter?: string[]
-  /**
-   * Automatic maintenance settings
-   */
-  maintenance?: UpdateDBAASServiceMysqlRequestMaintenance
-  /**
-   * Migrate data from existing server
-   */
-  migration?: UpdateDBAASServiceMysqlRequestMigration
-  /**
-   * MySQL-specific settings
-   */
-  mysqlSettings?: JSONSchemaMysql
-  /**
-   * Subscription plan
-   *
-   * Length 1-128
-   */
-  plan?: string
-  /**
-   * Service is protected against termination and powering off
-   */
-  terminationProtection?: boolean
-  /**
-   * MySQL version
-   */
-  version?: string
-}
-/** @internal */
-export function toWireUpdateDBAASServiceMysqlRequest(
-  v: UpdateDBAASServiceMysqlRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.backupSchedule !== undefined)
-    o['backup-schedule'] = toWireUpdateDBAASServiceMysqlRequestBackupSchedule(v.backupSchedule)
-  if (v.binlogRetentionPeriod !== undefined) o['binlog-retention-period'] = v.binlogRetentionPeriod
-  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter
-  if (v.maintenance !== undefined)
-    o['maintenance'] = toWireUpdateDBAASServiceMysqlRequestMaintenance(v.maintenance)
-  if (v.migration !== undefined)
-    o['migration'] = toWireUpdateDBAASServiceMysqlRequestMigration(v.migration)
-  if (v.mysqlSettings !== undefined) o['mysql-settings'] = toWireJSONSchemaMysql(v.mysqlSettings)
-  if (v.plan !== undefined) o['plan'] = v.plan
-  if (v.terminationProtection !== undefined) o['termination-protection'] = v.terminationProtection
-  if (v.version !== undefined) o['version'] = v.version
-  return o
-}
-
-export interface EnableDBAASMysqlWritesRequest {
-  name: DBAASServiceName
-}
-
-export interface StartDBAASMysqlMaintenanceRequest {
-  name: DBAASServiceName
-}
-
-export interface StopDBAASMysqlMigrationRequest {
-  name: DBAASServiceName
-}
-
-export interface CreateDBAASMysqlDatabaseRequest {
-  serviceName: DBAASServiceName
-  /**
-   * Service database name
-   */
-  databaseName: DBAASDatabaseName
-}
-/** @internal */
-export function toWireCreateDBAASMysqlDatabaseRequest(
-  v: CreateDBAASMysqlDatabaseRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.databaseName !== undefined) o['database-name'] = v.databaseName
-  return o
-}
-
-export interface DeleteDBAASMysqlDatabaseRequest {
-  databaseName: DBAASMysqlDatabaseName
-  serviceName: DBAASServiceName
-}
-
-export interface CreateDBAASMysqlUserRequest {
-  serviceName: DBAASServiceName
-  /**
-   * Authentication option
-   */
-  authentication?: EnumMysqlAuthenticationPlugin
-  /**
-   * Username
-   */
-  username: DBAASUserUsername
-}
-/** @internal */
-export function toWireCreateDBAASMysqlUserRequest(
-  v: CreateDBAASMysqlUserRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.authentication !== undefined) o['authentication'] = v.authentication
-  if (v.username !== undefined) o['username'] = v.username
-  return o
-}
-
-export interface DeleteDBAASMysqlUserRequest {
-  serviceName: DBAASServiceName
-  username: DBAASUserUsername
-}
-
-export interface ResetDBAASMysqlUserPasswordRequest {
-  serviceName: DBAASServiceName
-  username: DBAASUserUsername
-  /**
-   * Authentication method
-   */
-  authentication?: EnumMysqlAuthenticationPlugin
-  /**
-   * New password
-   */
-  password?: DBAASMysqlUserPassword
-}
-/** @internal */
-export function toWireResetDBAASMysqlUserPasswordRequest(
-  v: ResetDBAASMysqlUserPasswordRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.authentication !== undefined) o['authentication'] = v.authentication
-  if (v.password !== undefined) o['password'] = v.password
-  return o
-}
-
-export interface RevealDBAASMysqlUserPasswordRequest {
-  serviceName: DBAASServiceName
-  username: DBAASUserUsername
-}
-
-export interface DeleteDBAASServiceOpensearchRequest {
-  name: string
-}
-
-export interface GetDBAASServiceOpensearchRequest {
-  name: DBAASServiceName
-}
-
 export interface CreateDBAASServiceOpensearchRequestIndexPatterns {
   /**
    * Maximum number of indexes to keep
@@ -2518,274 +1814,6 @@ export function toWireCreateDBAASServiceOpensearchRequest(
   if (v.terminationProtection !== undefined) o['termination-protection'] = v.terminationProtection
   if (v.version !== undefined) o['version'] = v.version
   return o
-}
-
-export interface UpdateDBAASServiceOpensearchRequestIndexPatterns {
-  /**
-   * Maximum number of indexes to keep
-   *
-   * Min 0
-   */
-  maxIndexCount?: number | null
-  /**
-   * fnmatch pattern
-   *
-   * Max length 1024
-   */
-  pattern?: string
-  /**
-   * Deletion sorting algorithm
-   */
-  sortingAlgorithm?: 'alphabetical' | 'creation_date'
-}
-
-/** @internal */
-export function toWireUpdateDBAASServiceOpensearchRequestIndexPatterns(
-  v: UpdateDBAASServiceOpensearchRequestIndexPatterns,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.maxIndexCount !== undefined)
-    o['max-index-count'] = v.maxIndexCount === null ? null : v.maxIndexCount
-  if (v.pattern !== undefined) o['pattern'] = v.pattern
-  if (v.sortingAlgorithm !== undefined) o['sorting-algorithm'] = v.sortingAlgorithm
-  return o
-}
-
-/**
- * Template settings for all new indexes
- */
-export interface UpdateDBAASServiceOpensearchRequestIndexTemplate {
-  /**
-   * The maximum number of nested JSON objects that a single document can contain across all nested types. This limit helps to prevent out of memory errors when a document contains too many nested objects. Default is 10000.
-   *
-   * Min 0, Max 100000
-   */
-  mappingNestedObjectsLimit?: number | null
-  /**
-   * The number of replicas each primary shard has.
-   *
-   * Min 0, Max 29
-   */
-  numberOfReplicas?: number | null
-  /**
-   * The number of primary shards that an index should have.
-   *
-   * Min 1, Max 1024
-   */
-  numberOfShards?: number
-}
-
-/** @internal */
-export function toWireUpdateDBAASServiceOpensearchRequestIndexTemplate(
-  v: UpdateDBAASServiceOpensearchRequestIndexTemplate,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.mappingNestedObjectsLimit !== undefined)
-    o['mapping-nested-objects-limit'] =
-      v.mappingNestedObjectsLimit === null ? null : v.mappingNestedObjectsLimit
-  if (v.numberOfReplicas !== undefined)
-    o['number-of-replicas'] = v.numberOfReplicas === null ? null : v.numberOfReplicas
-  if (v.numberOfShards !== undefined) o['number-of-shards'] = v.numberOfShards
-  return o
-}
-
-/**
- * Automatic maintenance settings
- */
-export interface UpdateDBAASServiceOpensearchRequestMaintenance {
-  /**
-   * Day of week for installing updates
-   */
-  dow: 'friday' | 'monday' | 'never' | 'saturday' | 'sunday' | 'thursday' | 'tuesday' | 'wednesday'
-  /**
-   * Time for installing updates, UTC
-   *
-   * Length 8-8
-   */
-  time: string
-}
-
-/** @internal */
-export function toWireUpdateDBAASServiceOpensearchRequestMaintenance(
-  v: UpdateDBAASServiceOpensearchRequestMaintenance,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.dow !== undefined) o['dow'] = v.dow
-  if (v.time !== undefined) o['time'] = v.time
-  return o
-}
-
-/**
- * OpenSearch Dashboards settings
- */
-export interface UpdateDBAASServiceOpensearchRequestOpensearchDashboards {
-  /**
-   * Enable or disable OpenSearch Dashboards (default: true)
-   */
-  enabled?: boolean
-  /**
-   * Limits the maximum amount of memory (in MiB) the OpenSearch Dashboards process can use. This sets the max_old_space_size option of the nodejs running the OpenSearch Dashboards. Note: the memory reserved by OpenSearch Dashboards is not available for OpenSearch. (default: 128)
-   *
-   * Min 64, Max 1024
-   */
-  maxOldSpaceSize?: number
-  /**
-   * Timeout in milliseconds for requests made by OpenSearch Dashboards towards OpenSearch (default: 30000)
-   *
-   * Min 5000, Max 120000
-   */
-  opensearchRequestTimeout?: number
-}
-
-/** @internal */
-export function toWireUpdateDBAASServiceOpensearchRequestOpensearchDashboards(
-  v: UpdateDBAASServiceOpensearchRequestOpensearchDashboards,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.enabled !== undefined) o['enabled'] = v.enabled
-  if (v.maxOldSpaceSize !== undefined) o['max-old-space-size'] = v.maxOldSpaceSize
-  if (v.opensearchRequestTimeout !== undefined)
-    o['opensearch-request-timeout'] = v.opensearchRequestTimeout
-  return o
-}
-export interface UpdateDBAASServiceOpensearchRequest {
-  name: DBAASServiceName
-  /**
-   * Allows you to create glob style patterns and set a max number of indexes matching this pattern you want to keep. Creating indexes exceeding this value will cause the oldest one to get deleted. You could for example create a pattern looking like 'logs.?' and then create index logs.1, logs.2 etc, it will delete logs.1 once you create logs.6. Do note 'logs.?' does not apply to logs.10. Note: Setting max_index_count to 0 will do nothing and the pattern gets ignored.
-   */
-  indexPatterns?: UpdateDBAASServiceOpensearchRequestIndexPatterns[]
-  /**
-   * Template settings for all new indexes
-   */
-  indexTemplate?: UpdateDBAASServiceOpensearchRequestIndexTemplate
-  /**
-   * Allow incoming connections from CIDR address block, e.g. '10.20.0.0/16'
-   */
-  ipFilter?: string[]
-  /**
-   * Aiven automation resets index.refresh_interval to default value for every index to be sure that indices are always visible to search. If it doesn't fit your case, you can disable this by setting up this flag to true.
-   */
-  keepIndexRefreshInterval?: boolean
-  /**
-   * Automatic maintenance settings
-   */
-  maintenance?: UpdateDBAASServiceOpensearchRequestMaintenance
-  /**
-   * Maximum number of indexes to keep before deleting the oldest one
-   *
-   * Min 0
-   */
-  maxIndexCount?: number | null
-  /**
-   * OpenSearch Dashboards settings
-   */
-  opensearchDashboards?: UpdateDBAASServiceOpensearchRequestOpensearchDashboards
-  /**
-   * OpenSearch-specific settings
-   */
-  opensearchSettings?: JSONSchemaOpensearch
-  /**
-   * Subscription plan
-   *
-   * Length 1-128
-   */
-  plan?: string
-  /**
-   * Service is protected against termination and powering off
-   */
-  terminationProtection?: boolean
-  /**
-   * Version
-   */
-  version?: string
-}
-/** @internal */
-export function toWireUpdateDBAASServiceOpensearchRequest(
-  v: UpdateDBAASServiceOpensearchRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.indexPatterns !== undefined)
-    o['index-patterns'] = v.indexPatterns.map((x) =>
-      toWireUpdateDBAASServiceOpensearchRequestIndexPatterns(x),
-    )
-  if (v.indexTemplate !== undefined)
-    o['index-template'] = toWireUpdateDBAASServiceOpensearchRequestIndexTemplate(v.indexTemplate)
-  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter
-  if (v.keepIndexRefreshInterval !== undefined)
-    o['keep-index-refresh-interval'] = v.keepIndexRefreshInterval
-  if (v.maintenance !== undefined)
-    o['maintenance'] = toWireUpdateDBAASServiceOpensearchRequestMaintenance(v.maintenance)
-  if (v.maxIndexCount !== undefined)
-    o['max-index-count'] = v.maxIndexCount === null ? null : v.maxIndexCount
-  if (v.opensearchDashboards !== undefined)
-    o['opensearch-dashboards'] = toWireUpdateDBAASServiceOpensearchRequestOpensearchDashboards(
-      v.opensearchDashboards,
-    )
-  if (v.opensearchSettings !== undefined)
-    o['opensearch-settings'] = toWireJSONSchemaOpensearch(v.opensearchSettings)
-  if (v.plan !== undefined) o['plan'] = v.plan
-  if (v.terminationProtection !== undefined) o['termination-protection'] = v.terminationProtection
-  if (v.version !== undefined) o['version'] = v.version
-  return o
-}
-
-export interface GetDBAASOpensearchAclConfigRequest {
-  name: DBAASServiceName
-}
-
-export interface StartDBAASOpensearchMaintenanceRequest {
-  name: DBAASServiceName
-}
-
-export interface CreateDBAASOpensearchUserRequest {
-  serviceName: DBAASServiceName
-  /**
-   * Username
-   */
-  username: DBAASUserUsername
-}
-/** @internal */
-export function toWireCreateDBAASOpensearchUserRequest(
-  v: CreateDBAASOpensearchUserRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.username !== undefined) o['username'] = v.username
-  return o
-}
-
-export interface DeleteDBAASOpensearchUserRequest {
-  serviceName: DBAASServiceName
-  username: DBAASUserUsername
-}
-
-export interface ResetDBAASOpensearchUserPasswordRequest {
-  serviceName: DBAASServiceName
-  username: DBAASUserUsername
-  /**
-   * New password
-   */
-  password?: DBAASUserPassword
-}
-/** @internal */
-export function toWireResetDBAASOpensearchUserPasswordRequest(
-  v: ResetDBAASOpensearchUserPasswordRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.password !== undefined) o['password'] = v.password
-  return o
-}
-
-export interface RevealDBAASOpensearchUserPasswordRequest {
-  serviceName: DBAASServiceName
-  username: DBAASUserUsername
-}
-
-export interface DeleteDBAASServicePGRequest {
-  name: string
-}
-
-export interface GetDBAASServicePGRequest {
-  name: DBAASServiceName
 }
 
 export interface CreateDBAASServicePGRequestBackupSchedule {
@@ -3071,36 +2099,10 @@ export function toWireCreateDBAASServicePGRequest(
   return o
 }
 
-export interface UpdateDBAASServicePGRequestBackupSchedule {
-  /**
-   * The hour of day (in UTC) when backup for the service is started. New backup is only started if previous backup has already completed.
-   *
-   * Min 0, Max 23
-   */
-  backupHour?: number | null
-  /**
-   * The minute of an hour when backup for the service is started. New backup is only started if previous backup has already completed.
-   *
-   * Min 0, Max 59
-   */
-  backupMinute?: number | null
-}
-
-/** @internal */
-export function toWireUpdateDBAASServicePGRequestBackupSchedule(
-  v: UpdateDBAASServicePGRequestBackupSchedule,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.backupHour !== undefined) o['backup-hour'] = v.backupHour === null ? null : v.backupHour
-  if (v.backupMinute !== undefined)
-    o['backup-minute'] = v.backupMinute === null ? null : v.backupMinute
-  return o
-}
-
 /**
  * Automatic maintenance settings
  */
-export interface UpdateDBAASServicePGRequestMaintenance {
+export interface CreateDBAASServiceThanosRequestMaintenance {
   /**
    * Day of week for installing updates
    */
@@ -3114,8 +2116,73 @@ export interface UpdateDBAASServicePGRequestMaintenance {
 }
 
 /** @internal */
-export function toWireUpdateDBAASServicePGRequestMaintenance(
-  v: UpdateDBAASServicePGRequestMaintenance,
+export function toWireCreateDBAASServiceThanosRequestMaintenance(
+  v: CreateDBAASServiceThanosRequestMaintenance,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.dow !== undefined) o['dow'] = v.dow
+  if (v.time !== undefined) o['time'] = v.time
+  return o
+}
+export interface CreateDBAASServiceThanosRequest {
+  name: DBAASServiceName
+  /**
+   * Allowed CIDR address blocks for incoming connections
+   */
+  ipFilter?: string[]
+  /**
+   * Automatic maintenance settings
+   */
+  maintenance?: CreateDBAASServiceThanosRequestMaintenance
+  /**
+   * Subscription plan
+   *
+   * Length 1-128
+   */
+  plan: string
+  /**
+   * Service is protected against termination and powering off
+   */
+  terminationProtection?: boolean
+  /**
+   * Thanos specific settings
+   */
+  thanosSettings?: JSONSchemaThanos
+}
+/** @internal */
+export function toWireCreateDBAASServiceThanosRequest(
+  v: CreateDBAASServiceThanosRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter
+  if (v.maintenance !== undefined)
+    o['maintenance'] = toWireCreateDBAASServiceThanosRequestMaintenance(v.maintenance)
+  if (v.plan !== undefined) o['plan'] = v.plan
+  if (v.terminationProtection !== undefined) o['termination-protection'] = v.terminationProtection
+  if (v.thanosSettings !== undefined)
+    o['thanos-settings'] = toWireJSONSchemaThanos(v.thanosSettings)
+  return o
+}
+
+/**
+ * Automatic maintenance settings
+ */
+export interface CreateDBAASServiceValkeyRequestMaintenance {
+  /**
+   * Day of week for installing updates
+   */
+  dow: 'friday' | 'monday' | 'never' | 'saturday' | 'sunday' | 'thursday' | 'tuesday' | 'wednesday'
+  /**
+   * Time for installing updates, UTC
+   *
+   * Length 8-8
+   */
+  time: string
+}
+
+/** @internal */
+export function toWireCreateDBAASServiceValkeyRequestMaintenance(
+  v: CreateDBAASServiceValkeyRequestMaintenance,
 ): Record<string, unknown> {
   const o: Record<string, unknown> = {}
   if (v.dow !== undefined) o['dow'] = v.dow
@@ -3126,7 +2193,7 @@ export function toWireUpdateDBAASServicePGRequestMaintenance(
 /**
  * Migrate data from existing server
  */
-export interface UpdateDBAASServicePGRequestMigration {
+export interface CreateDBAASServiceValkeyRequestMigration {
   /**
    * Database name for bootstrapping the initial connection
    *
@@ -3174,8 +2241,8 @@ export interface UpdateDBAASServicePGRequestMigration {
 }
 
 /** @internal */
-export function toWireUpdateDBAASServicePGRequestMigration(
-  v: UpdateDBAASServicePGRequestMigration,
+export function toWireCreateDBAASServiceValkeyRequestMigration(
+  v: CreateDBAASServiceValkeyRequestMigration,
 ): Record<string, unknown> {
   const o: Record<string, unknown> = {}
   if (v.dbname !== undefined) o['dbname'] = v.dbname
@@ -3188,9 +2255,12 @@ export function toWireUpdateDBAASServicePGRequestMigration(
   if (v.username !== undefined) o['username'] = v.username
   return o
 }
-export interface UpdateDBAASServicePGRequest {
+export interface CreateDBAASServiceValkeyRequest {
   name: DBAASServiceName
-  backupSchedule?: UpdateDBAASServicePGRequestBackupSchedule
+  /**
+   * Service to fork from
+   */
+  forkFromService?: DBAASServiceName
   /**
    * Allow incoming connections from CIDR address block, e.g. '10.20.0.0/16'
    */
@@ -3198,141 +2268,1032 @@ export interface UpdateDBAASServicePGRequest {
   /**
    * Automatic maintenance settings
    */
-  maintenance?: UpdateDBAASServicePGRequestMaintenance
+  maintenance?: CreateDBAASServiceValkeyRequestMaintenance
   /**
    * Migrate data from existing server
    */
-  migration?: UpdateDBAASServicePGRequestMigration
-  /**
-   * PostgreSQL-specific settings
-   */
-  pgSettings?: JSONSchemaPG
-  /**
-   * PGAudit settings
-   */
-  pgauditSettings?: JSONSchemaPgaudit
-  /**
-   * PGBouncer connection pooling settings
-   */
-  pgbouncerSettings?: JSONSchemaPgbouncer
-  /**
-   * PGLookout settings
-   */
-  pglookoutSettings?: JSONSchemaPglookout
+  migration?: CreateDBAASServiceValkeyRequestMigration
   /**
    * Subscription plan
    *
    * Length 1-128
    */
-  plan?: string
+  plan: string
   /**
-   * Percentage of total RAM that the database server uses for shared memory buffers. Valid range is 20-60 (float), which corresponds to 20% - 60%. This setting adjusts the shared_buffers configuration value.
+   * Name of a backup to recover from for services that support backup names
    *
-   * Min 20, Max 60
+   * Min length 1
    */
-  sharedBuffersPercentage?: number
-  /**
-   * Synchronous replication type. Note that the service plan also needs to support synchronous replication.
-   */
-  synchronousReplication?: EnumPGSynchronousReplication
+  recoveryBackupName?: string
   /**
    * Service is protected against termination and powering off
    */
   terminationProtection?: boolean
   /**
-   * TimescaleDB extension configuration values
+   * Valkey.conf settings
    */
-  timescaledbSettings?: JSONSchemaTimescaledb
+  valkeySettings?: JSONSchemaValkey
   /**
-   * Variant of the PostgreSQL service, may affect the features that are exposed by default
-   */
-  variant?: EnumPGVariant
-  /**
-   * Version
+   * Valkey major version
+   *
+   * Min length 1
    */
   version?: string
-  /**
-   * Sets the maximum amount of memory to be used by a query operation (such as a sort or hash table) before writing to temporary disk files, in MB. Default is 1MB + 0.075% of total RAM (up to 32MB).
-   *
-   * Min 1, Max 1024
-   */
-  workMem?: number
 }
 /** @internal */
-export function toWireUpdateDBAASServicePGRequest(
-  v: UpdateDBAASServicePGRequest,
+export function toWireCreateDBAASServiceValkeyRequest(
+  v: CreateDBAASServiceValkeyRequest,
 ): Record<string, unknown> {
   const o: Record<string, unknown> = {}
-  if (v.backupSchedule !== undefined)
-    o['backup-schedule'] = toWireUpdateDBAASServicePGRequestBackupSchedule(v.backupSchedule)
+  if (v.forkFromService !== undefined) o['fork-from-service'] = v.forkFromService
   if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter
   if (v.maintenance !== undefined)
-    o['maintenance'] = toWireUpdateDBAASServicePGRequestMaintenance(v.maintenance)
+    o['maintenance'] = toWireCreateDBAASServiceValkeyRequestMaintenance(v.maintenance)
   if (v.migration !== undefined)
-    o['migration'] = toWireUpdateDBAASServicePGRequestMigration(v.migration)
-  if (v.pgSettings !== undefined) o['pg-settings'] = toWireJSONSchemaPG(v.pgSettings)
-  if (v.pgauditSettings !== undefined)
-    o['pgaudit-settings'] = toWireJSONSchemaPgaudit(v.pgauditSettings)
-  if (v.pgbouncerSettings !== undefined)
-    o['pgbouncer-settings'] = toWireJSONSchemaPgbouncer(v.pgbouncerSettings)
-  if (v.pglookoutSettings !== undefined)
-    o['pglookout-settings'] = toWireJSONSchemaPglookout(v.pglookoutSettings)
+    o['migration'] = toWireCreateDBAASServiceValkeyRequestMigration(v.migration)
   if (v.plan !== undefined) o['plan'] = v.plan
-  if (v.sharedBuffersPercentage !== undefined)
-    o['shared-buffers-percentage'] = v.sharedBuffersPercentage
-  if (v.synchronousReplication !== undefined)
-    o['synchronous-replication'] = v.synchronousReplication
+  if (v.recoveryBackupName !== undefined) o['recovery-backup-name'] = v.recoveryBackupName
   if (v.terminationProtection !== undefined) o['termination-protection'] = v.terminationProtection
-  if (v.timescaledbSettings !== undefined)
-    o['timescaledb-settings'] = toWireJSONSchemaTimescaledb(v.timescaledbSettings)
-  if (v.variant !== undefined) o['variant'] = v.variant
+  if (v.valkeySettings !== undefined)
+    o['valkey-settings'] = toWireJSONSchemaValkey(v.valkeySettings)
   if (v.version !== undefined) o['version'] = v.version
-  if (v.workMem !== undefined) o['work-mem'] = v.workMem
   return o
 }
 
-export interface StartDBAASPGMaintenanceRequest {
-  name: DBAASServiceName
-}
-
-export interface StopDBAASPGMigrationRequest {
-  name: DBAASServiceName
-}
-
-export interface CreateDBAASPGConnectionPoolRequest {
-  serviceName: DBAASServiceName
+export interface CreateDBAASTaskMigrationCheckRequest {
+  service: DBAASServiceName
   /**
-   * Service database name
+   * Comma-separated list of databases, which should be ignored during migration (supported by MySQL only at the moment)
+   *
+   * Length 1-2048
    */
-  databaseName: DBAASDatabaseName
+  ignoreDbs?: string
   /**
-   * PGBouncer pool mode
+   * The migration method to be used (currently supported only by MySQL service type)
    */
-  mode?: EnumPGPoolMode
+  method?: EnumMigrationMethod
   /**
-   * Connection pool name
+   * Service URI of the source MySQL or PostgreSQL database with admin credentials.
+   *
+   * Length 1-512
    */
-  name: DBAASPGPoolName
-  /**
-   * Size of PGBouncer's PostgreSQL side connection pool
-   */
-  size?: DBAASPGPoolSize
-  /**
-   * Pool username
-   */
-  username?: DBAASPGPoolUsername
+  sourceServiceURI: string
 }
 /** @internal */
-export function toWireCreateDBAASPGConnectionPoolRequest(
-  v: CreateDBAASPGConnectionPoolRequest,
+export function toWireCreateDBAASTaskMigrationCheckRequest(
+  v: CreateDBAASTaskMigrationCheckRequest,
 ): Record<string, unknown> {
   const o: Record<string, unknown> = {}
-  if (v.databaseName !== undefined) o['database-name'] = v.databaseName
-  if (v.mode !== undefined) o['mode'] = v.mode
-  if (v.name !== undefined) o['name'] = v.name
-  if (v.size !== undefined) o['size'] = v.size
+  if (v.ignoreDbs !== undefined) o['ignore-dbs'] = v.ignoreDbs
+  if (v.method !== undefined) o['method'] = v.method
+  if (v.sourceServiceURI !== undefined) o['source-service-uri'] = v.sourceServiceURI
+  return o
+}
+
+export interface CreateDBAASValkeyUserRequest {
+  serviceName: DBAASServiceName
+  accessControl?: DBAASValkeyUserAccessControl
+  /**
+   * Username
+   */
+  username: DBAASUserUsername
+}
+/** @internal */
+export function toWireCreateDBAASValkeyUserRequest(
+  v: CreateDBAASValkeyUserRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.accessControl !== undefined)
+    o['access-control'] = toWireDBAASValkeyUserAccessControl(v.accessControl)
   if (v.username !== undefined) o['username'] = v.username
   return o
+}
+
+export interface CreateDNSDomainRequest {
+  /**
+   * Domain name
+   */
+  unicodeName?: string
+}
+/** @internal */
+export function toWireCreateDNSDomainRequest(v: CreateDNSDomainRequest): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.unicodeName !== undefined) o['unicode-name'] = v.unicodeName
+  return o
+}
+
+export interface CreateDNSDomainRecordRequest {
+  domainID: string
+  /**
+   * DNS domain record content
+   */
+  content: string
+  /**
+   * DNS domain record name
+   */
+  name: string
+  /**
+   * DNS domain record priority
+   *
+   * Min 0
+   */
+  priority?: number
+  /**
+   * DNS domain record TTL
+   *
+   * Min 0
+   */
+  ttl?: number
+  /**
+   * DNS domain record type
+   */
+  type:
+    | 'A'
+    | 'AAAA'
+    | 'ALIAS'
+    | 'CAA'
+    | 'CNAME'
+    | 'HINFO'
+    | 'MX'
+    | 'NAPTR'
+    | 'NS'
+    | 'POOL'
+    | 'SRV'
+    | 'SSHFP'
+    | 'TXT'
+    | 'URL'
+}
+/** @internal */
+export function toWireCreateDNSDomainRecordRequest(
+  v: CreateDNSDomainRecordRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.content !== undefined) o['content'] = v.content
+  if (v.name !== undefined) o['name'] = v.name
+  if (v.priority !== undefined) o['priority'] = v.priority
+  if (v.ttl !== undefined) o['ttl'] = v.ttl
+  if (v.type !== undefined) o['type'] = v.type
+  return o
+}
+
+export interface CreateElasticIPRequest {
+  /**
+   * Elastic IP address family (default: :inet4)
+   */
+  addressfamily?: 'inet4' | 'inet6'
+  /**
+   * Elastic IP description
+   *
+   * Max length 255
+   */
+  description?: string
+  /**
+   * Elastic IP healthcheck
+   */
+  healthcheck?: ElasticIPHealthcheck
+  /**
+   * Resource labels
+   */
+  labels?: Labels
+}
+/** @internal */
+export function toWireCreateElasticIPRequest(v: CreateElasticIPRequest): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.addressfamily !== undefined) o['addressfamily'] = v.addressfamily
+  if (v.description !== undefined) o['description'] = v.description
+  if (v.healthcheck !== undefined) o['healthcheck'] = toWireElasticIPHealthcheck(v.healthcheck)
+  if (v.labels !== undefined) o['labels'] = v.labels
+  return o
+}
+
+export interface CreateIAMRoleRequest {
+  /**
+   * IAM Assume role policy
+   */
+  assumeRolePolicy?: IAMAssumeRolePolicy
+  /**
+   * IAM Role description
+   *
+   * Length 1-255
+   */
+  description?: string
+  /**
+   * Sets if the IAM Role Policy is editable or not (default: true). This setting cannot be changed after creation
+   */
+  editable?: boolean
+  /**
+   * IAM Role labels
+   */
+  labels?: Labels
+  /**
+   * Maximum TTL requester is allowed to ask for when assuming a role
+   *
+   * Min >0
+   */
+  maxSessionTtl?: number
+  /**
+   * IAM Role name
+   *
+   * Length 1-191
+   */
+  name: string
+  /**
+   * IAM Role permissions
+   *
+   * Unique items
+   */
+  permissions?: string[]
+  /**
+   * IAM Role policy
+   */
+  policy?: IAMPolicy
+}
+/** @internal */
+export function toWireCreateIAMRoleRequest(v: CreateIAMRoleRequest): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.assumeRolePolicy !== undefined)
+    o['assume-role-policy'] = toWireIAMAssumeRolePolicy(v.assumeRolePolicy)
+  if (v.description !== undefined) o['description'] = v.description
+  if (v.editable !== undefined) o['editable'] = v.editable
+  if (v.labels !== undefined) o['labels'] = v.labels
+  if (v.maxSessionTtl !== undefined) o['max-session-ttl'] = v.maxSessionTtl
+  if (v.name !== undefined) o['name'] = v.name
+  if (v.permissions !== undefined) o['permissions'] = v.permissions
+  if (v.policy !== undefined) o['policy'] = toWireIAMPolicy(v.policy)
+  return o
+}
+
+export interface CreateInstanceRequest {
+  /**
+   * Instance Anti-affinity Groups
+   *
+   * Unique items
+   */
+  antiAffinityGroups?: AntiAffinityGroupRef[]
+  /**
+   * Enable application-consistent snapshot for the instance
+   */
+  applicationConsistentSnapshotEnabled?: boolean
+  /**
+   * Start Instance on creation (default: true)
+   */
+  autoStart?: boolean
+  /**
+   * Instance Deploy Target
+   */
+  deployTarget?: DeployTargetRef
+  /**
+   * Instance disk size in GiB
+   *
+   * Min 10, Max 51200
+   */
+  diskSize: number
+  /**
+   * Instance Type
+   */
+  instanceType: InstanceTypeRef
+  /**
+   * VPC ip forwarding
+   */
+  ipForwarding?: boolean
+  /**
+   * Enable IPv6. DEPRECATED: use `public-ip-assignments`.
+   */
+  ipv6Enabled?: boolean
+  /**
+   * Resource labels
+   */
+  labels?: Labels
+  /**
+   * Instance name
+   *
+   * Length 1-255
+   */
+  name?: string
+  /**
+   * Assign public IP to the Instance
+   */
+  publicIPAssignment?: PublicIPAssignment
+  /**
+   * Enable secure boot
+   */
+  securebootEnabled?: boolean
+  /**
+   * Instance Security Groups
+   *
+   * Unique items
+   */
+  securityGroups?: SecurityGroupRef[]
+  /**
+   * Instance SSH Key
+   */
+  sshKey?: SSHKeyRef
+  /**
+   * Instance SSH Keys
+   *
+   * Unique items
+   */
+  sshKeys?: SSHKeyRef[]
+  /**
+   * Instance Template
+   */
+  template: TemplateRef
+  /**
+   * Enable Trusted Platform Module (TPM)
+   */
+  tpmEnabled?: boolean
+  /**
+   * Instance Cloud-init user-data (base64 encoded)
+   *
+   * Length 1-32768
+   */
+  userData?: string
+}
+/** @internal */
+export function toWireCreateInstanceRequest(v: CreateInstanceRequest): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.antiAffinityGroups !== undefined)
+    o['anti-affinity-groups'] = v.antiAffinityGroups.map((x) => toWireAntiAffinityGroupRef(x))
+  if (v.applicationConsistentSnapshotEnabled !== undefined)
+    o['application-consistent-snapshot-enabled'] = v.applicationConsistentSnapshotEnabled
+  if (v.autoStart !== undefined) o['auto-start'] = v.autoStart
+  if (v.deployTarget !== undefined) o['deploy-target'] = toWireDeployTargetRef(v.deployTarget)
+  if (v.diskSize !== undefined) o['disk-size'] = v.diskSize
+  if (v.instanceType !== undefined) o['instance-type'] = toWireInstanceTypeRef(v.instanceType)
+  if (v.ipForwarding !== undefined) o['ip-forwarding'] = v.ipForwarding
+  if (v.ipv6Enabled !== undefined) o['ipv6-enabled'] = v.ipv6Enabled
+  if (v.labels !== undefined) o['labels'] = v.labels
+  if (v.name !== undefined) o['name'] = v.name
+  if (v.publicIPAssignment !== undefined) o['public-ip-assignment'] = v.publicIPAssignment
+  if (v.securebootEnabled !== undefined) o['secureboot-enabled'] = v.securebootEnabled
+  if (v.securityGroups !== undefined)
+    o['security-groups'] = v.securityGroups.map((x) => toWireSecurityGroupRef(x))
+  if (v.sshKey !== undefined) o['ssh-key'] = toWireSSHKeyRef(v.sshKey)
+  if (v.sshKeys !== undefined) o['ssh-keys'] = v.sshKeys.map((x) => toWireSSHKeyRef(x))
+  if (v.template !== undefined) o['template'] = toWireTemplateRef(v.template)
+  if (v.tpmEnabled !== undefined) o['tpm-enabled'] = v.tpmEnabled
+  if (v.userData !== undefined) o['user-data'] = v.userData
+  return o
+}
+
+export interface CreateInstancePoolRequest {
+  /**
+   * Instance Pool Anti-affinity Groups
+   *
+   * Unique items
+   */
+  antiAffinityGroups?: AntiAffinityGroupRef[]
+  /**
+   * Enable application consistent snapshots
+   */
+  applicationConsistentSnapshotEnabled?: boolean
+  /**
+   * Deploy Target to deploy Instances on
+   */
+  deployTarget?: DeployTargetRef
+  /**
+   * Instance Pool description
+   *
+   * Max length 255
+   */
+  description?: string
+  /**
+   * Instances disk size in GiB
+   *
+   * Min 10, Max 51200
+   */
+  diskSize: number
+  /**
+   * Instances Elastic IPs
+   *
+   * Unique items
+   */
+  elasticIPS?: ElasticIPRef[]
+  /**
+   * Prefix to apply to Instances names (default: pool)
+   *
+   * Length 1-30
+   */
+  instancePrefix?: string
+  /**
+   * Instances type
+   */
+  instanceType: InstanceTypeRef
+  /**
+   * Enable IPv6. DEPRECATED: use `public-ip-assignments`.
+   */
+  ipv6Enabled?: boolean
+  /**
+   * Instance Pool Labels
+   */
+  labels?: Labels
+  /**
+   * Minimum number of running Instances
+   *
+   * Min 0
+   */
+  minAvailable?: number
+  /**
+   * Instance Pool name
+   *
+   * Length 1-255
+   */
+  name: string
+  /**
+   * Instance Pool Private Networks
+   *
+   * Unique items
+   */
+  privateNetworks?: PrivateNetworkRef[]
+  /**
+   * Determines public IP assignment of the Instances. Type `none` is final and can't be changed later on.
+   */
+  publicIPAssignment?: 'dual' | 'inet4' | 'none'
+  /**
+   * Instance Pool Security Groups
+   *
+   * Unique items
+   */
+  securityGroups?: SecurityGroupRef[]
+  /**
+   * Number of Instances
+   *
+   * Min >0
+   */
+  size: number
+  /**
+   * Instances SSH key
+   */
+  sshKey?: SSHKeyRef
+  /**
+   * Instances SSH Keys
+   *
+   * Unique items
+   */
+  sshKeys?: SSHKeyRef[]
+  /**
+   * Instances template
+   */
+  template: TemplateRef
+  /**
+   * Instances Cloud-init user-data
+   *
+   * Length 1-32768
+   */
+  userData?: string
+}
+/** @internal */
+export function toWireCreateInstancePoolRequest(
+  v: CreateInstancePoolRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.antiAffinityGroups !== undefined)
+    o['anti-affinity-groups'] = v.antiAffinityGroups.map((x) => toWireAntiAffinityGroupRef(x))
+  if (v.applicationConsistentSnapshotEnabled !== undefined)
+    o['application-consistent-snapshot-enabled'] = v.applicationConsistentSnapshotEnabled
+  if (v.deployTarget !== undefined) o['deploy-target'] = toWireDeployTargetRef(v.deployTarget)
+  if (v.description !== undefined) o['description'] = v.description
+  if (v.diskSize !== undefined) o['disk-size'] = v.diskSize
+  if (v.elasticIPS !== undefined) o['elastic-ips'] = v.elasticIPS.map((x) => toWireElasticIPRef(x))
+  if (v.instancePrefix !== undefined) o['instance-prefix'] = v.instancePrefix
+  if (v.instanceType !== undefined) o['instance-type'] = toWireInstanceTypeRef(v.instanceType)
+  if (v.ipv6Enabled !== undefined) o['ipv6-enabled'] = v.ipv6Enabled
+  if (v.labels !== undefined) o['labels'] = v.labels
+  if (v.minAvailable !== undefined) o['min-available'] = v.minAvailable
+  if (v.name !== undefined) o['name'] = v.name
+  if (v.privateNetworks !== undefined)
+    o['private-networks'] = v.privateNetworks.map((x) => toWirePrivateNetworkRef(x))
+  if (v.publicIPAssignment !== undefined) o['public-ip-assignment'] = v.publicIPAssignment
+  if (v.securityGroups !== undefined)
+    o['security-groups'] = v.securityGroups.map((x) => toWireSecurityGroupRef(x))
+  if (v.size !== undefined) o['size'] = v.size
+  if (v.sshKey !== undefined) o['ssh-key'] = toWireSSHKeyRef(v.sshKey)
+  if (v.sshKeys !== undefined) o['ssh-keys'] = v.sshKeys.map((x) => toWireSSHKeyRef(x))
+  if (v.template !== undefined) o['template'] = toWireTemplateRef(v.template)
+  if (v.userData !== undefined) o['user-data'] = v.userData
+  return o
+}
+
+export interface CreateLoadBalancerRequest {
+  /**
+   * Load Balancer address family (default: :inet4)
+   */
+  addressfamily?: 'inet4' | 'inet6'
+  /**
+   * Load Balancer description
+   *
+   * Max length 255
+   */
+  description?: string
+  /**
+   * Load balancer labels
+   */
+  labels?: Labels
+  /**
+   * Load Balancer name
+   *
+   * Length 1-255
+   */
+  name: string
+}
+/** @internal */
+export function toWireCreateLoadBalancerRequest(
+  v: CreateLoadBalancerRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.addressfamily !== undefined) o['addressfamily'] = v.addressfamily
+  if (v.description !== undefined) o['description'] = v.description
+  if (v.labels !== undefined) o['labels'] = v.labels
+  if (v.name !== undefined) o['name'] = v.name
+  return o
+}
+
+export interface CreatePrivateNetworkRequest {
+  /**
+   * Private Network description
+   *
+   * Max length 255
+   */
+  description?: string
+  /**
+   * Private Network end IP address
+   */
+  endIP?: string
+  /**
+   * Resource labels
+   */
+  labels?: Labels
+  /**
+   * Private Network name
+   *
+   * Length 1-255
+   */
+  name: string
+  /**
+   * Private Network netmask
+   */
+  netmask?: string
+  /**
+   * DHCP options
+   */
+  options?: PrivateNetworkOptions
+  /**
+   * Private Network start IP address
+   */
+  startIP?: string
+}
+/** @internal */
+export function toWireCreatePrivateNetworkRequest(
+  v: CreatePrivateNetworkRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.description !== undefined) o['description'] = v.description
+  if (v.endIP !== undefined) o['end-ip'] = v.endIP
+  if (v.labels !== undefined) o['labels'] = v.labels
+  if (v.name !== undefined) o['name'] = v.name
+  if (v.netmask !== undefined) o['netmask'] = v.netmask
+  if (v.options !== undefined) o['options'] = toWirePrivateNetworkOptions(v.options)
+  if (v.startIP !== undefined) o['start-ip'] = v.startIP
+  return o
+}
+
+export interface CreateRouteRequest {
+  subnetID: string
+  vpcID: string
+  /**
+   * Route description
+   *
+   * Max length 4096
+   */
+  description?: string
+  /**
+   * Route destination CIDR
+   */
+  destination: string
+  /**
+   * Route target
+   */
+  target: string
+}
+/** @internal */
+export function toWireCreateRouteRequest(v: CreateRouteRequest): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.description !== undefined) o['description'] = v.description
+  if (v.destination !== undefined) o['destination'] = v.destination
+  if (v.target !== undefined) o['target'] = v.target
+  return o
+}
+
+export interface CreateSecurityGroupRequest {
+  /**
+   * Security Group description
+   *
+   * Max length 255
+   */
+  description?: string
+  /**
+   * Security Group name
+   *
+   * Length 1-255
+   */
+  name: string
+}
+/** @internal */
+export function toWireCreateSecurityGroupRequest(
+  v: CreateSecurityGroupRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.description !== undefined) o['description'] = v.description
+  if (v.name !== undefined) o['name'] = v.name
+  return o
+}
+
+export interface CreateSKSClusterRequest {
+  /**
+   * Cluster addons
+   *
+   * Unique items
+   */
+  addons?: string[]
+  /**
+   * Kubernetes Audit Log Configuration
+   */
+  audit?: SKSAuditCreate
+  /**
+   * Enable auto upgrade of the control plane to the latest patch version available
+   */
+  autoUpgrade?: boolean
+  /**
+   * Cluster CNI
+   */
+  cni?: 'calico' | 'cilium'
+  /**
+   * Creates an ad-hoc security group based on the choice of the selected CNI
+   */
+  createDefaultSecurityGroup?: boolean | null
+  /**
+   * Cluster description
+   *
+   * Max length 255
+   */
+  description?: string | null
+  /**
+   * Indicates whether to deploy the Kubernetes network proxy. When unspecified, defaults to `true` unless Cilium CNI is selected
+   */
+  enableKubeProxy?: boolean
+  /**
+   * A list of Kubernetes-only Alpha features to enable for API server component
+   *
+   * Unique items
+   */
+  featureGates?: string[]
+  /**
+   * Cluster Labels
+   */
+  labels?: SKSClusterLabels
+  /**
+   * Cluster service level
+   */
+  level: 'pro' | 'starter'
+  /**
+   * Cluster name
+   *
+   * Length 1-255
+   */
+  name: string
+  /**
+   * Cluster networking configuration
+   */
+  networking?: Networking
+  /**
+   * Cluster OpenID configmap
+   */
+  oidc?: SKSOidc
+  /**
+   * Control plane Kubernetes version
+   */
+  version: string
+}
+/** @internal */
+export function toWireCreateSKSClusterRequest(v: CreateSKSClusterRequest): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.addons !== undefined) o['addons'] = v.addons
+  if (v.audit !== undefined) o['audit'] = toWireSKSAuditCreate(v.audit)
+  if (v.autoUpgrade !== undefined) o['auto-upgrade'] = v.autoUpgrade
+  if (v.cni !== undefined) o['cni'] = v.cni
+  if (v.createDefaultSecurityGroup !== undefined)
+    o['create-default-security-group'] =
+      v.createDefaultSecurityGroup === null ? null : v.createDefaultSecurityGroup
+  if (v.description !== undefined) o['description'] = v.description === null ? null : v.description
+  if (v.enableKubeProxy !== undefined) o['enable-kube-proxy'] = v.enableKubeProxy
+  if (v.featureGates !== undefined) o['feature-gates'] = v.featureGates
+  if (v.labels !== undefined) o['labels'] = v.labels
+  if (v.level !== undefined) o['level'] = v.level
+  if (v.name !== undefined) o['name'] = v.name
+  if (v.networking !== undefined) o['networking'] = toWireNetworking(v.networking)
+  if (v.oidc !== undefined) o['oidc'] = toWireSKSOidc(v.oidc)
+  if (v.version !== undefined) o['version'] = v.version
+  return o
+}
+
+export interface CreateSKSNodepoolRequest {
+  id: string
+  /**
+   * Nodepool addons
+   *
+   * Unique items
+   */
+  addons?: string[]
+  /**
+   * Nodepool Anti-affinity Groups
+   *
+   * Max items 8, Unique items
+   */
+  antiAffinityGroups?: AntiAffinityGroupRef[]
+  /**
+   * Nodepool Deploy Target
+   */
+  deployTarget?: DeployTargetRef
+  /**
+   * Nodepool description
+   *
+   * Max length 255
+   */
+  description?: string
+  /**
+   * Nodepool instances disk size in GiB
+   *
+   * Min 20, Max 51200
+   */
+  diskSize: number
+  /**
+   * Prefix to apply to instances names (default: pool), lowercase only
+   *
+   * Length 1-30
+   */
+  instancePrefix?: string
+  /**
+   * Nodepool instances type
+   */
+  instanceType: InstanceTypeRef
+  /**
+   * Kubelet image GC options
+   */
+  kubeletImageGC?: KubeletImageGC
+  /**
+   * Maximum number of pods per node (kubelet setting)
+   *
+   * Min 1, Max 65535
+   */
+  kubeletMaxPods?: number | null
+  /**
+   * Nodepool labels
+   */
+  labels?: SKSNodepoolLabels
+  /**
+   * Nodepool name, lowercase only
+   *
+   * Length 1-255
+   */
+  name: string
+  /**
+   * Nvidia MIG Profiles
+   */
+  nvidiaMigProfiles?: NvidiaMigProfiles
+  /**
+   * Nodepool Private Networks
+   *
+   * Max items 16, Unique items
+   */
+  privateNetworks?: PrivateNetworkRef[]
+  /**
+   * Configures public IP assignment of the Instances with:
+   *
+   * * IPv4 (`inet4`) addressing only (default);
+   * * both IPv4 and IPv6 (`dual`) addressing.
+   */
+  publicIPAssignment?: 'dual' | 'inet4'
+  /**
+   * Nodepool Security Groups
+   *
+   * Max items 16, Unique items
+   */
+  securityGroups?: SecurityGroupRef[]
+  /**
+   * Number of instances
+   *
+   * Min >0
+   */
+  size: number
+  /**
+   * Nodepool taints
+   */
+  taints?: SKSNodepoolTaints
+}
+/** @internal */
+export function toWireCreateSKSNodepoolRequest(
+  v: CreateSKSNodepoolRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.addons !== undefined) o['addons'] = v.addons
+  if (v.antiAffinityGroups !== undefined)
+    o['anti-affinity-groups'] = v.antiAffinityGroups.map((x) => toWireAntiAffinityGroupRef(x))
+  if (v.deployTarget !== undefined) o['deploy-target'] = toWireDeployTargetRef(v.deployTarget)
+  if (v.description !== undefined) o['description'] = v.description
+  if (v.diskSize !== undefined) o['disk-size'] = v.diskSize
+  if (v.instancePrefix !== undefined) o['instance-prefix'] = v.instancePrefix
+  if (v.instanceType !== undefined) o['instance-type'] = toWireInstanceTypeRef(v.instanceType)
+  if (v.kubeletImageGC !== undefined) o['kubelet-image-gc'] = toWireKubeletImageGC(v.kubeletImageGC)
+  if (v.kubeletMaxPods !== undefined)
+    o['kubelet-max-pods'] = v.kubeletMaxPods === null ? null : v.kubeletMaxPods
+  if (v.labels !== undefined) o['labels'] = v.labels
+  if (v.name !== undefined) o['name'] = v.name
+  if (v.nvidiaMigProfiles !== undefined)
+    o['nvidia-mig-profiles'] = toWireNvidiaMigProfiles(v.nvidiaMigProfiles)
+  if (v.privateNetworks !== undefined)
+    o['private-networks'] = v.privateNetworks.map((x) => toWirePrivateNetworkRef(x))
+  if (v.publicIPAssignment !== undefined) o['public-ip-assignment'] = v.publicIPAssignment
+  if (v.securityGroups !== undefined)
+    o['security-groups'] = v.securityGroups.map((x) => toWireSecurityGroupRef(x))
+  if (v.size !== undefined) o['size'] = v.size
+  if (v.taints !== undefined) o['taints'] = toWireSKSNodepoolTaints(v.taints)
+  return o
+}
+
+export interface CreateSnapshotRequest {
+  id: string
+}
+
+export interface CreateSubnetRequest {
+  vpcID: string
+  /**
+   * Subnet address space
+   */
+  addressSpace: 'private'
+  /**
+   * Subnet address family
+   */
+  addressfamily: 'inet4'
+  /**
+   * Subnet description
+   *
+   * Max length 4096
+   */
+  description?: string
+  /**
+   * Subnet ipv4 CIDR
+   */
+  ipv4Block?: string
+  /**
+   * Resource labels
+   */
+  labels?: Labels
+  /**
+   * Subnet name
+   *
+   * Length 1-255
+   */
+  name: string
+}
+/** @internal */
+export function toWireCreateSubnetRequest(v: CreateSubnetRequest): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.addressSpace !== undefined) o['address-space'] = v.addressSpace
+  if (v.addressfamily !== undefined) o['addressfamily'] = v.addressfamily
+  if (v.description !== undefined) o['description'] = v.description
+  if (v.ipv4Block !== undefined) o['ipv4-block'] = v.ipv4Block
+  if (v.labels !== undefined) o['labels'] = v.labels
+  if (v.name !== undefined) o['name'] = v.name
+  return o
+}
+
+export interface CreateUserRequest {
+  /**
+   * User Email
+   */
+  email: string
+  /**
+   * IAM Role
+   */
+  role?: IAMRole
+}
+/** @internal */
+export function toWireCreateUserRequest(v: CreateUserRequest): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.email !== undefined) o['email'] = v.email
+  if (v.role !== undefined) o['role'] = toWireIAMRole(v.role)
+  return o
+}
+
+export interface CreateVpcRequest {
+  /**
+   * VPC description
+   *
+   * Max length 4096
+   */
+  description?: string
+  /**
+   * Resource labels
+   */
+  labels?: Labels
+  /**
+   * VPC name
+   *
+   * Length 1-255
+   */
+  name: string
+}
+/** @internal */
+export function toWireCreateVpcRequest(v: CreateVpcRequest): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.description !== undefined) o['description'] = v.description
+  if (v.labels !== undefined) o['labels'] = v.labels
+  if (v.name !== undefined) o['name'] = v.name
+  return o
+}
+
+export interface DeleteAIAPIKeyRequest {
+  id: string
+}
+
+export interface DeleteAntiAffinityGroupRequest {
+  id: string
+}
+
+export interface DeleteAPIKeyRequest {
+  id: string
+}
+
+export interface DeleteBlockStorageSnapshotRequest {
+  id: string
+}
+
+export interface DeleteBlockStorageVolumeRequest {
+  id: string
+}
+
+export interface DeleteDBAASClickhouseRoleRequest {
+  roleUuid: string
+  serviceName: DBAASServiceName
+}
+
+export interface DeleteDBAASClickhouseUserRequest {
+  serviceName: DBAASServiceName
+  userUuid: string
+}
+
+export interface DeleteDBAASExternalEndpointDatadogRequest {
+  endpointID: string
+}
+
+export interface DeleteDBAASExternalEndpointElasticsearchRequest {
+  endpointID: string
+}
+
+export interface DeleteDBAASExternalEndpointOpensearchRequest {
+  endpointID: string
+}
+
+export interface DeleteDBAASExternalEndpointPrometheusRequest {
+  endpointID: string
+}
+
+export interface DeleteDBAASExternalEndpointRsyslogRequest {
+  endpointID: string
+}
+
+export interface DeleteDBAASIntegrationRequest {
+  id: string
+}
+
+export interface DeleteDBAASKafkaSchemaRegistryAclConfigRequest {
+  aclID: DBAASKafkaAclID
+  name: DBAASServiceName
+}
+
+export interface DeleteDBAASKafkaTopicAclConfigRequest {
+  aclID: DBAASKafkaAclID
+  name: DBAASServiceName
+}
+
+export interface DeleteDBAASKafkaUserRequest {
+  serviceName: DBAASServiceName
+  username: DBAASUserUsername
+}
+
+export interface DeleteDBAASMysqlDatabaseRequest {
+  databaseName: DBAASMysqlDatabaseName
+  serviceName: DBAASServiceName
+}
+
+export interface DeleteDBAASMysqlUserRequest {
+  serviceName: DBAASServiceName
+  username: DBAASUserUsername
+}
+
+export interface DeleteDBAASOpensearchUserRequest {
+  serviceName: DBAASServiceName
+  username: DBAASUserUsername
 }
 
 export interface DeleteDBAASPGConnectionPoolRequest {
@@ -3340,89 +3301,9 @@ export interface DeleteDBAASPGConnectionPoolRequest {
   serviceName: DBAASServiceName
 }
 
-export interface UpdateDBAASPGConnectionPoolRequest {
-  connectionPoolName: DBAASPGPoolName
-  serviceName: DBAASServiceName
-  /**
-   * Service database name
-   */
-  databaseName?: DBAASDatabaseName
-  /**
-   * PGBouncer pool mode
-   */
-  mode?: EnumPGPoolMode
-  /**
-   * Size of PGBouncer's PostgreSQL side connection pool
-   */
-  size?: DBAASPGPoolSize
-  /**
-   * Pool username
-   */
-  username?: DBAASPGPoolUsername
-}
-/** @internal */
-export function toWireUpdateDBAASPGConnectionPoolRequest(
-  v: UpdateDBAASPGConnectionPoolRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.databaseName !== undefined) o['database-name'] = v.databaseName
-  if (v.mode !== undefined) o['mode'] = v.mode
-  if (v.size !== undefined) o['size'] = v.size
-  if (v.username !== undefined) o['username'] = v.username
-  return o
-}
-
-export interface CreateDBAASPGDatabaseRequest {
-  serviceName: DBAASServiceName
-  /**
-   * Service database name
-   */
-  databaseName: DBAASDatabaseName
-  /**
-   * Default string sort order (LC_COLLATE) for PostgreSQL database
-   *
-   * Max length 128
-   */
-  lcCollate?: string
-  /**
-   * Default character classification (LC_CTYPE) for PostgreSQL database
-   *
-   * Max length 128
-   */
-  lcCtype?: string
-}
-/** @internal */
-export function toWireCreateDBAASPGDatabaseRequest(
-  v: CreateDBAASPGDatabaseRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.databaseName !== undefined) o['database-name'] = v.databaseName
-  if (v.lcCollate !== undefined) o['lc-collate'] = v.lcCollate
-  if (v.lcCtype !== undefined) o['lc-ctype'] = v.lcCtype
-  return o
-}
-
 export interface DeleteDBAASPGDatabaseRequest {
   databaseName: DBAASPGDatabaseName
   serviceName: DBAASServiceName
-}
-
-export interface CreateDBAASPostgresUserRequest {
-  serviceName: DBAASServiceName
-  allowReplication?: boolean
-  /**
-   * Username
-   */
-  username: DBAASUserUsername
-}
-/** @internal */
-export function toWireCreateDBAASPostgresUserRequest(
-  v: CreateDBAASPostgresUserRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.allowReplication !== undefined) o['allow-replication'] = v.allowReplication
-  if (v.username !== undefined) o['username'] = v.username
-  return o
 }
 
 export interface DeleteDBAASPostgresUserRequest {
@@ -3430,68 +3311,471 @@ export interface DeleteDBAASPostgresUserRequest {
   username: DBAASUserUsername
 }
 
-export interface UpdateDBAASPostgresAllowReplicationRequest {
-  serviceName: DBAASServiceName
-  username: DBAASUserUsername
-  allowReplication?: boolean
-}
-/** @internal */
-export function toWireUpdateDBAASPostgresAllowReplicationRequest(
-  v: UpdateDBAASPostgresAllowReplicationRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.allowReplication !== undefined) o['allow-replication'] = v.allowReplication
-  return o
+export interface DeleteDBAASServiceRequest {
+  name: string
 }
 
-export interface ResetDBAASPostgresUserPasswordRequest {
+export interface DeleteDBAASServiceClickhouseRequest {
+  name: string
+}
+
+export interface DeleteDBAASServiceGrafanaRequest {
+  name: string
+}
+
+export interface DeleteDBAASServiceKafkaRequest {
+  name: string
+}
+
+export interface DeleteDBAASServiceMysqlRequest {
+  name: string
+}
+
+export interface DeleteDBAASServiceOpensearchRequest {
+  name: string
+}
+
+export interface DeleteDBAASServicePGRequest {
+  name: string
+}
+
+export interface DeleteDBAASServiceThanosRequest {
+  name: string
+}
+
+export interface DeleteDBAASServiceValkeyRequest {
+  name: string
+}
+
+export interface DeleteDBAASValkeyUserRequest {
   serviceName: DBAASServiceName
   username: DBAASUserUsername
+}
+
+export interface DeleteDeploymentRequest {
+  id: string
+}
+
+export interface DeleteDNSDomainRequest {
+  id: string
+}
+
+export interface DeleteDNSDomainRecordRequest {
+  domainID: string
+  recordID: string
+}
+
+export interface DeleteElasticIPRequest {
+  id: string
+}
+
+export interface DeleteIAMRoleRequest {
+  id: string
+}
+
+export interface DeleteInstanceRequest {
+  id: string
+}
+
+export interface DeleteInstancePoolRequest {
+  id: string
+}
+
+export interface DeleteLoadBalancerRequest {
+  id: string
+}
+
+export interface DeleteLoadBalancerServiceRequest {
+  id: string
+  serviceID: string
+}
+
+export interface DeleteModelRequest {
+  id: string
+}
+
+export interface DeletePrivateNetworkRequest {
+  id: string
+}
+
+export interface DeleteReverseDNSElasticIPRequest {
+  id: string
+}
+
+export interface DeleteReverseDNSInstanceRequest {
+  id: string
+}
+
+export interface DeleteRouteRequest {
+  id: string
+  subnetID: string
+  vpcID: string
+}
+
+export interface DeleteRuleFromSecurityGroupRequest {
+  id: string
+  ruleID: string
+}
+
+export interface DeleteSecurityGroupRequest {
+  id: string
+}
+
+export interface DeleteSKSClusterRequest {
+  id: string
+}
+
+export interface DeleteSKSNodepoolRequest {
+  id: string
+  sksNodepoolID: string
+}
+
+export interface DeleteSnapshotRequest {
+  id: string
+}
+
+export interface DeleteSSHKeyRequest {
+  name: string
+}
+
+export interface DeleteSubnetRequest {
+  id: string
+  vpcID: string
+}
+
+export interface DeleteTemplateRequest {
+  id: string
+}
+
+export interface DeleteUserRequest {
+  id: string
+}
+
+export interface DeleteVpcRequest {
+  id: string
+}
+
+export interface DetachBlockStorageVolumeRequest {
+  id: string
+}
+
+export interface DetachDBAASServiceFromEndpointRequest {
+  sourceServiceName: DBAASServiceName
   /**
-   * New password
+   * External Integration ID
    */
-  password?: DBAASUserPassword
+  integrationID: string
 }
 /** @internal */
-export function toWireResetDBAASPostgresUserPasswordRequest(
-  v: ResetDBAASPostgresUserPasswordRequest,
+export function toWireDetachDBAASServiceFromEndpointRequest(
+  v: DetachDBAASServiceFromEndpointRequest,
 ): Record<string, unknown> {
   const o: Record<string, unknown> = {}
-  if (v.password !== undefined) o['password'] = v.password
+  if (v.integrationID !== undefined) o['integration-id'] = v.integrationID
   return o
 }
 
-export interface RevealDBAASPostgresUserPasswordRequest {
-  serviceName: DBAASServiceName
-  username: DBAASUserUsername
-}
-
-export interface CreateDBAASPGUpgradeCheckRequest {
-  service: DBAASServiceName
+export interface DetachInstanceFromElasticIPRequest {
+  id: string
   /**
-   * Target version for upgrade
+   * Compute instance
    */
-  targetVersion: DBAASPGTargetVersions
+  instance: InstanceRef
 }
 /** @internal */
-export function toWireCreateDBAASPGUpgradeCheckRequest(
-  v: CreateDBAASPGUpgradeCheckRequest,
+export function toWireDetachInstanceFromElasticIPRequest(
+  v: DetachInstanceFromElasticIPRequest,
 ): Record<string, unknown> {
   const o: Record<string, unknown> = {}
-  if (v.targetVersion !== undefined) o['target-version'] = v.targetVersion
+  if (v.instance !== undefined) o['instance'] = toWireInstanceRef(v.instance)
   return o
 }
 
-export interface ListDBAASServicesResponse {
-  dbaasServices?: DBAASServiceCommon[]
+export interface DetachInstanceFromPrivateNetworkRequest {
+  id: string
+  /**
+   * Compute instance
+   */
+  instance: Instance
+}
+/** @internal */
+export function toWireDetachInstanceFromPrivateNetworkRequest(
+  v: DetachInstanceFromPrivateNetworkRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.instance !== undefined) o['instance'] = toWireInstance(v.instance)
+  return o
+}
+
+export interface DetachInstanceFromSecurityGroupRequest {
+  id: string
+  /**
+   * Compute instance
+   */
+  instance: Instance
+}
+/** @internal */
+export function toWireDetachInstanceFromSecurityGroupRequest(
+  v: DetachInstanceFromSecurityGroupRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.instance !== undefined) o['instance'] = toWireInstance(v.instance)
+  return o
+}
+
+export interface DetachInstanceFromSubnetRequest {
+  subnetID: string
+  vpcID: string
+  /**
+   * Compute instance
+   */
+  instance: InstanceRef
+}
+/** @internal */
+export function toWireDetachInstanceFromSubnetRequest(
+  v: DetachInstanceFromSubnetRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.instance !== undefined) o['instance'] = toWireInstanceRef(v.instance)
+  return o
+}
+
+export interface DisableKmsKeyRequest {
+  id: string
+}
+
+export interface DisableKmsKeyRotationRequest {
+  id: string
+}
+
+export interface EnableDBAASMysqlWritesRequest {
+  name: DBAASServiceName
+}
+
+export interface EnableKmsKeyRequest {
+  id: string
+}
+
+export interface EnableTpmRequest {
+  id: string
+}
+
+export interface EvictInstancePoolMembersRequest {
+  id: string
+  instances?: string[]
+}
+/** @internal */
+export function toWireEvictInstancePoolMembersRequest(
+  v: EvictInstancePoolMembersRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.instances !== undefined) o['instances'] = v.instances
+  return o
+}
+
+export interface EvictSKSNodepoolMembersRequest {
+  id: string
+  sksNodepoolID: string
+  /**
+   * Unique items
+   */
+  instances?: string[]
+}
+/** @internal */
+export function toWireEvictSKSNodepoolMembersRequest(
+  v: EvictSKSNodepoolMembersRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.instances !== undefined) o['instances'] = v.instances
+  return o
+}
+
+export interface ExportSnapshotRequest {
+  id: string
+}
+
+export interface GenerateSKSClusterKubeconfigResponse {
+  kubeconfig?: string
 }
 
 /** @internal */
-export function fromWireListDBAASServicesResponse(w: any): ListDBAASServicesResponse {
-  const v = {} as ListDBAASServicesResponse
-  if (w['dbaas-services'] !== undefined)
-    v.dbaasServices = (w['dbaas-services'] as any[]).map((x) => fromWireDBAASServiceCommon(x))
+export function fromWireGenerateSKSClusterKubeconfigResponse(
+  w: any,
+): GenerateSKSClusterKubeconfigResponse {
+  const v = {} as GenerateSKSClusterKubeconfigResponse
+  if (w['kubeconfig'] !== undefined) v.kubeconfig = w['kubeconfig']
   return v
+}
+
+export interface GenerateSKSKarpenterExoscaleNodeclassRequest {
+  id: string
+}
+export interface GenerateSKSKarpenterExoscaleNodeclassResponse {
+  exoscaleNodeclass?: string
+}
+
+/** @internal */
+export function fromWireGenerateSKSKarpenterExoscaleNodeclassResponse(
+  w: any,
+): GenerateSKSKarpenterExoscaleNodeclassResponse {
+  const v = {} as GenerateSKSKarpenterExoscaleNodeclassResponse
+  if (w['exoscale-nodeclass'] !== undefined) v.exoscaleNodeclass = w['exoscale-nodeclass']
+  return v
+}
+
+export interface GenerateSKSKarpenterNodepoolRequest {
+  id: string
+}
+export interface GenerateSKSKarpenterNodepoolResponse {
+  nodepool?: string
+}
+
+/** @internal */
+export function fromWireGenerateSKSKarpenterNodepoolResponse(
+  w: any,
+): GenerateSKSKarpenterNodepoolResponse {
+  const v = {} as GenerateSKSKarpenterNodepoolResponse
+  if (w['nodepool'] !== undefined) v.nodepool = w['nodepool']
+  return v
+}
+
+export interface GetActiveNodepoolTemplateRequest {
+  kubeVersion: string
+  variant: 'nvidia' | 'standard'
+}
+export interface GetActiveNodepoolTemplateResponse {
+  activeTemplate?: string
+}
+
+/** @internal */
+export function fromWireGetActiveNodepoolTemplateResponse(
+  w: any,
+): GetActiveNodepoolTemplateResponse {
+  const v = {} as GetActiveNodepoolTemplateResponse
+  if (w['active-template'] !== undefined) v.activeTemplate = w['active-template']
+  return v
+}
+
+export interface GetAIAPIKeyRequest {
+  id: string
+}
+
+export interface GetAntiAffinityGroupRequest {
+  id: string
+}
+
+export interface GetAPIKeyRequest {
+  id: string
+}
+
+export interface GetBlockStorageSnapshotRequest {
+  id: string
+}
+
+export interface GetBlockStorageVolumeRequest {
+  id: string
+}
+
+export interface GetConsoleProxyURLRequest {
+  id: string
+}
+export interface GetConsoleProxyURLResponse {
+  host?: string
+  path?: string
+  url?: string
+}
+
+/** @internal */
+export function fromWireGetConsoleProxyURLResponse(w: any): GetConsoleProxyURLResponse {
+  const v = {} as GetConsoleProxyURLResponse
+  if (w['host'] !== undefined) v.host = w['host']
+  if (w['path'] !== undefined) v.path = w['path']
+  if (w['url'] !== undefined) v.url = w['url']
+  return v
+}
+
+export interface GetDBAASCACertificateResponse {
+  certificate?: string
+}
+
+/** @internal */
+export function fromWireGetDBAASCACertificateResponse(w: any): GetDBAASCACertificateResponse {
+  const v = {} as GetDBAASCACertificateResponse
+  if (w['certificate'] !== undefined) v.certificate = w['certificate']
+  return v
+}
+
+export interface GetDBAASClickhouseAclConfigRequest {
+  serviceName: DBAASServiceName
+}
+
+export interface GetDBAASExternalEndpointDatadogRequest {
+  endpointID: string
+}
+
+export interface GetDBAASExternalEndpointElasticsearchRequest {
+  endpointID: string
+}
+
+export interface GetDBAASExternalEndpointOpensearchRequest {
+  endpointID: string
+}
+
+export interface GetDBAASExternalEndpointPrometheusRequest {
+  endpointID: string
+}
+
+export interface GetDBAASExternalEndpointRsyslogRequest {
+  endpointID: string
+}
+
+export interface GetDBAASExternalIntegrationRequest {
+  integrationID: string
+}
+
+export interface GetDBAASExternalIntegrationSettingsDatadogRequest {
+  integrationID: string
+}
+export interface GetDBAASExternalIntegrationSettingsDatadogResponse {
+  settings?: DBAASIntegrationSettingsDatadog
+}
+
+/** @internal */
+export function fromWireGetDBAASExternalIntegrationSettingsDatadogResponse(
+  w: any,
+): GetDBAASExternalIntegrationSettingsDatadogResponse {
+  const v = {} as GetDBAASExternalIntegrationSettingsDatadogResponse
+  if (w['settings'] !== undefined)
+    v.settings = fromWireDBAASIntegrationSettingsDatadog(w['settings'])
+  return v
+}
+
+export interface GetDBAASIntegrationRequest {
+  id: string
+}
+
+export interface GetDBAASKafkaAclConfigRequest {
+  name: DBAASServiceName
+}
+
+export interface GetDBAASMigrationStatusRequest {
+  name: DBAASServiceName
+}
+
+export interface GetDBAASOpensearchAclConfigRequest {
+  name: DBAASServiceName
+}
+
+export interface GetDBAASServiceClickhouseRequest {
+  name: DBAASServiceName
+}
+
+export interface GetDBAASServiceGrafanaRequest {
+  name: DBAASServiceName
+}
+
+export interface GetDBAASServiceKafkaRequest {
+  name: DBAASServiceName
 }
 
 export interface GetDBAASServiceLogsRequest {
@@ -3548,26 +3832,28 @@ export function fromWireGetDBAASServiceMetricsResponse(w: any): GetDBAASServiceM
   return v
 }
 
-export interface ListDBAASServiceTypesResponse {
-  dbaasServiceTypes?: DBAASServiceType[]
+export interface GetDBAASServiceMysqlRequest {
+  name: DBAASServiceName
 }
 
-/** @internal */
-export function fromWireListDBAASServiceTypesResponse(w: any): ListDBAASServiceTypesResponse {
-  const v = {} as ListDBAASServiceTypesResponse
-  if (w['dbaas-service-types'] !== undefined)
-    v.dbaasServiceTypes = (w['dbaas-service-types'] as any[]).map((x) =>
-      fromWireDBAASServiceType(x),
-    )
-  return v
+export interface GetDBAASServiceOpensearchRequest {
+  name: DBAASServiceName
+}
+
+export interface GetDBAASServicePGRequest {
+  name: DBAASServiceName
+}
+
+export interface GetDBAASServiceThanosRequest {
+  name: DBAASServiceName
 }
 
 export interface GetDBAASServiceTypeRequest {
   serviceTypeName: string
 }
 
-export interface DeleteDBAASServiceRequest {
-  name: string
+export interface GetDBAASServiceValkeyRequest {
+  name: DBAASServiceName
 }
 
 /**
@@ -4143,53 +4429,1710 @@ export function fromWireGetDBAASSettingsValkeyResponse(w: any): GetDBAASSettings
   return v
 }
 
-export interface CreateDBAASTaskMigrationCheckRequest {
-  service: DBAASServiceName
-  /**
-   * Comma-separated list of databases, which should be ignored during migration (supported by MySQL only at the moment)
-   *
-   * Length 1-2048
-   */
-  ignoreDbs?: string
-  /**
-   * The migration method to be used (currently supported only by MySQL service type)
-   */
-  method?: EnumMigrationMethod
-  /**
-   * Service URI of the source MySQL or PostgreSQL database with admin credentials.
-   *
-   * Length 1-512
-   */
-  sourceServiceURI: string
-}
-/** @internal */
-export function toWireCreateDBAASTaskMigrationCheckRequest(
-  v: CreateDBAASTaskMigrationCheckRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.ignoreDbs !== undefined) o['ignore-dbs'] = v.ignoreDbs
-  if (v.method !== undefined) o['method'] = v.method
-  if (v.sourceServiceURI !== undefined) o['source-service-uri'] = v.sourceServiceURI
-  return o
-}
-
 export interface GetDBAASTaskRequest {
   id: string
   service: DBAASServiceName
 }
 
-export interface DeleteDBAASServiceThanosRequest {
+export interface GetDeployTargetRequest {
+  id: string
+}
+
+export interface GetDeploymentRequest {
+  id: string
+}
+
+export interface GetDeploymentLogsRequest {
+  id: string
+  stream?: boolean
+  tail?: number
+}
+
+export interface GetDNSDomainRequest {
+  id: string
+}
+
+export interface GetDNSDomainRecordRequest {
+  domainID: string
+  recordID: string
+}
+
+export interface GetDNSDomainZoneFileRequest {
+  id: string
+}
+export interface GetDNSDomainZoneFileResponse {
+  zoneFile?: string
+}
+
+/** @internal */
+export function fromWireGetDNSDomainZoneFileResponse(w: any): GetDNSDomainZoneFileResponse {
+  const v = {} as GetDNSDomainZoneFileResponse
+  if (w['zone-file'] !== undefined) v.zoneFile = w['zone-file']
+  return v
+}
+
+export interface GetElasticIPRequest {
+  id: string
+}
+
+export interface GetEnvImpactRequest {
+  period: string
+}
+
+export interface GetIAMRoleRequest {
+  id: string
+}
+
+export interface GetImpactEstimateRequest {
+  /**
+   * Product-specific configuration details
+   */
+  metadata?: Record<string, unknown>
+  /**
+   * Product SKU, e.g. compute:ch-gva-2:instance:standard:medium; can also include wildcards, e.g. compute:\*:instance:standard:\* for all standard instances in all zones
+   */
+  sku: string
+}
+/** @internal */
+export function toWireGetImpactEstimateRequest(
+  v: GetImpactEstimateRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.metadata !== undefined) o['metadata'] = v.metadata
+  if (v.sku !== undefined) o['sku'] = v.sku
+  return o
+}
+export type GetImpactEstimateResponseImpact = Record<string, ImpactValueWithUnit>
+
+/** @internal */
+export function fromWireGetImpactEstimateResponseImpact(w: any): GetImpactEstimateResponseImpact {
+  return Object.fromEntries(
+    Object.entries(w ?? {}).map(([k, x]) => [k, fromWireImpactValueWithUnit(x)]),
+  )
+}
+export interface GetImpactEstimateResponse {
+  /**
+   * Map of SKUs to their different impact indicators
+   */
+  impact: Record<string, GetImpactEstimateResponseImpact>
+}
+
+/** @internal */
+export function fromWireGetImpactEstimateResponse(w: any): GetImpactEstimateResponse {
+  const v = {} as GetImpactEstimateResponse
+  v.impact = Object.fromEntries(
+    Object.entries(w['impact'] ?? {}).map(([k, val]) => [
+      k,
+      fromWireGetImpactEstimateResponseImpact(val),
+    ]),
+  )
+  return v
+}
+
+export interface GetImpactReportRequest {
+  from?: string
+  to?: string
+}
+
+export interface GetInferenceEngineHelpRequest {
+  version?: string
+}
+
+export interface GetInstanceRequest {
+  id: string
+}
+
+export interface GetInstancePoolRequest {
+  id: string
+}
+
+export interface GetInstanceTypeRequest {
+  id: string
+}
+
+export interface GetKmsKeyRequest {
+  id: string
+}
+
+export interface GetLoadBalancerRequest {
+  id: string
+}
+
+export interface GetLoadBalancerServiceRequest {
+  id: string
+  serviceID: string
+}
+
+export interface GetModelRequest {
+  id: string
+}
+
+export interface GetOperationRequest {
+  id: string
+}
+
+export interface GetPrivateNetworkRequest {
+  id: string
+}
+
+export interface GetQuotaRequest {
+  entity: string
+}
+
+export interface GetReverseDNSElasticIPRequest {
+  id: string
+}
+
+export interface GetReverseDNSInstanceRequest {
+  id: string
+}
+
+export interface GetSecurityGroupRequest {
+  id: string
+}
+
+export interface GetSKSClusterRequest {
+  id: string
+}
+
+export interface GetSKSClusterAuthorityCertRequest {
+  authority: 'aggregation' | 'control-plane' | 'kubelet'
+  id: string
+}
+export interface GetSKSClusterAuthorityCertResponse {
+  cacert?: string
+}
+
+/** @internal */
+export function fromWireGetSKSClusterAuthorityCertResponse(
+  w: any,
+): GetSKSClusterAuthorityCertResponse {
+  const v = {} as GetSKSClusterAuthorityCertResponse
+  if (w['cacert'] !== undefined) v.cacert = w['cacert']
+  return v
+}
+
+export interface GetSKSClusterInspectionRequest {
+  id: string
+}
+export type GetSKSClusterInspectionResponse = Record<string, unknown>
+
+export interface GetSKSNodepoolRequest {
+  id: string
+  sksNodepoolID: string
+}
+
+export interface GetSnapshotRequest {
+  id: string
+}
+
+export interface GetSOSPresignedURLRequest {
+  bucket: string
+  key?: string
+}
+export interface GetSOSPresignedURLResponse {
+  url?: string
+}
+
+/** @internal */
+export function fromWireGetSOSPresignedURLResponse(w: any): GetSOSPresignedURLResponse {
+  const v = {} as GetSOSPresignedURLResponse
+  if (w['url'] !== undefined) v.url = w['url']
+  return v
+}
+
+export interface GetSSHKeyRequest {
   name: string
 }
 
-export interface GetDBAASServiceThanosRequest {
+export interface GetSubnetRequest {
+  id: string
+  vpcID: string
+}
+
+export interface GetTemplateRequest {
+  id: string
+}
+
+export interface GetUsageReportRequest {
+  period?: string
+}
+/**
+ * Usage
+ */
+export interface GetUsageReportResponseUsage {
+  /**
+   * Description
+   *
+   * Read-only
+   */
+  description?: string
+  /**
+   * Period Start Date
+   *
+   * Read-only
+   */
+  from?: string
+  /**
+   * Product
+   *
+   * Read-only
+   */
+  product?: string
+  /**
+   * Quantity
+   *
+   * Read-only
+   */
+  quantity?: string
+  /**
+   * Period End Date
+   *
+   * Read-only
+   */
+  to?: string
+  /**
+   * Unit
+   *
+   * Read-only
+   */
+  unit?: string
+  /**
+   * Variable
+   *
+   * Read-only
+   */
+  variable?: string
+}
+
+/** @internal */
+export function fromWireGetUsageReportResponseUsage(w: any): GetUsageReportResponseUsage {
+  const v = {} as GetUsageReportResponseUsage
+  if (w['description'] !== undefined) v.description = w['description']
+  if (w['from'] !== undefined) v.from = w['from']
+  if (w['product'] !== undefined) v.product = w['product']
+  if (w['quantity'] !== undefined) v.quantity = w['quantity']
+  if (w['to'] !== undefined) v.to = w['to']
+  if (w['unit'] !== undefined) v.unit = w['unit']
+  if (w['variable'] !== undefined) v.variable = w['variable']
+  return v
+}
+export interface GetUsageReportResponse {
+  usage?: GetUsageReportResponseUsage[]
+}
+
+/** @internal */
+export function fromWireGetUsageReportResponse(w: any): GetUsageReportResponse {
+  const v = {} as GetUsageReportResponse
+  if (w['usage'] !== undefined)
+    v.usage = (w['usage'] as any[]).map((x) => fromWireGetUsageReportResponseUsage(x))
+  return v
+}
+
+export interface GetVpcRequest {
+  id: string
+}
+
+export interface ListAntiAffinityGroupsResponse {
+  antiAffinityGroups?: AntiAffinityGroup[]
+}
+
+/** @internal */
+export function fromWireListAntiAffinityGroupsResponse(w: any): ListAntiAffinityGroupsResponse {
+  const v = {} as ListAntiAffinityGroupsResponse
+  if (w['anti-affinity-groups'] !== undefined)
+    v.antiAffinityGroups = (w['anti-affinity-groups'] as any[]).map((x) =>
+      fromWireAntiAffinityGroup(x),
+    )
+  return v
+}
+
+export interface ListAPIKeysResponse {
+  apiKeys?: IAMAPIKey[]
+}
+
+/** @internal */
+export function fromWireListAPIKeysResponse(w: any): ListAPIKeysResponse {
+  const v = {} as ListAPIKeysResponse
+  if (w['api-keys'] !== undefined)
+    v.apiKeys = (w['api-keys'] as any[]).map((x) => fromWireIAMAPIKey(x))
+  return v
+}
+
+export interface ListBlockStorageSnapshotsResponse {
+  blockStorageSnapshots?: BlockStorageSnapshot[]
+}
+
+/** @internal */
+export function fromWireListBlockStorageSnapshotsResponse(
+  w: any,
+): ListBlockStorageSnapshotsResponse {
+  const v = {} as ListBlockStorageSnapshotsResponse
+  if (w['block-storage-snapshots'] !== undefined)
+    v.blockStorageSnapshots = (w['block-storage-snapshots'] as any[]).map((x) =>
+      fromWireBlockStorageSnapshot(x),
+    )
+  return v
+}
+
+export interface ListBlockStorageVolumesRequest {
+  instanceID?: string
+}
+export interface ListBlockStorageVolumesResponse {
+  blockStorageVolumes?: BlockStorageVolume[]
+}
+
+/** @internal */
+export function fromWireListBlockStorageVolumesResponse(w: any): ListBlockStorageVolumesResponse {
+  const v = {} as ListBlockStorageVolumesResponse
+  if (w['block-storage-volumes'] !== undefined)
+    v.blockStorageVolumes = (w['block-storage-volumes'] as any[]).map((x) =>
+      fromWireBlockStorageVolume(x),
+    )
+  return v
+}
+
+export interface ListDBAASClickhouseRolesRequest {
+  serviceName: DBAASServiceName
+}
+
+export interface ListDBAASClickhouseUsersRequest {
+  serviceName: DBAASServiceName
+}
+
+export interface ListDBAASExternalEndpointTypesResponseEndpointTypes {
+  serviceTypes?: string[]
+  title?: string
+  type?: EnumExternalEndpointTypes
+}
+
+/** @internal */
+export function fromWireListDBAASExternalEndpointTypesResponseEndpointTypes(
+  w: any,
+): ListDBAASExternalEndpointTypesResponseEndpointTypes {
+  const v = {} as ListDBAASExternalEndpointTypesResponseEndpointTypes
+  if (w['service-types'] !== undefined) v.serviceTypes = w['service-types']
+  if (w['title'] !== undefined) v.title = w['title']
+  if (w['type'] !== undefined) v.type = w['type']
+  return v
+}
+export interface ListDBAASExternalEndpointTypesResponse {
+  endpointTypes?: ListDBAASExternalEndpointTypesResponseEndpointTypes[]
+}
+
+/** @internal */
+export function fromWireListDBAASExternalEndpointTypesResponse(
+  w: any,
+): ListDBAASExternalEndpointTypesResponse {
+  const v = {} as ListDBAASExternalEndpointTypesResponse
+  if (w['endpoint-types'] !== undefined)
+    v.endpointTypes = (w['endpoint-types'] as any[]).map((x) =>
+      fromWireListDBAASExternalEndpointTypesResponseEndpointTypes(x),
+    )
+  return v
+}
+
+export interface ListDBAASExternalEndpointsResponse {
+  dbaasEndpoints?: DBAASExternalEndpoint[]
+}
+
+/** @internal */
+export function fromWireListDBAASExternalEndpointsResponse(
+  w: any,
+): ListDBAASExternalEndpointsResponse {
+  const v = {} as ListDBAASExternalEndpointsResponse
+  if (w['dbaas-endpoints'] !== undefined)
+    v.dbaasEndpoints = (w['dbaas-endpoints'] as any[]).map((x) => fromWireDBAASExternalEndpoint(x))
+  return v
+}
+
+export interface ListDBAASExternalIntegrationsRequest {
+  serviceName: DBAASServiceName
+}
+export interface ListDBAASExternalIntegrationsResponse {
+  externalIntegrations?: DBAASExternalIntegration[]
+}
+
+/** @internal */
+export function fromWireListDBAASExternalIntegrationsResponse(
+  w: any,
+): ListDBAASExternalIntegrationsResponse {
+  const v = {} as ListDBAASExternalIntegrationsResponse
+  if (w['external-integrations'] !== undefined)
+    v.externalIntegrations = (w['external-integrations'] as any[]).map((x) =>
+      fromWireDBAASExternalIntegration(x),
+    )
+  return v
+}
+
+export interface ListDBAASIntegrationSettingsRequest {
+  destType: string
+  integrationType: string
+  sourceType: string
+}
+/**
+ * The JSON schema representing the settings for the given integration type, source, and destination service types.
+ */
+export interface ListDBAASIntegrationSettingsResponseSettings {
+  additionalproperties?: boolean
+  properties?: Record<string, unknown>
+  title?: string
+  type?: string
+}
+
+/** @internal */
+export function fromWireListDBAASIntegrationSettingsResponseSettings(
+  w: any,
+): ListDBAASIntegrationSettingsResponseSettings {
+  const v = {} as ListDBAASIntegrationSettingsResponseSettings
+  if (w['additionalProperties'] !== undefined) v.additionalproperties = w['additionalProperties']
+  if (w['properties'] !== undefined) v.properties = w['properties']
+  if (w['title'] !== undefined) v.title = w['title']
+  if (w['type'] !== undefined) v.type = w['type']
+  return v
+}
+export interface ListDBAASIntegrationSettingsResponse {
+  /**
+   * The JSON schema representing the settings for the given integration type, source, and destination service types.
+   */
+  settings?: ListDBAASIntegrationSettingsResponseSettings
+}
+
+/** @internal */
+export function fromWireListDBAASIntegrationSettingsResponse(
+  w: any,
+): ListDBAASIntegrationSettingsResponse {
+  const v = {} as ListDBAASIntegrationSettingsResponse
+  if (w['settings'] !== undefined)
+    v.settings = fromWireListDBAASIntegrationSettingsResponseSettings(w['settings'])
+  return v
+}
+
+export interface ListDBAASIntegrationTypesResponse {
+  dbaasIntegrationTypes?: DBAASIntegrationType[]
+}
+
+/** @internal */
+export function fromWireListDBAASIntegrationTypesResponse(
+  w: any,
+): ListDBAASIntegrationTypesResponse {
+  const v = {} as ListDBAASIntegrationTypesResponse
+  if (w['dbaas-integration-types'] !== undefined)
+    v.dbaasIntegrationTypes = (w['dbaas-integration-types'] as any[]).map((x) =>
+      fromWireDBAASIntegrationType(x),
+    )
+  return v
+}
+
+export interface ListDBAASServiceTypesResponse {
+  dbaasServiceTypes?: DBAASServiceType[]
+}
+
+/** @internal */
+export function fromWireListDBAASServiceTypesResponse(w: any): ListDBAASServiceTypesResponse {
+  const v = {} as ListDBAASServiceTypesResponse
+  if (w['dbaas-service-types'] !== undefined)
+    v.dbaasServiceTypes = (w['dbaas-service-types'] as any[]).map((x) =>
+      fromWireDBAASServiceType(x),
+    )
+  return v
+}
+
+export interface ListDBAASServicesResponse {
+  dbaasServices?: DBAASServiceCommon[]
+}
+
+/** @internal */
+export function fromWireListDBAASServicesResponse(w: any): ListDBAASServicesResponse {
+  const v = {} as ListDBAASServicesResponse
+  if (w['dbaas-services'] !== undefined)
+    v.dbaasServices = (w['dbaas-services'] as any[]).map((x) => fromWireDBAASServiceCommon(x))
+  return v
+}
+
+export interface ListDBAASValkeyUsersRequest {
+  serviceName: DBAASServiceName
+}
+
+export interface ListDeployTargetsResponse {
+  deployTargets?: DeployTarget[]
+}
+
+/** @internal */
+export function fromWireListDeployTargetsResponse(w: any): ListDeployTargetsResponse {
+  const v = {} as ListDeployTargetsResponse
+  if (w['deploy-targets'] !== undefined)
+    v.deployTargets = (w['deploy-targets'] as any[]).map((x) => fromWireDeployTarget(x))
+  return v
+}
+
+export interface ListDeploymentsRequest {
+  visibility?: string
+}
+
+export interface ListDNSDomainRecordsRequest {
+  domainID: string
+}
+export interface ListDNSDomainRecordsResponse {
+  dnsDomainRecords?: DNSDomainRecord[]
+}
+
+/** @internal */
+export function fromWireListDNSDomainRecordsResponse(w: any): ListDNSDomainRecordsResponse {
+  const v = {} as ListDNSDomainRecordsResponse
+  if (w['dns-domain-records'] !== undefined)
+    v.dnsDomainRecords = (w['dns-domain-records'] as any[]).map((x) => fromWireDNSDomainRecord(x))
+  return v
+}
+
+export interface ListDNSDomainsResponse {
+  dnsDomains?: DNSDomain[]
+}
+
+/** @internal */
+export function fromWireListDNSDomainsResponse(w: any): ListDNSDomainsResponse {
+  const v = {} as ListDNSDomainsResponse
+  if (w['dns-domains'] !== undefined)
+    v.dnsDomains = (w['dns-domains'] as any[]).map((x) => fromWireDNSDomain(x))
+  return v
+}
+
+export interface ListElasticIPSResponse {
+  elasticIPS?: ElasticIP[]
+}
+
+/** @internal */
+export function fromWireListElasticIPSResponse(w: any): ListElasticIPSResponse {
+  const v = {} as ListElasticIPSResponse
+  if (w['elastic-ips'] !== undefined)
+    v.elasticIPS = (w['elastic-ips'] as any[]).map((x) => fromWireElasticIP(x))
+  return v
+}
+
+export interface ListEventsRequest {
+  from?: Date
+  to?: Date
+}
+
+export interface ListIAMRolesResponse {
+  iamRoles?: IAMRole[]
+}
+
+/** @internal */
+export function fromWireListIAMRolesResponse(w: any): ListIAMRolesResponse {
+  const v = {} as ListIAMRolesResponse
+  if (w['iam-roles'] !== undefined)
+    v.iamRoles = (w['iam-roles'] as any[]).map((x) => fromWireIAMRole(x))
+  return v
+}
+
+export interface ListInstancePoolsResponse {
+  instancePools?: InstancePool[]
+}
+
+/** @internal */
+export function fromWireListInstancePoolsResponse(w: any): ListInstancePoolsResponse {
+  const v = {} as ListInstancePoolsResponse
+  if (w['instance-pools'] !== undefined)
+    v.instancePools = (w['instance-pools'] as any[]).map((x) => fromWireInstancePool(x))
+  return v
+}
+
+export interface ListInstanceTypesResponse {
+  instanceTypes?: InstanceType[]
+}
+
+/** @internal */
+export function fromWireListInstanceTypesResponse(w: any): ListInstanceTypesResponse {
+  const v = {} as ListInstanceTypesResponse
+  if (w['instance-types'] !== undefined)
+    v.instanceTypes = (w['instance-types'] as any[]).map((x) => fromWireInstanceType(x))
+  return v
+}
+
+export interface ListInstancesRequest {
+  ipAddress?: string
+  labels?: string
+  managerID?: string
+  managerType?: 'instance-pool'
+}
+/**
+ * Private Network
+ */
+export interface ListInstancesResponseInstancesPrivateNetworks {
+  /**
+   * Private Network ID
+   */
+  id?: string
+  /**
+   * Private Network MAC address
+   */
+  macAddress?: string
+}
+
+/** @internal */
+export function fromWireListInstancesResponseInstancesPrivateNetworks(
+  w: any,
+): ListInstancesResponseInstancesPrivateNetworks {
+  const v = {} as ListInstancesResponseInstancesPrivateNetworks
+  if (w['id'] !== undefined) v.id = w['id']
+  if (w['mac-address'] !== undefined) v.macAddress = w['mac-address']
+  return v
+}
+
+/**
+ * Instance
+ */
+export interface ListInstancesResponseInstances {
+  /**
+   * Instance creation date
+   */
+  createdAT?: Date
+  /**
+   * Instance ID
+   */
+  id?: string
+  /**
+   * Instance Type
+   */
+  instanceType?: InstanceType
+  /**
+   * Instance IPv6 address
+   */
+  ipv6Address?: string
+  /**
+   * Resource labels
+   */
+  labels?: Labels
+  /**
+   * Instance MAC address
+   */
+  macAddress?: string
+  /**
+   * Instance manager
+   */
+  manager?: Manager
+  /**
+   * Instance name
+   *
+   * Length 1-255
+   */
+  name?: string
+  /**
+   * Instance Private Networks
+   */
+  privateNetworks?: ListInstancesResponseInstancesPrivateNetworks[]
+  /**
+   * Instance public IPv4 address
+   */
+  publicIP?: string
+  /**
+   * Instance public IP assignment
+   */
+  publicIPAssignment?: PublicIPAssignment
+  /**
+   * Instance Security Groups
+   */
+  securityGroups?: SecurityGroup[]
+  /**
+   * Instance SSH Key
+   */
+  sshKey?: SSHKey
+  /**
+   * Instance SSH Keys
+   */
+  sshKeys?: SSHKey[]
+  /**
+   * Instance state
+   */
+  state?: InstanceState
+  /**
+   * Instance Template
+   */
+  template?: Template
+}
+
+/** @internal */
+export function fromWireListInstancesResponseInstances(w: any): ListInstancesResponseInstances {
+  const v = {} as ListInstancesResponseInstances
+  if (w['created-at'] !== undefined) v.createdAT = new Date(w['created-at'])
+  if (w['id'] !== undefined) v.id = w['id']
+  if (w['instance-type'] !== undefined) v.instanceType = fromWireInstanceType(w['instance-type'])
+  if (w['ipv6-address'] !== undefined) v.ipv6Address = w['ipv6-address']
+  if (w['labels'] !== undefined) v.labels = w['labels']
+  if (w['mac-address'] !== undefined) v.macAddress = w['mac-address']
+  if (w['manager'] !== undefined) v.manager = fromWireManager(w['manager'])
+  if (w['name'] !== undefined) v.name = w['name']
+  if (w['private-networks'] !== undefined)
+    v.privateNetworks = (w['private-networks'] as any[]).map((x) =>
+      fromWireListInstancesResponseInstancesPrivateNetworks(x),
+    )
+  if (w['public-ip'] !== undefined) v.publicIP = w['public-ip']
+  if (w['public-ip-assignment'] !== undefined) v.publicIPAssignment = w['public-ip-assignment']
+  if (w['security-groups'] !== undefined)
+    v.securityGroups = (w['security-groups'] as any[]).map((x) => fromWireSecurityGroup(x))
+  if (w['ssh-key'] !== undefined) v.sshKey = fromWireSSHKey(w['ssh-key'])
+  if (w['ssh-keys'] !== undefined)
+    v.sshKeys = (w['ssh-keys'] as any[]).map((x) => fromWireSSHKey(x))
+  if (w['state'] !== undefined) v.state = w['state']
+  if (w['template'] !== undefined) v.template = fromWireTemplate(w['template'])
+  return v
+}
+export interface ListInstancesResponse {
+  instances?: ListInstancesResponseInstances[]
+}
+
+/** @internal */
+export function fromWireListInstancesResponse(w: any): ListInstancesResponse {
+  const v = {} as ListInstancesResponse
+  if (w['instances'] !== undefined)
+    v.instances = (w['instances'] as any[]).map((x) => fromWireListInstancesResponseInstances(x))
+  return v
+}
+
+export interface ListKmsKeyRotationsRequest {
+  id: string
+}
+
+export interface ListLoadBalancersResponse {
+  loadBalancers?: LoadBalancer[]
+}
+
+/** @internal */
+export function fromWireListLoadBalancersResponse(w: any): ListLoadBalancersResponse {
+  const v = {} as ListLoadBalancersResponse
+  if (w['load-balancers'] !== undefined)
+    v.loadBalancers = (w['load-balancers'] as any[]).map((x) => fromWireLoadBalancer(x))
+  return v
+}
+
+export interface ListPrivateNetworksResponse {
+  privateNetworks?: PrivateNetwork[]
+}
+
+/** @internal */
+export function fromWireListPrivateNetworksResponse(w: any): ListPrivateNetworksResponse {
+  const v = {} as ListPrivateNetworksResponse
+  if (w['private-networks'] !== undefined)
+    v.privateNetworks = (w['private-networks'] as any[]).map((x) => fromWirePrivateNetwork(x))
+  return v
+}
+
+export interface ListQuotasResponse {
+  quotas?: Quota[]
+}
+
+/** @internal */
+export function fromWireListQuotasResponse(w: any): ListQuotasResponse {
+  const v = {} as ListQuotasResponse
+  if (w['quotas'] !== undefined) v.quotas = (w['quotas'] as any[]).map((x) => fromWireQuota(x))
+  return v
+}
+
+export interface ListRoutesRequest {
+  subnetID: string
+  vpcID: string
+}
+export interface ListRoutesResponse {
+  routes?: ListRouteEntry[]
+}
+
+/** @internal */
+export function fromWireListRoutesResponse(w: any): ListRoutesResponse {
+  const v = {} as ListRoutesResponse
+  if (w['routes'] !== undefined)
+    v.routes = (w['routes'] as any[]).map((x) => fromWireListRouteEntry(x))
+  return v
+}
+
+export interface ListSecurityGroupsRequest {
+  visibility?: 'private' | 'public'
+}
+export interface ListSecurityGroupsResponse {
+  securityGroups?: SecurityGroup[]
+}
+
+/** @internal */
+export function fromWireListSecurityGroupsResponse(w: any): ListSecurityGroupsResponse {
+  const v = {} as ListSecurityGroupsResponse
+  if (w['security-groups'] !== undefined)
+    v.securityGroups = (w['security-groups'] as any[]).map((x) => fromWireSecurityGroup(x))
+  return v
+}
+
+export interface ListSKSClusterDeprecatedResourcesRequest {
+  id: string
+}
+
+export interface ListSKSClusterVersionsRequest {
+  includeDeprecated?: string
+}
+export interface ListSKSClusterVersionsResponse {
+  sksClusterVersions?: string[]
+}
+
+/** @internal */
+export function fromWireListSKSClusterVersionsResponse(w: any): ListSKSClusterVersionsResponse {
+  const v = {} as ListSKSClusterVersionsResponse
+  if (w['sks-cluster-versions'] !== undefined) v.sksClusterVersions = w['sks-cluster-versions']
+  return v
+}
+
+export interface ListSKSClustersResponse {
+  sksClusters?: SKSCluster[]
+}
+
+/** @internal */
+export function fromWireListSKSClustersResponse(w: any): ListSKSClustersResponse {
+  const v = {} as ListSKSClustersResponse
+  if (w['sks-clusters'] !== undefined)
+    v.sksClusters = (w['sks-clusters'] as any[]).map((x) => fromWireSKSCluster(x))
+  return v
+}
+
+export interface ListSnapshotsResponse {
+  snapshots?: Snapshot[]
+}
+
+/** @internal */
+export function fromWireListSnapshotsResponse(w: any): ListSnapshotsResponse {
+  const v = {} as ListSnapshotsResponse
+  if (w['snapshots'] !== undefined)
+    v.snapshots = (w['snapshots'] as any[]).map((x) => fromWireSnapshot(x))
+  return v
+}
+
+export interface ListSOSBucketsUsageResponse {
+  sosBucketsUsage?: SOSBucketUsage[]
+}
+
+/** @internal */
+export function fromWireListSOSBucketsUsageResponse(w: any): ListSOSBucketsUsageResponse {
+  const v = {} as ListSOSBucketsUsageResponse
+  if (w['sos-buckets-usage'] !== undefined)
+    v.sosBucketsUsage = (w['sos-buckets-usage'] as any[]).map((x) => fromWireSOSBucketUsage(x))
+  return v
+}
+
+export interface ListSSHKeysResponse {
+  sshKeys?: SSHKey[]
+}
+
+/** @internal */
+export function fromWireListSSHKeysResponse(w: any): ListSSHKeysResponse {
+  const v = {} as ListSSHKeysResponse
+  if (w['ssh-keys'] !== undefined)
+    v.sshKeys = (w['ssh-keys'] as any[]).map((x) => fromWireSSHKey(x))
+  return v
+}
+
+export interface ListSubnetsRequest {
+  vpcID: string
+}
+export interface ListSubnetsResponse {
+  subnets?: ListSubnetEntry[]
+}
+
+/** @internal */
+export function fromWireListSubnetsResponse(w: any): ListSubnetsResponse {
+  const v = {} as ListSubnetsResponse
+  if (w['subnets'] !== undefined)
+    v.subnets = (w['subnets'] as any[]).map((x) => fromWireListSubnetEntry(x))
+  return v
+}
+
+export interface ListTemplatesRequest {
+  family?: string
+  visibility?: 'private' | 'public'
+}
+export interface ListTemplatesResponse {
+  templates?: Template[]
+}
+
+/** @internal */
+export function fromWireListTemplatesResponse(w: any): ListTemplatesResponse {
+  const v = {} as ListTemplatesResponse
+  if (w['templates'] !== undefined)
+    v.templates = (w['templates'] as any[]).map((x) => fromWireTemplate(x))
+  return v
+}
+
+export interface ListUsersResponse {
+  users?: User[]
+}
+
+/** @internal */
+export function fromWireListUsersResponse(w: any): ListUsersResponse {
+  const v = {} as ListUsersResponse
+  if (w['users'] !== undefined) v.users = (w['users'] as any[]).map((x) => fromWireUser(x))
+  return v
+}
+
+export interface ListVpcRoutesRequest {
+  vpcID: string
+}
+export interface ListVpcRoutesResponse {
+  routes?: ListRouteEntry[]
+}
+
+/** @internal */
+export function fromWireListVpcRoutesResponse(w: any): ListVpcRoutesResponse {
+  const v = {} as ListVpcRoutesResponse
+  if (w['routes'] !== undefined)
+    v.routes = (w['routes'] as any[]).map((x) => fromWireListRouteEntry(x))
+  return v
+}
+
+export interface ListVpcsResponse {
+  vpcs?: ListVpcEntry[]
+}
+
+/** @internal */
+export function fromWireListVpcsResponse(w: any): ListVpcsResponse {
+  const v = {} as ListVpcsResponse
+  if (w['vpcs'] !== undefined) v.vpcs = (w['vpcs'] as any[]).map((x) => fromWireListVpcEntry(x))
+  return v
+}
+
+export interface ListZonesResponse {
+  zones?: Zone[]
+}
+
+/** @internal */
+export function fromWireListZonesResponse(w: any): ListZonesResponse {
+  const v = {} as ListZonesResponse
+  if (w['zones'] !== undefined) v.zones = (w['zones'] as any[]).map((x) => fromWireZone(x))
+  return v
+}
+
+export interface PromoteSnapshotToTemplateRequest {
+  id: string
+  /**
+   * Template default user
+   *
+   * Length 1-255
+   */
+  defaultUser?: string
+  /**
+   * Template description
+   *
+   * Max length 4096
+   */
+  description?: string
+  /**
+   * Template name
+   *
+   * Length 1-255
+   */
+  name: string
+  /**
+   * Enable password-based login in the template
+   */
+  passwordEnabled?: boolean
+  /**
+   * Enable SSH key-based login in the template
+   */
+  sshKeyEnabled?: boolean
+}
+/** @internal */
+export function toWirePromoteSnapshotToTemplateRequest(
+  v: PromoteSnapshotToTemplateRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.defaultUser !== undefined) o['default-user'] = v.defaultUser
+  if (v.description !== undefined) o['description'] = v.description
+  if (v.name !== undefined) o['name'] = v.name
+  if (v.passwordEnabled !== undefined) o['password-enabled'] = v.passwordEnabled
+  if (v.sshKeyEnabled !== undefined) o['ssh-key-enabled'] = v.sshKeyEnabled
+  return o
+}
+
+export interface RebootInstanceRequest {
+  id: string
+}
+
+export interface RegisterSSHKeyRequest {
+  /**
+   * SSH key name
+   *
+   * Pattern `^[a-zA-Z0-9]{1}[a-zA-Z0-9._-]{0,254}$`
+   */
+  name: string
+  /**
+   * Public key value
+   */
+  publicKey: string
+}
+/** @internal */
+export function toWireRegisterSSHKeyRequest(v: RegisterSSHKeyRequest): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.name !== undefined) o['name'] = v.name
+  if (v.publicKey !== undefined) o['public-key'] = v.publicKey
+  return o
+}
+
+export interface RegisterTemplateRequest {
+  /**
+   * Template with support for Application Consistent Snapshots
+   */
+  applicationConsistentSnapshotEnabled?: boolean
+  /**
+   * Boot mode (default: legacy)
+   */
+  bootMode?: 'legacy' | 'uefi'
+  /**
+   * Template build
+   *
+   * Length 1-255
+   */
+  build?: string
+  /**
+   * Template MD5 checksum
+   *
+   * Min length 1
+   */
+  checksum: string
+  /**
+   * Template default user
+   *
+   * Length 1-255
+   */
+  defaultUser?: string
+  /**
+   * Template description
+   *
+   * Max length 255
+   */
+  description?: string
+  /**
+   * Template maintainer
+   *
+   * Length 1-255
+   */
+  maintainer?: string
+  /**
+   * Template name
+   *
+   * Length 1-255
+   */
+  name: string
+  /**
+   * Enable password-based login
+   */
+  passwordEnabled: boolean
+  /**
+   * Template size
+   *
+   * Min >0
+   */
+  size?: number
+  /**
+   * Enable SSH key-based login
+   */
+  sshKeyEnabled: boolean
+  /**
+   * Template source URL
+   *
+   * Min length 1
+   */
+  url: string
+  /**
+   * Template version
+   *
+   * Length 1-255
+   */
+  version?: string
+}
+/** @internal */
+export function toWireRegisterTemplateRequest(v: RegisterTemplateRequest): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.applicationConsistentSnapshotEnabled !== undefined)
+    o['application-consistent-snapshot-enabled'] = v.applicationConsistentSnapshotEnabled
+  if (v.bootMode !== undefined) o['boot-mode'] = v.bootMode
+  if (v.build !== undefined) o['build'] = v.build
+  if (v.checksum !== undefined) o['checksum'] = v.checksum
+  if (v.defaultUser !== undefined) o['default-user'] = v.defaultUser
+  if (v.description !== undefined) o['description'] = v.description
+  if (v.maintainer !== undefined) o['maintainer'] = v.maintainer
+  if (v.name !== undefined) o['name'] = v.name
+  if (v.passwordEnabled !== undefined) o['password-enabled'] = v.passwordEnabled
+  if (v.size !== undefined) o['size'] = v.size
+  if (v.sshKeyEnabled !== undefined) o['ssh-key-enabled'] = v.sshKeyEnabled
+  if (v.url !== undefined) o['url'] = v.url
+  if (v.version !== undefined) o['version'] = v.version
+  return o
+}
+
+export interface RemoveExternalSourceFromSecurityGroupRequest {
+  id: string
+  /**
+   * CIDR-formatted network to remove
+   */
+  cidr: string
+}
+/** @internal */
+export function toWireRemoveExternalSourceFromSecurityGroupRequest(
+  v: RemoveExternalSourceFromSecurityGroupRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.cidr !== undefined) o['cidr'] = v.cidr
+  return o
+}
+
+export interface RemoveInstanceProtectionRequest {
+  id: string
+}
+
+export interface ResetDBAASClickhouseUserPasswordRequest {
+  serviceName: DBAASServiceName
+  username: DBAASUserUsername
+  /**
+   * New password
+   */
+  password?: DBAASUserPassword
+}
+/** @internal */
+export function toWireResetDBAASClickhouseUserPasswordRequest(
+  v: ResetDBAASClickhouseUserPasswordRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.password !== undefined) o['password'] = v.password
+  return o
+}
+
+export interface ResetDBAASGrafanaUserPasswordRequest {
+  serviceName: DBAASServiceName
+  username: DBAASUserUsername
+  /**
+   * New password
+   */
+  password?: DBAASUserPassword
+}
+/** @internal */
+export function toWireResetDBAASGrafanaUserPasswordRequest(
+  v: ResetDBAASGrafanaUserPasswordRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.password !== undefined) o['password'] = v.password
+  return o
+}
+
+export interface ResetDBAASKafkaUserPasswordRequest {
+  serviceName: DBAASServiceName
+  username: DBAASUserUsername
+  /**
+   * New password
+   */
+  password?: DBAASUserPassword
+}
+/** @internal */
+export function toWireResetDBAASKafkaUserPasswordRequest(
+  v: ResetDBAASKafkaUserPasswordRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.password !== undefined) o['password'] = v.password
+  return o
+}
+
+export interface ResetDBAASMysqlUserPasswordRequest {
+  serviceName: DBAASServiceName
+  username: DBAASUserUsername
+  /**
+   * Authentication method
+   */
+  authentication?: EnumMysqlAuthenticationPlugin
+  /**
+   * New password
+   */
+  password?: DBAASMysqlUserPassword
+}
+/** @internal */
+export function toWireResetDBAASMysqlUserPasswordRequest(
+  v: ResetDBAASMysqlUserPasswordRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.authentication !== undefined) o['authentication'] = v.authentication
+  if (v.password !== undefined) o['password'] = v.password
+  return o
+}
+
+export interface ResetDBAASOpensearchUserPasswordRequest {
+  serviceName: DBAASServiceName
+  username: DBAASUserUsername
+  /**
+   * New password
+   */
+  password?: DBAASUserPassword
+}
+/** @internal */
+export function toWireResetDBAASOpensearchUserPasswordRequest(
+  v: ResetDBAASOpensearchUserPasswordRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.password !== undefined) o['password'] = v.password
+  return o
+}
+
+export interface ResetDBAASPostgresUserPasswordRequest {
+  serviceName: DBAASServiceName
+  username: DBAASUserUsername
+  /**
+   * New password
+   */
+  password?: DBAASUserPassword
+}
+/** @internal */
+export function toWireResetDBAASPostgresUserPasswordRequest(
+  v: ResetDBAASPostgresUserPasswordRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.password !== undefined) o['password'] = v.password
+  return o
+}
+
+export interface ResetDBAASValkeyUserPasswordRequest {
+  serviceName: DBAASServiceName
+  username: DBAASUserUsername
+  /**
+   * New password
+   */
+  password?: DBAASUserPassword
+}
+/** @internal */
+export function toWireResetDBAASValkeyUserPasswordRequest(
+  v: ResetDBAASValkeyUserPasswordRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.password !== undefined) o['password'] = v.password
+  return o
+}
+
+export interface ResetElasticIPFieldRequest {
+  field: 'description'
+  id: string
+}
+
+export interface ResetInstanceRequest {
+  id: string
+  /**
+   * Instance disk size in GiB
+   *
+   * Min 10, Max 51200
+   */
+  diskSize?: number
+  /**
+   * Template to recreate Instance from
+   */
+  template?: TemplateRef
+}
+/** @internal */
+export function toWireResetInstanceRequest(v: ResetInstanceRequest): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.diskSize !== undefined) o['disk-size'] = v.diskSize
+  if (v.template !== undefined) o['template'] = toWireTemplateRef(v.template)
+  return o
+}
+
+export interface ResetInstanceFieldRequest {
+  field: 'labels'
+  id: string
+}
+
+export interface ResetInstancePasswordRequest {
+  id: string
+}
+
+export interface ResetInstancePoolFieldRequest {
+  field:
+    | 'anti-affinity-groups'
+    | 'deploy-target'
+    | 'description'
+    | 'elastic-ips'
+    | 'ipv6-enabled'
+    | 'labels'
+    | 'private-networks'
+    | 'security-groups'
+    | 'ssh-key'
+    | 'user-data'
+  id: string
+}
+
+export interface ResetLoadBalancerFieldRequest {
+  field: 'description' | 'labels'
+  id: string
+}
+
+export interface ResetLoadBalancerServiceFieldRequest {
+  field: 'description'
+  id: string
+  serviceID: string
+}
+
+export interface ResetPrivateNetworkFieldRequest {
+  field: 'labels'
+  id: string
+}
+
+export interface ResizeBlockStorageVolumeRequest {
+  id: string
+  /**
+   * Volume size in GiB
+   *
+   * Min >0
+   */
+  size: number
+}
+/** @internal */
+export function toWireResizeBlockStorageVolumeRequest(
+  v: ResizeBlockStorageVolumeRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.size !== undefined) o['size'] = v.size
+  return o
+}
+
+export interface ResizeInstanceDiskRequest {
+  id: string
+  /**
+   * Instance disk size in GiB
+   *
+   * Min 10, Max 51200
+   */
+  diskSize: number
+}
+/** @internal */
+export function toWireResizeInstanceDiskRequest(
+  v: ResizeInstanceDiskRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.diskSize !== undefined) o['disk-size'] = v.diskSize
+  return o
+}
+
+export interface RevealDBAASClickhouseUserPasswordRequest {
+  serviceName: DBAASServiceName
+  username: DBAASUserUsername
+}
+
+export interface RevealDBAASGrafanaUserPasswordRequest {
+  serviceName: DBAASServiceName
+  username: DBAASUserUsername
+}
+
+export interface RevealDBAASKafkaConnectPasswordRequest {
+  serviceName: DBAASServiceName
+}
+
+export interface RevealDBAASKafkaUserPasswordRequest {
+  serviceName: DBAASServiceName
+  username: DBAASUserUsername
+}
+
+export interface RevealDBAASMysqlUserPasswordRequest {
+  serviceName: DBAASServiceName
+  username: DBAASUserUsername
+}
+
+export interface RevealDBAASOpensearchUserPasswordRequest {
+  serviceName: DBAASServiceName
+  username: DBAASUserUsername
+}
+
+export interface RevealDBAASPostgresUserPasswordRequest {
+  serviceName: DBAASServiceName
+  username: DBAASUserUsername
+}
+
+export interface RevealDBAASThanosUserPasswordRequest {
+  serviceName: DBAASServiceName
+  username: DBAASUserUsername
+}
+
+export interface RevealDBAASValkeyUserPasswordRequest {
+  serviceName: DBAASServiceName
+  username: DBAASUserUsername
+}
+
+export interface RevealDeploymentAPIKeyRequest {
+  id: string
+}
+
+export interface RevealInstancePasswordRequest {
+  id: string
+}
+
+export interface RevertInstanceToSnapshotRequest {
+  instanceID: string
+  /**
+   * Snapshot ID
+   */
+  id: string
+}
+/** @internal */
+export function toWireRevertInstanceToSnapshotRequest(
+  v: RevertInstanceToSnapshotRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.id !== undefined) o['id'] = v.id
+  return o
+}
+
+export interface RotateKmsKeyRequest {
+  id: string
+}
+
+export interface RotateSKSCcmCredentialsRequest {
+  id: string
+}
+
+export interface RotateSKSCsiCredentialsRequest {
+  id: string
+}
+
+export interface RotateSKSKarpenterCredentialsRequest {
+  id: string
+}
+
+export interface RotateSKSOperatorsCARequest {
+  id: string
+}
+
+export interface ScaleInstanceRequest {
+  id: string
+  /**
+   * Instance Type
+   */
+  instanceType: InstanceTypeRef
+}
+/** @internal */
+export function toWireScaleInstanceRequest(v: ScaleInstanceRequest): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.instanceType !== undefined) o['instance-type'] = toWireInstanceTypeRef(v.instanceType)
+  return o
+}
+
+export interface ScaleInstancePoolRequest {
+  id: string
+  /**
+   * Number of managed Instances
+   *
+   * Min 0
+   */
+  size: number
+}
+/** @internal */
+export function toWireScaleInstancePoolRequest(
+  v: ScaleInstancePoolRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.size !== undefined) o['size'] = v.size
+  return o
+}
+
+export interface ScaleSKSNodepoolRequest {
+  id: string
+  sksNodepoolID: string
+  /**
+   * Number of instances
+   *
+   * Min 0
+   */
+  size: number
+}
+/** @internal */
+export function toWireScaleSKSNodepoolRequest(v: ScaleSKSNodepoolRequest): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.size !== undefined) o['size'] = v.size
+  return o
+}
+
+export interface StartDBAASClickhouseMaintenanceRequest {
   name: DBAASServiceName
+}
+
+export interface StartDBAASGrafanaMaintenanceRequest {
+  name: DBAASServiceName
+}
+
+export interface StartDBAASKafkaMaintenanceRequest {
+  name: DBAASServiceName
+}
+
+export interface StartDBAASMysqlMaintenanceRequest {
+  name: DBAASServiceName
+}
+
+export interface StartDBAASOpensearchMaintenanceRequest {
+  name: DBAASServiceName
+}
+
+export interface StartDBAASPGMaintenanceRequest {
+  name: DBAASServiceName
+}
+
+export interface StartDBAASThanosMaintenanceRequest {
+  name: DBAASServiceName
+}
+
+export interface StartDBAASValkeyMaintenanceRequest {
+  name: DBAASServiceName
+}
+
+export interface StartInstanceRequest {
+  id: string
+  /**
+   * Boot in Rescue Mode, using named profile (supported: netboot, netboot-efi)
+   */
+  rescueProfile?: 'netboot' | 'netboot-efi'
+}
+/** @internal */
+export function toWireStartInstanceRequest(v: StartInstanceRequest): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.rescueProfile !== undefined) o['rescue-profile'] = v.rescueProfile
+  return o
+}
+
+export interface StopDBAASMysqlMigrationRequest {
+  name: DBAASServiceName
+}
+
+export interface StopDBAASPGMigrationRequest {
+  name: DBAASServiceName
+}
+
+export interface StopDBAASValkeyMigrationRequest {
+  name: DBAASServiceName
+}
+
+export interface StopInstanceRequest {
+  id: string
+}
+
+export interface UpdateBlockStorageSnapshotRequest {
+  id: string
+  /**
+   * Resource labels
+   */
+  labels?: Labels | null
+  /**
+   * Snapshot name
+   *
+   * Max length 255
+   */
+  name?: string | null
+}
+/** @internal */
+export function toWireUpdateBlockStorageSnapshotRequest(
+  v: UpdateBlockStorageSnapshotRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.labels !== undefined) o['labels'] = v.labels === null ? null : v.labels
+  if (v.name !== undefined) o['name'] = v.name === null ? null : v.name
+  return o
+}
+
+export interface UpdateBlockStorageVolumeRequest {
+  id: string
+  /**
+   * Resource labels
+   */
+  labels?: Labels | null
+  /**
+   * Volume name
+   *
+   * Max length 255
+   */
+  name?: string | null
+}
+/** @internal */
+export function toWireUpdateBlockStorageVolumeRequest(
+  v: UpdateBlockStorageVolumeRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.labels !== undefined) o['labels'] = v.labels === null ? null : v.labels
+  if (v.name !== undefined) o['name'] = v.name === null ? null : v.name
+  return o
+}
+
+export interface UpdateDBAASExternalIntegrationSettingsDatadogRequest {
+  integrationID: string
+  settings?: DBAASIntegrationSettingsDatadog
+}
+/** @internal */
+export function toWireUpdateDBAASExternalIntegrationSettingsDatadogRequest(
+  v: UpdateDBAASExternalIntegrationSettingsDatadogRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.settings !== undefined) o['settings'] = toWireDBAASIntegrationSettingsDatadog(v.settings)
+  return o
+}
+
+export interface UpdateDBAASIntegrationRequest {
+  id: string
+  /**
+   * Integration settings
+   */
+  settings: Record<string, unknown>
+}
+/** @internal */
+export function toWireUpdateDBAASIntegrationRequest(
+  v: UpdateDBAASIntegrationRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.settings !== undefined) o['settings'] = v.settings
+  return o
+}
+
+export interface UpdateDBAASPGConnectionPoolRequest {
+  connectionPoolName: DBAASPGPoolName
+  serviceName: DBAASServiceName
+  /**
+   * Service database name
+   */
+  databaseName?: DBAASDatabaseName
+  /**
+   * PGBouncer pool mode
+   */
+  mode?: EnumPGPoolMode
+  /**
+   * Size of PGBouncer's PostgreSQL side connection pool
+   */
+  size?: DBAASPGPoolSize
+  /**
+   * Pool username
+   */
+  username?: DBAASPGPoolUsername
+}
+/** @internal */
+export function toWireUpdateDBAASPGConnectionPoolRequest(
+  v: UpdateDBAASPGConnectionPoolRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.databaseName !== undefined) o['database-name'] = v.databaseName
+  if (v.mode !== undefined) o['mode'] = v.mode
+  if (v.size !== undefined) o['size'] = v.size
+  if (v.username !== undefined) o['username'] = v.username
+  return o
+}
+
+export interface UpdateDBAASPostgresAllowReplicationRequest {
+  serviceName: DBAASServiceName
+  username: DBAASUserUsername
+  allowReplication?: boolean
+}
+/** @internal */
+export function toWireUpdateDBAASPostgresAllowReplicationRequest(
+  v: UpdateDBAASPostgresAllowReplicationRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.allowReplication !== undefined) o['allow-replication'] = v.allowReplication
+  return o
 }
 
 /**
  * Automatic maintenance settings
  */
-export interface CreateDBAASServiceThanosRequestMaintenance {
+export interface UpdateDBAASServiceClickhouseRequestMaintenance {
   /**
    * Day of week for installing updates
    */
@@ -4203,16 +6146,92 @@ export interface CreateDBAASServiceThanosRequestMaintenance {
 }
 
 /** @internal */
-export function toWireCreateDBAASServiceThanosRequestMaintenance(
-  v: CreateDBAASServiceThanosRequestMaintenance,
+export function toWireUpdateDBAASServiceClickhouseRequestMaintenance(
+  v: UpdateDBAASServiceClickhouseRequestMaintenance,
 ): Record<string, unknown> {
   const o: Record<string, unknown> = {}
   if (v.dow !== undefined) o['dow'] = v.dow
   if (v.time !== undefined) o['time'] = v.time
   return o
 }
-export interface CreateDBAASServiceThanosRequest {
+export interface UpdateDBAASServiceClickhouseRequest {
   name: DBAASServiceName
+  /**
+   * ClickHouse-specific settings
+   */
+  clickhouseSettings?: JSONSchemaClickhouse
+  /**
+   * Allow incoming connections from CIDR address block, e.g. '10.20.0.0/16'
+   */
+  ipFilter?: string[]
+  /**
+   * Automatic maintenance settings
+   */
+  maintenance?: UpdateDBAASServiceClickhouseRequestMaintenance
+  /**
+   * Subscription plan
+   *
+   * Length 1-128
+   */
+  plan?: string
+  /**
+   * Service is protected against termination and powering off
+   */
+  terminationProtection?: boolean
+  /**
+   * ClickHouse major version
+   *
+   * Min length 1
+   */
+  version?: string
+}
+/** @internal */
+export function toWireUpdateDBAASServiceClickhouseRequest(
+  v: UpdateDBAASServiceClickhouseRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.clickhouseSettings !== undefined)
+    o['clickhouse-settings'] = toWireJSONSchemaClickhouse(v.clickhouseSettings)
+  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter
+  if (v.maintenance !== undefined)
+    o['maintenance'] = toWireUpdateDBAASServiceClickhouseRequestMaintenance(v.maintenance)
+  if (v.plan !== undefined) o['plan'] = v.plan
+  if (v.terminationProtection !== undefined) o['termination-protection'] = v.terminationProtection
+  if (v.version !== undefined) o['version'] = v.version
+  return o
+}
+
+/**
+ * Automatic maintenance settings
+ */
+export interface UpdateDBAASServiceGrafanaRequestMaintenance {
+  /**
+   * Day of week for installing updates
+   */
+  dow: 'friday' | 'monday' | 'never' | 'saturday' | 'sunday' | 'thursday' | 'tuesday' | 'wednesday'
+  /**
+   * Time for installing updates, UTC
+   *
+   * Length 8-8
+   */
+  time: string
+}
+
+/** @internal */
+export function toWireUpdateDBAASServiceGrafanaRequestMaintenance(
+  v: UpdateDBAASServiceGrafanaRequestMaintenance,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.dow !== undefined) o['dow'] = v.dow
+  if (v.time !== undefined) o['time'] = v.time
+  return o
+}
+export interface UpdateDBAASServiceGrafanaRequest {
+  name: DBAASServiceName
+  /**
+   * Grafana specific settings
+   */
+  grafanaSettings?: JSONSchemaGrafana
   /**
    * Allowed CIDR address blocks for incoming connections
    */
@@ -4220,34 +6239,772 @@ export interface CreateDBAASServiceThanosRequest {
   /**
    * Automatic maintenance settings
    */
-  maintenance?: CreateDBAASServiceThanosRequestMaintenance
+  maintenance?: UpdateDBAASServiceGrafanaRequestMaintenance
   /**
    * Subscription plan
    *
    * Length 1-128
    */
-  plan: string
+  plan?: string
+  /**
+   * Service is protected against termination and powering off
+   */
+  terminationProtection?: boolean
+}
+/** @internal */
+export function toWireUpdateDBAASServiceGrafanaRequest(
+  v: UpdateDBAASServiceGrafanaRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.grafanaSettings !== undefined)
+    o['grafana-settings'] = toWireJSONSchemaGrafana(v.grafanaSettings)
+  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter
+  if (v.maintenance !== undefined)
+    o['maintenance'] = toWireUpdateDBAASServiceGrafanaRequestMaintenance(v.maintenance)
+  if (v.plan !== undefined) o['plan'] = v.plan
+  if (v.terminationProtection !== undefined) o['termination-protection'] = v.terminationProtection
+  return o
+}
+
+/**
+ * Kafka authentication methods
+ */
+export interface UpdateDBAASServiceKafkaRequestAuthenticationMethods {
+  /**
+   * Enable certificate/SSL authentication
+   */
+  certificate?: boolean
+  /**
+   * Enable SASL authentication
+   */
+  sasl?: boolean
+}
+
+/** @internal */
+export function toWireUpdateDBAASServiceKafkaRequestAuthenticationMethods(
+  v: UpdateDBAASServiceKafkaRequestAuthenticationMethods,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.certificate !== undefined) o['certificate'] = v.certificate
+  if (v.sasl !== undefined) o['sasl'] = v.sasl
+  return o
+}
+
+/**
+ * Automatic maintenance settings
+ */
+export interface UpdateDBAASServiceKafkaRequestMaintenance {
+  /**
+   * Day of week for installing updates
+   */
+  dow: 'friday' | 'monday' | 'never' | 'saturday' | 'sunday' | 'thursday' | 'tuesday' | 'wednesday'
+  /**
+   * Time for installing updates, UTC
+   *
+   * Length 8-8
+   */
+  time: string
+}
+
+/** @internal */
+export function toWireUpdateDBAASServiceKafkaRequestMaintenance(
+  v: UpdateDBAASServiceKafkaRequestMaintenance,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.dow !== undefined) o['dow'] = v.dow
+  if (v.time !== undefined) o['time'] = v.time
+  return o
+}
+export interface UpdateDBAASServiceKafkaRequest {
+  name: DBAASServiceName
+  /**
+   * Kafka authentication methods
+   */
+  authenticationMethods?: UpdateDBAASServiceKafkaRequestAuthenticationMethods
+  /**
+   * Allow incoming connections from CIDR address block, e.g. '10.20.0.0/16'
+   */
+  ipFilter?: string[]
+  /**
+   * Allow clients to connect to kafka_connect from the public internet for service nodes that are in a project VPC or another type of private network
+   */
+  kafkaConnectEnabled?: boolean
+  /**
+   * Kafka Connect configuration values
+   */
+  kafkaConnectSettings?: JSONSchemaKafkaConnect
+  /**
+   * Enable Kafka-REST service
+   */
+  kafkaRestEnabled?: boolean
+  /**
+   * Kafka REST configuration
+   */
+  kafkaRestSettings?: JSONSchemaKafkaRest
+  /**
+   * Kafka-specific settings
+   */
+  kafkaSettings?: JSONSchemaKafka
+  /**
+   * Automatic maintenance settings
+   */
+  maintenance?: UpdateDBAASServiceKafkaRequestMaintenance
+  /**
+   * Subscription plan
+   *
+   * Length 1-128
+   */
+  plan?: string
+  /**
+   * Enable Schema-Registry service
+   */
+  schemaRegistryEnabled?: boolean
+  /**
+   * Schema Registry configuration
+   */
+  schemaRegistrySettings?: JSONSchemaSchemaRegistry
   /**
    * Service is protected against termination and powering off
    */
   terminationProtection?: boolean
   /**
-   * Thanos specific settings
+   * Kafka major version
+   *
+   * Min length 1
    */
-  thanosSettings?: JSONSchemaThanos
+  version?: string
 }
 /** @internal */
-export function toWireCreateDBAASServiceThanosRequest(
-  v: CreateDBAASServiceThanosRequest,
+export function toWireUpdateDBAASServiceKafkaRequest(
+  v: UpdateDBAASServiceKafkaRequest,
 ): Record<string, unknown> {
   const o: Record<string, unknown> = {}
+  if (v.authenticationMethods !== undefined)
+    o['authentication-methods'] = toWireUpdateDBAASServiceKafkaRequestAuthenticationMethods(
+      v.authenticationMethods,
+    )
+  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter
+  if (v.kafkaConnectEnabled !== undefined) o['kafka-connect-enabled'] = v.kafkaConnectEnabled
+  if (v.kafkaConnectSettings !== undefined)
+    o['kafka-connect-settings'] = toWireJSONSchemaKafkaConnect(v.kafkaConnectSettings)
+  if (v.kafkaRestEnabled !== undefined) o['kafka-rest-enabled'] = v.kafkaRestEnabled
+  if (v.kafkaRestSettings !== undefined)
+    o['kafka-rest-settings'] = toWireJSONSchemaKafkaRest(v.kafkaRestSettings)
+  if (v.kafkaSettings !== undefined) o['kafka-settings'] = toWireJSONSchemaKafka(v.kafkaSettings)
+  if (v.maintenance !== undefined)
+    o['maintenance'] = toWireUpdateDBAASServiceKafkaRequestMaintenance(v.maintenance)
+  if (v.plan !== undefined) o['plan'] = v.plan
+  if (v.schemaRegistryEnabled !== undefined) o['schema-registry-enabled'] = v.schemaRegistryEnabled
+  if (v.schemaRegistrySettings !== undefined)
+    o['schema-registry-settings'] = toWireJSONSchemaSchemaRegistry(v.schemaRegistrySettings)
+  if (v.terminationProtection !== undefined) o['termination-protection'] = v.terminationProtection
+  if (v.version !== undefined) o['version'] = v.version
+  return o
+}
+
+export interface UpdateDBAASServiceMysqlRequestBackupSchedule {
+  /**
+   * The hour of day (in UTC) when backup for the service is started. New backup is only started if previous backup has already completed.
+   *
+   * Min 0, Max 23
+   */
+  backupHour?: number | null
+  /**
+   * The minute of an hour when backup for the service is started. New backup is only started if previous backup has already completed.
+   *
+   * Min 0, Max 59
+   */
+  backupMinute?: number | null
+}
+
+/** @internal */
+export function toWireUpdateDBAASServiceMysqlRequestBackupSchedule(
+  v: UpdateDBAASServiceMysqlRequestBackupSchedule,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.backupHour !== undefined) o['backup-hour'] = v.backupHour === null ? null : v.backupHour
+  if (v.backupMinute !== undefined)
+    o['backup-minute'] = v.backupMinute === null ? null : v.backupMinute
+  return o
+}
+
+/**
+ * Automatic maintenance settings
+ */
+export interface UpdateDBAASServiceMysqlRequestMaintenance {
+  /**
+   * Day of week for installing updates
+   */
+  dow: 'friday' | 'monday' | 'never' | 'saturday' | 'sunday' | 'thursday' | 'tuesday' | 'wednesday'
+  /**
+   * Time for installing updates, UTC
+   *
+   * Length 8-8
+   */
+  time: string
+}
+
+/** @internal */
+export function toWireUpdateDBAASServiceMysqlRequestMaintenance(
+  v: UpdateDBAASServiceMysqlRequestMaintenance,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.dow !== undefined) o['dow'] = v.dow
+  if (v.time !== undefined) o['time'] = v.time
+  return o
+}
+
+/**
+ * Migrate data from existing server
+ */
+export interface UpdateDBAASServiceMysqlRequestMigration {
+  /**
+   * Database name for bootstrapping the initial connection
+   *
+   * Length 1-63
+   */
+  dbname?: string
+  /**
+   * Hostname or IP address of the server where to migrate data from
+   *
+   * Length 1-255
+   */
+  host: string
+  /**
+   * Comma-separated list of databases, which should be ignored during migration (supported by MySQL only at the moment)
+   *
+   * Length 1-2048
+   */
+  ignoreDbs?: string
+  /**
+   * The migration method to be used
+   */
+  method?: EnumMigrationMethod
+  /**
+   * Password for authentication with the server where to migrate data from
+   *
+   * Length 1-255
+   */
+  password?: string
+  /**
+   * Port number of the server where to migrate data from
+   *
+   * Min 1, Max 65535
+   */
+  port: number
+  /**
+   * The server where to migrate data from is secured with SSL
+   */
+  ssl?: boolean
+  /**
+   * User name for authentication with the server where to migrate data from
+   *
+   * Length 1-255
+   */
+  username?: string
+}
+
+/** @internal */
+export function toWireUpdateDBAASServiceMysqlRequestMigration(
+  v: UpdateDBAASServiceMysqlRequestMigration,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.dbname !== undefined) o['dbname'] = v.dbname
+  if (v.host !== undefined) o['host'] = v.host
+  if (v.ignoreDbs !== undefined) o['ignore-dbs'] = v.ignoreDbs
+  if (v.method !== undefined) o['method'] = v.method
+  if (v.password !== undefined) o['password'] = v.password
+  if (v.port !== undefined) o['port'] = v.port
+  if (v.ssl !== undefined) o['ssl'] = v.ssl
+  if (v.username !== undefined) o['username'] = v.username
+  return o
+}
+export interface UpdateDBAASServiceMysqlRequest {
+  name: DBAASServiceName
+  backupSchedule?: UpdateDBAASServiceMysqlRequestBackupSchedule
+  /**
+   * The minimum amount of time in seconds to keep binlog entries before deletion. This may be extended for services that require binlog entries for longer than the default for example if using the MySQL Debezium Kafka connector.
+   *
+   * Min 600, Max 86400
+   */
+  binlogRetentionPeriod?: number
+  /**
+   * Allow incoming connections from CIDR address block, e.g. '10.20.0.0/16'
+   */
+  ipFilter?: string[]
+  /**
+   * Automatic maintenance settings
+   */
+  maintenance?: UpdateDBAASServiceMysqlRequestMaintenance
+  /**
+   * Migrate data from existing server
+   */
+  migration?: UpdateDBAASServiceMysqlRequestMigration
+  /**
+   * MySQL-specific settings
+   */
+  mysqlSettings?: JSONSchemaMysql
+  /**
+   * Subscription plan
+   *
+   * Length 1-128
+   */
+  plan?: string
+  /**
+   * Service is protected against termination and powering off
+   */
+  terminationProtection?: boolean
+  /**
+   * MySQL version
+   */
+  version?: string
+}
+/** @internal */
+export function toWireUpdateDBAASServiceMysqlRequest(
+  v: UpdateDBAASServiceMysqlRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.backupSchedule !== undefined)
+    o['backup-schedule'] = toWireUpdateDBAASServiceMysqlRequestBackupSchedule(v.backupSchedule)
+  if (v.binlogRetentionPeriod !== undefined) o['binlog-retention-period'] = v.binlogRetentionPeriod
   if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter
   if (v.maintenance !== undefined)
-    o['maintenance'] = toWireCreateDBAASServiceThanosRequestMaintenance(v.maintenance)
+    o['maintenance'] = toWireUpdateDBAASServiceMysqlRequestMaintenance(v.maintenance)
+  if (v.migration !== undefined)
+    o['migration'] = toWireUpdateDBAASServiceMysqlRequestMigration(v.migration)
+  if (v.mysqlSettings !== undefined) o['mysql-settings'] = toWireJSONSchemaMysql(v.mysqlSettings)
   if (v.plan !== undefined) o['plan'] = v.plan
   if (v.terminationProtection !== undefined) o['termination-protection'] = v.terminationProtection
-  if (v.thanosSettings !== undefined)
-    o['thanos-settings'] = toWireJSONSchemaThanos(v.thanosSettings)
+  if (v.version !== undefined) o['version'] = v.version
+  return o
+}
+
+export interface UpdateDBAASServiceOpensearchRequestIndexPatterns {
+  /**
+   * Maximum number of indexes to keep
+   *
+   * Min 0
+   */
+  maxIndexCount?: number | null
+  /**
+   * fnmatch pattern
+   *
+   * Max length 1024
+   */
+  pattern?: string
+  /**
+   * Deletion sorting algorithm
+   */
+  sortingAlgorithm?: 'alphabetical' | 'creation_date'
+}
+
+/** @internal */
+export function toWireUpdateDBAASServiceOpensearchRequestIndexPatterns(
+  v: UpdateDBAASServiceOpensearchRequestIndexPatterns,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.maxIndexCount !== undefined)
+    o['max-index-count'] = v.maxIndexCount === null ? null : v.maxIndexCount
+  if (v.pattern !== undefined) o['pattern'] = v.pattern
+  if (v.sortingAlgorithm !== undefined) o['sorting-algorithm'] = v.sortingAlgorithm
+  return o
+}
+
+/**
+ * Template settings for all new indexes
+ */
+export interface UpdateDBAASServiceOpensearchRequestIndexTemplate {
+  /**
+   * The maximum number of nested JSON objects that a single document can contain across all nested types. This limit helps to prevent out of memory errors when a document contains too many nested objects. Default is 10000.
+   *
+   * Min 0, Max 100000
+   */
+  mappingNestedObjectsLimit?: number | null
+  /**
+   * The number of replicas each primary shard has.
+   *
+   * Min 0, Max 29
+   */
+  numberOfReplicas?: number | null
+  /**
+   * The number of primary shards that an index should have.
+   *
+   * Min 1, Max 1024
+   */
+  numberOfShards?: number
+}
+
+/** @internal */
+export function toWireUpdateDBAASServiceOpensearchRequestIndexTemplate(
+  v: UpdateDBAASServiceOpensearchRequestIndexTemplate,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.mappingNestedObjectsLimit !== undefined)
+    o['mapping-nested-objects-limit'] =
+      v.mappingNestedObjectsLimit === null ? null : v.mappingNestedObjectsLimit
+  if (v.numberOfReplicas !== undefined)
+    o['number-of-replicas'] = v.numberOfReplicas === null ? null : v.numberOfReplicas
+  if (v.numberOfShards !== undefined) o['number-of-shards'] = v.numberOfShards
+  return o
+}
+
+/**
+ * Automatic maintenance settings
+ */
+export interface UpdateDBAASServiceOpensearchRequestMaintenance {
+  /**
+   * Day of week for installing updates
+   */
+  dow: 'friday' | 'monday' | 'never' | 'saturday' | 'sunday' | 'thursday' | 'tuesday' | 'wednesday'
+  /**
+   * Time for installing updates, UTC
+   *
+   * Length 8-8
+   */
+  time: string
+}
+
+/** @internal */
+export function toWireUpdateDBAASServiceOpensearchRequestMaintenance(
+  v: UpdateDBAASServiceOpensearchRequestMaintenance,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.dow !== undefined) o['dow'] = v.dow
+  if (v.time !== undefined) o['time'] = v.time
+  return o
+}
+
+/**
+ * OpenSearch Dashboards settings
+ */
+export interface UpdateDBAASServiceOpensearchRequestOpensearchDashboards {
+  /**
+   * Enable or disable OpenSearch Dashboards (default: true)
+   */
+  enabled?: boolean
+  /**
+   * Limits the maximum amount of memory (in MiB) the OpenSearch Dashboards process can use. This sets the max_old_space_size option of the nodejs running the OpenSearch Dashboards. Note: the memory reserved by OpenSearch Dashboards is not available for OpenSearch. (default: 128)
+   *
+   * Min 64, Max 1024
+   */
+  maxOldSpaceSize?: number
+  /**
+   * Timeout in milliseconds for requests made by OpenSearch Dashboards towards OpenSearch (default: 30000)
+   *
+   * Min 5000, Max 120000
+   */
+  opensearchRequestTimeout?: number
+}
+
+/** @internal */
+export function toWireUpdateDBAASServiceOpensearchRequestOpensearchDashboards(
+  v: UpdateDBAASServiceOpensearchRequestOpensearchDashboards,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.enabled !== undefined) o['enabled'] = v.enabled
+  if (v.maxOldSpaceSize !== undefined) o['max-old-space-size'] = v.maxOldSpaceSize
+  if (v.opensearchRequestTimeout !== undefined)
+    o['opensearch-request-timeout'] = v.opensearchRequestTimeout
+  return o
+}
+export interface UpdateDBAASServiceOpensearchRequest {
+  name: DBAASServiceName
+  /**
+   * Allows you to create glob style patterns and set a max number of indexes matching this pattern you want to keep. Creating indexes exceeding this value will cause the oldest one to get deleted. You could for example create a pattern looking like 'logs.?' and then create index logs.1, logs.2 etc, it will delete logs.1 once you create logs.6. Do note 'logs.?' does not apply to logs.10. Note: Setting max_index_count to 0 will do nothing and the pattern gets ignored.
+   */
+  indexPatterns?: UpdateDBAASServiceOpensearchRequestIndexPatterns[]
+  /**
+   * Template settings for all new indexes
+   */
+  indexTemplate?: UpdateDBAASServiceOpensearchRequestIndexTemplate
+  /**
+   * Allow incoming connections from CIDR address block, e.g. '10.20.0.0/16'
+   */
+  ipFilter?: string[]
+  /**
+   * Aiven automation resets index.refresh_interval to default value for every index to be sure that indices are always visible to search. If it doesn't fit your case, you can disable this by setting up this flag to true.
+   */
+  keepIndexRefreshInterval?: boolean
+  /**
+   * Automatic maintenance settings
+   */
+  maintenance?: UpdateDBAASServiceOpensearchRequestMaintenance
+  /**
+   * Maximum number of indexes to keep before deleting the oldest one
+   *
+   * Min 0
+   */
+  maxIndexCount?: number | null
+  /**
+   * OpenSearch Dashboards settings
+   */
+  opensearchDashboards?: UpdateDBAASServiceOpensearchRequestOpensearchDashboards
+  /**
+   * OpenSearch-specific settings
+   */
+  opensearchSettings?: JSONSchemaOpensearch
+  /**
+   * Subscription plan
+   *
+   * Length 1-128
+   */
+  plan?: string
+  /**
+   * Service is protected against termination and powering off
+   */
+  terminationProtection?: boolean
+  /**
+   * Version
+   */
+  version?: string
+}
+/** @internal */
+export function toWireUpdateDBAASServiceOpensearchRequest(
+  v: UpdateDBAASServiceOpensearchRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.indexPatterns !== undefined)
+    o['index-patterns'] = v.indexPatterns.map((x) =>
+      toWireUpdateDBAASServiceOpensearchRequestIndexPatterns(x),
+    )
+  if (v.indexTemplate !== undefined)
+    o['index-template'] = toWireUpdateDBAASServiceOpensearchRequestIndexTemplate(v.indexTemplate)
+  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter
+  if (v.keepIndexRefreshInterval !== undefined)
+    o['keep-index-refresh-interval'] = v.keepIndexRefreshInterval
+  if (v.maintenance !== undefined)
+    o['maintenance'] = toWireUpdateDBAASServiceOpensearchRequestMaintenance(v.maintenance)
+  if (v.maxIndexCount !== undefined)
+    o['max-index-count'] = v.maxIndexCount === null ? null : v.maxIndexCount
+  if (v.opensearchDashboards !== undefined)
+    o['opensearch-dashboards'] = toWireUpdateDBAASServiceOpensearchRequestOpensearchDashboards(
+      v.opensearchDashboards,
+    )
+  if (v.opensearchSettings !== undefined)
+    o['opensearch-settings'] = toWireJSONSchemaOpensearch(v.opensearchSettings)
+  if (v.plan !== undefined) o['plan'] = v.plan
+  if (v.terminationProtection !== undefined) o['termination-protection'] = v.terminationProtection
+  if (v.version !== undefined) o['version'] = v.version
+  return o
+}
+
+export interface UpdateDBAASServicePGRequestBackupSchedule {
+  /**
+   * The hour of day (in UTC) when backup for the service is started. New backup is only started if previous backup has already completed.
+   *
+   * Min 0, Max 23
+   */
+  backupHour?: number | null
+  /**
+   * The minute of an hour when backup for the service is started. New backup is only started if previous backup has already completed.
+   *
+   * Min 0, Max 59
+   */
+  backupMinute?: number | null
+}
+
+/** @internal */
+export function toWireUpdateDBAASServicePGRequestBackupSchedule(
+  v: UpdateDBAASServicePGRequestBackupSchedule,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.backupHour !== undefined) o['backup-hour'] = v.backupHour === null ? null : v.backupHour
+  if (v.backupMinute !== undefined)
+    o['backup-minute'] = v.backupMinute === null ? null : v.backupMinute
+  return o
+}
+
+/**
+ * Automatic maintenance settings
+ */
+export interface UpdateDBAASServicePGRequestMaintenance {
+  /**
+   * Day of week for installing updates
+   */
+  dow: 'friday' | 'monday' | 'never' | 'saturday' | 'sunday' | 'thursday' | 'tuesday' | 'wednesday'
+  /**
+   * Time for installing updates, UTC
+   *
+   * Length 8-8
+   */
+  time: string
+}
+
+/** @internal */
+export function toWireUpdateDBAASServicePGRequestMaintenance(
+  v: UpdateDBAASServicePGRequestMaintenance,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.dow !== undefined) o['dow'] = v.dow
+  if (v.time !== undefined) o['time'] = v.time
+  return o
+}
+
+/**
+ * Migrate data from existing server
+ */
+export interface UpdateDBAASServicePGRequestMigration {
+  /**
+   * Database name for bootstrapping the initial connection
+   *
+   * Length 1-63
+   */
+  dbname?: string
+  /**
+   * Hostname or IP address of the server where to migrate data from
+   *
+   * Length 1-255
+   */
+  host: string
+  /**
+   * Comma-separated list of databases, which should be ignored during migration (supported by MySQL only at the moment)
+   *
+   * Length 1-2048
+   */
+  ignoreDbs?: string
+  /**
+   * The migration method to be used
+   */
+  method?: EnumMigrationMethod
+  /**
+   * Password for authentication with the server where to migrate data from
+   *
+   * Length 1-255
+   */
+  password?: string
+  /**
+   * Port number of the server where to migrate data from
+   *
+   * Min 1, Max 65535
+   */
+  port: number
+  /**
+   * The server where to migrate data from is secured with SSL
+   */
+  ssl?: boolean
+  /**
+   * User name for authentication with the server where to migrate data from
+   *
+   * Length 1-255
+   */
+  username?: string
+}
+
+/** @internal */
+export function toWireUpdateDBAASServicePGRequestMigration(
+  v: UpdateDBAASServicePGRequestMigration,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.dbname !== undefined) o['dbname'] = v.dbname
+  if (v.host !== undefined) o['host'] = v.host
+  if (v.ignoreDbs !== undefined) o['ignore-dbs'] = v.ignoreDbs
+  if (v.method !== undefined) o['method'] = v.method
+  if (v.password !== undefined) o['password'] = v.password
+  if (v.port !== undefined) o['port'] = v.port
+  if (v.ssl !== undefined) o['ssl'] = v.ssl
+  if (v.username !== undefined) o['username'] = v.username
+  return o
+}
+export interface UpdateDBAASServicePGRequest {
+  name: DBAASServiceName
+  backupSchedule?: UpdateDBAASServicePGRequestBackupSchedule
+  /**
+   * Allow incoming connections from CIDR address block, e.g. '10.20.0.0/16'
+   */
+  ipFilter?: string[]
+  /**
+   * Automatic maintenance settings
+   */
+  maintenance?: UpdateDBAASServicePGRequestMaintenance
+  /**
+   * Migrate data from existing server
+   */
+  migration?: UpdateDBAASServicePGRequestMigration
+  /**
+   * PostgreSQL-specific settings
+   */
+  pgSettings?: JSONSchemaPG
+  /**
+   * PGAudit settings
+   */
+  pgauditSettings?: JSONSchemaPgaudit
+  /**
+   * PGBouncer connection pooling settings
+   */
+  pgbouncerSettings?: JSONSchemaPgbouncer
+  /**
+   * PGLookout settings
+   */
+  pglookoutSettings?: JSONSchemaPglookout
+  /**
+   * Subscription plan
+   *
+   * Length 1-128
+   */
+  plan?: string
+  /**
+   * Percentage of total RAM that the database server uses for shared memory buffers. Valid range is 20-60 (float), which corresponds to 20% - 60%. This setting adjusts the shared_buffers configuration value.
+   *
+   * Min 20, Max 60
+   */
+  sharedBuffersPercentage?: number
+  /**
+   * Synchronous replication type. Note that the service plan also needs to support synchronous replication.
+   */
+  synchronousReplication?: EnumPGSynchronousReplication
+  /**
+   * Service is protected against termination and powering off
+   */
+  terminationProtection?: boolean
+  /**
+   * TimescaleDB extension configuration values
+   */
+  timescaledbSettings?: JSONSchemaTimescaledb
+  /**
+   * Variant of the PostgreSQL service, may affect the features that are exposed by default
+   */
+  variant?: EnumPGVariant
+  /**
+   * Version
+   */
+  version?: string
+  /**
+   * Sets the maximum amount of memory to be used by a query operation (such as a sort or hash table) before writing to temporary disk files, in MB. Default is 1MB + 0.075% of total RAM (up to 32MB).
+   *
+   * Min 1, Max 1024
+   */
+  workMem?: number
+}
+/** @internal */
+export function toWireUpdateDBAASServicePGRequest(
+  v: UpdateDBAASServicePGRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.backupSchedule !== undefined)
+    o['backup-schedule'] = toWireUpdateDBAASServicePGRequestBackupSchedule(v.backupSchedule)
+  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter
+  if (v.maintenance !== undefined)
+    o['maintenance'] = toWireUpdateDBAASServicePGRequestMaintenance(v.maintenance)
+  if (v.migration !== undefined)
+    o['migration'] = toWireUpdateDBAASServicePGRequestMigration(v.migration)
+  if (v.pgSettings !== undefined) o['pg-settings'] = toWireJSONSchemaPG(v.pgSettings)
+  if (v.pgauditSettings !== undefined)
+    o['pgaudit-settings'] = toWireJSONSchemaPgaudit(v.pgauditSettings)
+  if (v.pgbouncerSettings !== undefined)
+    o['pgbouncer-settings'] = toWireJSONSchemaPgbouncer(v.pgbouncerSettings)
+  if (v.pglookoutSettings !== undefined)
+    o['pglookout-settings'] = toWireJSONSchemaPglookout(v.pglookoutSettings)
+  if (v.plan !== undefined) o['plan'] = v.plan
+  if (v.sharedBuffersPercentage !== undefined)
+    o['shared-buffers-percentage'] = v.sharedBuffersPercentage
+  if (v.synchronousReplication !== undefined)
+    o['synchronous-replication'] = v.synchronousReplication
+  if (v.terminationProtection !== undefined) o['termination-protection'] = v.terminationProtection
+  if (v.timescaledbSettings !== undefined)
+    o['timescaledb-settings'] = toWireJSONSchemaTimescaledb(v.timescaledbSettings)
+  if (v.variant !== undefined) o['variant'] = v.variant
+  if (v.version !== undefined) o['version'] = v.version
+  if (v.workMem !== undefined) o['work-mem'] = v.workMem
   return o
 }
 
@@ -4313,179 +7070,6 @@ export function toWireUpdateDBAASServiceThanosRequest(
   if (v.terminationProtection !== undefined) o['termination-protection'] = v.terminationProtection
   if (v.thanosSettings !== undefined)
     o['thanos-settings'] = toWireJSONSchemaThanos(v.thanosSettings)
-  return o
-}
-
-export interface StartDBAASThanosMaintenanceRequest {
-  name: DBAASServiceName
-}
-
-export interface RevealDBAASThanosUserPasswordRequest {
-  serviceName: DBAASServiceName
-  username: DBAASUserUsername
-}
-
-export interface DeleteDBAASServiceValkeyRequest {
-  name: string
-}
-
-export interface GetDBAASServiceValkeyRequest {
-  name: DBAASServiceName
-}
-
-/**
- * Automatic maintenance settings
- */
-export interface CreateDBAASServiceValkeyRequestMaintenance {
-  /**
-   * Day of week for installing updates
-   */
-  dow: 'friday' | 'monday' | 'never' | 'saturday' | 'sunday' | 'thursday' | 'tuesday' | 'wednesday'
-  /**
-   * Time for installing updates, UTC
-   *
-   * Length 8-8
-   */
-  time: string
-}
-
-/** @internal */
-export function toWireCreateDBAASServiceValkeyRequestMaintenance(
-  v: CreateDBAASServiceValkeyRequestMaintenance,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.dow !== undefined) o['dow'] = v.dow
-  if (v.time !== undefined) o['time'] = v.time
-  return o
-}
-
-/**
- * Migrate data from existing server
- */
-export interface CreateDBAASServiceValkeyRequestMigration {
-  /**
-   * Database name for bootstrapping the initial connection
-   *
-   * Length 1-63
-   */
-  dbname?: string
-  /**
-   * Hostname or IP address of the server where to migrate data from
-   *
-   * Length 1-255
-   */
-  host: string
-  /**
-   * Comma-separated list of databases, which should be ignored during migration (supported by MySQL only at the moment)
-   *
-   * Length 1-2048
-   */
-  ignoreDbs?: string
-  /**
-   * The migration method to be used
-   */
-  method?: EnumMigrationMethod
-  /**
-   * Password for authentication with the server where to migrate data from
-   *
-   * Length 1-255
-   */
-  password?: string
-  /**
-   * Port number of the server where to migrate data from
-   *
-   * Min 1, Max 65535
-   */
-  port: number
-  /**
-   * The server where to migrate data from is secured with SSL
-   */
-  ssl?: boolean
-  /**
-   * User name for authentication with the server where to migrate data from
-   *
-   * Length 1-255
-   */
-  username?: string
-}
-
-/** @internal */
-export function toWireCreateDBAASServiceValkeyRequestMigration(
-  v: CreateDBAASServiceValkeyRequestMigration,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.dbname !== undefined) o['dbname'] = v.dbname
-  if (v.host !== undefined) o['host'] = v.host
-  if (v.ignoreDbs !== undefined) o['ignore-dbs'] = v.ignoreDbs
-  if (v.method !== undefined) o['method'] = v.method
-  if (v.password !== undefined) o['password'] = v.password
-  if (v.port !== undefined) o['port'] = v.port
-  if (v.ssl !== undefined) o['ssl'] = v.ssl
-  if (v.username !== undefined) o['username'] = v.username
-  return o
-}
-export interface CreateDBAASServiceValkeyRequest {
-  name: DBAASServiceName
-  /**
-   * Service to fork from
-   */
-  forkFromService?: DBAASServiceName
-  /**
-   * Allow incoming connections from CIDR address block, e.g. '10.20.0.0/16'
-   */
-  ipFilter?: string[]
-  /**
-   * Automatic maintenance settings
-   */
-  maintenance?: CreateDBAASServiceValkeyRequestMaintenance
-  /**
-   * Migrate data from existing server
-   */
-  migration?: CreateDBAASServiceValkeyRequestMigration
-  /**
-   * Subscription plan
-   *
-   * Length 1-128
-   */
-  plan: string
-  /**
-   * Name of a backup to recover from for services that support backup names
-   *
-   * Min length 1
-   */
-  recoveryBackupName?: string
-  /**
-   * Service is protected against termination and powering off
-   */
-  terminationProtection?: boolean
-  /**
-   * Valkey.conf settings
-   */
-  valkeySettings?: JSONSchemaValkey
-  /**
-   * Valkey major version
-   *
-   * Min length 1
-   */
-  version?: string
-}
-/** @internal */
-export function toWireCreateDBAASServiceValkeyRequest(
-  v: CreateDBAASServiceValkeyRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.forkFromService !== undefined) o['fork-from-service'] = v.forkFromService
-  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter
-  if (v.maintenance !== undefined)
-    o['maintenance'] = toWireCreateDBAASServiceValkeyRequestMaintenance(v.maintenance)
-  if (v.migration !== undefined)
-    o['migration'] = toWireCreateDBAASServiceValkeyRequestMigration(v.migration)
-  if (v.plan !== undefined) o['plan'] = v.plan
-  if (v.recoveryBackupName !== undefined) o['recovery-backup-name'] = v.recoveryBackupName
-  if (v.terminationProtection !== undefined) o['termination-protection'] = v.terminationProtection
-  if (v.valkeySettings !== undefined)
-    o['valkey-settings'] = toWireJSONSchemaValkey(v.valkeySettings)
-  if (v.version !== undefined) o['version'] = v.version
   return o
 }
 
@@ -4633,42 +7217,6 @@ export function toWireUpdateDBAASServiceValkeyRequest(
   return o
 }
 
-export interface StartDBAASValkeyMaintenanceRequest {
-  name: DBAASServiceName
-}
-
-export interface StopDBAASValkeyMigrationRequest {
-  name: DBAASServiceName
-}
-
-export interface ListDBAASValkeyUsersRequest {
-  serviceName: DBAASServiceName
-}
-
-export interface CreateDBAASValkeyUserRequest {
-  serviceName: DBAASServiceName
-  accessControl?: DBAASValkeyUserAccessControl
-  /**
-   * Username
-   */
-  username: DBAASUserUsername
-}
-/** @internal */
-export function toWireCreateDBAASValkeyUserRequest(
-  v: CreateDBAASValkeyUserRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.accessControl !== undefined)
-    o['access-control'] = toWireDBAASValkeyUserAccessControl(v.accessControl)
-  if (v.username !== undefined) o['username'] = v.username
-  return o
-}
-
-export interface DeleteDBAASValkeyUserRequest {
-  serviceName: DBAASServiceName
-  username: DBAASUserUsername
-}
-
 export interface UpdateDBAASValkeyUserAccessControlRequest {
   serviceName: DBAASServiceName
   username: DBAASUserUsername
@@ -4682,148 +7230,6 @@ export function toWireUpdateDBAASValkeyUserAccessControlRequest(
   if (v.accessControl !== undefined)
     o['access-control'] = toWireDBAASValkeyUserAccessControl(v.accessControl)
   return o
-}
-
-export interface ResetDBAASValkeyUserPasswordRequest {
-  serviceName: DBAASServiceName
-  username: DBAASUserUsername
-  /**
-   * New password
-   */
-  password?: DBAASUserPassword
-}
-/** @internal */
-export function toWireResetDBAASValkeyUserPasswordRequest(
-  v: ResetDBAASValkeyUserPasswordRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.password !== undefined) o['password'] = v.password
-  return o
-}
-
-export interface RevealDBAASValkeyUserPasswordRequest {
-  serviceName: DBAASServiceName
-  username: DBAASUserUsername
-}
-
-export interface ListDeployTargetsResponse {
-  deployTargets?: DeployTarget[]
-}
-
-/** @internal */
-export function fromWireListDeployTargetsResponse(w: any): ListDeployTargetsResponse {
-  const v = {} as ListDeployTargetsResponse
-  if (w['deploy-targets'] !== undefined)
-    v.deployTargets = (w['deploy-targets'] as any[]).map((x) => fromWireDeployTarget(x))
-  return v
-}
-
-export interface GetDeployTargetRequest {
-  id: string
-}
-
-export interface ListDNSDomainsResponse {
-  dnsDomains?: DNSDomain[]
-}
-
-/** @internal */
-export function fromWireListDNSDomainsResponse(w: any): ListDNSDomainsResponse {
-  const v = {} as ListDNSDomainsResponse
-  if (w['dns-domains'] !== undefined)
-    v.dnsDomains = (w['dns-domains'] as any[]).map((x) => fromWireDNSDomain(x))
-  return v
-}
-
-export interface CreateDNSDomainRequest {
-  /**
-   * Domain name
-   */
-  unicodeName?: string
-}
-/** @internal */
-export function toWireCreateDNSDomainRequest(v: CreateDNSDomainRequest): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.unicodeName !== undefined) o['unicode-name'] = v.unicodeName
-  return o
-}
-
-export interface ListDNSDomainRecordsRequest {
-  domainID: string
-}
-export interface ListDNSDomainRecordsResponse {
-  dnsDomainRecords?: DNSDomainRecord[]
-}
-
-/** @internal */
-export function fromWireListDNSDomainRecordsResponse(w: any): ListDNSDomainRecordsResponse {
-  const v = {} as ListDNSDomainRecordsResponse
-  if (w['dns-domain-records'] !== undefined)
-    v.dnsDomainRecords = (w['dns-domain-records'] as any[]).map((x) => fromWireDNSDomainRecord(x))
-  return v
-}
-
-export interface CreateDNSDomainRecordRequest {
-  domainID: string
-  /**
-   * DNS domain record content
-   */
-  content: string
-  /**
-   * DNS domain record name
-   */
-  name: string
-  /**
-   * DNS domain record priority
-   *
-   * Min 0
-   */
-  priority?: number
-  /**
-   * DNS domain record TTL
-   *
-   * Min 0
-   */
-  ttl?: number
-  /**
-   * DNS domain record type
-   */
-  type:
-    | 'A'
-    | 'AAAA'
-    | 'ALIAS'
-    | 'CAA'
-    | 'CNAME'
-    | 'HINFO'
-    | 'MX'
-    | 'NAPTR'
-    | 'NS'
-    | 'POOL'
-    | 'SRV'
-    | 'SSHFP'
-    | 'TXT'
-    | 'URL'
-}
-/** @internal */
-export function toWireCreateDNSDomainRecordRequest(
-  v: CreateDNSDomainRecordRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.content !== undefined) o['content'] = v.content
-  if (v.name !== undefined) o['name'] = v.name
-  if (v.priority !== undefined) o['priority'] = v.priority
-  if (v.ttl !== undefined) o['ttl'] = v.ttl
-  if (v.type !== undefined) o['type'] = v.type
-  return o
-}
-
-export interface DeleteDNSDomainRecordRequest {
-  domainID: string
-  recordID: string
-}
-
-export interface GetDNSDomainRecordRequest {
-  domainID: string
-  recordID: string
 }
 
 export interface UpdateDNSDomainRecordRequest {
@@ -4862,78 +7268,6 @@ export function toWireUpdateDNSDomainRecordRequest(
   return o
 }
 
-export interface DeleteDNSDomainRequest {
-  id: string
-}
-
-export interface GetDNSDomainRequest {
-  id: string
-}
-
-export interface GetDNSDomainZoneFileRequest {
-  id: string
-}
-export interface GetDNSDomainZoneFileResponse {
-  zoneFile?: string
-}
-
-/** @internal */
-export function fromWireGetDNSDomainZoneFileResponse(w: any): GetDNSDomainZoneFileResponse {
-  const v = {} as GetDNSDomainZoneFileResponse
-  if (w['zone-file'] !== undefined) v.zoneFile = w['zone-file']
-  return v
-}
-
-export interface ListElasticIPSResponse {
-  elasticIPS?: ElasticIP[]
-}
-
-/** @internal */
-export function fromWireListElasticIPSResponse(w: any): ListElasticIPSResponse {
-  const v = {} as ListElasticIPSResponse
-  if (w['elastic-ips'] !== undefined)
-    v.elasticIPS = (w['elastic-ips'] as any[]).map((x) => fromWireElasticIP(x))
-  return v
-}
-
-export interface CreateElasticIPRequest {
-  /**
-   * Elastic IP address family (default: :inet4)
-   */
-  addressfamily?: 'inet4' | 'inet6'
-  /**
-   * Elastic IP description
-   *
-   * Max length 255
-   */
-  description?: string
-  /**
-   * Elastic IP healthcheck
-   */
-  healthcheck?: ElasticIPHealthcheck
-  /**
-   * Resource labels
-   */
-  labels?: Labels
-}
-/** @internal */
-export function toWireCreateElasticIPRequest(v: CreateElasticIPRequest): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.addressfamily !== undefined) o['addressfamily'] = v.addressfamily
-  if (v.description !== undefined) o['description'] = v.description
-  if (v.healthcheck !== undefined) o['healthcheck'] = toWireElasticIPHealthcheck(v.healthcheck)
-  if (v.labels !== undefined) o['labels'] = v.labels
-  return o
-}
-
-export interface DeleteElasticIPRequest {
-  id: string
-}
-
-export interface GetElasticIPRequest {
-  id: string
-}
-
 export interface UpdateElasticIPRequest {
   id: string
   /**
@@ -4958,180 +7292,6 @@ export function toWireUpdateElasticIPRequest(v: UpdateElasticIPRequest): Record<
   if (v.healthcheck !== undefined) o['healthcheck'] = toWireElasticIPHealthcheck(v.healthcheck)
   if (v.labels !== undefined) o['labels'] = v.labels
   return o
-}
-
-export interface ResetElasticIPFieldRequest {
-  field: 'description'
-  id: string
-}
-
-export interface AttachInstanceToElasticIPRequest {
-  id: string
-  /**
-   * Compute instance
-   */
-  instance: InstanceRef
-}
-/** @internal */
-export function toWireAttachInstanceToElasticIPRequest(
-  v: AttachInstanceToElasticIPRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.instance !== undefined) o['instance'] = toWireInstanceRef(v.instance)
-  return o
-}
-
-export interface DetachInstanceFromElasticIPRequest {
-  id: string
-  /**
-   * Compute instance
-   */
-  instance: InstanceRef
-}
-/** @internal */
-export function toWireDetachInstanceFromElasticIPRequest(
-  v: DetachInstanceFromElasticIPRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.instance !== undefined) o['instance'] = toWireInstanceRef(v.instance)
-  return o
-}
-
-export interface GetEnvImpactRequest {
-  period: string
-}
-
-export interface GetImpactEstimateRequest {
-  /**
-   * Product-specific configuration details
-   */
-  metadata?: Record<string, unknown>
-  /**
-   * Product SKU, e.g. compute:ch-gva-2:instance:standard:medium; can also include wildcards, e.g. compute:\*:instance:standard:\* for all standard instances in all zones
-   */
-  sku: string
-}
-/** @internal */
-export function toWireGetImpactEstimateRequest(
-  v: GetImpactEstimateRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.metadata !== undefined) o['metadata'] = v.metadata
-  if (v.sku !== undefined) o['sku'] = v.sku
-  return o
-}
-export type GetImpactEstimateResponseImpact = Record<string, ImpactValueWithUnit>
-
-/** @internal */
-export function fromWireGetImpactEstimateResponseImpact(w: any): GetImpactEstimateResponseImpact {
-  return Object.fromEntries(
-    Object.entries(w ?? {}).map(([k, x]) => [k, fromWireImpactValueWithUnit(x)]),
-  )
-}
-export interface GetImpactEstimateResponse {
-  /**
-   * Map of SKUs to their different impact indicators
-   */
-  impact: Record<string, GetImpactEstimateResponseImpact>
-}
-
-/** @internal */
-export function fromWireGetImpactEstimateResponse(w: any): GetImpactEstimateResponse {
-  const v = {} as GetImpactEstimateResponse
-  v.impact = Object.fromEntries(
-    Object.entries(w['impact'] ?? {}).map(([k, val]) => [
-      k,
-      fromWireGetImpactEstimateResponseImpact(val),
-    ]),
-  )
-  return v
-}
-
-export interface GetImpactReportRequest {
-  from?: string
-  to?: string
-}
-
-export interface ListEventsRequest {
-  from?: Date
-  to?: Date
-}
-
-export interface ListIAMRolesResponse {
-  iamRoles?: IAMRole[]
-}
-
-/** @internal */
-export function fromWireListIAMRolesResponse(w: any): ListIAMRolesResponse {
-  const v = {} as ListIAMRolesResponse
-  if (w['iam-roles'] !== undefined)
-    v.iamRoles = (w['iam-roles'] as any[]).map((x) => fromWireIAMRole(x))
-  return v
-}
-
-export interface CreateIAMRoleRequest {
-  /**
-   * IAM Assume role policy
-   */
-  assumeRolePolicy?: IAMAssumeRolePolicy
-  /**
-   * IAM Role description
-   *
-   * Length 1-255
-   */
-  description?: string
-  /**
-   * Sets if the IAM Role Policy is editable or not (default: true). This setting cannot be changed after creation
-   */
-  editable?: boolean
-  /**
-   * IAM Role labels
-   */
-  labels?: Labels
-  /**
-   * Maximum TTL requester is allowed to ask for when assuming a role
-   *
-   * Min >0
-   */
-  maxSessionTtl?: number
-  /**
-   * IAM Role name
-   *
-   * Length 1-191
-   */
-  name: string
-  /**
-   * IAM Role permissions
-   *
-   * Unique items
-   */
-  permissions?: string[]
-  /**
-   * IAM Role policy
-   */
-  policy?: IAMPolicy
-}
-/** @internal */
-export function toWireCreateIAMRoleRequest(v: CreateIAMRoleRequest): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.assumeRolePolicy !== undefined)
-    o['assume-role-policy'] = toWireIAMAssumeRolePolicy(v.assumeRolePolicy)
-  if (v.description !== undefined) o['description'] = v.description
-  if (v.editable !== undefined) o['editable'] = v.editable
-  if (v.labels !== undefined) o['labels'] = v.labels
-  if (v.maxSessionTtl !== undefined) o['max-session-ttl'] = v.maxSessionTtl
-  if (v.name !== undefined) o['name'] = v.name
-  if (v.permissions !== undefined) o['permissions'] = v.permissions
-  if (v.policy !== undefined) o['policy'] = toWireIAMPolicy(v.policy)
-  return o
-}
-
-export interface DeleteIAMRoleRequest {
-  id: string
-}
-
-export interface GetIAMRoleRequest {
-  id: string
 }
 
 export interface UpdateIAMRoleRequest {
@@ -5175,228 +7335,16 @@ export function toWireUpdateIAMRoleRequest(v: UpdateIAMRoleRequest): Record<stri
   return o
 }
 
-export interface AssumeIAMRoleRequest {
+export interface UpdateInstanceRequest {
   id: string
   /**
-   * Organization ID target of the assume role action
-   */
-  orgID?: string
-  /**
-   * TTL in seconds for the generated access key (cannot exceed the max TTL defined in the targeted assume role)
-   *
-   * Min >0
-   */
-  ttl: number
-}
-/** @internal */
-export function toWireAssumeIAMRoleRequest(v: AssumeIAMRoleRequest): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.orgID !== undefined) o['org-id'] = v.orgID
-  if (v.ttl !== undefined) o['ttl'] = v.ttl
-  return o
-}
-export interface AssumeIAMRoleResponse {
-  expiresAT?: string
-  key?: string
-  name?: string
-  orgID?: string
-  roleID?: string
-  secret?: string
-}
-
-/** @internal */
-export function fromWireAssumeIAMRoleResponse(w: any): AssumeIAMRoleResponse {
-  const v = {} as AssumeIAMRoleResponse
-  if (w['expires-at'] !== undefined) v.expiresAT = w['expires-at']
-  if (w['key'] !== undefined) v.key = w['key']
-  if (w['name'] !== undefined) v.name = w['name']
-  if (w['org-id'] !== undefined) v.orgID = w['org-id']
-  if (w['role-id'] !== undefined) v.roleID = w['role-id']
-  if (w['secret'] !== undefined) v.secret = w['secret']
-  return v
-}
-
-export interface ListInstancesRequest {
-  ipAddress?: string
-  labels?: string
-  managerID?: string
-  managerType?: 'instance-pool'
-}
-/**
- * Private Network
- */
-export interface ListInstancesResponseInstancesPrivateNetworks {
-  /**
-   * Private Network ID
-   */
-  id?: string
-  /**
-   * Private Network MAC address
-   */
-  macAddress?: string
-}
-
-/** @internal */
-export function fromWireListInstancesResponseInstancesPrivateNetworks(
-  w: any,
-): ListInstancesResponseInstancesPrivateNetworks {
-  const v = {} as ListInstancesResponseInstancesPrivateNetworks
-  if (w['id'] !== undefined) v.id = w['id']
-  if (w['mac-address'] !== undefined) v.macAddress = w['mac-address']
-  return v
-}
-
-/**
- * Instance
- */
-export interface ListInstancesResponseInstances {
-  /**
-   * Instance creation date
-   */
-  createdAT?: Date
-  /**
-   * Instance ID
-   */
-  id?: string
-  /**
-   * Instance Type
-   */
-  instanceType?: InstanceType
-  /**
-   * Instance IPv6 address
-   */
-  ipv6Address?: string
-  /**
-   * Resource labels
-   */
-  labels?: Labels
-  /**
-   * Instance MAC address
-   */
-  macAddress?: string
-  /**
-   * Instance manager
-   */
-  manager?: Manager
-  /**
-   * Instance name
-   *
-   * Length 1-255
-   */
-  name?: string
-  /**
-   * Instance Private Networks
-   */
-  privateNetworks?: ListInstancesResponseInstancesPrivateNetworks[]
-  /**
-   * Instance public IPv4 address
-   */
-  publicIP?: string
-  /**
-   * Instance public IP assignment
-   */
-  publicIPAssignment?: PublicIPAssignment
-  /**
-   * Instance Security Groups
-   */
-  securityGroups?: SecurityGroup[]
-  /**
-   * Instance SSH Key
-   */
-  sshKey?: SSHKey
-  /**
-   * Instance SSH Keys
-   */
-  sshKeys?: SSHKey[]
-  /**
-   * Instance state
-   */
-  state?: InstanceState
-  /**
-   * Instance Template
-   */
-  template?: Template
-}
-
-/** @internal */
-export function fromWireListInstancesResponseInstances(w: any): ListInstancesResponseInstances {
-  const v = {} as ListInstancesResponseInstances
-  if (w['created-at'] !== undefined) v.createdAT = new Date(w['created-at'])
-  if (w['id'] !== undefined) v.id = w['id']
-  if (w['instance-type'] !== undefined) v.instanceType = fromWireInstanceType(w['instance-type'])
-  if (w['ipv6-address'] !== undefined) v.ipv6Address = w['ipv6-address']
-  if (w['labels'] !== undefined) v.labels = w['labels']
-  if (w['mac-address'] !== undefined) v.macAddress = w['mac-address']
-  if (w['manager'] !== undefined) v.manager = fromWireManager(w['manager'])
-  if (w['name'] !== undefined) v.name = w['name']
-  if (w['private-networks'] !== undefined)
-    v.privateNetworks = (w['private-networks'] as any[]).map((x) =>
-      fromWireListInstancesResponseInstancesPrivateNetworks(x),
-    )
-  if (w['public-ip'] !== undefined) v.publicIP = w['public-ip']
-  if (w['public-ip-assignment'] !== undefined) v.publicIPAssignment = w['public-ip-assignment']
-  if (w['security-groups'] !== undefined)
-    v.securityGroups = (w['security-groups'] as any[]).map((x) => fromWireSecurityGroup(x))
-  if (w['ssh-key'] !== undefined) v.sshKey = fromWireSSHKey(w['ssh-key'])
-  if (w['ssh-keys'] !== undefined)
-    v.sshKeys = (w['ssh-keys'] as any[]).map((x) => fromWireSSHKey(x))
-  if (w['state'] !== undefined) v.state = w['state']
-  if (w['template'] !== undefined) v.template = fromWireTemplate(w['template'])
-  return v
-}
-export interface ListInstancesResponse {
-  instances?: ListInstancesResponseInstances[]
-}
-
-/** @internal */
-export function fromWireListInstancesResponse(w: any): ListInstancesResponse {
-  const v = {} as ListInstancesResponse
-  if (w['instances'] !== undefined)
-    v.instances = (w['instances'] as any[]).map((x) => fromWireListInstancesResponseInstances(x))
-  return v
-}
-
-export interface CreateInstanceRequest {
-  /**
-   * Instance Anti-affinity Groups
-   *
-   * Unique items
-   */
-  antiAffinityGroups?: AntiAffinityGroupRef[]
-  /**
-   * Enable application-consistent snapshot for the instance
+   * Enable/Disable Application Consistent Snapshot for Instance
    */
   applicationConsistentSnapshotEnabled?: boolean
   /**
-   * Start Instance on creation (default: true)
-   */
-  autoStart?: boolean
-  /**
-   * Instance Deploy Target
-   */
-  deployTarget?: DeployTargetRef
-  /**
-   * Instance disk size in GiB
-   *
-   * Min 10, Max 51200
-   */
-  diskSize: number
-  /**
-   * Instance Type
-   */
-  instanceType: InstanceTypeRef
-  /**
-   * VPC ip forwarding
-   */
-  ipForwarding?: boolean
-  /**
-   * Enable IPv6. DEPRECATED: use `public-ip-assignments`.
-   */
-  ipv6Enabled?: boolean
-  /**
    * Resource labels
    */
-  labels?: Labels
+  labels?: Labels | null
   /**
    * Instance name
    *
@@ -5408,34 +7356,6 @@ export interface CreateInstanceRequest {
    */
   publicIPAssignment?: PublicIPAssignment
   /**
-   * Enable secure boot
-   */
-  securebootEnabled?: boolean
-  /**
-   * Instance Security Groups
-   *
-   * Unique items
-   */
-  securityGroups?: SecurityGroupRef[]
-  /**
-   * Instance SSH Key
-   */
-  sshKey?: SSHKeyRef
-  /**
-   * Instance SSH Keys
-   *
-   * Unique items
-   */
-  sshKeys?: SSHKeyRef[]
-  /**
-   * Instance Template
-   */
-  template: TemplateRef
-  /**
-   * Enable Trusted Platform Module (TPM)
-   */
-  tpmEnabled?: boolean
-  /**
    * Instance Cloud-init user-data (base64 encoded)
    *
    * Length 1-32768
@@ -5443,188 +7363,15 @@ export interface CreateInstanceRequest {
   userData?: string
 }
 /** @internal */
-export function toWireCreateInstanceRequest(v: CreateInstanceRequest): Record<string, unknown> {
+export function toWireUpdateInstanceRequest(v: UpdateInstanceRequest): Record<string, unknown> {
   const o: Record<string, unknown> = {}
-  if (v.antiAffinityGroups !== undefined)
-    o['anti-affinity-groups'] = v.antiAffinityGroups.map((x) => toWireAntiAffinityGroupRef(x))
   if (v.applicationConsistentSnapshotEnabled !== undefined)
     o['application-consistent-snapshot-enabled'] = v.applicationConsistentSnapshotEnabled
-  if (v.autoStart !== undefined) o['auto-start'] = v.autoStart
-  if (v.deployTarget !== undefined) o['deploy-target'] = toWireDeployTargetRef(v.deployTarget)
-  if (v.diskSize !== undefined) o['disk-size'] = v.diskSize
-  if (v.instanceType !== undefined) o['instance-type'] = toWireInstanceTypeRef(v.instanceType)
-  if (v.ipForwarding !== undefined) o['ip-forwarding'] = v.ipForwarding
-  if (v.ipv6Enabled !== undefined) o['ipv6-enabled'] = v.ipv6Enabled
-  if (v.labels !== undefined) o['labels'] = v.labels
+  if (v.labels !== undefined) o['labels'] = v.labels === null ? null : v.labels
   if (v.name !== undefined) o['name'] = v.name
   if (v.publicIPAssignment !== undefined) o['public-ip-assignment'] = v.publicIPAssignment
-  if (v.securebootEnabled !== undefined) o['secureboot-enabled'] = v.securebootEnabled
-  if (v.securityGroups !== undefined)
-    o['security-groups'] = v.securityGroups.map((x) => toWireSecurityGroupRef(x))
-  if (v.sshKey !== undefined) o['ssh-key'] = toWireSSHKeyRef(v.sshKey)
-  if (v.sshKeys !== undefined) o['ssh-keys'] = v.sshKeys.map((x) => toWireSSHKeyRef(x))
-  if (v.template !== undefined) o['template'] = toWireTemplateRef(v.template)
-  if (v.tpmEnabled !== undefined) o['tpm-enabled'] = v.tpmEnabled
   if (v.userData !== undefined) o['user-data'] = v.userData
   return o
-}
-
-export interface ListInstancePoolsResponse {
-  instancePools?: InstancePool[]
-}
-
-/** @internal */
-export function fromWireListInstancePoolsResponse(w: any): ListInstancePoolsResponse {
-  const v = {} as ListInstancePoolsResponse
-  if (w['instance-pools'] !== undefined)
-    v.instancePools = (w['instance-pools'] as any[]).map((x) => fromWireInstancePool(x))
-  return v
-}
-
-export interface CreateInstancePoolRequest {
-  /**
-   * Instance Pool Anti-affinity Groups
-   *
-   * Unique items
-   */
-  antiAffinityGroups?: AntiAffinityGroupRef[]
-  /**
-   * Enable application consistent snapshots
-   */
-  applicationConsistentSnapshotEnabled?: boolean
-  /**
-   * Deploy Target to deploy Instances on
-   */
-  deployTarget?: DeployTargetRef
-  /**
-   * Instance Pool description
-   *
-   * Max length 255
-   */
-  description?: string
-  /**
-   * Instances disk size in GiB
-   *
-   * Min 10, Max 51200
-   */
-  diskSize: number
-  /**
-   * Instances Elastic IPs
-   *
-   * Unique items
-   */
-  elasticIPS?: ElasticIPRef[]
-  /**
-   * Prefix to apply to Instances names (default: pool)
-   *
-   * Length 1-30
-   */
-  instancePrefix?: string
-  /**
-   * Instances type
-   */
-  instanceType: InstanceTypeRef
-  /**
-   * Enable IPv6. DEPRECATED: use `public-ip-assignments`.
-   */
-  ipv6Enabled?: boolean
-  /**
-   * Instance Pool Labels
-   */
-  labels?: Labels
-  /**
-   * Minimum number of running Instances
-   *
-   * Min 0
-   */
-  minAvailable?: number
-  /**
-   * Instance Pool name
-   *
-   * Length 1-255
-   */
-  name: string
-  /**
-   * Instance Pool Private Networks
-   *
-   * Unique items
-   */
-  privateNetworks?: PrivateNetworkRef[]
-  /**
-   * Determines public IP assignment of the Instances. Type `none` is final and can't be changed later on.
-   */
-  publicIPAssignment?: 'dual' | 'inet4' | 'none'
-  /**
-   * Instance Pool Security Groups
-   *
-   * Unique items
-   */
-  securityGroups?: SecurityGroupRef[]
-  /**
-   * Number of Instances
-   *
-   * Min >0
-   */
-  size: number
-  /**
-   * Instances SSH key
-   */
-  sshKey?: SSHKeyRef
-  /**
-   * Instances SSH Keys
-   *
-   * Unique items
-   */
-  sshKeys?: SSHKeyRef[]
-  /**
-   * Instances template
-   */
-  template: TemplateRef
-  /**
-   * Instances Cloud-init user-data
-   *
-   * Length 1-32768
-   */
-  userData?: string
-}
-/** @internal */
-export function toWireCreateInstancePoolRequest(
-  v: CreateInstancePoolRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.antiAffinityGroups !== undefined)
-    o['anti-affinity-groups'] = v.antiAffinityGroups.map((x) => toWireAntiAffinityGroupRef(x))
-  if (v.applicationConsistentSnapshotEnabled !== undefined)
-    o['application-consistent-snapshot-enabled'] = v.applicationConsistentSnapshotEnabled
-  if (v.deployTarget !== undefined) o['deploy-target'] = toWireDeployTargetRef(v.deployTarget)
-  if (v.description !== undefined) o['description'] = v.description
-  if (v.diskSize !== undefined) o['disk-size'] = v.diskSize
-  if (v.elasticIPS !== undefined) o['elastic-ips'] = v.elasticIPS.map((x) => toWireElasticIPRef(x))
-  if (v.instancePrefix !== undefined) o['instance-prefix'] = v.instancePrefix
-  if (v.instanceType !== undefined) o['instance-type'] = toWireInstanceTypeRef(v.instanceType)
-  if (v.ipv6Enabled !== undefined) o['ipv6-enabled'] = v.ipv6Enabled
-  if (v.labels !== undefined) o['labels'] = v.labels
-  if (v.minAvailable !== undefined) o['min-available'] = v.minAvailable
-  if (v.name !== undefined) o['name'] = v.name
-  if (v.privateNetworks !== undefined)
-    o['private-networks'] = v.privateNetworks.map((x) => toWirePrivateNetworkRef(x))
-  if (v.publicIPAssignment !== undefined) o['public-ip-assignment'] = v.publicIPAssignment
-  if (v.securityGroups !== undefined)
-    o['security-groups'] = v.securityGroups.map((x) => toWireSecurityGroupRef(x))
-  if (v.size !== undefined) o['size'] = v.size
-  if (v.sshKey !== undefined) o['ssh-key'] = toWireSSHKeyRef(v.sshKey)
-  if (v.sshKeys !== undefined) o['ssh-keys'] = v.sshKeys.map((x) => toWireSSHKeyRef(x))
-  if (v.template !== undefined) o['template'] = toWireTemplateRef(v.template)
-  if (v.userData !== undefined) o['user-data'] = v.userData
-  return o
-}
-
-export interface DeleteInstancePoolRequest {
-  id: string
-}
-
-export interface GetInstancePoolRequest {
-  id: string
 }
 
 export interface UpdateInstancePoolRequest {
@@ -5765,317 +7512,6 @@ export function toWireUpdateInstancePoolRequest(
   return o
 }
 
-export interface ResetInstancePoolFieldRequest {
-  field:
-    | 'anti-affinity-groups'
-    | 'deploy-target'
-    | 'description'
-    | 'elastic-ips'
-    | 'ipv6-enabled'
-    | 'labels'
-    | 'private-networks'
-    | 'security-groups'
-    | 'ssh-key'
-    | 'user-data'
-  id: string
-}
-
-export interface EvictInstancePoolMembersRequest {
-  id: string
-  instances?: string[]
-}
-/** @internal */
-export function toWireEvictInstancePoolMembersRequest(
-  v: EvictInstancePoolMembersRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.instances !== undefined) o['instances'] = v.instances
-  return o
-}
-
-export interface ScaleInstancePoolRequest {
-  id: string
-  /**
-   * Number of managed Instances
-   *
-   * Min 0
-   */
-  size: number
-}
-/** @internal */
-export function toWireScaleInstancePoolRequest(
-  v: ScaleInstancePoolRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.size !== undefined) o['size'] = v.size
-  return o
-}
-
-export interface ListInstanceTypesResponse {
-  instanceTypes?: InstanceType[]
-}
-
-/** @internal */
-export function fromWireListInstanceTypesResponse(w: any): ListInstanceTypesResponse {
-  const v = {} as ListInstanceTypesResponse
-  if (w['instance-types'] !== undefined)
-    v.instanceTypes = (w['instance-types'] as any[]).map((x) => fromWireInstanceType(x))
-  return v
-}
-
-export interface GetInstanceTypeRequest {
-  id: string
-}
-
-export interface DeleteInstanceRequest {
-  id: string
-}
-
-export interface GetInstanceRequest {
-  id: string
-}
-
-export interface UpdateInstanceRequest {
-  id: string
-  /**
-   * Enable/Disable Application Consistent Snapshot for Instance
-   */
-  applicationConsistentSnapshotEnabled?: boolean
-  /**
-   * Resource labels
-   */
-  labels?: Labels | null
-  /**
-   * Instance name
-   *
-   * Length 1-255
-   */
-  name?: string
-  /**
-   * Assign public IP to the Instance
-   */
-  publicIPAssignment?: PublicIPAssignment
-  /**
-   * Instance Cloud-init user-data (base64 encoded)
-   *
-   * Length 1-32768
-   */
-  userData?: string
-}
-/** @internal */
-export function toWireUpdateInstanceRequest(v: UpdateInstanceRequest): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.applicationConsistentSnapshotEnabled !== undefined)
-    o['application-consistent-snapshot-enabled'] = v.applicationConsistentSnapshotEnabled
-  if (v.labels !== undefined) o['labels'] = v.labels === null ? null : v.labels
-  if (v.name !== undefined) o['name'] = v.name
-  if (v.publicIPAssignment !== undefined) o['public-ip-assignment'] = v.publicIPAssignment
-  if (v.userData !== undefined) o['user-data'] = v.userData
-  return o
-}
-
-export interface ResetInstanceFieldRequest {
-  field: 'labels'
-  id: string
-}
-
-export interface AddInstanceProtectionRequest {
-  id: string
-}
-
-export interface CreateSnapshotRequest {
-  id: string
-}
-
-export interface EnableTpmRequest {
-  id: string
-}
-
-export interface RevealInstancePasswordRequest {
-  id: string
-}
-
-export interface RebootInstanceRequest {
-  id: string
-}
-
-export interface RemoveInstanceProtectionRequest {
-  id: string
-}
-
-export interface ResetInstanceRequest {
-  id: string
-  /**
-   * Instance disk size in GiB
-   *
-   * Min 10, Max 51200
-   */
-  diskSize?: number
-  /**
-   * Template to recreate Instance from
-   */
-  template?: TemplateRef
-}
-/** @internal */
-export function toWireResetInstanceRequest(v: ResetInstanceRequest): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.diskSize !== undefined) o['disk-size'] = v.diskSize
-  if (v.template !== undefined) o['template'] = toWireTemplateRef(v.template)
-  return o
-}
-
-export interface ResetInstancePasswordRequest {
-  id: string
-}
-
-export interface ResizeInstanceDiskRequest {
-  id: string
-  /**
-   * Instance disk size in GiB
-   *
-   * Min 10, Max 51200
-   */
-  diskSize: number
-}
-/** @internal */
-export function toWireResizeInstanceDiskRequest(
-  v: ResizeInstanceDiskRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.diskSize !== undefined) o['disk-size'] = v.diskSize
-  return o
-}
-
-export interface ScaleInstanceRequest {
-  id: string
-  /**
-   * Instance Type
-   */
-  instanceType: InstanceTypeRef
-}
-/** @internal */
-export function toWireScaleInstanceRequest(v: ScaleInstanceRequest): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.instanceType !== undefined) o['instance-type'] = toWireInstanceTypeRef(v.instanceType)
-  return o
-}
-
-export interface StartInstanceRequest {
-  id: string
-  /**
-   * Boot in Rescue Mode, using named profile (supported: netboot, netboot-efi)
-   */
-  rescueProfile?: 'netboot' | 'netboot-efi'
-}
-/** @internal */
-export function toWireStartInstanceRequest(v: StartInstanceRequest): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.rescueProfile !== undefined) o['rescue-profile'] = v.rescueProfile
-  return o
-}
-
-export interface StopInstanceRequest {
-  id: string
-}
-
-export interface RevertInstanceToSnapshotRequest {
-  instanceID: string
-  /**
-   * Snapshot ID
-   */
-  id: string
-}
-/** @internal */
-export function toWireRevertInstanceToSnapshotRequest(
-  v: RevertInstanceToSnapshotRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.id !== undefined) o['id'] = v.id
-  return o
-}
-
-export interface GetKmsKeyRequest {
-  id: string
-}
-
-export interface CancelKmsKeyDeletionRequest {
-  id: string
-}
-
-export interface DisableKmsKeyRequest {
-  id: string
-}
-
-export interface DisableKmsKeyRotationRequest {
-  id: string
-}
-
-export interface EnableKmsKeyRequest {
-  id: string
-}
-
-export interface ListKmsKeyRotationsRequest {
-  id: string
-}
-
-export interface RotateKmsKeyRequest {
-  id: string
-}
-
-export interface ListLoadBalancersResponse {
-  loadBalancers?: LoadBalancer[]
-}
-
-/** @internal */
-export function fromWireListLoadBalancersResponse(w: any): ListLoadBalancersResponse {
-  const v = {} as ListLoadBalancersResponse
-  if (w['load-balancers'] !== undefined)
-    v.loadBalancers = (w['load-balancers'] as any[]).map((x) => fromWireLoadBalancer(x))
-  return v
-}
-
-export interface CreateLoadBalancerRequest {
-  /**
-   * Load Balancer address family (default: :inet4)
-   */
-  addressfamily?: 'inet4' | 'inet6'
-  /**
-   * Load Balancer description
-   *
-   * Max length 255
-   */
-  description?: string
-  /**
-   * Load balancer labels
-   */
-  labels?: Labels
-  /**
-   * Load Balancer name
-   *
-   * Length 1-255
-   */
-  name: string
-}
-/** @internal */
-export function toWireCreateLoadBalancerRequest(
-  v: CreateLoadBalancerRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.addressfamily !== undefined) o['addressfamily'] = v.addressfamily
-  if (v.description !== undefined) o['description'] = v.description
-  if (v.labels !== undefined) o['labels'] = v.labels
-  if (v.name !== undefined) o['name'] = v.name
-  return o
-}
-
-export interface DeleteLoadBalancerRequest {
-  id: string
-}
-
-export interface GetLoadBalancerRequest {
-  id: string
-}
-
 export interface UpdateLoadBalancerRequest {
   id: string
   /**
@@ -6101,76 +7537,6 @@ export function toWireUpdateLoadBalancerRequest(
   if (v.labels !== undefined) o['labels'] = v.labels
   if (v.name !== undefined) o['name'] = v.name
   return o
-}
-
-export interface AddServiceToLoadBalancerRequest {
-  id: string
-  /**
-   * Load Balancer Service description
-   *
-   * Max length 255
-   */
-  description?: string
-  /**
-   * Healthcheck configuration
-   */
-  healthcheck: LoadBalancerServiceHealthcheck
-  /**
-   * Instance Pool to forward traffic to
-   */
-  instancePool: InstancePool
-  /**
-   * Load Balancer Service name
-   *
-   * Length 1-255
-   */
-  name: string
-  /**
-   * Port exposed on the Load Balancer's public IP
-   *
-   * Min 1, Max 65535
-   */
-  port: number
-  /**
-   * Network traffic protocol
-   */
-  protocol: 'tcp' | 'udp'
-  /**
-   * Load balancing strategy
-   */
-  strategy: 'maglev-hash' | 'round-robin' | 'source-hash'
-  /**
-   * Port on which the network traffic will be forwarded to on the receiving instance
-   *
-   * Min 1, Max 65535
-   */
-  targetPort: number
-}
-/** @internal */
-export function toWireAddServiceToLoadBalancerRequest(
-  v: AddServiceToLoadBalancerRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.description !== undefined) o['description'] = v.description
-  if (v.healthcheck !== undefined)
-    o['healthcheck'] = toWireLoadBalancerServiceHealthcheck(v.healthcheck)
-  if (v.instancePool !== undefined) o['instance-pool'] = toWireInstancePool(v.instancePool)
-  if (v.name !== undefined) o['name'] = v.name
-  if (v.port !== undefined) o['port'] = v.port
-  if (v.protocol !== undefined) o['protocol'] = v.protocol
-  if (v.strategy !== undefined) o['strategy'] = v.strategy
-  if (v.targetPort !== undefined) o['target-port'] = v.targetPort
-  return o
-}
-
-export interface DeleteLoadBalancerServiceRequest {
-  id: string
-  serviceID: string
-}
-
-export interface GetLoadBalancerServiceRequest {
-  id: string
-  serviceID: string
 }
 
 export interface UpdateLoadBalancerServiceRequest {
@@ -6229,90 +7595,6 @@ export function toWireUpdateLoadBalancerServiceRequest(
   return o
 }
 
-export interface ResetLoadBalancerServiceFieldRequest {
-  field: 'description'
-  id: string
-  serviceID: string
-}
-
-export interface ResetLoadBalancerFieldRequest {
-  field: 'description' | 'labels'
-  id: string
-}
-
-export interface GetOperationRequest {
-  id: string
-}
-
-export interface ListPrivateNetworksResponse {
-  privateNetworks?: PrivateNetwork[]
-}
-
-/** @internal */
-export function fromWireListPrivateNetworksResponse(w: any): ListPrivateNetworksResponse {
-  const v = {} as ListPrivateNetworksResponse
-  if (w['private-networks'] !== undefined)
-    v.privateNetworks = (w['private-networks'] as any[]).map((x) => fromWirePrivateNetwork(x))
-  return v
-}
-
-export interface CreatePrivateNetworkRequest {
-  /**
-   * Private Network description
-   *
-   * Max length 255
-   */
-  description?: string
-  /**
-   * Private Network end IP address
-   */
-  endIP?: string
-  /**
-   * Resource labels
-   */
-  labels?: Labels
-  /**
-   * Private Network name
-   *
-   * Length 1-255
-   */
-  name: string
-  /**
-   * Private Network netmask
-   */
-  netmask?: string
-  /**
-   * DHCP options
-   */
-  options?: PrivateNetworkOptions
-  /**
-   * Private Network start IP address
-   */
-  startIP?: string
-}
-/** @internal */
-export function toWireCreatePrivateNetworkRequest(
-  v: CreatePrivateNetworkRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.description !== undefined) o['description'] = v.description
-  if (v.endIP !== undefined) o['end-ip'] = v.endIP
-  if (v.labels !== undefined) o['labels'] = v.labels
-  if (v.name !== undefined) o['name'] = v.name
-  if (v.netmask !== undefined) o['netmask'] = v.netmask
-  if (v.options !== undefined) o['options'] = toWirePrivateNetworkOptions(v.options)
-  if (v.startIP !== undefined) o['start-ip'] = v.startIP
-  return o
-}
-
-export interface DeletePrivateNetworkRequest {
-  id: string
-}
-
-export interface GetPrivateNetworkRequest {
-  id: string
-}
-
 export interface UpdatePrivateNetworkRequest {
   id: string
   /**
@@ -6363,67 +7645,6 @@ export function toWireUpdatePrivateNetworkRequest(
   return o
 }
 
-export interface ResetPrivateNetworkFieldRequest {
-  field: 'labels'
-  id: string
-}
-
-/**
- * Compute instance
- */
-export interface AttachInstanceToPrivateNetworkRequestInstance {
-  /**
-   * Instance ID
-   */
-  id?: string
-}
-
-/** @internal */
-export function toWireAttachInstanceToPrivateNetworkRequestInstance(
-  v: AttachInstanceToPrivateNetworkRequestInstance,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.id !== undefined) o['id'] = v.id
-  return o
-}
-export interface AttachInstanceToPrivateNetworkRequest {
-  id: string
-  /**
-   * Compute instance
-   */
-  instance: AttachInstanceToPrivateNetworkRequestInstance
-  /**
-   * Static IP address lease for the corresponding network interface
-   */
-  ip?: string
-}
-/** @internal */
-export function toWireAttachInstanceToPrivateNetworkRequest(
-  v: AttachInstanceToPrivateNetworkRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.instance !== undefined)
-    o['instance'] = toWireAttachInstanceToPrivateNetworkRequestInstance(v.instance)
-  if (v.ip !== undefined) o['ip'] = v.ip
-  return o
-}
-
-export interface DetachInstanceFromPrivateNetworkRequest {
-  id: string
-  /**
-   * Compute instance
-   */
-  instance: Instance
-}
-/** @internal */
-export function toWireDetachInstanceFromPrivateNetworkRequest(
-  v: DetachInstanceFromPrivateNetworkRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.instance !== undefined) o['instance'] = toWireInstance(v.instance)
-  return o
-}
-
 export interface UpdatePrivateNetworkInstanceIPRequestInstance {
   /**
    * Instance ID
@@ -6458,29 +7679,6 @@ export function toWireUpdatePrivateNetworkInstanceIPRequest(
   return o
 }
 
-export interface ListQuotasResponse {
-  quotas?: Quota[]
-}
-
-/** @internal */
-export function fromWireListQuotasResponse(w: any): ListQuotasResponse {
-  const v = {} as ListQuotasResponse
-  if (w['quotas'] !== undefined) v.quotas = (w['quotas'] as any[]).map((x) => fromWireQuota(x))
-  return v
-}
-
-export interface GetQuotaRequest {
-  entity: string
-}
-
-export interface DeleteReverseDNSElasticIPRequest {
-  id: string
-}
-
-export interface GetReverseDNSElasticIPRequest {
-  id: string
-}
-
 export interface UpdateReverseDNSElasticIPRequest {
   id: string
   /**
@@ -6497,14 +7695,6 @@ export function toWireUpdateReverseDNSElasticIPRequest(
   return o
 }
 
-export interface DeleteReverseDNSInstanceRequest {
-  id: string
-}
-
-export interface GetReverseDNSInstanceRequest {
-  id: string
-}
-
 export interface UpdateReverseDNSInstanceRequest {
   id: string
   /**
@@ -6519,342 +7709,6 @@ export function toWireUpdateReverseDNSInstanceRequest(
   const o: Record<string, unknown> = {}
   if (v.domainName !== undefined) o['domain-name'] = v.domainName
   return o
-}
-
-export interface ListSecurityGroupsRequest {
-  visibility?: 'private' | 'public'
-}
-export interface ListSecurityGroupsResponse {
-  securityGroups?: SecurityGroup[]
-}
-
-/** @internal */
-export function fromWireListSecurityGroupsResponse(w: any): ListSecurityGroupsResponse {
-  const v = {} as ListSecurityGroupsResponse
-  if (w['security-groups'] !== undefined)
-    v.securityGroups = (w['security-groups'] as any[]).map((x) => fromWireSecurityGroup(x))
-  return v
-}
-
-export interface CreateSecurityGroupRequest {
-  /**
-   * Security Group description
-   *
-   * Max length 255
-   */
-  description?: string
-  /**
-   * Security Group name
-   *
-   * Length 1-255
-   */
-  name: string
-}
-/** @internal */
-export function toWireCreateSecurityGroupRequest(
-  v: CreateSecurityGroupRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.description !== undefined) o['description'] = v.description
-  if (v.name !== undefined) o['name'] = v.name
-  return o
-}
-
-export interface DeleteSecurityGroupRequest {
-  id: string
-}
-
-export interface GetSecurityGroupRequest {
-  id: string
-}
-
-/**
- * ICMP details (default: -1 (ANY))
- */
-export interface AddRuleToSecurityGroupRequestICMP {
-  /**
-   * Min -1, Max 254
-   */
-  code?: number | null
-  /**
-   * Min -1, Max 254
-   */
-  type?: number | null
-}
-
-/** @internal */
-export function toWireAddRuleToSecurityGroupRequestICMP(
-  v: AddRuleToSecurityGroupRequestICMP,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.code !== undefined) o['code'] = v.code === null ? null : v.code
-  if (v.type !== undefined) o['type'] = v.type === null ? null : v.type
-  return o
-}
-export interface AddRuleToSecurityGroupRequest {
-  id: string
-  /**
-   * Security Group rule description
-   *
-   * Max length 255
-   */
-  description?: string
-  /**
-   * End port of the range
-   *
-   * Min 1, Max 65535
-   */
-  endPort?: number
-  /**
-   * Network flow direction to match
-   */
-  flowDirection: 'egress' | 'ingress'
-  /**
-   * ICMP details (default: -1 (ANY))
-   */
-  icmp?: AddRuleToSecurityGroupRequestICMP
-  /**
-   * CIDR-formatted network allowed
-   */
-  network?: string
-  /**
-   * Network protocol
-   */
-  protocol: 'ah' | 'all' | 'esp' | 'gre' | 'icmp' | 'icmpv6' | 'ipip' | 'tcp' | 'udp'
-  /**
-   * Security Group allowed
-   */
-  securityGroup?: SecurityGroupResource
-  /**
-   * Start port of the range
-   *
-   * Min 1, Max 65535
-   */
-  startPort?: number
-}
-/** @internal */
-export function toWireAddRuleToSecurityGroupRequest(
-  v: AddRuleToSecurityGroupRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.description !== undefined) o['description'] = v.description
-  if (v.endPort !== undefined) o['end-port'] = v.endPort
-  if (v.flowDirection !== undefined) o['flow-direction'] = v.flowDirection
-  if (v.icmp !== undefined) o['icmp'] = toWireAddRuleToSecurityGroupRequestICMP(v.icmp)
-  if (v.network !== undefined) o['network'] = v.network
-  if (v.protocol !== undefined) o['protocol'] = v.protocol
-  if (v.securityGroup !== undefined)
-    o['security-group'] = toWireSecurityGroupResource(v.securityGroup)
-  if (v.startPort !== undefined) o['start-port'] = v.startPort
-  return o
-}
-
-export interface DeleteRuleFromSecurityGroupRequest {
-  id: string
-  ruleID: string
-}
-
-export interface AddExternalSourceToSecurityGroupRequest {
-  id: string
-  /**
-   * CIDR-formatted network to add
-   */
-  cidr: string
-}
-/** @internal */
-export function toWireAddExternalSourceToSecurityGroupRequest(
-  v: AddExternalSourceToSecurityGroupRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.cidr !== undefined) o['cidr'] = v.cidr
-  return o
-}
-
-export interface AttachInstanceToSecurityGroupRequest {
-  id: string
-  /**
-   * Compute instance
-   */
-  instance: Instance
-}
-/** @internal */
-export function toWireAttachInstanceToSecurityGroupRequest(
-  v: AttachInstanceToSecurityGroupRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.instance !== undefined) o['instance'] = toWireInstance(v.instance)
-  return o
-}
-
-export interface DetachInstanceFromSecurityGroupRequest {
-  id: string
-  /**
-   * Compute instance
-   */
-  instance: Instance
-}
-/** @internal */
-export function toWireDetachInstanceFromSecurityGroupRequest(
-  v: DetachInstanceFromSecurityGroupRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.instance !== undefined) o['instance'] = toWireInstance(v.instance)
-  return o
-}
-
-export interface RemoveExternalSourceFromSecurityGroupRequest {
-  id: string
-  /**
-   * CIDR-formatted network to remove
-   */
-  cidr: string
-}
-/** @internal */
-export function toWireRemoveExternalSourceFromSecurityGroupRequest(
-  v: RemoveExternalSourceFromSecurityGroupRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.cidr !== undefined) o['cidr'] = v.cidr
-  return o
-}
-
-export interface ListSKSClustersResponse {
-  sksClusters?: SKSCluster[]
-}
-
-/** @internal */
-export function fromWireListSKSClustersResponse(w: any): ListSKSClustersResponse {
-  const v = {} as ListSKSClustersResponse
-  if (w['sks-clusters'] !== undefined)
-    v.sksClusters = (w['sks-clusters'] as any[]).map((x) => fromWireSKSCluster(x))
-  return v
-}
-
-export interface CreateSKSClusterRequest {
-  /**
-   * Cluster addons
-   *
-   * Unique items
-   */
-  addons?: string[]
-  /**
-   * Kubernetes Audit Log Configuration
-   */
-  audit?: SKSAuditCreate
-  /**
-   * Enable auto upgrade of the control plane to the latest patch version available
-   */
-  autoUpgrade?: boolean
-  /**
-   * Cluster CNI
-   */
-  cni?: 'calico' | 'cilium'
-  /**
-   * Creates an ad-hoc security group based on the choice of the selected CNI
-   */
-  createDefaultSecurityGroup?: boolean | null
-  /**
-   * Cluster description
-   *
-   * Max length 255
-   */
-  description?: string | null
-  /**
-   * Indicates whether to deploy the Kubernetes network proxy. When unspecified, defaults to `true` unless Cilium CNI is selected
-   */
-  enableKubeProxy?: boolean
-  /**
-   * A list of Kubernetes-only Alpha features to enable for API server component
-   *
-   * Unique items
-   */
-  featureGates?: string[]
-  /**
-   * Cluster Labels
-   */
-  labels?: SKSClusterLabels
-  /**
-   * Cluster service level
-   */
-  level: 'pro' | 'starter'
-  /**
-   * Cluster name
-   *
-   * Length 1-255
-   */
-  name: string
-  /**
-   * Cluster networking configuration
-   */
-  networking?: Networking
-  /**
-   * Cluster OpenID configmap
-   */
-  oidc?: SKSOidc
-  /**
-   * Control plane Kubernetes version
-   */
-  version: string
-}
-/** @internal */
-export function toWireCreateSKSClusterRequest(v: CreateSKSClusterRequest): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.addons !== undefined) o['addons'] = v.addons
-  if (v.audit !== undefined) o['audit'] = toWireSKSAuditCreate(v.audit)
-  if (v.autoUpgrade !== undefined) o['auto-upgrade'] = v.autoUpgrade
-  if (v.cni !== undefined) o['cni'] = v.cni
-  if (v.createDefaultSecurityGroup !== undefined)
-    o['create-default-security-group'] =
-      v.createDefaultSecurityGroup === null ? null : v.createDefaultSecurityGroup
-  if (v.description !== undefined) o['description'] = v.description === null ? null : v.description
-  if (v.enableKubeProxy !== undefined) o['enable-kube-proxy'] = v.enableKubeProxy
-  if (v.featureGates !== undefined) o['feature-gates'] = v.featureGates
-  if (v.labels !== undefined) o['labels'] = v.labels
-  if (v.level !== undefined) o['level'] = v.level
-  if (v.name !== undefined) o['name'] = v.name
-  if (v.networking !== undefined) o['networking'] = toWireNetworking(v.networking)
-  if (v.oidc !== undefined) o['oidc'] = toWireSKSOidc(v.oidc)
-  if (v.version !== undefined) o['version'] = v.version
-  return o
-}
-
-export interface ListSKSClusterDeprecatedResourcesRequest {
-  id: string
-}
-
-export interface GenerateSKSClusterKubeconfigResponse {
-  kubeconfig?: string
-}
-
-/** @internal */
-export function fromWireGenerateSKSClusterKubeconfigResponse(
-  w: any,
-): GenerateSKSClusterKubeconfigResponse {
-  const v = {} as GenerateSKSClusterKubeconfigResponse
-  if (w['kubeconfig'] !== undefined) v.kubeconfig = w['kubeconfig']
-  return v
-}
-
-export interface ListSKSClusterVersionsRequest {
-  includeDeprecated?: string
-}
-export interface ListSKSClusterVersionsResponse {
-  sksClusterVersions?: string[]
-}
-
-/** @internal */
-export function fromWireListSKSClusterVersionsResponse(w: any): ListSKSClusterVersionsResponse {
-  const v = {} as ListSKSClusterVersionsResponse
-  if (w['sks-cluster-versions'] !== undefined) v.sksClusterVersions = w['sks-cluster-versions']
-  return v
-}
-
-export interface DeleteSKSClusterRequest {
-  id: string
-}
-
-export interface GetSKSClusterRequest {
-  id: string
 }
 
 export interface UpdateSKSClusterRequest {
@@ -6918,194 +7772,6 @@ export function toWireUpdateSKSClusterRequest(v: UpdateSKSClusterRequest): Recor
   if (v.name !== undefined) o['name'] = v.name
   if (v.oidc !== undefined) o['oidc'] = v.oidc === null ? null : toWireSKSOidc(v.oidc)
   return o
-}
-
-export interface GetSKSClusterAuthorityCertRequest {
-  authority: 'aggregation' | 'control-plane' | 'kubelet'
-  id: string
-}
-export interface GetSKSClusterAuthorityCertResponse {
-  cacert?: string
-}
-
-/** @internal */
-export function fromWireGetSKSClusterAuthorityCertResponse(
-  w: any,
-): GetSKSClusterAuthorityCertResponse {
-  const v = {} as GetSKSClusterAuthorityCertResponse
-  if (w['cacert'] !== undefined) v.cacert = w['cacert']
-  return v
-}
-
-export interface GenerateSKSKarpenterExoscaleNodeclassRequest {
-  id: string
-}
-export interface GenerateSKSKarpenterExoscaleNodeclassResponse {
-  exoscaleNodeclass?: string
-}
-
-/** @internal */
-export function fromWireGenerateSKSKarpenterExoscaleNodeclassResponse(
-  w: any,
-): GenerateSKSKarpenterExoscaleNodeclassResponse {
-  const v = {} as GenerateSKSKarpenterExoscaleNodeclassResponse
-  if (w['exoscale-nodeclass'] !== undefined) v.exoscaleNodeclass = w['exoscale-nodeclass']
-  return v
-}
-
-export interface GenerateSKSKarpenterNodepoolRequest {
-  id: string
-}
-export interface GenerateSKSKarpenterNodepoolResponse {
-  nodepool?: string
-}
-
-/** @internal */
-export function fromWireGenerateSKSKarpenterNodepoolResponse(
-  w: any,
-): GenerateSKSKarpenterNodepoolResponse {
-  const v = {} as GenerateSKSKarpenterNodepoolResponse
-  if (w['nodepool'] !== undefined) v.nodepool = w['nodepool']
-  return v
-}
-
-export interface GetSKSClusterInspectionRequest {
-  id: string
-}
-export type GetSKSClusterInspectionResponse = Record<string, unknown>
-
-export interface CreateSKSNodepoolRequest {
-  id: string
-  /**
-   * Nodepool addons
-   *
-   * Unique items
-   */
-  addons?: string[]
-  /**
-   * Nodepool Anti-affinity Groups
-   *
-   * Max items 8, Unique items
-   */
-  antiAffinityGroups?: AntiAffinityGroupRef[]
-  /**
-   * Nodepool Deploy Target
-   */
-  deployTarget?: DeployTargetRef
-  /**
-   * Nodepool description
-   *
-   * Max length 255
-   */
-  description?: string
-  /**
-   * Nodepool instances disk size in GiB
-   *
-   * Min 20, Max 51200
-   */
-  diskSize: number
-  /**
-   * Prefix to apply to instances names (default: pool), lowercase only
-   *
-   * Length 1-30
-   */
-  instancePrefix?: string
-  /**
-   * Nodepool instances type
-   */
-  instanceType: InstanceTypeRef
-  /**
-   * Kubelet image GC options
-   */
-  kubeletImageGC?: KubeletImageGC
-  /**
-   * Maximum number of pods per node (kubelet setting)
-   *
-   * Min 1, Max 65535
-   */
-  kubeletMaxPods?: number | null
-  /**
-   * Nodepool labels
-   */
-  labels?: SKSNodepoolLabels
-  /**
-   * Nodepool name, lowercase only
-   *
-   * Length 1-255
-   */
-  name: string
-  /**
-   * Nvidia MIG Profiles
-   */
-  nvidiaMigProfiles?: NvidiaMigProfiles
-  /**
-   * Nodepool Private Networks
-   *
-   * Max items 16, Unique items
-   */
-  privateNetworks?: PrivateNetworkRef[]
-  /**
-   * Configures public IP assignment of the Instances with:
-   *
-   * * IPv4 (`inet4`) addressing only (default);
-   * * both IPv4 and IPv6 (`dual`) addressing.
-   */
-  publicIPAssignment?: 'dual' | 'inet4'
-  /**
-   * Nodepool Security Groups
-   *
-   * Max items 16, Unique items
-   */
-  securityGroups?: SecurityGroupRef[]
-  /**
-   * Number of instances
-   *
-   * Min >0
-   */
-  size: number
-  /**
-   * Nodepool taints
-   */
-  taints?: SKSNodepoolTaints
-}
-/** @internal */
-export function toWireCreateSKSNodepoolRequest(
-  v: CreateSKSNodepoolRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.addons !== undefined) o['addons'] = v.addons
-  if (v.antiAffinityGroups !== undefined)
-    o['anti-affinity-groups'] = v.antiAffinityGroups.map((x) => toWireAntiAffinityGroupRef(x))
-  if (v.deployTarget !== undefined) o['deploy-target'] = toWireDeployTargetRef(v.deployTarget)
-  if (v.description !== undefined) o['description'] = v.description
-  if (v.diskSize !== undefined) o['disk-size'] = v.diskSize
-  if (v.instancePrefix !== undefined) o['instance-prefix'] = v.instancePrefix
-  if (v.instanceType !== undefined) o['instance-type'] = toWireInstanceTypeRef(v.instanceType)
-  if (v.kubeletImageGC !== undefined) o['kubelet-image-gc'] = toWireKubeletImageGC(v.kubeletImageGC)
-  if (v.kubeletMaxPods !== undefined)
-    o['kubelet-max-pods'] = v.kubeletMaxPods === null ? null : v.kubeletMaxPods
-  if (v.labels !== undefined) o['labels'] = v.labels
-  if (v.name !== undefined) o['name'] = v.name
-  if (v.nvidiaMigProfiles !== undefined)
-    o['nvidia-mig-profiles'] = toWireNvidiaMigProfiles(v.nvidiaMigProfiles)
-  if (v.privateNetworks !== undefined)
-    o['private-networks'] = v.privateNetworks.map((x) => toWirePrivateNetworkRef(x))
-  if (v.publicIPAssignment !== undefined) o['public-ip-assignment'] = v.publicIPAssignment
-  if (v.securityGroups !== undefined)
-    o['security-groups'] = v.securityGroups.map((x) => toWireSecurityGroupRef(x))
-  if (v.size !== undefined) o['size'] = v.size
-  if (v.taints !== undefined) o['taints'] = toWireSKSNodepoolTaints(v.taints)
-  return o
-}
-
-export interface DeleteSKSNodepoolRequest {
-  id: string
-  sksNodepoolID: string
-}
-
-export interface GetSKSNodepoolRequest {
-  id: string
-  sksNodepoolID: string
 }
 
 export interface UpdateSKSNodepoolRequest {
@@ -7221,353 +7887,32 @@ export function toWireUpdateSKSNodepoolRequest(
   return o
 }
 
-export interface EvictSKSNodepoolMembersRequest {
+export interface UpdateSubnetRequest {
   id: string
-  sksNodepoolID: string
+  vpcID: string
   /**
-   * Unique items
-   */
-  instances?: string[]
-}
-/** @internal */
-export function toWireEvictSKSNodepoolMembersRequest(
-  v: EvictSKSNodepoolMembersRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.instances !== undefined) o['instances'] = v.instances
-  return o
-}
-
-export interface ScaleSKSNodepoolRequest {
-  id: string
-  sksNodepoolID: string
-  /**
-   * Number of instances
-   *
-   * Min 0
-   */
-  size: number
-}
-/** @internal */
-export function toWireScaleSKSNodepoolRequest(v: ScaleSKSNodepoolRequest): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.size !== undefined) o['size'] = v.size
-  return o
-}
-
-export interface RotateSKSCcmCredentialsRequest {
-  id: string
-}
-
-export interface RotateSKSCsiCredentialsRequest {
-  id: string
-}
-
-export interface RotateSKSKarpenterCredentialsRequest {
-  id: string
-}
-
-export interface RotateSKSOperatorsCARequest {
-  id: string
-}
-
-export interface UpgradeSKSClusterRequest {
-  id: string
-  /**
-   * Control plane Kubernetes version
-   */
-  version: string
-}
-/** @internal */
-export function toWireUpgradeSKSClusterRequest(
-  v: UpgradeSKSClusterRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.version !== undefined) o['version'] = v.version
-  return o
-}
-
-export interface UpgradeSKSClusterServiceLevelRequest {
-  id: string
-}
-
-export interface GetActiveNodepoolTemplateRequest {
-  kubeVersion: string
-  variant: 'nvidia' | 'standard'
-}
-export interface GetActiveNodepoolTemplateResponse {
-  activeTemplate?: string
-}
-
-/** @internal */
-export function fromWireGetActiveNodepoolTemplateResponse(
-  w: any,
-): GetActiveNodepoolTemplateResponse {
-  const v = {} as GetActiveNodepoolTemplateResponse
-  if (w['active-template'] !== undefined) v.activeTemplate = w['active-template']
-  return v
-}
-
-export interface ListSnapshotsResponse {
-  snapshots?: Snapshot[]
-}
-
-/** @internal */
-export function fromWireListSnapshotsResponse(w: any): ListSnapshotsResponse {
-  const v = {} as ListSnapshotsResponse
-  if (w['snapshots'] !== undefined)
-    v.snapshots = (w['snapshots'] as any[]).map((x) => fromWireSnapshot(x))
-  return v
-}
-
-export interface DeleteSnapshotRequest {
-  id: string
-}
-
-export interface GetSnapshotRequest {
-  id: string
-}
-
-export interface ExportSnapshotRequest {
-  id: string
-}
-
-export interface PromoteSnapshotToTemplateRequest {
-  id: string
-  /**
-   * Template default user
-   *
-   * Length 1-255
-   */
-  defaultUser?: string
-  /**
-   * Template description
+   * Subnet description
    *
    * Max length 4096
    */
-  description?: string
+  description?: string | null
   /**
-   * Template name
+   * Resource labels
+   */
+  labels?: Labels | null
+  /**
+   * Subnet name
    *
    * Length 1-255
    */
-  name: string
-  /**
-   * Enable password-based login in the template
-   */
-  passwordEnabled?: boolean
-  /**
-   * Enable SSH key-based login in the template
-   */
-  sshKeyEnabled?: boolean
+  name?: string | null
 }
 /** @internal */
-export function toWirePromoteSnapshotToTemplateRequest(
-  v: PromoteSnapshotToTemplateRequest,
-): Record<string, unknown> {
+export function toWireUpdateSubnetRequest(v: UpdateSubnetRequest): Record<string, unknown> {
   const o: Record<string, unknown> = {}
-  if (v.defaultUser !== undefined) o['default-user'] = v.defaultUser
-  if (v.description !== undefined) o['description'] = v.description
-  if (v.name !== undefined) o['name'] = v.name
-  if (v.passwordEnabled !== undefined) o['password-enabled'] = v.passwordEnabled
-  if (v.sshKeyEnabled !== undefined) o['ssh-key-enabled'] = v.sshKeyEnabled
-  return o
-}
-
-export interface ListSOSBucketsUsageResponse {
-  sosBucketsUsage?: SOSBucketUsage[]
-}
-
-/** @internal */
-export function fromWireListSOSBucketsUsageResponse(w: any): ListSOSBucketsUsageResponse {
-  const v = {} as ListSOSBucketsUsageResponse
-  if (w['sos-buckets-usage'] !== undefined)
-    v.sosBucketsUsage = (w['sos-buckets-usage'] as any[]).map((x) => fromWireSOSBucketUsage(x))
-  return v
-}
-
-export interface GetSOSPresignedURLRequest {
-  bucket: string
-  key?: string
-}
-export interface GetSOSPresignedURLResponse {
-  url?: string
-}
-
-/** @internal */
-export function fromWireGetSOSPresignedURLResponse(w: any): GetSOSPresignedURLResponse {
-  const v = {} as GetSOSPresignedURLResponse
-  if (w['url'] !== undefined) v.url = w['url']
-  return v
-}
-
-export interface ListSSHKeysResponse {
-  sshKeys?: SSHKey[]
-}
-
-/** @internal */
-export function fromWireListSSHKeysResponse(w: any): ListSSHKeysResponse {
-  const v = {} as ListSSHKeysResponse
-  if (w['ssh-keys'] !== undefined)
-    v.sshKeys = (w['ssh-keys'] as any[]).map((x) => fromWireSSHKey(x))
-  return v
-}
-
-export interface RegisterSSHKeyRequest {
-  /**
-   * SSH key name
-   *
-   * Pattern `^[a-zA-Z0-9]{1}[a-zA-Z0-9._-]{0,254}$`
-   */
-  name: string
-  /**
-   * Public key value
-   */
-  publicKey: string
-}
-/** @internal */
-export function toWireRegisterSSHKeyRequest(v: RegisterSSHKeyRequest): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.name !== undefined) o['name'] = v.name
-  if (v.publicKey !== undefined) o['public-key'] = v.publicKey
-  return o
-}
-
-export interface DeleteSSHKeyRequest {
-  name: string
-}
-
-export interface GetSSHKeyRequest {
-  name: string
-}
-
-export interface ListTemplatesRequest {
-  family?: string
-  visibility?: 'private' | 'public'
-}
-export interface ListTemplatesResponse {
-  templates?: Template[]
-}
-
-/** @internal */
-export function fromWireListTemplatesResponse(w: any): ListTemplatesResponse {
-  const v = {} as ListTemplatesResponse
-  if (w['templates'] !== undefined)
-    v.templates = (w['templates'] as any[]).map((x) => fromWireTemplate(x))
-  return v
-}
-
-export interface RegisterTemplateRequest {
-  /**
-   * Template with support for Application Consistent Snapshots
-   */
-  applicationConsistentSnapshotEnabled?: boolean
-  /**
-   * Boot mode (default: legacy)
-   */
-  bootMode?: 'legacy' | 'uefi'
-  /**
-   * Template build
-   *
-   * Length 1-255
-   */
-  build?: string
-  /**
-   * Template MD5 checksum
-   *
-   * Min length 1
-   */
-  checksum: string
-  /**
-   * Template default user
-   *
-   * Length 1-255
-   */
-  defaultUser?: string
-  /**
-   * Template description
-   *
-   * Max length 255
-   */
-  description?: string
-  /**
-   * Template maintainer
-   *
-   * Length 1-255
-   */
-  maintainer?: string
-  /**
-   * Template name
-   *
-   * Length 1-255
-   */
-  name: string
-  /**
-   * Enable password-based login
-   */
-  passwordEnabled: boolean
-  /**
-   * Template size
-   *
-   * Min >0
-   */
-  size?: number
-  /**
-   * Enable SSH key-based login
-   */
-  sshKeyEnabled: boolean
-  /**
-   * Template source URL
-   *
-   * Min length 1
-   */
-  url: string
-  /**
-   * Template version
-   *
-   * Length 1-255
-   */
-  version?: string
-}
-/** @internal */
-export function toWireRegisterTemplateRequest(v: RegisterTemplateRequest): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.applicationConsistentSnapshotEnabled !== undefined)
-    o['application-consistent-snapshot-enabled'] = v.applicationConsistentSnapshotEnabled
-  if (v.bootMode !== undefined) o['boot-mode'] = v.bootMode
-  if (v.build !== undefined) o['build'] = v.build
-  if (v.checksum !== undefined) o['checksum'] = v.checksum
-  if (v.defaultUser !== undefined) o['default-user'] = v.defaultUser
-  if (v.description !== undefined) o['description'] = v.description
-  if (v.maintainer !== undefined) o['maintainer'] = v.maintainer
-  if (v.name !== undefined) o['name'] = v.name
-  if (v.passwordEnabled !== undefined) o['password-enabled'] = v.passwordEnabled
-  if (v.size !== undefined) o['size'] = v.size
-  if (v.sshKeyEnabled !== undefined) o['ssh-key-enabled'] = v.sshKeyEnabled
-  if (v.url !== undefined) o['url'] = v.url
-  if (v.version !== undefined) o['version'] = v.version
-  return o
-}
-
-export interface DeleteTemplateRequest {
-  id: string
-}
-
-export interface GetTemplateRequest {
-  id: string
-}
-
-export interface CopyTemplateRequest {
-  id: string
-  /**
-   * Target Zone name
-   */
-  targetZone: Zone
-}
-/** @internal */
-export function toWireCopyTemplateRequest(v: CopyTemplateRequest): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.targetZone !== undefined) o['target-zone'] = toWireZone(v.targetZone)
+  if (v.description !== undefined) o['description'] = v.description === null ? null : v.description
+  if (v.labels !== undefined) o['labels'] = v.labels === null ? null : v.labels
+  if (v.name !== undefined) o['name'] = v.name === null ? null : v.name
   return o
 }
 
@@ -7594,114 +7939,6 @@ export function toWireUpdateTemplateRequest(v: UpdateTemplateRequest): Record<st
   return o
 }
 
-export interface GetUsageReportRequest {
-  period?: string
-}
-/**
- * Usage
- */
-export interface GetUsageReportResponseUsage {
-  /**
-   * Description
-   *
-   * Read-only
-   */
-  description?: string
-  /**
-   * Period Start Date
-   *
-   * Read-only
-   */
-  from?: string
-  /**
-   * Product
-   *
-   * Read-only
-   */
-  product?: string
-  /**
-   * Quantity
-   *
-   * Read-only
-   */
-  quantity?: string
-  /**
-   * Period End Date
-   *
-   * Read-only
-   */
-  to?: string
-  /**
-   * Unit
-   *
-   * Read-only
-   */
-  unit?: string
-  /**
-   * Variable
-   *
-   * Read-only
-   */
-  variable?: string
-}
-
-/** @internal */
-export function fromWireGetUsageReportResponseUsage(w: any): GetUsageReportResponseUsage {
-  const v = {} as GetUsageReportResponseUsage
-  if (w['description'] !== undefined) v.description = w['description']
-  if (w['from'] !== undefined) v.from = w['from']
-  if (w['product'] !== undefined) v.product = w['product']
-  if (w['quantity'] !== undefined) v.quantity = w['quantity']
-  if (w['to'] !== undefined) v.to = w['to']
-  if (w['unit'] !== undefined) v.unit = w['unit']
-  if (w['variable'] !== undefined) v.variable = w['variable']
-  return v
-}
-export interface GetUsageReportResponse {
-  usage?: GetUsageReportResponseUsage[]
-}
-
-/** @internal */
-export function fromWireGetUsageReportResponse(w: any): GetUsageReportResponse {
-  const v = {} as GetUsageReportResponse
-  if (w['usage'] !== undefined)
-    v.usage = (w['usage'] as any[]).map((x) => fromWireGetUsageReportResponseUsage(x))
-  return v
-}
-
-export interface ListUsersResponse {
-  users?: User[]
-}
-
-/** @internal */
-export function fromWireListUsersResponse(w: any): ListUsersResponse {
-  const v = {} as ListUsersResponse
-  if (w['users'] !== undefined) v.users = (w['users'] as any[]).map((x) => fromWireUser(x))
-  return v
-}
-
-export interface CreateUserRequest {
-  /**
-   * User Email
-   */
-  email: string
-  /**
-   * IAM Role
-   */
-  role?: IAMRole
-}
-/** @internal */
-export function toWireCreateUserRequest(v: CreateUserRequest): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.email !== undefined) o['email'] = v.email
-  if (v.role !== undefined) o['role'] = toWireIAMRole(v.role)
-  return o
-}
-
-export interface DeleteUserRequest {
-  id: string
-}
-
 export interface UpdateUserRoleRequest {
   id: string
   /**
@@ -7714,52 +7951,6 @@ export function toWireUpdateUserRoleRequest(v: UpdateUserRoleRequest): Record<st
   const o: Record<string, unknown> = {}
   if (v.role !== undefined) o['role'] = toWireIAMRole(v.role)
   return o
-}
-
-export interface ListVpcsResponse {
-  vpcs?: ListVpcEntry[]
-}
-
-/** @internal */
-export function fromWireListVpcsResponse(w: any): ListVpcsResponse {
-  const v = {} as ListVpcsResponse
-  if (w['vpcs'] !== undefined) v.vpcs = (w['vpcs'] as any[]).map((x) => fromWireListVpcEntry(x))
-  return v
-}
-
-export interface CreateVpcRequest {
-  /**
-   * VPC description
-   *
-   * Max length 4096
-   */
-  description?: string
-  /**
-   * Resource labels
-   */
-  labels?: Labels
-  /**
-   * VPC name
-   *
-   * Length 1-255
-   */
-  name: string
-}
-/** @internal */
-export function toWireCreateVpcRequest(v: CreateVpcRequest): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.description !== undefined) o['description'] = v.description
-  if (v.labels !== undefined) o['labels'] = v.labels
-  if (v.name !== undefined) o['name'] = v.name
-  return o
-}
-
-export interface DeleteVpcRequest {
-  id: string
-}
-
-export interface GetVpcRequest {
-  id: string
 }
 
 export interface UpdateVpcRequest {
@@ -7790,232 +7981,185 @@ export function toWireUpdateVpcRequest(v: UpdateVpcRequest): Record<string, unkn
   return o
 }
 
-export interface ListVpcRoutesRequest {
-  vpcID: string
-}
-export interface ListVpcRoutesResponse {
-  routes?: ListRouteEntry[]
-}
-
-/** @internal */
-export function fromWireListVpcRoutesResponse(w: any): ListVpcRoutesResponse {
-  const v = {} as ListVpcRoutesResponse
-  if (w['routes'] !== undefined)
-    v.routes = (w['routes'] as any[]).map((x) => fromWireListRouteEntry(x))
-  return v
-}
-
-export interface ListSubnetsRequest {
-  vpcID: string
-}
-export interface ListSubnetsResponse {
-  subnets?: ListSubnetEntry[]
-}
-
-/** @internal */
-export function fromWireListSubnetsResponse(w: any): ListSubnetsResponse {
-  const v = {} as ListSubnetsResponse
-  if (w['subnets'] !== undefined)
-    v.subnets = (w['subnets'] as any[]).map((x) => fromWireListSubnetEntry(x))
-  return v
-}
-
-export interface CreateSubnetRequest {
-  vpcID: string
-  /**
-   * Subnet address space
-   */
-  addressSpace: 'private'
-  /**
-   * Subnet address family
-   */
-  addressfamily: 'inet4'
-  /**
-   * Subnet description
-   *
-   * Max length 4096
-   */
-  description?: string
-  /**
-   * Subnet ipv4 CIDR
-   */
-  ipv4Block?: string
-  /**
-   * Resource labels
-   */
-  labels?: Labels
-  /**
-   * Subnet name
-   *
-   * Length 1-255
-   */
-  name: string
-}
-/** @internal */
-export function toWireCreateSubnetRequest(v: CreateSubnetRequest): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.addressSpace !== undefined) o['address-space'] = v.addressSpace
-  if (v.addressfamily !== undefined) o['addressfamily'] = v.addressfamily
-  if (v.description !== undefined) o['description'] = v.description
-  if (v.ipv4Block !== undefined) o['ipv4-block'] = v.ipv4Block
-  if (v.labels !== undefined) o['labels'] = v.labels
-  if (v.name !== undefined) o['name'] = v.name
-  return o
-}
-
-export interface DeleteSubnetRequest {
+export interface UpgradeSKSClusterRequest {
   id: string
-  vpcID: string
-}
-
-export interface GetSubnetRequest {
-  id: string
-  vpcID: string
-}
-
-export interface UpdateSubnetRequest {
-  id: string
-  vpcID: string
   /**
-   * Subnet description
-   *
-   * Max length 4096
+   * Control plane Kubernetes version
    */
-  description?: string | null
-  /**
-   * Resource labels
-   */
-  labels?: Labels | null
-  /**
-   * Subnet name
-   *
-   * Length 1-255
-   */
-  name?: string | null
+  version: string
 }
 /** @internal */
-export function toWireUpdateSubnetRequest(v: UpdateSubnetRequest): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.description !== undefined) o['description'] = v.description === null ? null : v.description
-  if (v.labels !== undefined) o['labels'] = v.labels === null ? null : v.labels
-  if (v.name !== undefined) o['name'] = v.name === null ? null : v.name
-  return o
-}
-
-export interface AttachInstanceToSubnetRequest {
-  subnetID: string
-  vpcID: string
-  /**
-   * Compute instance
-   */
-  instance: InstanceRef
-  /**
-   * Instance IPv4
-   */
-  ipv4?: string
-}
-/** @internal */
-export function toWireAttachInstanceToSubnetRequest(
-  v: AttachInstanceToSubnetRequest,
+export function toWireUpgradeSKSClusterRequest(
+  v: UpgradeSKSClusterRequest,
 ): Record<string, unknown> {
   const o: Record<string, unknown> = {}
-  if (v.instance !== undefined) o['instance'] = toWireInstanceRef(v.instance)
-  if (v.ipv4 !== undefined) o['ipv4'] = v.ipv4
+  if (v.version !== undefined) o['version'] = v.version
   return o
 }
 
-export interface DetachInstanceFromSubnetRequest {
-  subnetID: string
-  vpcID: string
-  /**
-   * Compute instance
-   */
-  instance: InstanceRef
-}
-/** @internal */
-export function toWireDetachInstanceFromSubnetRequest(
-  v: DetachInstanceFromSubnetRequest,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.instance !== undefined) o['instance'] = toWireInstanceRef(v.instance)
-  return o
-}
-
-export interface ListRoutesRequest {
-  subnetID: string
-  vpcID: string
-}
-export interface ListRoutesResponse {
-  routes?: ListRouteEntry[]
-}
-
-/** @internal */
-export function fromWireListRoutesResponse(w: any): ListRoutesResponse {
-  const v = {} as ListRoutesResponse
-  if (w['routes'] !== undefined)
-    v.routes = (w['routes'] as any[]).map((x) => fromWireListRouteEntry(x))
-  return v
-}
-
-export interface CreateRouteRequest {
-  subnetID: string
-  vpcID: string
-  /**
-   * Route description
-   *
-   * Max length 4096
-   */
-  description?: string
-  /**
-   * Route destination CIDR
-   */
-  destination: string
-  /**
-   * Route target
-   */
-  target: string
-}
-/** @internal */
-export function toWireCreateRouteRequest(v: CreateRouteRequest): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.description !== undefined) o['description'] = v.description
-  if (v.destination !== undefined) o['destination'] = v.destination
-  if (v.target !== undefined) o['target'] = v.target
-  return o
-}
-
-export interface DeleteRouteRequest {
+export interface UpgradeSKSClusterServiceLevelRequest {
   id: string
-  subnetID: string
-  vpcID: string
-}
-
-export interface ListZonesResponse {
-  zones?: Zone[]
-}
-
-/** @internal */
-export function fromWireListZonesResponse(w: any): ListZonesResponse {
-  const v = {} as ListZonesResponse
-  if (w['zones'] !== undefined) v.zones = (w['zones'] as any[]).map((x) => fromWireZone(x))
-  return v
 }
 
 export abstract class GeneratedExoscaleClient {
   protected abstract core: ClientCore
 
   /**
-   * List AI API keys for an organization
+   * Add an external source as a member of a Security Group
+   *
+   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
+   */
+  addExternalSourceToSecurityGroup(
+    params: AddExternalSourceToSecurityGroupRequest,
+  ): Promise<Operation> {
+    const path = `/security-group/${encodeURIComponent(params.id)}:add-source`
+    const body = toWireAddExternalSourceToSecurityGroupRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Set instance destruction protection
+   *
+   * @see https://www.exoscale.com/compute/ Read more
+   */
+  addInstanceProtection(params: AddInstanceProtectionRequest): Promise<Operation> {
+    const path = `/instance/${encodeURIComponent(params.id)}:add-protection`
+    return this.core.request('PUT', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Create a Security Group rule
+   *
+   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
+   */
+  addRuleToSecurityGroup(params: AddRuleToSecurityGroupRequest): Promise<Operation> {
+    const path = `/security-group/${encodeURIComponent(params.id)}/rules`
+    const body = toWireAddRuleToSecurityGroupRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Add a Load Balancer Service
+   *
+   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
+   */
+  addServiceToLoadBalancer(params: AddServiceToLoadBalancerRequest): Promise<Operation> {
+    const path = `/load-balancer/${encodeURIComponent(params.id)}/service`
+    const body = toWireAddServiceToLoadBalancerRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * [BETA] Request generation of key/secret that allow caller to assume target role
+   *
+   * @see https://community.exoscale.com/product/iam/operation/role-mgmt/ Read more
+   */
+  assumeIAMRole(params: AssumeIAMRoleRequest): Promise<AssumeIAMRoleResponse> {
+    const path = `/iam-role/${encodeURIComponent(params.id)}/assume`
+    const body = toWireAssumeIAMRoleRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireAssumeIAMRoleResponse })
+  }
+
+  /**
+   * Attach block storage volume to an instance
+   *
+   * @see https://community.exoscale.com/documentation/block-storage/ Read more
+   */
+  attachBlockStorageVolumeToInstance(
+    params: AttachBlockStorageVolumeToInstanceRequest,
+  ): Promise<Operation> {
+    const path = `/block-storage/${encodeURIComponent(params.id)}:attach`
+    const body = toWireAttachBlockStorageVolumeToInstanceRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * [BETA] Create a new DBaaS connection between a DBaaS service and an external service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  attachDBAASServiceToEndpoint(params: AttachDBAASServiceToEndpointRequest): Promise<Operation> {
+    const path = `/dbaas-external-endpoint/${encodeURIComponent(params.sourceServiceName)}/attach`
+    const body = toWireAttachDBAASServiceToEndpointRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Attach a Compute instance to an Elastic IP
+   *
+   * @see https://community.exoscale.com/product/networking/eip/ Read more
+   */
+  attachInstanceToElasticIP(params: AttachInstanceToElasticIPRequest): Promise<Operation> {
+    const path = `/elastic-ip/${encodeURIComponent(params.id)}:attach`
+    const body = toWireAttachInstanceToElasticIPRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Attach a Compute instance to a Private Network
+   *
+   * @see https://community.exoscale.com/product/networking/private-network/ Read more
+   */
+  attachInstanceToPrivateNetwork(
+    params: AttachInstanceToPrivateNetworkRequest,
+  ): Promise<Operation> {
+    const path = `/private-network/${encodeURIComponent(params.id)}:attach`
+    const body = toWireAttachInstanceToPrivateNetworkRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Attach a Compute instance to a Security Group
+   *
+   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
+   */
+  attachInstanceToSecurityGroup(params: AttachInstanceToSecurityGroupRequest): Promise<Operation> {
+    const path = `/security-group/${encodeURIComponent(params.id)}:attach`
+    const body = toWireAttachInstanceToSecurityGroupRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * [BETA] Attach a Compute instance to a Subnet
+   *
+   * @see https://community.exoscale.com/product/networking/vpc Read more
+   */
+  attachInstanceToSubnet(params: AttachInstanceToSubnetRequest): Promise<Operation> {
+    const path = `/vpc/${encodeURIComponent(params.vpcID)}/subnet/${encodeURIComponent(params.subnetID)}/attach`
+    const body = toWireAttachInstanceToSubnetRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Cancels the scheduled deletion of a KMS Key.
    *
    * Errors:
    *
-   * **403**
-   * Forbidden
+   * **400**
+   * ### Errors
    *
-   * @see https://www.exoscale.com/ai-cloud-infrastructure/managed-inference/ Read more
+   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
+   *
+   * Not on Replica: The request was rejected because the operation is not allowed on a replica.
+   *
+   * Not Pending Deletion: The request was rejected because the key is not pending deletion.
+   *
+   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
    */
-  listAIAPIKeys(): Promise<ListAIAPIKeysResponse> {
-    return this.core.request('GET', '/ai/api-key', { decode: fromWireListAIAPIKeysResponse })
+  cancelKmsKeyDeletion(params: CancelKmsKeyDeletionRequest): Promise<SuccessResponse> {
+    const path = `/kms-key/${encodeURIComponent(params.id)}/cancel-deletion`
+    return this.core.request('POST', path, { decode: fromWireSuccessResponse })
+  }
+
+  /**
+   * Copy a Template from a zone to another
+   *
+   * @see https://www.exoscale.com/templates/ Read more
+   */
+  copyTemplate(params: CopyTemplateRequest): Promise<Operation> {
+    const path = `/template/${encodeURIComponent(params.id)}`
+    const body = toWireCopyTemplateRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
   }
 
   /**
@@ -8043,58 +8187,370 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * Delete AI API key
+   * Create an Anti-affinity Group
    *
-   * Errors:
-   *
-   * **403**
-   * Forbidden
-   *
-   * **404**
-   * Not Found
-   *
-   * @see https://www.exoscale.com/ai-cloud-infrastructure/managed-inference/ Read more
+   * @see https://community.exoscale.com/product/compute/instances/how-to/anti-affinity/ Read more
    */
-  deleteAIAPIKey(params: DeleteAIAPIKeyRequest): Promise<Operation> {
-    const path = `/ai/api-key/${encodeURIComponent(params.id)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  createAntiAffinityGroup(params: CreateAntiAffinityGroupRequest): Promise<Operation> {
+    const body = toWireCreateAntiAffinityGroupRequest(params)
+    return this.core.request('POST', '/anti-affinity-group', { body, decode: fromWireOperation })
   }
 
   /**
-   * Get AI API key metadata
+   * Create a new API key
    *
-   * Errors:
-   *
-   * **403**
-   * Forbidden
-   *
-   * **404**
-   * Not Found
-   *
-   * @see https://www.exoscale.com/ai-cloud-infrastructure/managed-inference/ Read more
+   * @see https://community.exoscale.com/product/iam/how-to/key-mgmt/ Read more
    */
-  getAIAPIKey(params: GetAIAPIKeyRequest): Promise<GetAIAPIKeyResponse> {
-    const path = `/ai/api-key/${encodeURIComponent(params.id)}`
-    return this.core.request('GET', path, { decode: fromWireGetAIAPIKeyResponse })
+  createAPIKey(params: CreateAPIKeyRequest): Promise<IAMAPIKeyCreated> {
+    const body = toWireCreateAPIKeyRequest(params)
+    return this.core.request('POST', '/api-key', { body, decode: fromWireIAMAPIKeyCreated })
   }
 
   /**
-   * List Deployments
+   * Create a block storage snapshot
    *
-   * Errors:
-   *
-   * **400**
-   * Bad Request
-   *
-   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
+   * @see https://community.exoscale.com/documentation/block-storage/ Read more
    */
-  listDeployments(params?: ListDeploymentsRequest): Promise<ListDeploymentsResponse> {
-    const query: Record<string, string> = {}
-    if (params?.visibility !== undefined) query['visibility'] = params?.visibility
-    return this.core.request('GET', '/ai/deployment', {
-      query,
-      decode: fromWireListDeploymentsResponse,
-    })
+  createBlockStorageSnapshot(params: CreateBlockStorageSnapshotRequest): Promise<Operation> {
+    const path = `/block-storage/${encodeURIComponent(params.id)}:create-snapshot`
+    const body = toWireCreateBlockStorageSnapshotRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Create a block storage volume
+   *
+   * @see https://community.exoscale.com/documentation/block-storage/ Read more
+   */
+  createBlockStorageVolume(params: CreateBlockStorageVolumeRequest): Promise<Operation> {
+    const body = toWireCreateBlockStorageVolumeRequest(params)
+    return this.core.request('POST', '/block-storage', { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Create a DBaaS ClickHouse user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  createDBAASClickhouseUser(
+    params: CreateDBAASClickhouseUserRequest,
+  ): Promise<DBAASUserClickhouseSecrets> {
+    const path = `/dbaas-clickhouse/${encodeURIComponent(params.serviceName)}/user`
+    const body = toWireCreateDBAASClickhouseUserRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireDBAASUserClickhouseSecrets })
+  }
+
+  /**
+   * [BETA] Create DataDog external integration endpoint
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  createDBAASExternalEndpointDatadog(
+    params: DBAASEndpointDatadogInputCreate & {
+      name: string
+    },
+  ): Promise<Operation> {
+    const path = `/dbaas-external-endpoint-datadog/${encodeURIComponent(params.name)}`
+    const body = toWireDBAASEndpointDatadogInputCreate(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * [BETA] Create ElasticSearch Logs external integration endpoint
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  createDBAASExternalEndpointElasticsearch(
+    params: DBAASEndpointElasticsearchInputCreate & {
+      name: string
+    },
+  ): Promise<Operation> {
+    const path = `/dbaas-external-endpoint-elasticsearch/${encodeURIComponent(params.name)}`
+    const body = toWireDBAASEndpointElasticsearchInputCreate(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * [BETA] Create OpenSearch Logs external integration endpoint
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  createDBAASExternalEndpointOpensearch(
+    params: DBAASEndpointOpensearchInputCreate & {
+      name: string
+    },
+  ): Promise<Operation> {
+    const path = `/dbaas-external-endpoint-opensearch/${encodeURIComponent(params.name)}`
+    const body = toWireDBAASEndpointOpensearchInputCreate(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * [BETA] Create Prometheus external integration endpoint
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  createDBAASExternalEndpointPrometheus(
+    params: DBAASEndpointPrometheusPayload & {
+      name: string
+    },
+  ): Promise<Operation> {
+    const path = `/dbaas-external-endpoint-prometheus/${encodeURIComponent(params.name)}`
+    const body = toWireDBAASEndpointPrometheusPayload(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * [BETA] Create RSyslog external integration endpoint
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  createDBAASExternalEndpointRsyslog(
+    params: DBAASEndpointRsyslogInputCreate & {
+      name: string
+    },
+  ): Promise<Operation> {
+    const path = `/dbaas-external-endpoint-rsyslog/${encodeURIComponent(params.name)}`
+    const body = toWireDBAASEndpointRsyslogInputCreate(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * [BETA] Create a new DBaaS integration between two services
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  createDBAASIntegration(params: CreateDBAASIntegrationRequest): Promise<Operation> {
+    const body = toWireCreateDBAASIntegrationRequest(params)
+    return this.core.request('POST', '/dbaas-integration', { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Add a Kafka Schema Registry ACL entry
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  createDBAASKafkaSchemaRegistryAclConfig(
+    params: DBAASKafkaSchemaRegistryAclEntry & {
+      name: DBAASServiceName
+    },
+  ): Promise<Operation> {
+    const path = `/dbaas-kafka/${encodeURIComponent(params.name)}/schema-registry/acl-config`
+    const body = toWireDBAASKafkaSchemaRegistryAclEntry(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Add a Kafka topic ACL entry
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  createDBAASKafkaTopicAclConfig(
+    params: DBAASKafkaTopicAclEntry & {
+      name: DBAASServiceName
+    },
+  ): Promise<Operation> {
+    const path = `/dbaas-kafka/${encodeURIComponent(params.name)}/topic/acl-config`
+    const body = toWireDBAASKafkaTopicAclEntry(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Create a DBaaS Kafka user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  createDBAASKafkaUser(params: CreateDBAASKafkaUserRequest): Promise<Operation> {
+    const path = `/dbaas-kafka/${encodeURIComponent(params.serviceName)}/user`
+    const body = toWireCreateDBAASKafkaUserRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Create a DBaaS MySQL database
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  createDBAASMysqlDatabase(params: CreateDBAASMysqlDatabaseRequest): Promise<Operation> {
+    const path = `/dbaas-mysql/${encodeURIComponent(params.serviceName)}/database`
+    const body = toWireCreateDBAASMysqlDatabaseRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Create a DBaaS MySQL user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  createDBAASMysqlUser(params: CreateDBAASMysqlUserRequest): Promise<Operation> {
+    const path = `/dbaas-mysql/${encodeURIComponent(params.serviceName)}/user`
+    const body = toWireCreateDBAASMysqlUserRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Create a DBaaS OpenSearch user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  createDBAASOpensearchUser(params: CreateDBAASOpensearchUserRequest): Promise<Operation> {
+    const path = `/dbaas-opensearch/${encodeURIComponent(params.serviceName)}/user`
+    const body = toWireCreateDBAASOpensearchUserRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Create a DBaaS PostgreSQL connection pool
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  createDBAASPGConnectionPool(params: CreateDBAASPGConnectionPoolRequest): Promise<Operation> {
+    const path = `/dbaas-postgres/${encodeURIComponent(params.serviceName)}/connection-pool`
+    const body = toWireCreateDBAASPGConnectionPoolRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Create a DBaaS Postgres database
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  createDBAASPGDatabase(params: CreateDBAASPGDatabaseRequest): Promise<Operation> {
+    const path = `/dbaas-postgres/${encodeURIComponent(params.serviceName)}/database`
+    const body = toWireCreateDBAASPGDatabaseRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Check whether you can upgrade Postgres service to a newer version
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  createDBAASPGUpgradeCheck(params: CreateDBAASPGUpgradeCheckRequest): Promise<DBAASTask> {
+    const path = `/dbaas-postgres/${encodeURIComponent(params.service)}/upgrade-check`
+    const body = toWireCreateDBAASPGUpgradeCheckRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireDBAASTask })
+  }
+
+  /**
+   * Create a DBaaS Postgres user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  createDBAASPostgresUser(params: CreateDBAASPostgresUserRequest): Promise<Operation> {
+    const path = `/dbaas-postgres/${encodeURIComponent(params.serviceName)}/user`
+    const body = toWireCreateDBAASPostgresUserRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Create a DBaaS ClickHouse service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  createDBAASServiceClickhouse(params: CreateDBAASServiceClickhouseRequest): Promise<Operation> {
+    const path = `/dbaas-clickhouse/${encodeURIComponent(params.name)}`
+    const body = toWireCreateDBAASServiceClickhouseRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Create a DBaaS Grafana service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  createDBAASServiceGrafana(params: CreateDBAASServiceGrafanaRequest): Promise<Operation> {
+    const path = `/dbaas-grafana/${encodeURIComponent(params.name)}`
+    const body = toWireCreateDBAASServiceGrafanaRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Create a DBaaS Kafka service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  createDBAASServiceKafka(params: CreateDBAASServiceKafkaRequest): Promise<Operation> {
+    const path = `/dbaas-kafka/${encodeURIComponent(params.name)}`
+    const body = toWireCreateDBAASServiceKafkaRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Create a DBaaS MySQL service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  createDBAASServiceMysql(params: CreateDBAASServiceMysqlRequest): Promise<Operation> {
+    const path = `/dbaas-mysql/${encodeURIComponent(params.name)}`
+    const body = toWireCreateDBAASServiceMysqlRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Create a DBaaS OpenSearch service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  createDBAASServiceOpensearch(params: CreateDBAASServiceOpensearchRequest): Promise<Operation> {
+    const path = `/dbaas-opensearch/${encodeURIComponent(params.name)}`
+    const body = toWireCreateDBAASServiceOpensearchRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Create a DBaaS PostgreSQL service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  createDBAASServicePG(params: CreateDBAASServicePGRequest): Promise<Operation> {
+    const path = `/dbaas-postgres/${encodeURIComponent(params.name)}`
+    const body = toWireCreateDBAASServicePGRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Create a DBaaS Thanos service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  createDBAASServiceThanos(params: CreateDBAASServiceThanosRequest): Promise<Operation> {
+    const path = `/dbaas-thanos/${encodeURIComponent(params.name)}`
+    const body = toWireCreateDBAASServiceThanosRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Create a DBaaS Valkey service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  createDBAASServiceValkey(params: CreateDBAASServiceValkeyRequest): Promise<Operation> {
+    const path = `/dbaas-valkey/${encodeURIComponent(params.name)}`
+    const body = toWireCreateDBAASServiceValkeyRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Create a DBaaS task to check migration
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  createDBAASTaskMigrationCheck(params: CreateDBAASTaskMigrationCheckRequest): Promise<Operation> {
+    const path = `/dbaas-task-migration-check/${encodeURIComponent(params.service)}`
+    const body = toWireCreateDBAASTaskMigrationCheckRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Create a DBaaS Valkey user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  createDBAASValkeyUser(params: CreateDBAASValkeyUserRequest): Promise<Operation> {
+    const path = `/dbaas-valkey/${encodeURIComponent(params.serviceName)}/user`
+    const body = toWireCreateDBAASValkeyUserRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
   }
 
   /**
@@ -8119,6 +8575,577 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
+   * Create DNS domain
+   *
+   * @see https://community.exoscale.com/product/networking/dns/quick-start/ Read more
+   */
+  createDNSDomain(params: CreateDNSDomainRequest): Promise<Operation> {
+    const body = toWireCreateDNSDomainRequest(params)
+    return this.core.request('POST', '/dns-domain', { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Create DNS domain record
+   *
+   * @see https://community.exoscale.com/product/networking/dns/overview/ Read more
+   */
+  createDNSDomainRecord(params: CreateDNSDomainRecordRequest): Promise<Operation> {
+    const path = `/dns-domain/${encodeURIComponent(params.domainID)}/record`
+    const body = toWireCreateDNSDomainRecordRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Create an Elastic IP
+   *
+   * @see https://community.exoscale.com/product/networking/eip/ Read more
+   */
+  createElasticIP(params: CreateElasticIPRequest): Promise<Operation> {
+    const body = toWireCreateElasticIPRequest(params)
+    return this.core.request('POST', '/elastic-ip', { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Create IAM Role
+   *
+   * @see https://community.exoscale.com/product/iam/operation/role-mgmt/ Read more
+   */
+  createIAMRole(params: CreateIAMRoleRequest): Promise<Operation> {
+    const body = toWireCreateIAMRoleRequest(params)
+    return this.core.request('POST', '/iam-role', { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Create a Compute instance
+   *
+   * @see https://www.exoscale.com/compute/ Read more
+   */
+  createInstance(params: CreateInstanceRequest): Promise<Operation> {
+    const body = toWireCreateInstanceRequest(params)
+    return this.core.request('POST', '/instance', { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Create an Instance Pool
+   *
+   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
+   */
+  createInstancePool(params: CreateInstancePoolRequest): Promise<Operation> {
+    const body = toWireCreateInstancePoolRequest(params)
+    return this.core.request('POST', '/instance-pool', { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Create a customer-managed unique KMS Key in your organization. A KMS Key is a logical representation of a cryptographic key material. It also includes metadata such as a UUID, a name and its state.
+   *
+   * Errors:
+   *
+   * **400**
+   * ### Errors
+   *
+   * Name Conflict: The request was rejected because a key with the same name already exists in the target zone.
+   *
+   * Bad Request: The request was rejected because of an invalid request body or path parameter.
+   *
+   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   */
+  createKmsKey(params: CreateKmsKeyRequest): Promise<CreateKmsKeyResponse> {
+    const body = toWireCreateKmsKeyRequest(params)
+    return this.core.request('POST', '/kms-key', { body, decode: fromWireCreateKmsKeyResponse })
+  }
+
+  /**
+   * Create a Load Balancer
+   *
+   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
+   */
+  createLoadBalancer(params: CreateLoadBalancerRequest): Promise<Operation> {
+    const body = toWireCreateLoadBalancerRequest(params)
+    return this.core.request('POST', '/load-balancer', { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Model files will be downloaded from Huggingface.
+   *
+   * Name must be the exact name of the model on huggingface (ex: openai/gpt-oss-120b or ggml-org/gpt-oss-120b-GGUF).
+   *
+   * If the model is under a license then you must provide a Huggingface access token for an account that signed the license agreement
+   *
+   * Errors:
+   *
+   * **403**
+   * Forbidden
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
+   */
+  createModel(params: CreateModelRequest): Promise<Operation> {
+    const body = toWireCreateModelRequest(params)
+    return this.core.request('POST', '/ai/model', { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Create a Private Network
+   *
+   * @see https://community.exoscale.com/product/networking/private-network/ Read more
+   */
+  createPrivateNetwork(params: CreatePrivateNetworkRequest): Promise<Operation> {
+    const body = toWireCreatePrivateNetworkRequest(params)
+    return this.core.request('POST', '/private-network', { body, decode: fromWireOperation })
+  }
+
+  /**
+   * [BETA] Create a route
+   *
+   * @see https://community.exoscale.com/product/networking/vpc Read more
+   */
+  createRoute(params: CreateRouteRequest): Promise<Route> {
+    const path = `/vpc/${encodeURIComponent(params.vpcID)}/subnet/${encodeURIComponent(params.subnetID)}/route`
+    const body = toWireCreateRouteRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireRoute })
+  }
+
+  /**
+   * Create a Security Group
+   *
+   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
+   */
+  createSecurityGroup(params: CreateSecurityGroupRequest): Promise<Operation> {
+    const body = toWireCreateSecurityGroupRequest(params)
+    return this.core.request('POST', '/security-group', { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Create an SKS cluster
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
+   */
+  createSKSCluster(params: CreateSKSClusterRequest): Promise<Operation> {
+    const body = toWireCreateSKSClusterRequest(params)
+    return this.core.request('POST', '/sks-cluster', { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Create a new SKS Nodepool
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
+   */
+  createSKSNodepool(params: CreateSKSNodepoolRequest): Promise<Operation> {
+    const path = `/sks-cluster/${encodeURIComponent(params.id)}/nodepool`
+    const body = toWireCreateSKSNodepoolRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Create a Snapshot of a Compute instance
+   *
+   * @see https://www.exoscale.com/compute/ Read more
+   * @see https://community.exoscale.com/documentation/compute/snapshots/ Read more
+   */
+  createSnapshot(params: CreateSnapshotRequest): Promise<Operation> {
+    const path = `/instance/${encodeURIComponent(params.id)}:create-snapshot`
+    return this.core.request('POST', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * [BETA] Create a Subnet
+   *
+   * @see https://community.exoscale.com/product/networking/vpc Read more
+   */
+  createSubnet(params: CreateSubnetRequest): Promise<Operation> {
+    const path = `/vpc/${encodeURIComponent(params.vpcID)}/subnet`
+    const body = toWireCreateSubnetRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Create a User
+   *
+   * @see https://community.exoscale.com/product/iam/operation/users-keys/ Read more
+   */
+  createUser(params: CreateUserRequest): Promise<Operation> {
+    const body = toWireCreateUserRequest(params)
+    return this.core.request('POST', '/user', { body, decode: fromWireOperation })
+  }
+
+  /**
+   * [BETA] Create a VPC
+   *
+   * @see https://community.exoscale.com/product/networking/vpc Read more
+   */
+  createVpc(params: CreateVpcRequest): Promise<Operation> {
+    const body = toWireCreateVpcRequest(params)
+    return this.core.request('POST', '/vpc', { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Decrypts a ciphertext.
+   *
+   * Errors:
+   *
+   * **400**
+   * ### Errors
+   *
+   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
+   *
+   * Key is Disabled: The request was rejected because the specified KMS key is disabled.
+   *
+   * Invalid Usage: The request was rejected because the operation is only allowed on symmetric keys with usage "encrypt-decrypt".
+   *
+   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   */
+  decrypt(
+    params: DecryptRequest & {
+      id: string
+    },
+  ): Promise<DecryptResponse> {
+    const path = `/kms-key/${encodeURIComponent(params.id)}/decrypt`
+    const body = toWireDecryptRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireDecryptResponse })
+  }
+
+  /**
+   * Delete AI API key
+   *
+   * Errors:
+   *
+   * **403**
+   * Forbidden
+   *
+   * **404**
+   * Not Found
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/managed-inference/ Read more
+   */
+  deleteAIAPIKey(params: DeleteAIAPIKeyRequest): Promise<Operation> {
+    const path = `/ai/api-key/${encodeURIComponent(params.id)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Delete an Anti-affinity Group
+   *
+   * @see https://community.exoscale.com/product/compute/instances/how-to/anti-affinity/ Read more
+   */
+  deleteAntiAffinityGroup(params: DeleteAntiAffinityGroupRequest): Promise<Operation> {
+    const path = `/anti-affinity-group/${encodeURIComponent(params.id)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Delete an API key
+   *
+   * @see https://community.exoscale.com/product/iam/how-to/key-mgmt/ Read more
+   */
+  deleteAPIKey(params: DeleteAPIKeyRequest): Promise<Operation> {
+    const path = `/api-key/${encodeURIComponent(params.id)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Delete a block storage snapshot, data will be unrecoverable
+   *
+   * @see https://community.exoscale.com/documentation/block-storage/ Read more
+   */
+  deleteBlockStorageSnapshot(params: DeleteBlockStorageSnapshotRequest): Promise<Operation> {
+    const path = `/block-storage-snapshot/${encodeURIComponent(params.id)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Delete a block storage volume, data will be unrecoverable
+   *
+   * @see https://community.exoscale.com/documentation/block-storage/ Read more
+   */
+  deleteBlockStorageVolume(params: DeleteBlockStorageVolumeRequest): Promise<Operation> {
+    const path = `/block-storage/${encodeURIComponent(params.id)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Delete a DBaaS ClickHouse role
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  deleteDBAASClickhouseRole(params: DeleteDBAASClickhouseRoleRequest): Promise<Operation> {
+    const path = `/dbaas-clickhouse/${encodeURIComponent(params.serviceName)}/role/${encodeURIComponent(params.roleUuid)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Delete a DBaaS ClickHouse user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  deleteDBAASClickhouseUser(params: DeleteDBAASClickhouseUserRequest): Promise<Operation> {
+    const path = `/dbaas-clickhouse/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.userUuid)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * [BETA] Delete DataDog external integration endpoint
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  deleteDBAASExternalEndpointDatadog(
+    params: DeleteDBAASExternalEndpointDatadogRequest,
+  ): Promise<Operation> {
+    const path = `/dbaas-external-endpoint-datadog/${encodeURIComponent(params.endpointID)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * [BETA] Delete ElasticSearch logs external integration endpoint
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  deleteDBAASExternalEndpointElasticsearch(
+    params: DeleteDBAASExternalEndpointElasticsearchRequest,
+  ): Promise<Operation> {
+    const path = `/dbaas-external-endpoint-elasticsearch/${encodeURIComponent(params.endpointID)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * [BETA] Delete OpenSearch logs external integration endpoint
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  deleteDBAASExternalEndpointOpensearch(
+    params: DeleteDBAASExternalEndpointOpensearchRequest,
+  ): Promise<Operation> {
+    const path = `/dbaas-external-endpoint-opensearch/${encodeURIComponent(params.endpointID)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * [BETA] Delete Prometheus external integration endpoint
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  deleteDBAASExternalEndpointPrometheus(
+    params: DeleteDBAASExternalEndpointPrometheusRequest,
+  ): Promise<Operation> {
+    const path = `/dbaas-external-endpoint-prometheus/${encodeURIComponent(params.endpointID)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * [BETA] Delete RSyslog external integration endpoint
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  deleteDBAASExternalEndpointRsyslog(
+    params: DeleteDBAASExternalEndpointRsyslogRequest,
+  ): Promise<Operation> {
+    const path = `/dbaas-external-endpoint-rsyslog/${encodeURIComponent(params.endpointID)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * [BETA] Delete a DBaaS Integration
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  deleteDBAASIntegration(params: DeleteDBAASIntegrationRequest): Promise<Operation> {
+    const path = `/dbaas-integration/${encodeURIComponent(params.id)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Delete a Kafka ACL entry
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  deleteDBAASKafkaSchemaRegistryAclConfig(
+    params: DeleteDBAASKafkaSchemaRegistryAclConfigRequest,
+  ): Promise<Operation> {
+    const path = `/dbaas-kafka/${encodeURIComponent(params.name)}/schema-registry/acl-config/${encodeURIComponent(params.aclID)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Delete a Kafka ACL entry
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  deleteDBAASKafkaTopicAclConfig(
+    params: DeleteDBAASKafkaTopicAclConfigRequest,
+  ): Promise<Operation> {
+    const path = `/dbaas-kafka/${encodeURIComponent(params.name)}/topic/acl-config/${encodeURIComponent(params.aclID)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Delete a DBaaS kafka user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  deleteDBAASKafkaUser(params: DeleteDBAASKafkaUserRequest): Promise<Operation> {
+    const path = `/dbaas-kafka/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Delete a DBaaS MySQL database
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  deleteDBAASMysqlDatabase(params: DeleteDBAASMysqlDatabaseRequest): Promise<Operation> {
+    const path = `/dbaas-mysql/${encodeURIComponent(params.serviceName)}/database/${encodeURIComponent(params.databaseName)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Delete a DBaaS MySQL user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  deleteDBAASMysqlUser(params: DeleteDBAASMysqlUserRequest): Promise<Operation> {
+    const path = `/dbaas-mysql/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Delete a DBaaS OpenSearch user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  deleteDBAASOpensearchUser(params: DeleteDBAASOpensearchUserRequest): Promise<Operation> {
+    const path = `/dbaas-opensearch/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Delete a DBaaS PostgreSQL connection pool
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  deleteDBAASPGConnectionPool(params: DeleteDBAASPGConnectionPoolRequest): Promise<Operation> {
+    const path = `/dbaas-postgres/${encodeURIComponent(params.serviceName)}/connection-pool/${encodeURIComponent(params.connectionPoolName)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Delete a DBaaS Postgres database
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  deleteDBAASPGDatabase(params: DeleteDBAASPGDatabaseRequest): Promise<Operation> {
+    const path = `/dbaas-postgres/${encodeURIComponent(params.serviceName)}/database/${encodeURIComponent(params.databaseName)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Delete a DBaaS Postgres user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  deleteDBAASPostgresUser(params: DeleteDBAASPostgresUserRequest): Promise<Operation> {
+    const path = `/dbaas-postgres/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Delete a DBaaS service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  deleteDBAASService(params: DeleteDBAASServiceRequest): Promise<Operation> {
+    const path = `/dbaas-service/${encodeURIComponent(params.name)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Delete a ClickHouse service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  deleteDBAASServiceClickhouse(params: DeleteDBAASServiceClickhouseRequest): Promise<Operation> {
+    const path = `/dbaas-clickhouse/${encodeURIComponent(params.name)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Delete a Grafana service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  deleteDBAASServiceGrafana(params: DeleteDBAASServiceGrafanaRequest): Promise<Operation> {
+    const path = `/dbaas-grafana/${encodeURIComponent(params.name)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Delete a Kafka service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  deleteDBAASServiceKafka(params: DeleteDBAASServiceKafkaRequest): Promise<Operation> {
+    const path = `/dbaas-kafka/${encodeURIComponent(params.name)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Delete a MySQL service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  deleteDBAASServiceMysql(params: DeleteDBAASServiceMysqlRequest): Promise<Operation> {
+    const path = `/dbaas-mysql/${encodeURIComponent(params.name)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Delete a OpenSearch service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  deleteDBAASServiceOpensearch(params: DeleteDBAASServiceOpensearchRequest): Promise<Operation> {
+    const path = `/dbaas-opensearch/${encodeURIComponent(params.name)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Delete a Postgres service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  deleteDBAASServicePG(params: DeleteDBAASServicePGRequest): Promise<Operation> {
+    const path = `/dbaas-postgres/${encodeURIComponent(params.name)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Delete a Thanos service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  deleteDBAASServiceThanos(params: DeleteDBAASServiceThanosRequest): Promise<Operation> {
+    const path = `/dbaas-thanos/${encodeURIComponent(params.name)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Delete a Valkey service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  deleteDBAASServiceValkey(params: DeleteDBAASServiceValkeyRequest): Promise<Operation> {
+    const path = `/dbaas-valkey/${encodeURIComponent(params.name)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Delete a DBaaS Valkey user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  deleteDBAASValkeyUser(params: DeleteDBAASValkeyUserRequest): Promise<Operation> {
+    const path = `/dbaas-valkey/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
    * Delete Deployment
    *
    * Errors:
@@ -8140,172 +9167,83 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * Get Deployment details
+   * Delete DNS Domain
    *
-   * Errors:
-   *
-   * **404**
-   * Not Found
-   *
-   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
+   * @see https://community.exoscale.com/product/networking/dns/quick-start/ Read more
    */
-  getDeployment(params: GetDeploymentRequest): Promise<GetDeploymentResponse> {
-    const path = `/ai/deployment/${encodeURIComponent(params.id)}`
-    return this.core.request('GET', path, { decode: fromWireGetDeploymentResponse })
+  deleteDNSDomain(params: DeleteDNSDomainRequest): Promise<Operation> {
+    const path = `/dns-domain/${encodeURIComponent(params.id)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
   }
 
   /**
-   * Update AI deployment
+   * Delete DNS domain record
    *
-   * Errors:
-   *
-   * **400**
-   * Bad Request
-   *
-   * **403**
-   * Forbidden
-   *
-   * **404**
-   * Not Found
-   *
-   * **409**
-   * Conflict
-   *
-   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
+   * @see https://community.exoscale.com/product/networking/dns/overview/ Read more
    */
-  updateDeployment(
-    params: UpdateDeploymentRequest & {
-      id: string
-    },
-  ): Promise<Operation> {
-    const path = `/ai/deployment/${encodeURIComponent(params.id)}`
-    const body = toWireUpdateDeploymentRequest(params)
-    return this.core.request('PATCH', path, { body, decode: fromWireOperation })
+  deleteDNSDomainRecord(params: DeleteDNSDomainRecordRequest): Promise<Operation> {
+    const path = `/dns-domain/${encodeURIComponent(params.domainID)}/record/${encodeURIComponent(params.recordID)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
   }
 
   /**
-   * Get Deployment API Key
+   * Delete an Elastic IP
    *
-   * Errors:
-   *
-   * **404**
-   * Not Found
-   *
-   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
+   * @see https://community.exoscale.com/product/networking/eip/ Read more
    */
-  revealDeploymentAPIKey(
-    params: RevealDeploymentAPIKeyRequest,
-  ): Promise<RevealDeploymentAPIKeyResponse> {
-    const path = `/ai/deployment/${encodeURIComponent(params.id)}/api-key`
-    return this.core.request('GET', path, { decode: fromWireRevealDeploymentAPIKeyResponse })
+  deleteElasticIP(params: DeleteElasticIPRequest): Promise<Operation> {
+    const path = `/elastic-ip/${encodeURIComponent(params.id)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
   }
 
   /**
-   * Return logs for the vLLM deployment (deploy/<release-name>--deployment-vllm). Optional ?stream=true to request streaming (may not be supported).
+   * Delete IAM Role
    *
-   * Errors:
-   *
-   * **400**
-   * Bad Request
-   *
-   * **404**
-   * Not Found
-   *
-   * **500**
-   * Internal Server Error
-   *
-   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
+   * @see https://community.exoscale.com/product/iam/operation/role-mgmt/ Read more
    */
-  getDeploymentLogs(params: GetDeploymentLogsRequest): Promise<GetDeploymentLogsResponse> {
-    const path = `/ai/deployment/${encodeURIComponent(params.id)}/logs`
-    const query: Record<string, string> = {}
-    if (params.stream !== undefined) query['stream'] = String(params.stream)
-    if (params.tail !== undefined) query['tail'] = String(params.tail)
-    return this.core.request('GET', path, { query, decode: fromWireGetDeploymentLogsResponse })
+  deleteIAMRole(params: DeleteIAMRoleRequest): Promise<Operation> {
+    const path = `/iam-role/${encodeURIComponent(params.id)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
   }
 
   /**
-   * Scale Deployment
+   * Delete a Compute instance
    *
-   * Errors:
-   *
-   * **403**
-   * Forbidden
-   *
-   * **404**
-   * Not Found
-   *
-   * **409**
-   * Conflict
-   *
-   * **412**
-   * Precondition Failed
-   *
-   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
+   * @see https://www.exoscale.com/compute/ Read more
    */
-  scaleDeployment(
-    params: ScaleDeploymentRequest & {
-      id: string
-    },
-  ): Promise<Operation> {
-    const path = `/ai/deployment/${encodeURIComponent(params.id)}/scale`
-    const body = toWireScaleDeploymentRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  deleteInstance(params: DeleteInstanceRequest): Promise<Operation> {
+    const path = `/instance/${encodeURIComponent(params.id)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
   }
 
   /**
-   * Get list of allowed inference engine parameters with their descriptions and allowed values
+   * Delete an Instance Pool
    *
-   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
+   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
    */
-  getInferenceEngineHelp(
-    params?: GetInferenceEngineHelpRequest,
-  ): Promise<GetInferenceEngineHelpResponse> {
-    const query: Record<string, string> = {}
-    if (params?.version !== undefined) query['version'] = params?.version
-    return this.core.request('GET', '/ai/help/inference-engine-parameters', {
-      query,
-      decode: fromWireGetInferenceEngineHelpResponse,
-    })
+  deleteInstancePool(params: DeleteInstancePoolRequest): Promise<Operation> {
+    const path = `/instance-pool/${encodeURIComponent(params.id)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
   }
 
   /**
-   * List available instance types with authorization status based on GPU availability
+   * Delete a Load Balancer
    *
-   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
+   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
    */
-  listAIInstanceTypes(): Promise<ListAIInstanceTypesResponse> {
-    return this.core.request('GET', '/ai/instance-type', {
-      decode: fromWireListAIInstanceTypesResponse,
-    })
+  deleteLoadBalancer(params: DeleteLoadBalancerRequest): Promise<Operation> {
+    const path = `/load-balancer/${encodeURIComponent(params.id)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
   }
 
   /**
-   * List Models
+   * Delete a Load Balancer Service
    *
-   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
+   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
    */
-  listModels(): Promise<ListModelsResponse> {
-    return this.core.request('GET', '/ai/model', { decode: fromWireListModelsResponse })
-  }
-
-  /**
-   * Model files will be downloaded from Huggingface.
-   *
-   * Name must be the exact name of the model on huggingface (ex: openai/gpt-oss-120b or ggml-org/gpt-oss-120b-GGUF).
-   *
-   * If the model is under a license then you must provide a Huggingface access token for an account that signed the license agreement
-   *
-   * Errors:
-   *
-   * **403**
-   * Forbidden
-   *
-   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
-   */
-  createModel(params: CreateModelRequest): Promise<Operation> {
-    const body = toWireCreateModelRequest(params)
-    return this.core.request('POST', '/ai/model', { body, decode: fromWireOperation })
+  deleteLoadBalancerService(params: DeleteLoadBalancerServiceRequest): Promise<Operation> {
+    const path = `/load-balancer/${encodeURIComponent(params.id)}/service/${encodeURIComponent(params.serviceID)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
   }
 
   /**
@@ -8330,235 +9268,143 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * Get Model details
+   * Delete a Private Network
    *
-   * Errors:
-   *
-   * **404**
-   * Not Found
-   *
-   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
+   * @see https://community.exoscale.com/product/networking/private-network/ Read more
    */
-  getModel(params: GetModelRequest): Promise<GetModelResponse> {
-    const path = `/ai/model/${encodeURIComponent(params.id)}`
-    return this.core.request('GET', path, { decode: fromWireGetModelResponse })
-  }
-
-  /**
-   * Get per-org Unit Of Measurement (UOM) consumption quota (UOM/min). Null means unlimited. UOM represents weighted units across different AI workloads (e.g., tokens for LLMs, minutes for TTS, pages for OCR).
-   *
-   * Errors:
-   *
-   * **404**
-   * Not Found
-   *
-   * @see https://www.exoscale.com/ai-cloud-infrastructure/managed-inference/ Read more
-   */
-  getUserOrgConsumptionQuota(): Promise<OrgConsumptionQuotaResponse> {
-    return this.core.request('GET', '/ai/quota', { decode: fromWireOrgConsumptionQuotaResponse })
-  }
-
-  /**
-   * List Anti-affinity Groups
-   *
-   * @see https://community.exoscale.com/product/compute/instances/how-to/anti-affinity/ Read more
-   */
-  listAntiAffinityGroups(): Promise<ListAntiAffinityGroupsResponse> {
-    return this.core.request('GET', '/anti-affinity-group', {
-      decode: fromWireListAntiAffinityGroupsResponse,
-    })
-  }
-
-  /**
-   * Create an Anti-affinity Group
-   *
-   * @see https://community.exoscale.com/product/compute/instances/how-to/anti-affinity/ Read more
-   */
-  createAntiAffinityGroup(params: CreateAntiAffinityGroupRequest): Promise<Operation> {
-    const body = toWireCreateAntiAffinityGroupRequest(params)
-    return this.core.request('POST', '/anti-affinity-group', { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Delete an Anti-affinity Group
-   *
-   * @see https://community.exoscale.com/product/compute/instances/how-to/anti-affinity/ Read more
-   */
-  deleteAntiAffinityGroup(params: DeleteAntiAffinityGroupRequest): Promise<Operation> {
-    const path = `/anti-affinity-group/${encodeURIComponent(params.id)}`
+  deletePrivateNetwork(params: DeletePrivateNetworkRequest): Promise<Operation> {
+    const path = `/private-network/${encodeURIComponent(params.id)}`
     return this.core.request('DELETE', path, { decode: fromWireOperation })
   }
 
   /**
-   * Retrieve Anti-affinity Group details
+   * Delete the PTR DNS record for an elastic IP
    *
-   * @see https://community.exoscale.com/product/compute/instances/how-to/anti-affinity/ Read more
+   * @see https://community.exoscale.com/product/compute/instances/ Read more
    */
-  getAntiAffinityGroup(params: GetAntiAffinityGroupRequest): Promise<AntiAffinityGroup> {
-    const path = `/anti-affinity-group/${encodeURIComponent(params.id)}`
-    return this.core.request('GET', path, { decode: fromWireAntiAffinityGroup })
-  }
-
-  /**
-   * List API keys
-   *
-   * @see https://community.exoscale.com/product/iam/how-to/key-mgmt/ Read more
-   */
-  listAPIKeys(): Promise<ListAPIKeysResponse> {
-    return this.core.request('GET', '/api-key', { decode: fromWireListAPIKeysResponse })
-  }
-
-  /**
-   * Create a new API key
-   *
-   * @see https://community.exoscale.com/product/iam/how-to/key-mgmt/ Read more
-   */
-  createAPIKey(params: CreateAPIKeyRequest): Promise<IAMAPIKeyCreated> {
-    const body = toWireCreateAPIKeyRequest(params)
-    return this.core.request('POST', '/api-key', { body, decode: fromWireIAMAPIKeyCreated })
-  }
-
-  /**
-   * Delete an API key
-   *
-   * @see https://community.exoscale.com/product/iam/how-to/key-mgmt/ Read more
-   */
-  deleteAPIKey(params: DeleteAPIKeyRequest): Promise<Operation> {
-    const path = `/api-key/${encodeURIComponent(params.id)}`
+  deleteReverseDNSElasticIP(params: DeleteReverseDNSElasticIPRequest): Promise<Operation> {
+    const path = `/reverse-dns/elastic-ip/${encodeURIComponent(params.id)}`
     return this.core.request('DELETE', path, { decode: fromWireOperation })
   }
 
   /**
-   * Get API key
+   * Delete the PTR DNS record for an instance
    *
-   * @see https://community.exoscale.com/product/iam/how-to/key-mgmt/ Read more
+   * @see https://community.exoscale.com/product/compute/instances/ Read more
    */
-  getAPIKey(params: GetAPIKeyRequest): Promise<IAMAPIKey> {
-    const path = `/api-key/${encodeURIComponent(params.id)}`
-    return this.core.request('GET', path, { decode: fromWireIAMAPIKey })
-  }
-
-  /**
-   * List block storage volumes
-   *
-   * @see https://community.exoscale.com/documentation/block-storage/ Read more
-   */
-  listBlockStorageVolumes(
-    params?: ListBlockStorageVolumesRequest,
-  ): Promise<ListBlockStorageVolumesResponse> {
-    const query: Record<string, string> = {}
-    if (params?.instanceID !== undefined) query['instance-id'] = params?.instanceID
-    return this.core.request('GET', '/block-storage', {
-      query,
-      decode: fromWireListBlockStorageVolumesResponse,
-    })
-  }
-
-  /**
-   * Create a block storage volume
-   *
-   * @see https://community.exoscale.com/documentation/block-storage/ Read more
-   */
-  createBlockStorageVolume(params: CreateBlockStorageVolumeRequest): Promise<Operation> {
-    const body = toWireCreateBlockStorageVolumeRequest(params)
-    return this.core.request('POST', '/block-storage', { body, decode: fromWireOperation })
-  }
-
-  /**
-   * List block storage snapshots
-   *
-   * @see https://community.exoscale.com/documentation/block-storage/ Read more
-   */
-  listBlockStorageSnapshots(): Promise<ListBlockStorageSnapshotsResponse> {
-    return this.core.request('GET', '/block-storage-snapshot', {
-      decode: fromWireListBlockStorageSnapshotsResponse,
-    })
-  }
-
-  /**
-   * Delete a block storage snapshot, data will be unrecoverable
-   *
-   * @see https://community.exoscale.com/documentation/block-storage/ Read more
-   */
-  deleteBlockStorageSnapshot(params: DeleteBlockStorageSnapshotRequest): Promise<Operation> {
-    const path = `/block-storage-snapshot/${encodeURIComponent(params.id)}`
+  deleteReverseDNSInstance(params: DeleteReverseDNSInstanceRequest): Promise<Operation> {
+    const path = `/reverse-dns/instance/${encodeURIComponent(params.id)}`
     return this.core.request('DELETE', path, { decode: fromWireOperation })
   }
 
   /**
-   * Retrieve block storage snapshot details
+   * [BETA] Delete a route
    *
-   * @see https://community.exoscale.com/documentation/block-storage/ Read more
+   * @see https://community.exoscale.com/product/networking/vpc Read more
    */
-  getBlockStorageSnapshot(params: GetBlockStorageSnapshotRequest): Promise<BlockStorageSnapshot> {
-    const path = `/block-storage-snapshot/${encodeURIComponent(params.id)}`
-    return this.core.request('GET', path, { decode: fromWireBlockStorageSnapshot })
+  deleteRoute(params: DeleteRouteRequest): Promise<void> {
+    const path = `/vpc/${encodeURIComponent(params.vpcID)}/subnet/${encodeURIComponent(params.subnetID)}/route/${encodeURIComponent(params.id)}`
+    return this.core.request('DELETE', path)
   }
 
   /**
-   * Update block storage volume snapshot
+   * Delete a Security Group rule
    *
-   * @see https://community.exoscale.com/documentation/block-storage/ Read more
+   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
    */
-  updateBlockStorageSnapshot(params: UpdateBlockStorageSnapshotRequest): Promise<Operation> {
-    const path = `/block-storage-snapshot/${encodeURIComponent(params.id)}`
-    const body = toWireUpdateBlockStorageSnapshotRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Delete a block storage volume, data will be unrecoverable
-   *
-   * @see https://community.exoscale.com/documentation/block-storage/ Read more
-   */
-  deleteBlockStorageVolume(params: DeleteBlockStorageVolumeRequest): Promise<Operation> {
-    const path = `/block-storage/${encodeURIComponent(params.id)}`
+  deleteRuleFromSecurityGroup(params: DeleteRuleFromSecurityGroupRequest): Promise<Operation> {
+    const path = `/security-group/${encodeURIComponent(params.id)}/rules/${encodeURIComponent(params.ruleID)}`
     return this.core.request('DELETE', path, { decode: fromWireOperation })
   }
 
   /**
-   * Retrieve block storage volume details
+   * Delete a Security Group
    *
-   * @see https://community.exoscale.com/documentation/block-storage/ Read more
+   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
    */
-  getBlockStorageVolume(params: GetBlockStorageVolumeRequest): Promise<BlockStorageVolume> {
-    const path = `/block-storage/${encodeURIComponent(params.id)}`
-    return this.core.request('GET', path, { decode: fromWireBlockStorageVolume })
+  deleteSecurityGroup(params: DeleteSecurityGroupRequest): Promise<Operation> {
+    const path = `/security-group/${encodeURIComponent(params.id)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
   }
 
   /**
-   * Update block storage volume
+   * Delete an SKS cluster
    *
-   * @see https://community.exoscale.com/documentation/block-storage/ Read more
+   * @see https://community.exoscale.com/documentation/sks/ Read more
    */
-  updateBlockStorageVolume(params: UpdateBlockStorageVolumeRequest): Promise<Operation> {
-    const path = `/block-storage/${encodeURIComponent(params.id)}`
-    const body = toWireUpdateBlockStorageVolumeRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  deleteSKSCluster(params: DeleteSKSClusterRequest): Promise<Operation> {
+    const path = `/sks-cluster/${encodeURIComponent(params.id)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
   }
 
   /**
-   * Attach block storage volume to an instance
+   * Delete an SKS Nodepool
    *
-   * @see https://community.exoscale.com/documentation/block-storage/ Read more
+   * @see https://community.exoscale.com/documentation/sks/ Read more
    */
-  attachBlockStorageVolumeToInstance(
-    params: AttachBlockStorageVolumeToInstanceRequest,
-  ): Promise<Operation> {
-    const path = `/block-storage/${encodeURIComponent(params.id)}:attach`
-    const body = toWireAttachBlockStorageVolumeToInstanceRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  deleteSKSNodepool(params: DeleteSKSNodepoolRequest): Promise<Operation> {
+    const path = `/sks-cluster/${encodeURIComponent(params.id)}/nodepool/${encodeURIComponent(params.sksNodepoolID)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
   }
 
   /**
-   * Create a block storage snapshot
+   * Delete a Snapshot
    *
-   * @see https://community.exoscale.com/documentation/block-storage/ Read more
+   * @see https://community.exoscale.com/documentation/compute/snapshots/ Read more
    */
-  createBlockStorageSnapshot(params: CreateBlockStorageSnapshotRequest): Promise<Operation> {
-    const path = `/block-storage/${encodeURIComponent(params.id)}:create-snapshot`
-    const body = toWireCreateBlockStorageSnapshotRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  deleteSnapshot(params: DeleteSnapshotRequest): Promise<Operation> {
+    const path = `/snapshot/${encodeURIComponent(params.id)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Delete a SSH key
+   *
+   * @see https://community.exoscale.com/documentation/compute/ssh-keypairs/ Read more
+   */
+  deleteSSHKey(params: DeleteSSHKeyRequest): Promise<Operation> {
+    const path = `/ssh-key/${encodeURIComponent(params.name)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * [BETA] Delete a Subnet
+   *
+   * @see https://community.exoscale.com/product/networking/vpc Read more
+   */
+  deleteSubnet(params: DeleteSubnetRequest): Promise<void> {
+    const path = `/vpc/${encodeURIComponent(params.vpcID)}/subnet/${encodeURIComponent(params.id)}`
+    return this.core.request('DELETE', path)
+  }
+
+  /**
+   * Delete a Template
+   *
+   * @see https://www.exoscale.com/templates/ Read more
+   */
+  deleteTemplate(params: DeleteTemplateRequest): Promise<Operation> {
+    const path = `/template/${encodeURIComponent(params.id)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Delete User
+   *
+   * @see https://community.exoscale.com/product/iam/operation/users-keys/ Read more
+   */
+  deleteUser(params: DeleteUserRequest): Promise<Operation> {
+    const path = `/user/${encodeURIComponent(params.id)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * [BETA] Delete a VPC
+   *
+   * @see https://community.exoscale.com/product/networking/vpc Read more
+   */
+  deleteVpc(params: DeleteVpcRequest): Promise<void> {
+    const path = `/vpc/${encodeURIComponent(params.id)}`
+    return this.core.request('DELETE', path)
   }
 
   /**
@@ -8572,14 +9418,393 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * This operation resizes a Block storage volume. Note: the volume can only grow, cannot be shrunk. Only detached volumes or volumes attached to stopped instances can be resized.
+   * [BETA] Detach a DBaaS external integration from a service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  detachDBAASServiceFromEndpoint(
+    params: DetachDBAASServiceFromEndpointRequest,
+  ): Promise<Operation> {
+    const path = `/dbaas-external-endpoint/${encodeURIComponent(params.sourceServiceName)}/detach`
+    const body = toWireDetachDBAASServiceFromEndpointRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Detach a Compute instance from an Elastic IP
+   *
+   * @see https://community.exoscale.com/product/networking/eip/ Read more
+   */
+  detachInstanceFromElasticIP(params: DetachInstanceFromElasticIPRequest): Promise<Operation> {
+    const path = `/elastic-ip/${encodeURIComponent(params.id)}:detach`
+    const body = toWireDetachInstanceFromElasticIPRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Detach a Compute instance from a Private Network
+   *
+   * @see https://community.exoscale.com/product/networking/private-network/ Read more
+   */
+  detachInstanceFromPrivateNetwork(
+    params: DetachInstanceFromPrivateNetworkRequest,
+  ): Promise<Operation> {
+    const path = `/private-network/${encodeURIComponent(params.id)}:detach`
+    const body = toWireDetachInstanceFromPrivateNetworkRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Detach a Compute instance from a Security Group
+   *
+   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
+   */
+  detachInstanceFromSecurityGroup(
+    params: DetachInstanceFromSecurityGroupRequest,
+  ): Promise<Operation> {
+    const path = `/security-group/${encodeURIComponent(params.id)}:detach`
+    const body = toWireDetachInstanceFromSecurityGroupRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * [BETA] Detach a Compute instance from a Subnet
+   *
+   * @see https://community.exoscale.com/product/networking/vpc Read more
+   */
+  detachInstanceFromSubnet(params: DetachInstanceFromSubnetRequest): Promise<Operation> {
+    const path = `/vpc/${encodeURIComponent(params.vpcID)}/subnet/${encodeURIComponent(params.subnetID)}/detach`
+    const body = toWireDetachInstanceFromSubnetRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Disables a KMS Key by setting its state to "disabled". This prevents the use of the KMS key for cryptographic and key lifecycle operations.
+   *
+   * Errors:
+   *
+   * **400**
+   * ### Errors
+   *
+   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
+   *
+   * Key is Pending Deletion: The request was rejected because it was performed on a key that is pending deletion.
+   *
+   * Not on Default: The request was rejected because the operation is not allowed on the default key.
+   *
+   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   */
+  disableKmsKey(params: DisableKmsKeyRequest): Promise<SuccessResponse> {
+    const path = `/kms-key/${encodeURIComponent(params.id)}/disable`
+    return this.core.request('POST', path, { decode: fromWireSuccessResponse })
+  }
+
+  /**
+   * Disable the periodic rotation of a KMS Key.
+   *
+   * Errors:
+   *
+   * **400**
+   * ### Errors
+   *
+   * Invalid Origin: The request was rejected because automatic key rotation can only be enabled on a KMS key with origin "exoscale-kms".
+   *
+   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
+   *
+   * Not on Default: The request was rejected because the operation is not allowed on the default key.
+   *
+   * Not on Replica: The request was rejected because the operation is not allowed on a replica.
+   *
+   * Key is Pending Deletion: The request was rejected because it was performed on a key that is pending deletion.
+   *
+   * Key is Disabled: The request was rejected because the specified KMS key is disabled.
+   *
+   * Invalid Usage: The request was rejected because the operation is only allowed on symmetric keys with usage "encrypt-decrypt".
+   *
+   * Conflict: The request was rejected because the automatic rotation is already enabled for this KMS Key.
+   *
+   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   */
+  disableKmsKeyRotation(
+    params: DisableKmsKeyRotationRequest,
+  ): Promise<DisableKmsKeyRotationResponse> {
+    const path = `/kms-key/${encodeURIComponent(params.id)}/disable-key-rotation`
+    return this.core.request('POST', path, { decode: fromWireDisableKmsKeyRotationResponse })
+  }
+
+  /**
+   * Temporarily enable writes for MySQL services in read-only mode due to filled up storage
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  enableDBAASMysqlWrites(params: EnableDBAASMysqlWritesRequest): Promise<Operation> {
+    const path = `/dbaas-mysql/${encodeURIComponent(params.name)}/enable/writes`
+    return this.core.request('PUT', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Enables a KMS Key by setting its state to "enabled". It restores the ability to fully use the KMS key for cryptographic operations and key lifecycle operations.
+   *
+   * Errors:
+   *
+   * **400**
+   * ### Errors
+   *
+   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
+   *
+   * Key is Pending Deletion: The request was rejected because it was performed on a key that is pending deletion.
+   *
+   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   */
+  enableKmsKey(params: EnableKmsKeyRequest): Promise<SuccessResponse> {
+    const path = `/kms-key/${encodeURIComponent(params.id)}/enable`
+    return this.core.request('POST', path, { decode: fromWireSuccessResponse })
+  }
+
+  /**
+   * Enable the periodic rotation of a KMS Key.
+   *
+   * Errors:
+   *
+   * **400**
+   * ### Errors
+   *
+   * Invalid Origin: The request was rejected because automatic key rotation can only be enabled on a KMS key with origin "exoscale-kms".
+   *
+   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
+   *
+   * Not on Default: The request was rejected because the operation is not allowed on the default key.
+   *
+   * Not on Replica: The request was rejected because the operation is not allowed on a replica.
+   *
+   * Key is Pending Deletion: The request was rejected because it was performed on a key that is pending deletion.
+   *
+   * Key is Disabled: The request was rejected because the specified KMS key is disabled.
+   *
+   * Invalid Usage: The request was rejected because the operation is only allowed on symmetric keys with usage "encrypt-decrypt".
+   *
+   * Conflict: The request was rejected because the automatic rotation is already enabled for this KMS Key.
+   *
+   * Bad Request: The request was rejected because of an invalid request body or path parameter.
+   *
+   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   */
+  enableKmsKeyRotation(
+    params: EnableKmsKeyRotationRequest & {
+      id: string
+    },
+  ): Promise<EnableKmsKeyRotationResponse> {
+    const path = `/kms-key/${encodeURIComponent(params.id)}/enable-key-rotation`
+    const body = toWireEnableKmsKeyRotationRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireEnableKmsKeyRotationResponse })
+  }
+
+  /**
+   * Enable tpm for the instance.
+   *
+   * @see https://www.exoscale.com/compute/ Read more
+   */
+  enableTpm(params: EnableTpmRequest): Promise<Operation> {
+    const path = `/instance/${encodeURIComponent(params.id)}:enable-tpm`
+    return this.core.request('POST', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Encrypts a plaintext.
+   *
+   * Errors:
+   *
+   * **400**
+   * ### Errors
+   *
+   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
+   *
+   * Key is Disabled: The request was rejected because the specified KMS key is disabled.
+   *
+   * Invalid Usage: The request was rejected because the operation is only allowed on symmetric keys with usage "encrypt-decrypt".
+   *
+   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   */
+  encrypt(
+    params: EncryptRequest & {
+      id: string
+    },
+  ): Promise<EncryptResponse> {
+    const path = `/kms-key/${encodeURIComponent(params.id)}/encrypt`
+    const body = toWireEncryptRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireEncryptResponse })
+  }
+
+  /**
+   * This operation evicts the specified Compute instances member from the Instance Pool, shrinking it to `&lt;current pool size&gt; - &lt;# evicted members&gt;`.
+   *
+   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
+   */
+  evictInstancePoolMembers(params: EvictInstancePoolMembersRequest): Promise<Operation> {
+    const path = `/instance-pool/${encodeURIComponent(params.id)}:evict`
+    const body = toWireEvictInstancePoolMembersRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * This operation evicts the specified Compute instances member from the Nodepool, shrinking it to `&lt;current nodepool size&gt; - &lt;# evicted members&gt;`.
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
+   */
+  evictSKSNodepoolMembers(params: EvictSKSNodepoolMembersRequest): Promise<Operation> {
+    const path = `/sks-cluster/${encodeURIComponent(params.id)}/nodepool/${encodeURIComponent(params.sksNodepoolID)}:evict`
+    const body = toWireEvictSKSNodepoolMembersRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Export a Snapshot
+   *
+   * @see https://community.exoscale.com/documentation/compute/snapshots/ Read more
+   */
+  exportSnapshot(params: ExportSnapshotRequest): Promise<Operation> {
+    const path = `/snapshot/${encodeURIComponent(params.id)}:export`
+    return this.core.request('POST', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Generate a Data Encryption Key from a given KMS Key.
+   *
+   * Errors:
+   *
+   * **400**
+   * ### Errors
+   *
+   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
+   *
+   * Key is Disabled: The request was rejected because the specified KMS key is disabled.
+   *
+   * Invalid Usage: The request was rejected because the operation is only allowed on symmetric keys with usage "encrypt-decrypt".
+   *
+   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   */
+  generateDataKey(
+    params: GenerateDataKeyRequest & {
+      id: string
+    },
+  ): Promise<GenerateDataKeyResponse> {
+    const path = `/kms-key/${encodeURIComponent(params.id)}/generate-data-key`
+    const body = toWireGenerateDataKeyRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireGenerateDataKeyResponse })
+  }
+
+  /**
+   * This operation returns a Kubeconfig file encoded in base64.
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
+   */
+  generateSKSClusterKubeconfig(
+    params: SKSKubeconfigRequest & {
+      id: string
+    },
+  ): Promise<GenerateSKSClusterKubeconfigResponse> {
+    const path = `/sks-cluster-kubeconfig/${encodeURIComponent(params.id)}`
+    const body = toWireSKSKubeconfigRequest(params)
+    return this.core.request('POST', path, {
+      body,
+      decode: fromWireGenerateSKSClusterKubeconfigResponse,
+    })
+  }
+
+  /**
+   * Generate a Karpenter ExoscaleNodeClass manifest for an SKS cluster, including its default security group and feature flags if present
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
+   */
+  generateSKSKarpenterExoscaleNodeclass(
+    params: GenerateSKSKarpenterExoscaleNodeclassRequest,
+  ): Promise<GenerateSKSKarpenterExoscaleNodeclassResponse> {
+    const path = `/sks-cluster/${encodeURIComponent(params.id)}/generate-karpenter-exoscale-nodeclass`
+    return this.core.request('PUT', path, {
+      decode: fromWireGenerateSKSKarpenterExoscaleNodeclassResponse,
+    })
+  }
+
+  /**
+   * Generate a Karpenter NodePool manifest with minimal configuration for an SKS cluster
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
+   */
+  generateSKSKarpenterNodepool(
+    params: GenerateSKSKarpenterNodepoolRequest,
+  ): Promise<GenerateSKSKarpenterNodepoolResponse> {
+    const path = `/sks-cluster/${encodeURIComponent(params.id)}/generate-karpenter-nodepool`
+    return this.core.request('PUT', path, { decode: fromWireGenerateSKSKarpenterNodepoolResponse })
+  }
+
+  /**
+   * Get the active template for a given kube version and variant (standard | nvidia)
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
+   */
+  getActiveNodepoolTemplate(
+    params: GetActiveNodepoolTemplateRequest,
+  ): Promise<GetActiveNodepoolTemplateResponse> {
+    const path = `/sks-template/${encodeURIComponent(params.kubeVersion)}/${encodeURIComponent(params.variant)}`
+    return this.core.request('GET', path, { decode: fromWireGetActiveNodepoolTemplateResponse })
+  }
+
+  /**
+   * Get AI API key metadata
+   *
+   * Errors:
+   *
+   * **403**
+   * Forbidden
+   *
+   * **404**
+   * Not Found
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/managed-inference/ Read more
+   */
+  getAIAPIKey(params: GetAIAPIKeyRequest): Promise<GetAIAPIKeyResponse> {
+    const path = `/ai/api-key/${encodeURIComponent(params.id)}`
+    return this.core.request('GET', path, { decode: fromWireGetAIAPIKeyResponse })
+  }
+
+  /**
+   * Retrieve Anti-affinity Group details
+   *
+   * @see https://community.exoscale.com/product/compute/instances/how-to/anti-affinity/ Read more
+   */
+  getAntiAffinityGroup(params: GetAntiAffinityGroupRequest): Promise<AntiAffinityGroup> {
+    const path = `/anti-affinity-group/${encodeURIComponent(params.id)}`
+    return this.core.request('GET', path, { decode: fromWireAntiAffinityGroup })
+  }
+
+  /**
+   * Get API key
+   *
+   * @see https://community.exoscale.com/product/iam/how-to/key-mgmt/ Read more
+   */
+  getAPIKey(params: GetAPIKeyRequest): Promise<IAMAPIKey> {
+    const path = `/api-key/${encodeURIComponent(params.id)}`
+    return this.core.request('GET', path, { decode: fromWireIAMAPIKey })
+  }
+
+  /**
+   * Retrieve block storage snapshot details
    *
    * @see https://community.exoscale.com/documentation/block-storage/ Read more
    */
-  resizeBlockStorageVolume(params: ResizeBlockStorageVolumeRequest): Promise<BlockStorageVolume> {
-    const path = `/block-storage/${encodeURIComponent(params.id)}:resize-volume`
-    const body = toWireResizeBlockStorageVolumeRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireBlockStorageVolume })
+  getBlockStorageSnapshot(params: GetBlockStorageSnapshotRequest): Promise<BlockStorageSnapshot> {
+    const path = `/block-storage-snapshot/${encodeURIComponent(params.id)}`
+    return this.core.request('GET', path, { decode: fromWireBlockStorageSnapshot })
+  }
+
+  /**
+   * Retrieve block storage volume details
+   *
+   * @see https://community.exoscale.com/documentation/block-storage/ Read more
+   */
+  getBlockStorageVolume(params: GetBlockStorageVolumeRequest): Promise<BlockStorageVolume> {
+    const path = `/block-storage/${encodeURIComponent(params.id)}`
+    return this.core.request('GET', path, { decode: fromWireBlockStorageVolume })
   }
 
   /**
@@ -8604,62 +9829,6 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * Delete a ClickHouse service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  deleteDBAASServiceClickhouse(params: DeleteDBAASServiceClickhouseRequest): Promise<Operation> {
-    const path = `/dbaas-clickhouse/${encodeURIComponent(params.name)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Get a DBaaS ClickHouse service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  getDBAASServiceClickhouse(
-    params: GetDBAASServiceClickhouseRequest,
-  ): Promise<DBAASServiceClickhouse> {
-    const path = `/dbaas-clickhouse/${encodeURIComponent(params.name)}`
-    return this.core.request('GET', path, { decode: fromWireDBAASServiceClickhouse })
-  }
-
-  /**
-   * Create a DBaaS ClickHouse service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  createDBAASServiceClickhouse(params: CreateDBAASServiceClickhouseRequest): Promise<Operation> {
-    const path = `/dbaas-clickhouse/${encodeURIComponent(params.name)}`
-    const body = toWireCreateDBAASServiceClickhouseRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Update a DBaaS ClickHouse service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  updateDBAASServiceClickhouse(params: UpdateDBAASServiceClickhouseRequest): Promise<Operation> {
-    const path = `/dbaas-clickhouse/${encodeURIComponent(params.name)}`
-    const body = toWireUpdateDBAASServiceClickhouseRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Initiate ClickHouse maintenance update
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  startDBAASClickhouseMaintenance(
-    params: StartDBAASClickhouseMaintenanceRequest,
-  ): Promise<Operation> {
-    const path = `/dbaas-clickhouse/${encodeURIComponent(params.name)}/maintenance/start`
-    return this.core.request('PUT', path, { decode: fromWireOperation })
-  }
-
-  /**
    * Get DBaaS ClickHouse ACL configuration
    *
    * @see https://community.exoscale.com/product/dbaas/ Read more
@@ -8669,96 +9838,6 @@ export abstract class GeneratedExoscaleClient {
   ): Promise<DBAASClickhouseAclConfig> {
     const path = `/dbaas-clickhouse/${encodeURIComponent(params.serviceName)}/acl-config`
     return this.core.request('GET', path, { decode: fromWireDBAASClickhouseAclConfig })
-  }
-
-  /**
-   * List DBaaS ClickHouse roles
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  listDBAASClickhouseRoles(params: ListDBAASClickhouseRolesRequest): Promise<DBAASClickhouseRoles> {
-    const path = `/dbaas-clickhouse/${encodeURIComponent(params.serviceName)}/role`
-    return this.core.request('GET', path, { decode: fromWireDBAASClickhouseRoles })
-  }
-
-  /**
-   * Delete a DBaaS ClickHouse role
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  deleteDBAASClickhouseRole(params: DeleteDBAASClickhouseRoleRequest): Promise<Operation> {
-    const path = `/dbaas-clickhouse/${encodeURIComponent(params.serviceName)}/role/${encodeURIComponent(params.roleUuid)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * List DBaaS ClickHouse users
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  listDBAASClickhouseUsers(params: ListDBAASClickhouseUsersRequest): Promise<DBAASClickhouseUsers> {
-    const path = `/dbaas-clickhouse/${encodeURIComponent(params.serviceName)}/user`
-    return this.core.request('GET', path, { decode: fromWireDBAASClickhouseUsers })
-  }
-
-  /**
-   * Create a DBaaS ClickHouse user
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  createDBAASClickhouseUser(
-    params: CreateDBAASClickhouseUserRequest,
-  ): Promise<DBAASUserClickhouseSecrets> {
-    const path = `/dbaas-clickhouse/${encodeURIComponent(params.serviceName)}/user`
-    const body = toWireCreateDBAASClickhouseUserRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireDBAASUserClickhouseSecrets })
-  }
-
-  /**
-   * Delete a DBaaS ClickHouse user
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  deleteDBAASClickhouseUser(params: DeleteDBAASClickhouseUserRequest): Promise<Operation> {
-    const path = `/dbaas-clickhouse/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.userUuid)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Reset the credentials of a DBaaS ClickHouse user
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  resetDBAASClickhouseUserPassword(
-    params: ResetDBAASClickhouseUserPasswordRequest,
-  ): Promise<DBAASUserClickhouseSecrets> {
-    const path = `/dbaas-clickhouse/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reset`
-    const body = toWireResetDBAASClickhouseUserPasswordRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireDBAASUserClickhouseSecrets })
-  }
-
-  /**
-   * Reveal the secrets of a DBaaS ClickHouse user
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  revealDBAASClickhouseUserPassword(
-    params: RevealDBAASClickhouseUserPasswordRequest,
-  ): Promise<DBAASUserClickhouseSecrets> {
-    const path = `/dbaas-clickhouse/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reveal`
-    return this.core.request('GET', path, { decode: fromWireDBAASUserClickhouseSecrets })
-  }
-
-  /**
-   * [BETA] Delete DataDog external integration endpoint
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  deleteDBAASExternalEndpointDatadog(
-    params: DeleteDBAASExternalEndpointDatadogRequest,
-  ): Promise<Operation> {
-    const path = `/dbaas-external-endpoint-datadog/${encodeURIComponent(params.endpointID)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
   }
 
   /**
@@ -8774,48 +9853,6 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * [BETA] Update DataDog external integration endpoint
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  updateDBAASExternalEndpointDatadog(
-    params: DBAASEndpointDatadogInputUpdate & {
-      endpointID: string
-    },
-  ): Promise<Operation> {
-    const path = `/dbaas-external-endpoint-datadog/${encodeURIComponent(params.endpointID)}`
-    const body = toWireDBAASEndpointDatadogInputUpdate(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * [BETA] Create DataDog external integration endpoint
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  createDBAASExternalEndpointDatadog(
-    params: DBAASEndpointDatadogInputCreate & {
-      name: string
-    },
-  ): Promise<Operation> {
-    const path = `/dbaas-external-endpoint-datadog/${encodeURIComponent(params.name)}`
-    const body = toWireDBAASEndpointDatadogInputCreate(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * [BETA] Delete ElasticSearch logs external integration endpoint
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  deleteDBAASExternalEndpointElasticsearch(
-    params: DeleteDBAASExternalEndpointElasticsearchRequest,
-  ): Promise<Operation> {
-    const path = `/dbaas-external-endpoint-elasticsearch/${encodeURIComponent(params.endpointID)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
    * [BETA] Get ElasticSearch Logs external integration endpoint settings
    *
    * @see https://community.exoscale.com/product/dbaas/ Read more
@@ -8825,48 +9862,6 @@ export abstract class GeneratedExoscaleClient {
   ): Promise<DBAASEndpointElasticsearchOutput> {
     const path = `/dbaas-external-endpoint-elasticsearch/${encodeURIComponent(params.endpointID)}`
     return this.core.request('GET', path, { decode: fromWireDBAASEndpointElasticsearchOutput })
-  }
-
-  /**
-   * [BETA] Update ElasticSearch Logs external integration endpoint
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  updateDBAASExternalEndpointElasticsearch(
-    params: DBAASEndpointElasticsearchInputUpdate & {
-      endpointID: string
-    },
-  ): Promise<Operation> {
-    const path = `/dbaas-external-endpoint-elasticsearch/${encodeURIComponent(params.endpointID)}`
-    const body = toWireDBAASEndpointElasticsearchInputUpdate(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * [BETA] Create ElasticSearch Logs external integration endpoint
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  createDBAASExternalEndpointElasticsearch(
-    params: DBAASEndpointElasticsearchInputCreate & {
-      name: string
-    },
-  ): Promise<Operation> {
-    const path = `/dbaas-external-endpoint-elasticsearch/${encodeURIComponent(params.name)}`
-    const body = toWireDBAASEndpointElasticsearchInputCreate(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * [BETA] Delete OpenSearch logs external integration endpoint
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  deleteDBAASExternalEndpointOpensearch(
-    params: DeleteDBAASExternalEndpointOpensearchRequest,
-  ): Promise<Operation> {
-    const path = `/dbaas-external-endpoint-opensearch/${encodeURIComponent(params.endpointID)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
   }
 
   /**
@@ -8882,48 +9877,6 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * [BETA] Update OpenSearch Logs external integration endpoint
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  updateDBAASExternalEndpointOpensearch(
-    params: DBAASEndpointOpensearchInputUpdate & {
-      endpointID: string
-    },
-  ): Promise<Operation> {
-    const path = `/dbaas-external-endpoint-opensearch/${encodeURIComponent(params.endpointID)}`
-    const body = toWireDBAASEndpointOpensearchInputUpdate(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * [BETA] Create OpenSearch Logs external integration endpoint
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  createDBAASExternalEndpointOpensearch(
-    params: DBAASEndpointOpensearchInputCreate & {
-      name: string
-    },
-  ): Promise<Operation> {
-    const path = `/dbaas-external-endpoint-opensearch/${encodeURIComponent(params.name)}`
-    const body = toWireDBAASEndpointOpensearchInputCreate(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * [BETA] Delete Prometheus external integration endpoint
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  deleteDBAASExternalEndpointPrometheus(
-    params: DeleteDBAASExternalEndpointPrometheusRequest,
-  ): Promise<Operation> {
-    const path = `/dbaas-external-endpoint-prometheus/${encodeURIComponent(params.endpointID)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
    * [BETA] Get Prometheus external integration endpoint settings
    *
    * @see https://community.exoscale.com/product/dbaas/ Read more
@@ -8933,48 +9886,6 @@ export abstract class GeneratedExoscaleClient {
   ): Promise<DBAASEndpointExternalPrometheusOutput> {
     const path = `/dbaas-external-endpoint-prometheus/${encodeURIComponent(params.endpointID)}`
     return this.core.request('GET', path, { decode: fromWireDBAASEndpointExternalPrometheusOutput })
-  }
-
-  /**
-   * [BETA] Update Prometheus external integration endpoint
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  updateDBAASExternalEndpointPrometheus(
-    params: DBAASEndpointPrometheusPayload & {
-      endpointID: string
-    },
-  ): Promise<Operation> {
-    const path = `/dbaas-external-endpoint-prometheus/${encodeURIComponent(params.endpointID)}`
-    const body = toWireDBAASEndpointPrometheusPayload(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * [BETA] Create Prometheus external integration endpoint
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  createDBAASExternalEndpointPrometheus(
-    params: DBAASEndpointPrometheusPayload & {
-      name: string
-    },
-  ): Promise<Operation> {
-    const path = `/dbaas-external-endpoint-prometheus/${encodeURIComponent(params.name)}`
-    const body = toWireDBAASEndpointPrometheusPayload(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * [BETA] Delete RSyslog external integration endpoint
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  deleteDBAASExternalEndpointRsyslog(
-    params: DeleteDBAASExternalEndpointRsyslogRequest,
-  ): Promise<Operation> {
-    const path = `/dbaas-external-endpoint-rsyslog/${encodeURIComponent(params.endpointID)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
   }
 
   /**
@@ -8990,79 +9901,15 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * [BETA] Update RSyslog external integration endpoint
+   * [BETA] Get a DBaaS external integration
    *
    * @see https://community.exoscale.com/product/dbaas/ Read more
    */
-  updateDBAASExternalEndpointRsyslog(
-    params: DBAASEndpointRsyslogInputUpdate & {
-      endpointID: string
-    },
-  ): Promise<Operation> {
-    const path = `/dbaas-external-endpoint-rsyslog/${encodeURIComponent(params.endpointID)}`
-    const body = toWireDBAASEndpointRsyslogInputUpdate(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * [BETA] Create RSyslog external integration endpoint
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  createDBAASExternalEndpointRsyslog(
-    params: DBAASEndpointRsyslogInputCreate & {
-      name: string
-    },
-  ): Promise<Operation> {
-    const path = `/dbaas-external-endpoint-rsyslog/${encodeURIComponent(params.name)}`
-    const body = toWireDBAASEndpointRsyslogInputCreate(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * [BETA] List available external endpoint types and their schemas for DBaaS external integrations
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  listDBAASExternalEndpointTypes(): Promise<ListDBAASExternalEndpointTypesResponse> {
-    return this.core.request('GET', '/dbaas-external-endpoint-types', {
-      decode: fromWireListDBAASExternalEndpointTypesResponse,
-    })
-  }
-
-  /**
-   * [BETA] Create a new DBaaS connection between a DBaaS service and an external service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  attachDBAASServiceToEndpoint(params: AttachDBAASServiceToEndpointRequest): Promise<Operation> {
-    const path = `/dbaas-external-endpoint/${encodeURIComponent(params.sourceServiceName)}/attach`
-    const body = toWireAttachDBAASServiceToEndpointRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * [BETA] Detach a DBaaS external integration from a service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  detachDBAASServiceFromEndpoint(
-    params: DetachDBAASServiceFromEndpointRequest,
-  ): Promise<Operation> {
-    const path = `/dbaas-external-endpoint/${encodeURIComponent(params.sourceServiceName)}/detach`
-    const body = toWireDetachDBAASServiceFromEndpointRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * [BETA] List available external endpoints for integrations
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  listDBAASExternalEndpoints(): Promise<ListDBAASExternalEndpointsResponse> {
-    return this.core.request('GET', '/dbaas-external-endpoints', {
-      decode: fromWireListDBAASExternalEndpointsResponse,
-    })
+  getDBAASExternalIntegration(
+    params: GetDBAASExternalIntegrationRequest,
+  ): Promise<DBAASExternalIntegration> {
+    const path = `/dbaas-external-integration/${encodeURIComponent(params.integrationID)}`
+    return this.core.request('GET', path, { decode: fromWireDBAASExternalIntegration })
   }
 
   /**
@@ -9080,161 +9927,6 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * [BETA] Manage Datadog integration settings
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  updateDBAASExternalIntegrationSettingsDatadog(
-    params: UpdateDBAASExternalIntegrationSettingsDatadogRequest,
-  ): Promise<Operation> {
-    const path = `/dbaas-external-integration-settings-datadog/${encodeURIComponent(params.integrationID)}`
-    const body = toWireUpdateDBAASExternalIntegrationSettingsDatadogRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * [BETA] Get a DBaaS external integration
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  getDBAASExternalIntegration(
-    params: GetDBAASExternalIntegrationRequest,
-  ): Promise<DBAASExternalIntegration> {
-    const path = `/dbaas-external-integration/${encodeURIComponent(params.integrationID)}`
-    return this.core.request('GET', path, { decode: fromWireDBAASExternalIntegration })
-  }
-
-  /**
-   * [BETA] List all DBaaS connections between services and external endpoints
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  listDBAASExternalIntegrations(
-    params: ListDBAASExternalIntegrationsRequest,
-  ): Promise<ListDBAASExternalIntegrationsResponse> {
-    const path = `/dbaas-external-integrations/${encodeURIComponent(params.serviceName)}`
-    return this.core.request('GET', path, { decode: fromWireListDBAASExternalIntegrationsResponse })
-  }
-
-  /**
-   * Delete a Grafana service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  deleteDBAASServiceGrafana(params: DeleteDBAASServiceGrafanaRequest): Promise<Operation> {
-    const path = `/dbaas-grafana/${encodeURIComponent(params.name)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Get a DBaaS Grafana service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  getDBAASServiceGrafana(params: GetDBAASServiceGrafanaRequest): Promise<DBAASServiceGrafana> {
-    const path = `/dbaas-grafana/${encodeURIComponent(params.name)}`
-    return this.core.request('GET', path, { decode: fromWireDBAASServiceGrafana })
-  }
-
-  /**
-   * Create a DBaaS Grafana service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  createDBAASServiceGrafana(params: CreateDBAASServiceGrafanaRequest): Promise<Operation> {
-    const path = `/dbaas-grafana/${encodeURIComponent(params.name)}`
-    const body = toWireCreateDBAASServiceGrafanaRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Update a DBaaS Grafana service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  updateDBAASServiceGrafana(params: UpdateDBAASServiceGrafanaRequest): Promise<Operation> {
-    const path = `/dbaas-grafana/${encodeURIComponent(params.name)}`
-    const body = toWireUpdateDBAASServiceGrafanaRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Initiate Grafana maintenance update
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  startDBAASGrafanaMaintenance(params: StartDBAASGrafanaMaintenanceRequest): Promise<Operation> {
-    const path = `/dbaas-grafana/${encodeURIComponent(params.name)}/maintenance/start`
-    return this.core.request('PUT', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * If no password is provided one will be generated automatically.
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  resetDBAASGrafanaUserPassword(params: ResetDBAASGrafanaUserPasswordRequest): Promise<Operation> {
-    const path = `/dbaas-grafana/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reset`
-    const body = toWireResetDBAASGrafanaUserPasswordRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Reveal the secrets of a DBaaS Grafana user
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  revealDBAASGrafanaUserPassword(
-    params: RevealDBAASGrafanaUserPasswordRequest,
-  ): Promise<DBAASUserGrafanaSecrets> {
-    const path = `/dbaas-grafana/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reveal`
-    return this.core.request('GET', path, { decode: fromWireDBAASUserGrafanaSecrets })
-  }
-
-  /**
-   * [BETA] Create a new DBaaS integration between two services
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  createDBAASIntegration(params: CreateDBAASIntegrationRequest): Promise<Operation> {
-    const body = toWireCreateDBAASIntegrationRequest(params)
-    return this.core.request('POST', '/dbaas-integration', { body, decode: fromWireOperation })
-  }
-
-  /**
-   * [BETA] Get DBaaS integration settings
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  listDBAASIntegrationSettings(
-    params: ListDBAASIntegrationSettingsRequest,
-  ): Promise<ListDBAASIntegrationSettingsResponse> {
-    const path = `/dbaas-integration-settings/${encodeURIComponent(params.integrationType)}/${encodeURIComponent(params.sourceType)}/${encodeURIComponent(params.destType)}`
-    return this.core.request('GET', path, { decode: fromWireListDBAASIntegrationSettingsResponse })
-  }
-
-  /**
-   * [BETA] Get DBaaS integration types
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  listDBAASIntegrationTypes(): Promise<ListDBAASIntegrationTypesResponse> {
-    return this.core.request('GET', '/dbaas-integration-types', {
-      decode: fromWireListDBAASIntegrationTypesResponse,
-    })
-  }
-
-  /**
-   * [BETA] Delete a DBaaS Integration
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  deleteDBAASIntegration(params: DeleteDBAASIntegrationRequest): Promise<Operation> {
-    const path = `/dbaas-integration/${encodeURIComponent(params.id)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
    * [BETA] Get a DBaaS Integration
    *
    * @see https://community.exoscale.com/product/dbaas/ Read more
@@ -9242,59 +9934,6 @@ export abstract class GeneratedExoscaleClient {
   getDBAASIntegration(params: GetDBAASIntegrationRequest): Promise<DBAASIntegration> {
     const path = `/dbaas-integration/${encodeURIComponent(params.id)}`
     return this.core.request('GET', path, { decode: fromWireDBAASIntegration })
-  }
-
-  /**
-   * [BETA] Update a existing DBaaS integration
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  updateDBAASIntegration(params: UpdateDBAASIntegrationRequest): Promise<Operation> {
-    const path = `/dbaas-integration/${encodeURIComponent(params.id)}`
-    const body = toWireUpdateDBAASIntegrationRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Delete a Kafka service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  deleteDBAASServiceKafka(params: DeleteDBAASServiceKafkaRequest): Promise<Operation> {
-    const path = `/dbaas-kafka/${encodeURIComponent(params.name)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Get a DBaaS Kafka service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  getDBAASServiceKafka(params: GetDBAASServiceKafkaRequest): Promise<DBAASServiceKafka> {
-    const path = `/dbaas-kafka/${encodeURIComponent(params.name)}`
-    return this.core.request('GET', path, { decode: fromWireDBAASServiceKafka })
-  }
-
-  /**
-   * Create a DBaaS Kafka service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  createDBAASServiceKafka(params: CreateDBAASServiceKafkaRequest): Promise<Operation> {
-    const path = `/dbaas-kafka/${encodeURIComponent(params.name)}`
-    const body = toWireCreateDBAASServiceKafkaRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Update a DBaaS Kafka service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  updateDBAASServiceKafka(params: UpdateDBAASServiceKafkaRequest): Promise<Operation> {
-    const path = `/dbaas-kafka/${encodeURIComponent(params.name)}`
-    const body = toWireUpdateDBAASServiceKafkaRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
   }
 
   /**
@@ -9308,126 +9947,6 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * Initiate Kafka maintenance update
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  startDBAASKafkaMaintenance(params: StartDBAASKafkaMaintenanceRequest): Promise<Operation> {
-    const path = `/dbaas-kafka/${encodeURIComponent(params.name)}/maintenance/start`
-    return this.core.request('PUT', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Add a Kafka Schema Registry ACL entry
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  createDBAASKafkaSchemaRegistryAclConfig(
-    params: DBAASKafkaSchemaRegistryAclEntry & {
-      name: DBAASServiceName
-    },
-  ): Promise<Operation> {
-    const path = `/dbaas-kafka/${encodeURIComponent(params.name)}/schema-registry/acl-config`
-    const body = toWireDBAASKafkaSchemaRegistryAclEntry(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Delete a Kafka ACL entry
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  deleteDBAASKafkaSchemaRegistryAclConfig(
-    params: DeleteDBAASKafkaSchemaRegistryAclConfigRequest,
-  ): Promise<Operation> {
-    const path = `/dbaas-kafka/${encodeURIComponent(params.name)}/schema-registry/acl-config/${encodeURIComponent(params.aclID)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Add a Kafka topic ACL entry
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  createDBAASKafkaTopicAclConfig(
-    params: DBAASKafkaTopicAclEntry & {
-      name: DBAASServiceName
-    },
-  ): Promise<Operation> {
-    const path = `/dbaas-kafka/${encodeURIComponent(params.name)}/topic/acl-config`
-    const body = toWireDBAASKafkaTopicAclEntry(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Delete a Kafka ACL entry
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  deleteDBAASKafkaTopicAclConfig(
-    params: DeleteDBAASKafkaTopicAclConfigRequest,
-  ): Promise<Operation> {
-    const path = `/dbaas-kafka/${encodeURIComponent(params.name)}/topic/acl-config/${encodeURIComponent(params.aclID)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Reveal the secrets for DBaaS Kafka Connect
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  revealDBAASKafkaConnectPassword(
-    params: RevealDBAASKafkaConnectPasswordRequest,
-  ): Promise<DBAASUserKafkaConnectSecrets> {
-    const path = `/dbaas-kafka/${encodeURIComponent(params.serviceName)}/connect/password/reveal`
-    return this.core.request('GET', path, { decode: fromWireDBAASUserKafkaConnectSecrets })
-  }
-
-  /**
-   * Create a DBaaS Kafka user
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  createDBAASKafkaUser(params: CreateDBAASKafkaUserRequest): Promise<Operation> {
-    const path = `/dbaas-kafka/${encodeURIComponent(params.serviceName)}/user`
-    const body = toWireCreateDBAASKafkaUserRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Delete a DBaaS kafka user
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  deleteDBAASKafkaUser(params: DeleteDBAASKafkaUserRequest): Promise<Operation> {
-    const path = `/dbaas-kafka/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * If no password is provided one will be generated automatically.
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  resetDBAASKafkaUserPassword(params: ResetDBAASKafkaUserPasswordRequest): Promise<Operation> {
-    const path = `/dbaas-kafka/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reset`
-    const body = toWireResetDBAASKafkaUserPasswordRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Reveal the secrets of a DBaaS Kafka user
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  revealDBAASKafkaUserPassword(
-    params: RevealDBAASKafkaUserPasswordRequest,
-  ): Promise<DBAASUserKafkaSecrets> {
-    const path = `/dbaas-kafka/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reveal`
-    return this.core.request('GET', path, { decode: fromWireDBAASUserKafkaSecrets })
-  }
-
-  /**
    * Get a DBaaS migration status
    *
    * @see https://community.exoscale.com/product/dbaas/ Read more
@@ -9435,187 +9954,6 @@ export abstract class GeneratedExoscaleClient {
   getDBAASMigrationStatus(params: GetDBAASMigrationStatusRequest): Promise<DBAASMigrationStatus> {
     const path = `/dbaas-migration-status/${encodeURIComponent(params.name)}`
     return this.core.request('GET', path, { decode: fromWireDBAASMigrationStatus })
-  }
-
-  /**
-   * Delete a MySQL service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  deleteDBAASServiceMysql(params: DeleteDBAASServiceMysqlRequest): Promise<Operation> {
-    const path = `/dbaas-mysql/${encodeURIComponent(params.name)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Get a DBaaS MySQL service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  getDBAASServiceMysql(params: GetDBAASServiceMysqlRequest): Promise<DBAASServiceMysql> {
-    const path = `/dbaas-mysql/${encodeURIComponent(params.name)}`
-    return this.core.request('GET', path, { decode: fromWireDBAASServiceMysql })
-  }
-
-  /**
-   * Create a DBaaS MySQL service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  createDBAASServiceMysql(params: CreateDBAASServiceMysqlRequest): Promise<Operation> {
-    const path = `/dbaas-mysql/${encodeURIComponent(params.name)}`
-    const body = toWireCreateDBAASServiceMysqlRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Update a DBaaS MySQL service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  updateDBAASServiceMysql(params: UpdateDBAASServiceMysqlRequest): Promise<Operation> {
-    const path = `/dbaas-mysql/${encodeURIComponent(params.name)}`
-    const body = toWireUpdateDBAASServiceMysqlRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Temporarily enable writes for MySQL services in read-only mode due to filled up storage
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  enableDBAASMysqlWrites(params: EnableDBAASMysqlWritesRequest): Promise<Operation> {
-    const path = `/dbaas-mysql/${encodeURIComponent(params.name)}/enable/writes`
-    return this.core.request('PUT', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Initiate MySQL maintenance update
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  startDBAASMysqlMaintenance(params: StartDBAASMysqlMaintenanceRequest): Promise<Operation> {
-    const path = `/dbaas-mysql/${encodeURIComponent(params.name)}/maintenance/start`
-    return this.core.request('PUT', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Stop a DBaaS MySQL migration
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  stopDBAASMysqlMigration(params: StopDBAASMysqlMigrationRequest): Promise<Operation> {
-    const path = `/dbaas-mysql/${encodeURIComponent(params.name)}/migration/stop`
-    return this.core.request('POST', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Create a DBaaS MySQL database
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  createDBAASMysqlDatabase(params: CreateDBAASMysqlDatabaseRequest): Promise<Operation> {
-    const path = `/dbaas-mysql/${encodeURIComponent(params.serviceName)}/database`
-    const body = toWireCreateDBAASMysqlDatabaseRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Delete a DBaaS MySQL database
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  deleteDBAASMysqlDatabase(params: DeleteDBAASMysqlDatabaseRequest): Promise<Operation> {
-    const path = `/dbaas-mysql/${encodeURIComponent(params.serviceName)}/database/${encodeURIComponent(params.databaseName)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Create a DBaaS MySQL user
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  createDBAASMysqlUser(params: CreateDBAASMysqlUserRequest): Promise<Operation> {
-    const path = `/dbaas-mysql/${encodeURIComponent(params.serviceName)}/user`
-    const body = toWireCreateDBAASMysqlUserRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Delete a DBaaS MySQL user
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  deleteDBAASMysqlUser(params: DeleteDBAASMysqlUserRequest): Promise<Operation> {
-    const path = `/dbaas-mysql/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * If no password is provided one will be generated automatically.
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  resetDBAASMysqlUserPassword(params: ResetDBAASMysqlUserPasswordRequest): Promise<Operation> {
-    const path = `/dbaas-mysql/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reset`
-    const body = toWireResetDBAASMysqlUserPasswordRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Reveal the secrets of a DBaaS MySQL user
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  revealDBAASMysqlUserPassword(
-    params: RevealDBAASMysqlUserPasswordRequest,
-  ): Promise<DBAASUserMysqlSecrets> {
-    const path = `/dbaas-mysql/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reveal`
-    return this.core.request('GET', path, { decode: fromWireDBAASUserMysqlSecrets })
-  }
-
-  /**
-   * Delete a OpenSearch service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  deleteDBAASServiceOpensearch(params: DeleteDBAASServiceOpensearchRequest): Promise<Operation> {
-    const path = `/dbaas-opensearch/${encodeURIComponent(params.name)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Get a DBaaS OpenSearch service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  getDBAASServiceOpensearch(
-    params: GetDBAASServiceOpensearchRequest,
-  ): Promise<DBAASServiceOpensearch> {
-    const path = `/dbaas-opensearch/${encodeURIComponent(params.name)}`
-    return this.core.request('GET', path, { decode: fromWireDBAASServiceOpensearch })
-  }
-
-  /**
-   * Create a DBaaS OpenSearch service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  createDBAASServiceOpensearch(params: CreateDBAASServiceOpensearchRequest): Promise<Operation> {
-    const path = `/dbaas-opensearch/${encodeURIComponent(params.name)}`
-    const body = toWireCreateDBAASServiceOpensearchRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Update a DBaaS OpenSearch service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  updateDBAASServiceOpensearch(params: UpdateDBAASServiceOpensearchRequest): Promise<Operation> {
-    const path = `/dbaas-opensearch/${encodeURIComponent(params.name)}`
-    const body = toWireUpdateDBAASServiceOpensearchRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
   }
 
   /**
@@ -9631,270 +9969,35 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * Create a DBaaS OpenSearch ACL configuration
+   * Get a DBaaS ClickHouse service
    *
    * @see https://community.exoscale.com/product/dbaas/ Read more
    */
-  updateDBAASOpensearchAclConfig(
-    params: DBAASOpensearchAclConfig & {
-      name: DBAASServiceName
-    },
-  ): Promise<Operation> {
-    const path = `/dbaas-opensearch/${encodeURIComponent(params.name)}/acl-config`
-    const body = toWireDBAASOpensearchAclConfig(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  getDBAASServiceClickhouse(
+    params: GetDBAASServiceClickhouseRequest,
+  ): Promise<DBAASServiceClickhouse> {
+    const path = `/dbaas-clickhouse/${encodeURIComponent(params.name)}`
+    return this.core.request('GET', path, { decode: fromWireDBAASServiceClickhouse })
   }
 
   /**
-   * Initiate OpenSearch maintenance update
+   * Get a DBaaS Grafana service
    *
    * @see https://community.exoscale.com/product/dbaas/ Read more
    */
-  startDBAASOpensearchMaintenance(
-    params: StartDBAASOpensearchMaintenanceRequest,
-  ): Promise<Operation> {
-    const path = `/dbaas-opensearch/${encodeURIComponent(params.name)}/maintenance/start`
-    return this.core.request('PUT', path, { decode: fromWireOperation })
+  getDBAASServiceGrafana(params: GetDBAASServiceGrafanaRequest): Promise<DBAASServiceGrafana> {
+    const path = `/dbaas-grafana/${encodeURIComponent(params.name)}`
+    return this.core.request('GET', path, { decode: fromWireDBAASServiceGrafana })
   }
 
   /**
-   * Create a DBaaS OpenSearch user
+   * Get a DBaaS Kafka service
    *
    * @see https://community.exoscale.com/product/dbaas/ Read more
    */
-  createDBAASOpensearchUser(params: CreateDBAASOpensearchUserRequest): Promise<Operation> {
-    const path = `/dbaas-opensearch/${encodeURIComponent(params.serviceName)}/user`
-    const body = toWireCreateDBAASOpensearchUserRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Delete a DBaaS OpenSearch user
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  deleteDBAASOpensearchUser(params: DeleteDBAASOpensearchUserRequest): Promise<Operation> {
-    const path = `/dbaas-opensearch/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * If no password is provided one will be generated automatically.
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  resetDBAASOpensearchUserPassword(
-    params: ResetDBAASOpensearchUserPasswordRequest,
-  ): Promise<Operation> {
-    const path = `/dbaas-opensearch/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reset`
-    const body = toWireResetDBAASOpensearchUserPasswordRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Reveal the secrets of a DBaaS OpenSearch user
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  revealDBAASOpensearchUserPassword(
-    params: RevealDBAASOpensearchUserPasswordRequest,
-  ): Promise<DBAASUserOpensearchSecrets> {
-    const path = `/dbaas-opensearch/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reveal`
-    return this.core.request('GET', path, { decode: fromWireDBAASUserOpensearchSecrets })
-  }
-
-  /**
-   * Delete a Postgres service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  deleteDBAASServicePG(params: DeleteDBAASServicePGRequest): Promise<Operation> {
-    const path = `/dbaas-postgres/${encodeURIComponent(params.name)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Get a DBaaS PostgreSQL service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  getDBAASServicePG(params: GetDBAASServicePGRequest): Promise<DBAASServicePG> {
-    const path = `/dbaas-postgres/${encodeURIComponent(params.name)}`
-    return this.core.request('GET', path, { decode: fromWireDBAASServicePG })
-  }
-
-  /**
-   * Create a DBaaS PostgreSQL service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  createDBAASServicePG(params: CreateDBAASServicePGRequest): Promise<Operation> {
-    const path = `/dbaas-postgres/${encodeURIComponent(params.name)}`
-    const body = toWireCreateDBAASServicePGRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Update a DBaaS PostgreSQL service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  updateDBAASServicePG(params: UpdateDBAASServicePGRequest): Promise<Operation> {
-    const path = `/dbaas-postgres/${encodeURIComponent(params.name)}`
-    const body = toWireUpdateDBAASServicePGRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Initiate PostgreSQL maintenance update
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  startDBAASPGMaintenance(params: StartDBAASPGMaintenanceRequest): Promise<Operation> {
-    const path = `/dbaas-postgres/${encodeURIComponent(params.name)}/maintenance/start`
-    return this.core.request('PUT', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Stop a DBaaS PostgreSQL migration
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  stopDBAASPGMigration(params: StopDBAASPGMigrationRequest): Promise<Operation> {
-    const path = `/dbaas-postgres/${encodeURIComponent(params.name)}/migration/stop`
-    return this.core.request('POST', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Create a DBaaS PostgreSQL connection pool
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  createDBAASPGConnectionPool(params: CreateDBAASPGConnectionPoolRequest): Promise<Operation> {
-    const path = `/dbaas-postgres/${encodeURIComponent(params.serviceName)}/connection-pool`
-    const body = toWireCreateDBAASPGConnectionPoolRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Delete a DBaaS PostgreSQL connection pool
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  deleteDBAASPGConnectionPool(params: DeleteDBAASPGConnectionPoolRequest): Promise<Operation> {
-    const path = `/dbaas-postgres/${encodeURIComponent(params.serviceName)}/connection-pool/${encodeURIComponent(params.connectionPoolName)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Update a DBaaS PostgreSQL connection pool
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  updateDBAASPGConnectionPool(params: UpdateDBAASPGConnectionPoolRequest): Promise<Operation> {
-    const path = `/dbaas-postgres/${encodeURIComponent(params.serviceName)}/connection-pool/${encodeURIComponent(params.connectionPoolName)}`
-    const body = toWireUpdateDBAASPGConnectionPoolRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Create a DBaaS Postgres database
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  createDBAASPGDatabase(params: CreateDBAASPGDatabaseRequest): Promise<Operation> {
-    const path = `/dbaas-postgres/${encodeURIComponent(params.serviceName)}/database`
-    const body = toWireCreateDBAASPGDatabaseRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Delete a DBaaS Postgres database
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  deleteDBAASPGDatabase(params: DeleteDBAASPGDatabaseRequest): Promise<Operation> {
-    const path = `/dbaas-postgres/${encodeURIComponent(params.serviceName)}/database/${encodeURIComponent(params.databaseName)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Create a DBaaS Postgres user
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  createDBAASPostgresUser(params: CreateDBAASPostgresUserRequest): Promise<Operation> {
-    const path = `/dbaas-postgres/${encodeURIComponent(params.serviceName)}/user`
-    const body = toWireCreateDBAASPostgresUserRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Delete a DBaaS Postgres user
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  deleteDBAASPostgresUser(params: DeleteDBAASPostgresUserRequest): Promise<Operation> {
-    const path = `/dbaas-postgres/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Update access control for one service user
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  updateDBAASPostgresAllowReplication(
-    params: UpdateDBAASPostgresAllowReplicationRequest,
-  ): Promise<DBAASPostgresUsers> {
-    const path = `/dbaas-postgres/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/allow-replication`
-    const body = toWireUpdateDBAASPostgresAllowReplicationRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireDBAASPostgresUsers })
-  }
-
-  /**
-   * If no password is provided one will be generated automatically.
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  resetDBAASPostgresUserPassword(
-    params: ResetDBAASPostgresUserPasswordRequest,
-  ): Promise<Operation> {
-    const path = `/dbaas-postgres/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reset`
-    const body = toWireResetDBAASPostgresUserPasswordRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Reveal the secrets of a DBaaS Postgres user
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  revealDBAASPostgresUserPassword(
-    params: RevealDBAASPostgresUserPasswordRequest,
-  ): Promise<DBAASUserPostgresSecrets> {
-    const path = `/dbaas-postgres/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reveal`
-    return this.core.request('GET', path, { decode: fromWireDBAASUserPostgresSecrets })
-  }
-
-  /**
-   * Check whether you can upgrade Postgres service to a newer version
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  createDBAASPGUpgradeCheck(params: CreateDBAASPGUpgradeCheckRequest): Promise<DBAASTask> {
-    const path = `/dbaas-postgres/${encodeURIComponent(params.service)}/upgrade-check`
-    const body = toWireCreateDBAASPGUpgradeCheckRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireDBAASTask })
-  }
-
-  /**
-   * List DBaaS services
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  listDBAASServices(): Promise<ListDBAASServicesResponse> {
-    return this.core.request('GET', '/dbaas-service', { decode: fromWireListDBAASServicesResponse })
+  getDBAASServiceKafka(params: GetDBAASServiceKafkaRequest): Promise<DBAASServiceKafka> {
+    const path = `/dbaas-kafka/${encodeURIComponent(params.name)}`
+    return this.core.request('GET', path, { decode: fromWireDBAASServiceKafka })
   }
 
   /**
@@ -9922,14 +10025,45 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * List available service types for DBaaS
+   * Get a DBaaS MySQL service
    *
    * @see https://community.exoscale.com/product/dbaas/ Read more
    */
-  listDBAASServiceTypes(): Promise<ListDBAASServiceTypesResponse> {
-    return this.core.request('GET', '/dbaas-service-type', {
-      decode: fromWireListDBAASServiceTypesResponse,
-    })
+  getDBAASServiceMysql(params: GetDBAASServiceMysqlRequest): Promise<DBAASServiceMysql> {
+    const path = `/dbaas-mysql/${encodeURIComponent(params.name)}`
+    return this.core.request('GET', path, { decode: fromWireDBAASServiceMysql })
+  }
+
+  /**
+   * Get a DBaaS OpenSearch service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  getDBAASServiceOpensearch(
+    params: GetDBAASServiceOpensearchRequest,
+  ): Promise<DBAASServiceOpensearch> {
+    const path = `/dbaas-opensearch/${encodeURIComponent(params.name)}`
+    return this.core.request('GET', path, { decode: fromWireDBAASServiceOpensearch })
+  }
+
+  /**
+   * Get a DBaaS PostgreSQL service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  getDBAASServicePG(params: GetDBAASServicePGRequest): Promise<DBAASServicePG> {
+    const path = `/dbaas-postgres/${encodeURIComponent(params.name)}`
+    return this.core.request('GET', path, { decode: fromWireDBAASServicePG })
+  }
+
+  /**
+   * Get a DBaaS Thanos service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  getDBAASServiceThanos(params: GetDBAASServiceThanosRequest): Promise<DBAASServiceThanos> {
+    const path = `/dbaas-thanos/${encodeURIComponent(params.name)}`
+    return this.core.request('GET', path, { decode: fromWireDBAASServiceThanos })
   }
 
   /**
@@ -9943,13 +10077,13 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * Delete a DBaaS service
+   * Get a DBaaS Valkey service
    *
    * @see https://community.exoscale.com/product/dbaas/ Read more
    */
-  deleteDBAASService(params: DeleteDBAASServiceRequest): Promise<Operation> {
-    const path = `/dbaas-service/${encodeURIComponent(params.name)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  getDBAASServiceValkey(params: GetDBAASServiceValkeyRequest): Promise<DBAASServiceValkey> {
+    const path = `/dbaas-valkey/${encodeURIComponent(params.name)}`
+    return this.core.request('GET', path, { decode: fromWireDBAASServiceValkey })
   }
 
   /**
@@ -10041,17 +10175,6 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * Create a DBaaS task to check migration
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  createDBAASTaskMigrationCheck(params: CreateDBAASTaskMigrationCheckRequest): Promise<Operation> {
-    const path = `/dbaas-task-migration-check/${encodeURIComponent(params.service)}`
-    const body = toWireCreateDBAASTaskMigrationCheckRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
    * Get a DBaaS task
    *
    * @see https://community.exoscale.com/product/dbaas/ Read more
@@ -10059,208 +10182,6 @@ export abstract class GeneratedExoscaleClient {
   getDBAASTask(params: GetDBAASTaskRequest): Promise<DBAASTask> {
     const path = `/dbaas-task/${encodeURIComponent(params.service)}/${encodeURIComponent(params.id)}`
     return this.core.request('GET', path, { decode: fromWireDBAASTask })
-  }
-
-  /**
-   * Delete a Thanos service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  deleteDBAASServiceThanos(params: DeleteDBAASServiceThanosRequest): Promise<Operation> {
-    const path = `/dbaas-thanos/${encodeURIComponent(params.name)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Get a DBaaS Thanos service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  getDBAASServiceThanos(params: GetDBAASServiceThanosRequest): Promise<DBAASServiceThanos> {
-    const path = `/dbaas-thanos/${encodeURIComponent(params.name)}`
-    return this.core.request('GET', path, { decode: fromWireDBAASServiceThanos })
-  }
-
-  /**
-   * Create a DBaaS Thanos service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  createDBAASServiceThanos(params: CreateDBAASServiceThanosRequest): Promise<Operation> {
-    const path = `/dbaas-thanos/${encodeURIComponent(params.name)}`
-    const body = toWireCreateDBAASServiceThanosRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Update a DBaaS Thanos service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  updateDBAASServiceThanos(params: UpdateDBAASServiceThanosRequest): Promise<Operation> {
-    const path = `/dbaas-thanos/${encodeURIComponent(params.name)}`
-    const body = toWireUpdateDBAASServiceThanosRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Initiate Thanos maintenance update
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  startDBAASThanosMaintenance(params: StartDBAASThanosMaintenanceRequest): Promise<Operation> {
-    const path = `/dbaas-thanos/${encodeURIComponent(params.name)}/maintenance/start`
-    return this.core.request('PUT', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Reveal the secrets of a DBaaS Thanos user
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  revealDBAASThanosUserPassword(
-    params: RevealDBAASThanosUserPasswordRequest,
-  ): Promise<DBAASUserThanosSecrets> {
-    const path = `/dbaas-thanos/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reveal`
-    return this.core.request('GET', path, { decode: fromWireDBAASUserThanosSecrets })
-  }
-
-  /**
-   * Delete a Valkey service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  deleteDBAASServiceValkey(params: DeleteDBAASServiceValkeyRequest): Promise<Operation> {
-    const path = `/dbaas-valkey/${encodeURIComponent(params.name)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Get a DBaaS Valkey service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  getDBAASServiceValkey(params: GetDBAASServiceValkeyRequest): Promise<DBAASServiceValkey> {
-    const path = `/dbaas-valkey/${encodeURIComponent(params.name)}`
-    return this.core.request('GET', path, { decode: fromWireDBAASServiceValkey })
-  }
-
-  /**
-   * Create a DBaaS Valkey service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  createDBAASServiceValkey(params: CreateDBAASServiceValkeyRequest): Promise<Operation> {
-    const path = `/dbaas-valkey/${encodeURIComponent(params.name)}`
-    const body = toWireCreateDBAASServiceValkeyRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Update a DBaaS Valkey service
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  updateDBAASServiceValkey(params: UpdateDBAASServiceValkeyRequest): Promise<Operation> {
-    const path = `/dbaas-valkey/${encodeURIComponent(params.name)}`
-    const body = toWireUpdateDBAASServiceValkeyRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Initiate Valkey maintenance update
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  startDBAASValkeyMaintenance(params: StartDBAASValkeyMaintenanceRequest): Promise<Operation> {
-    const path = `/dbaas-valkey/${encodeURIComponent(params.name)}/maintenance/start`
-    return this.core.request('PUT', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Stop a DBaaS Valkey migration
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  stopDBAASValkeyMigration(params: StopDBAASValkeyMigrationRequest): Promise<Operation> {
-    const path = `/dbaas-valkey/${encodeURIComponent(params.name)}/migration/stop`
-    return this.core.request('POST', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * List DBaaS Valkey users with ACL configuration
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  listDBAASValkeyUsers(params: ListDBAASValkeyUsersRequest): Promise<DBAASValkeyUsers> {
-    const path = `/dbaas-valkey/${encodeURIComponent(params.serviceName)}/user`
-    return this.core.request('GET', path, { decode: fromWireDBAASValkeyUsers })
-  }
-
-  /**
-   * Create a DBaaS Valkey user
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  createDBAASValkeyUser(params: CreateDBAASValkeyUserRequest): Promise<Operation> {
-    const path = `/dbaas-valkey/${encodeURIComponent(params.serviceName)}/user`
-    const body = toWireCreateDBAASValkeyUserRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Delete a DBaaS Valkey user
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  deleteDBAASValkeyUser(params: DeleteDBAASValkeyUserRequest): Promise<Operation> {
-    const path = `/dbaas-valkey/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Update access control for one DBaaS Valkey service user
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  updateDBAASValkeyUserAccessControl(
-    params: UpdateDBAASValkeyUserAccessControlRequest,
-  ): Promise<Operation> {
-    const path = `/dbaas-valkey/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}`
-    const body = toWireUpdateDBAASValkeyUserAccessControlRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * If no password is provided one will be generated automatically.
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  resetDBAASValkeyUserPassword(params: ResetDBAASValkeyUserPasswordRequest): Promise<Operation> {
-    const path = `/dbaas-valkey/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reset`
-    const body = toWireResetDBAASValkeyUserPasswordRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Reveal the secrets of a DBaaS Valkey user
-   *
-   * @see https://community.exoscale.com/product/dbaas/ Read more
-   */
-  revealDBAASValkeyUserPassword(
-    params: RevealDBAASValkeyUserPasswordRequest,
-  ): Promise<DBAASUserValkeySecrets> {
-    const path = `/dbaas-valkey/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reveal`
-    return this.core.request('GET', path, { decode: fromWireDBAASUserValkeySecrets })
-  }
-
-  /**
-   * List Deploy Targets
-   *
-   * @see https://www.exoscale.com/virtual-private-cloud/ Read more
-   */
-  listDeployTargets(): Promise<ListDeployTargetsResponse> {
-    return this.core.request('GET', '/deploy-target', { decode: fromWireListDeployTargetsResponse })
   }
 
   /**
@@ -10274,84 +10195,42 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * List DNS domains
+   * Get Deployment details
    *
-   * @see https://community.exoscale.com/product/networking/dns/quick-start/ Read more
+   * Errors:
+   *
+   * **404**
+   * Not Found
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
    */
-  listDNSDomains(): Promise<ListDNSDomainsResponse> {
-    return this.core.request('GET', '/dns-domain', { decode: fromWireListDNSDomainsResponse })
+  getDeployment(params: GetDeploymentRequest): Promise<GetDeploymentResponse> {
+    const path = `/ai/deployment/${encodeURIComponent(params.id)}`
+    return this.core.request('GET', path, { decode: fromWireGetDeploymentResponse })
   }
 
   /**
-   * Create DNS domain
+   * Return logs for the vLLM deployment (deploy/<release-name>--deployment-vllm). Optional ?stream=true to request streaming (may not be supported).
    *
-   * @see https://community.exoscale.com/product/networking/dns/quick-start/ Read more
-   */
-  createDNSDomain(params: CreateDNSDomainRequest): Promise<Operation> {
-    const body = toWireCreateDNSDomainRequest(params)
-    return this.core.request('POST', '/dns-domain', { body, decode: fromWireOperation })
-  }
-
-  /**
-   * List DNS domain records
+   * Errors:
    *
-   * @see https://community.exoscale.com/product/networking/dns/overview/ Read more
-   */
-  listDNSDomainRecords(params: ListDNSDomainRecordsRequest): Promise<ListDNSDomainRecordsResponse> {
-    const path = `/dns-domain/${encodeURIComponent(params.domainID)}/record`
-    return this.core.request('GET', path, { decode: fromWireListDNSDomainRecordsResponse })
-  }
-
-  /**
-   * Create DNS domain record
+   * **400**
+   * Bad Request
    *
-   * @see https://community.exoscale.com/product/networking/dns/overview/ Read more
-   */
-  createDNSDomainRecord(params: CreateDNSDomainRecordRequest): Promise<Operation> {
-    const path = `/dns-domain/${encodeURIComponent(params.domainID)}/record`
-    const body = toWireCreateDNSDomainRecordRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Delete DNS domain record
+   * **404**
+   * Not Found
    *
-   * @see https://community.exoscale.com/product/networking/dns/overview/ Read more
-   */
-  deleteDNSDomainRecord(params: DeleteDNSDomainRecordRequest): Promise<Operation> {
-    const path = `/dns-domain/${encodeURIComponent(params.domainID)}/record/${encodeURIComponent(params.recordID)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Retrieve DNS domain record details
+   * **500**
+   * Internal Server Error
    *
-   * @see https://community.exoscale.com/product/networking/dns/overview/ Read more
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
    */
-  getDNSDomainRecord(params: GetDNSDomainRecordRequest): Promise<DNSDomainRecord> {
-    const path = `/dns-domain/${encodeURIComponent(params.domainID)}/record/${encodeURIComponent(params.recordID)}`
-    return this.core.request('GET', path, { decode: fromWireDNSDomainRecord })
-  }
-
-  /**
-   * Update DNS domain record
-   *
-   * @see https://community.exoscale.com/product/networking/dns/overview/ Read more
-   */
-  updateDNSDomainRecord(params: UpdateDNSDomainRecordRequest): Promise<Operation> {
-    const path = `/dns-domain/${encodeURIComponent(params.domainID)}/record/${encodeURIComponent(params.recordID)}`
-    const body = toWireUpdateDNSDomainRecordRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Delete DNS Domain
-   *
-   * @see https://community.exoscale.com/product/networking/dns/quick-start/ Read more
-   */
-  deleteDNSDomain(params: DeleteDNSDomainRequest): Promise<Operation> {
-    const path = `/dns-domain/${encodeURIComponent(params.id)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  getDeploymentLogs(params: GetDeploymentLogsRequest): Promise<GetDeploymentLogsResponse> {
+    const path = `/ai/deployment/${encodeURIComponent(params.id)}/logs`
+    const query: Record<string, string> = {}
+    if (params.stream !== undefined) query['stream'] = String(params.stream)
+    if (params.tail !== undefined) query['tail'] = String(params.tail)
+    return this.core.request('GET', path, { query, decode: fromWireGetDeploymentLogsResponse })
   }
 
   /**
@@ -10365,6 +10244,16 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
+   * Retrieve DNS domain record details
+   *
+   * @see https://community.exoscale.com/product/networking/dns/overview/ Read more
+   */
+  getDNSDomainRecord(params: GetDNSDomainRecordRequest): Promise<DNSDomainRecord> {
+    const path = `/dns-domain/${encodeURIComponent(params.domainID)}/record/${encodeURIComponent(params.recordID)}`
+    return this.core.request('GET', path, { decode: fromWireDNSDomainRecord })
+  }
+
+  /**
    * Retrieve DNS domain zone file
    *
    * @see https://community.exoscale.com/product/networking/dns/quick-start/ Read more
@@ -10372,35 +10261,6 @@ export abstract class GeneratedExoscaleClient {
   getDNSDomainZoneFile(params: GetDNSDomainZoneFileRequest): Promise<GetDNSDomainZoneFileResponse> {
     const path = `/dns-domain/${encodeURIComponent(params.id)}/zone`
     return this.core.request('GET', path, { decode: fromWireGetDNSDomainZoneFileResponse })
-  }
-
-  /**
-   * List Elastic IPs
-   *
-   * @see https://community.exoscale.com/product/networking/eip/ Read more
-   */
-  listElasticIPS(): Promise<ListElasticIPSResponse> {
-    return this.core.request('GET', '/elastic-ip', { decode: fromWireListElasticIPSResponse })
-  }
-
-  /**
-   * Create an Elastic IP
-   *
-   * @see https://community.exoscale.com/product/networking/eip/ Read more
-   */
-  createElasticIP(params: CreateElasticIPRequest): Promise<Operation> {
-    const body = toWireCreateElasticIPRequest(params)
-    return this.core.request('POST', '/elastic-ip', { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Delete an Elastic IP
-   *
-   * @see https://community.exoscale.com/product/networking/eip/ Read more
-   */
-  deleteElasticIP(params: DeleteElasticIPRequest): Promise<Operation> {
-    const path = `/elastic-ip/${encodeURIComponent(params.id)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
   }
 
   /**
@@ -10414,54 +10274,30 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * Update an Elastic IP
-   *
-   * @see https://community.exoscale.com/product/networking/eip/ Read more
-   */
-  updateElasticIP(params: UpdateElasticIPRequest): Promise<Operation> {
-    const path = `/elastic-ip/${encodeURIComponent(params.id)}`
-    const body = toWireUpdateElasticIPRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Reset an Elastic IP field to its default value
-   *
-   * @see https://community.exoscale.com/product/networking/eip/ Read more
-   */
-  resetElasticIPField(params: ResetElasticIPFieldRequest): Promise<Operation> {
-    const path = `/elastic-ip/${encodeURIComponent(params.id)}/${encodeURIComponent(params.field)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Attach a Compute instance to an Elastic IP
-   *
-   * @see https://community.exoscale.com/product/networking/eip/ Read more
-   */
-  attachInstanceToElasticIP(params: AttachInstanceToElasticIPRequest): Promise<Operation> {
-    const path = `/elastic-ip/${encodeURIComponent(params.id)}:attach`
-    const body = toWireAttachInstanceToElasticIPRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Detach a Compute instance from an Elastic IP
-   *
-   * @see https://community.exoscale.com/product/networking/eip/ Read more
-   */
-  detachInstanceFromElasticIP(params: DetachInstanceFromElasticIPRequest): Promise<Operation> {
-    const path = `/elastic-ip/${encodeURIComponent(params.id)}:detach`
-    const body = toWireDetachInstanceFromElasticIPRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
    * [DEPRECATED] use get-impact-report endpoint
    */
   getEnvImpact(params: GetEnvImpactRequest): Promise<EnvImpactReport> {
     const path = `/env-impact/${encodeURIComponent(params.period)}`
     return this.core.request('GET', path, { decode: fromWireEnvImpactReport })
+  }
+
+  /**
+   * Retrieve IAM Organization Policy
+   *
+   * @see https://community.exoscale.com/product/iam/operation/roles-policies/ Read more
+   */
+  getIAMOrganizationPolicy(): Promise<IAMPolicy> {
+    return this.core.request('GET', '/iam-organization-policy', { decode: fromWireIAMPolicy })
+  }
+
+  /**
+   * Retrieve IAM Role
+   *
+   * @see https://community.exoscale.com/product/iam/operation/role-mgmt/ Read more
+   */
+  getIAMRole(params: GetIAMRoleRequest): Promise<IAMRole> {
+    const path = `/iam-role/${encodeURIComponent(params.id)}`
+    return this.core.request('GET', path, { decode: fromWireIAMRole })
   }
 
   /**
@@ -10509,261 +10345,19 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * Retrieve Mutation Events for a given date range. Defaults to retrieving Events for the past 24 hours.
-   *          Both a `from` and `to` arguments can be specified to filter Events over a specific period.
-   *          Events will be the the most descriptive possible but not all fields are mandatory
+   * Get list of allowed inference engine parameters with their descriptions and allowed values
    *
-   * @see https://community.exoscale.com/platform/audit-trail/ Read more
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
    */
-  listEvents(params?: ListEventsRequest): Promise<Event[]> {
+  getInferenceEngineHelp(
+    params?: GetInferenceEngineHelpRequest,
+  ): Promise<GetInferenceEngineHelpResponse> {
     const query: Record<string, string> = {}
-    if (params?.from !== undefined) query['from'] = isoDateTime(params?.from)
-    if (params?.to !== undefined) query['to'] = isoDateTime(params?.to)
-    return this.core.request('GET', '/event', {
+    if (params?.version !== undefined) query['version'] = params?.version
+    return this.core.request('GET', '/ai/help/inference-engine-parameters', {
       query,
-      decode: (w) => (w as any[]).map(fromWireEvent),
+      decode: fromWireGetInferenceEngineHelpResponse,
     })
-  }
-
-  /**
-   * Retrieve IAM Organization Policy
-   *
-   * @see https://community.exoscale.com/product/iam/operation/roles-policies/ Read more
-   */
-  getIAMOrganizationPolicy(): Promise<IAMPolicy> {
-    return this.core.request('GET', '/iam-organization-policy', { decode: fromWireIAMPolicy })
-  }
-
-  /**
-   * Update IAM Organization Policy
-   *
-   * @see https://community.exoscale.com/product/iam/operation/roles-policies/ Read more
-   */
-  updateIAMOrganizationPolicy(params: IAMPolicy): Promise<Operation> {
-    const body = toWireIAMPolicy(params)
-    return this.core.request('PUT', '/iam-organization-policy', { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Reset IAM Organization Policy
-   *
-   * @see https://community.exoscale.com/product/iam/operation/roles-policies/ Read more
-   */
-  resetIAMOrganizationPolicy(): Promise<Operation> {
-    return this.core.request('POST', '/iam-organization-policy:reset', {
-      decode: fromWireOperation,
-    })
-  }
-
-  /**
-   * List IAM Roles
-   *
-   * @see https://community.exoscale.com/product/iam/operation/role-mgmt/ Read more
-   */
-  listIAMRoles(): Promise<ListIAMRolesResponse> {
-    return this.core.request('GET', '/iam-role', { decode: fromWireListIAMRolesResponse })
-  }
-
-  /**
-   * Create IAM Role
-   *
-   * @see https://community.exoscale.com/product/iam/operation/role-mgmt/ Read more
-   */
-  createIAMRole(params: CreateIAMRoleRequest): Promise<Operation> {
-    const body = toWireCreateIAMRoleRequest(params)
-    return this.core.request('POST', '/iam-role', { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Delete IAM Role
-   *
-   * @see https://community.exoscale.com/product/iam/operation/role-mgmt/ Read more
-   */
-  deleteIAMRole(params: DeleteIAMRoleRequest): Promise<Operation> {
-    const path = `/iam-role/${encodeURIComponent(params.id)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Retrieve IAM Role
-   *
-   * @see https://community.exoscale.com/product/iam/operation/role-mgmt/ Read more
-   */
-  getIAMRole(params: GetIAMRoleRequest): Promise<IAMRole> {
-    const path = `/iam-role/${encodeURIComponent(params.id)}`
-    return this.core.request('GET', path, { decode: fromWireIAMRole })
-  }
-
-  /**
-   * Update IAM Role
-   *
-   * @see https://community.exoscale.com/product/iam/operation/role-mgmt/ Read more
-   */
-  updateIAMRole(params: UpdateIAMRoleRequest): Promise<Operation> {
-    const path = `/iam-role/${encodeURIComponent(params.id)}`
-    const body = toWireUpdateIAMRoleRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * [BETA] Request generation of key/secret that allow caller to assume target role
-   *
-   * @see https://community.exoscale.com/product/iam/operation/role-mgmt/ Read more
-   */
-  assumeIAMRole(params: AssumeIAMRoleRequest): Promise<AssumeIAMRoleResponse> {
-    const path = `/iam-role/${encodeURIComponent(params.id)}/assume`
-    const body = toWireAssumeIAMRoleRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireAssumeIAMRoleResponse })
-  }
-
-  /**
-   * Update IAM Role Policy
-   *
-   * @see https://community.exoscale.com/product/iam/operation/role-mgmt/ Read more
-   */
-  updateIAMRolePolicy(
-    params: IAMPolicy & {
-      id: string
-    },
-  ): Promise<Operation> {
-    const path = `/iam-role/${encodeURIComponent(params.id)}:policy`
-    const body = toWireIAMPolicy(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * List Compute instances
-   *
-   * @see https://www.exoscale.com/compute/ Read more
-   */
-  listInstances(params?: ListInstancesRequest): Promise<ListInstancesResponse> {
-    const query: Record<string, string> = {}
-    if (params?.ipAddress !== undefined) query['ip-address'] = params?.ipAddress
-    if (params?.labels !== undefined) query['labels'] = params?.labels
-    if (params?.managerID !== undefined) query['manager-id'] = params?.managerID
-    if (params?.managerType !== undefined) query['manager-type'] = params?.managerType
-    return this.core.request('GET', '/instance', { query, decode: fromWireListInstancesResponse })
-  }
-
-  /**
-   * Create a Compute instance
-   *
-   * @see https://www.exoscale.com/compute/ Read more
-   */
-  createInstance(params: CreateInstanceRequest): Promise<Operation> {
-    const body = toWireCreateInstanceRequest(params)
-    return this.core.request('POST', '/instance', { body, decode: fromWireOperation })
-  }
-
-  /**
-   * List Instance Pools
-   *
-   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
-   */
-  listInstancePools(): Promise<ListInstancePoolsResponse> {
-    return this.core.request('GET', '/instance-pool', { decode: fromWireListInstancePoolsResponse })
-  }
-
-  /**
-   * Create an Instance Pool
-   *
-   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
-   */
-  createInstancePool(params: CreateInstancePoolRequest): Promise<Operation> {
-    const body = toWireCreateInstancePoolRequest(params)
-    return this.core.request('POST', '/instance-pool', { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Delete an Instance Pool
-   *
-   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
-   */
-  deleteInstancePool(params: DeleteInstancePoolRequest): Promise<Operation> {
-    const path = `/instance-pool/${encodeURIComponent(params.id)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Retrieve Instance Pool details
-   *
-   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
-   */
-  getInstancePool(params: GetInstancePoolRequest): Promise<InstancePool> {
-    const path = `/instance-pool/${encodeURIComponent(params.id)}`
-    return this.core.request('GET', path, { decode: fromWireInstancePool })
-  }
-
-  /**
-   * Update an Instance Pool
-   *
-   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
-   */
-  updateInstancePool(params: UpdateInstancePoolRequest): Promise<Operation> {
-    const path = `/instance-pool/${encodeURIComponent(params.id)}`
-    const body = toWireUpdateInstancePoolRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Reset an Instance Pool field to its default value
-   *
-   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
-   */
-  resetInstancePoolField(params: ResetInstancePoolFieldRequest): Promise<Operation> {
-    const path = `/instance-pool/${encodeURIComponent(params.id)}/${encodeURIComponent(params.field)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * This operation evicts the specified Compute instances member from the Instance Pool, shrinking it to `&lt;current pool size&gt; - &lt;# evicted members&gt;`.
-   *
-   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
-   */
-  evictInstancePoolMembers(params: EvictInstancePoolMembersRequest): Promise<Operation> {
-    const path = `/instance-pool/${encodeURIComponent(params.id)}:evict`
-    const body = toWireEvictInstancePoolMembersRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Scale an Instance Pool
-   *
-   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
-   */
-  scaleInstancePool(params: ScaleInstancePoolRequest): Promise<Operation> {
-    const path = `/instance-pool/${encodeURIComponent(params.id)}:scale`
-    const body = toWireScaleInstancePoolRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * List Compute instance Types
-   *
-   * @see https://www.exoscale.com/pricing/ Read more
-   */
-  listInstanceTypes(): Promise<ListInstanceTypesResponse> {
-    return this.core.request('GET', '/instance-type', { decode: fromWireListInstanceTypesResponse })
-  }
-
-  /**
-   * Retrieve Instance Type details
-   *
-   * @see https://www.exoscale.com/pricing/ Read more
-   */
-  getInstanceType(params: GetInstanceTypeRequest): Promise<InstanceType> {
-    const path = `/instance-type/${encodeURIComponent(params.id)}`
-    return this.core.request('GET', path, { decode: fromWireInstanceType })
-  }
-
-  /**
-   * Delete a Compute instance
-   *
-   * @see https://www.exoscale.com/compute/ Read more
-   */
-  deleteInstance(params: DeleteInstanceRequest): Promise<Operation> {
-    const path = `/instance/${encodeURIComponent(params.id)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
   }
 
   /**
@@ -10777,201 +10371,23 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * Update a Compute instance
+   * Retrieve Instance Pool details
    *
-   * @see https://www.exoscale.com/compute/ Read more
+   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
    */
-  updateInstance(params: UpdateInstanceRequest): Promise<Operation> {
-    const path = `/instance/${encodeURIComponent(params.id)}`
-    const body = toWireUpdateInstanceRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  getInstancePool(params: GetInstancePoolRequest): Promise<InstancePool> {
+    const path = `/instance-pool/${encodeURIComponent(params.id)}`
+    return this.core.request('GET', path, { decode: fromWireInstancePool })
   }
 
   /**
-   * Reset Instance field
+   * Retrieve Instance Type details
    *
-   * @see https://www.exoscale.com/compute/ Read more
+   * @see https://www.exoscale.com/pricing/ Read more
    */
-  resetInstanceField(params: ResetInstanceFieldRequest): Promise<Operation> {
-    const path = `/instance/${encodeURIComponent(params.id)}/${encodeURIComponent(params.field)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Set instance destruction protection
-   *
-   * @see https://www.exoscale.com/compute/ Read more
-   */
-  addInstanceProtection(params: AddInstanceProtectionRequest): Promise<Operation> {
-    const path = `/instance/${encodeURIComponent(params.id)}:add-protection`
-    return this.core.request('PUT', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Create a Snapshot of a Compute instance
-   *
-   * @see https://www.exoscale.com/compute/ Read more
-   * @see https://community.exoscale.com/documentation/compute/snapshots/ Read more
-   */
-  createSnapshot(params: CreateSnapshotRequest): Promise<Operation> {
-    const path = `/instance/${encodeURIComponent(params.id)}:create-snapshot`
-    return this.core.request('POST', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Enable tpm for the instance.
-   *
-   * @see https://www.exoscale.com/compute/ Read more
-   */
-  enableTpm(params: EnableTpmRequest): Promise<Operation> {
-    const path = `/instance/${encodeURIComponent(params.id)}:enable-tpm`
-    return this.core.request('POST', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Reveal the password used during instance creation or the latest password reset.
-   *             This is only available for VMs created against templates having the `password-enabled`
-   *             property set to `true`.
-   *
-   *             Passwords are transiently stored for at most 24 hours and intended to be retrieved shortly after
-   *             creation or resets.
-   *
-   * @see https://www.exoscale.com/compute/ Read more
-   */
-  revealInstancePassword(params: RevealInstancePasswordRequest): Promise<InstancePassword> {
-    const path = `/instance/${encodeURIComponent(params.id)}:password`
-    return this.core.request('GET', path, { decode: fromWireInstancePassword })
-  }
-
-  /**
-   * Reboot a Compute instance
-   *
-   * @see https://www.exoscale.com/compute/ Read more
-   */
-  rebootInstance(params: RebootInstanceRequest): Promise<Operation> {
-    const path = `/instance/${encodeURIComponent(params.id)}:reboot`
-    return this.core.request('PUT', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Remove instance destruction protection
-   *
-   * @see https://www.exoscale.com/compute/ Read more
-   */
-  removeInstanceProtection(params: RemoveInstanceProtectionRequest): Promise<Operation> {
-    const path = `/instance/${encodeURIComponent(params.id)}:remove-protection`
-    return this.core.request('PUT', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * This operation re-installs a Compute instance to a base template. If target template is provided it will be used to recreated instance from. Warning: the operation wipes all data stored on the disk.
-   *
-   * @see https://www.exoscale.com/compute/ Read more
-   */
-  resetInstance(params: ResetInstanceRequest): Promise<Operation> {
-    const path = `/instance/${encodeURIComponent(params.id)}:reset`
-    const body = toWireResetInstanceRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Reset a compute instance password
-   *
-   * @see https://www.exoscale.com/compute/ Read more
-   */
-  resetInstancePassword(params: ResetInstancePasswordRequest): Promise<Operation> {
-    const path = `/instance/${encodeURIComponent(params.id)}:reset-password`
-    return this.core.request('PUT', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * This operation resizes a Compute instance's disk volume. Note: the disk can only grow, cannot be shrunk.
-   *
-   * @see https://www.exoscale.com/compute/ Read more
-   */
-  resizeInstanceDisk(params: ResizeInstanceDiskRequest): Promise<Operation> {
-    const path = `/instance/${encodeURIComponent(params.id)}:resize-disk`
-    const body = toWireResizeInstanceDiskRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * This operation changes the Compute instance's type. Note: the new Instance Type must be within the same family (e.g. a standard instance cannot be scaled to gpu2 or storage).
-   *
-   * @see https://www.exoscale.com/compute/ Read more
-   */
-  scaleInstance(params: ScaleInstanceRequest): Promise<Operation> {
-    const path = `/instance/${encodeURIComponent(params.id)}:scale`
-    const body = toWireScaleInstanceRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * This operation starts a virtual machine, potentially using a rescue profile if specified
-   *
-   * @see https://www.exoscale.com/compute/ Read more
-   */
-  startInstance(params: StartInstanceRequest): Promise<Operation> {
-    const path = `/instance/${encodeURIComponent(params.id)}:start`
-    const body = toWireStartInstanceRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Stop a Compute instance
-   *
-   * @see https://www.exoscale.com/compute/ Read more
-   */
-  stopInstance(params: StopInstanceRequest): Promise<Operation> {
-    const path = `/instance/${encodeURIComponent(params.id)}:stop`
-    return this.core.request('PUT', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * This operation reverts the snapshot to the Compute instance volume, restoring stored data as it was at the time of the snapshot.
-   * The Compute instance must be previously stopped.
-   *
-   * @see https://www.exoscale.com/compute/ Read more
-   */
-  revertInstanceToSnapshot(params: RevertInstanceToSnapshotRequest): Promise<Operation> {
-    const path = `/instance/${encodeURIComponent(params.instanceID)}:revert-snapshot`
-    const body = toWireRevertInstanceToSnapshotRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Lists all KMS Keys in your organization in a given zone.
-   *
-   * Errors:
-   *
-   * **400**
-   * ### Errors
-   *
-   * Bad Request: The request was rejected because of an invalid request body or path parameter.
-   *
-   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
-   */
-  listKmsKeys(): Promise<ListKmsKeysResponse> {
-    return this.core.request('GET', '/kms-key', { decode: fromWireListKmsKeysResponse })
-  }
-
-  /**
-   * Create a customer-managed unique KMS Key in your organization. A KMS Key is a logical representation of a cryptographic key material. It also includes metadata such as a UUID, a name and its state.
-   *
-   * Errors:
-   *
-   * **400**
-   * ### Errors
-   *
-   * Name Conflict: The request was rejected because a key with the same name already exists in the target zone.
-   *
-   * Bad Request: The request was rejected because of an invalid request body or path parameter.
-   *
-   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
-   */
-  createKmsKey(params: CreateKmsKeyRequest): Promise<CreateKmsKeyResponse> {
-    const body = toWireCreateKmsKeyRequest(params)
-    return this.core.request('POST', '/kms-key', { body, decode: fromWireCreateKmsKeyResponse })
+  getInstanceType(params: GetInstanceTypeRequest): Promise<InstanceType> {
+    const path = `/instance-type/${encodeURIComponent(params.id)}`
+    return this.core.request('GET', path, { decode: fromWireInstanceType })
   }
 
   /**
@@ -10992,213 +10408,540 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * Cancels the scheduled deletion of a KMS Key.
+   * [BETA] Returns the live-balance of the current organization.
    *
    * Errors:
    *
-   * **400**
-   * ### Errors
-   *
-   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
-   *
-   * Not on Replica: The request was rejected because the operation is not allowed on a replica.
-   *
-   * Not Pending Deletion: The request was rejected because the key is not pending deletion.
-   *
-   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   * **429**
+   * 429
    */
-  cancelKmsKeyDeletion(params: CancelKmsKeyDeletionRequest): Promise<SuccessResponse> {
-    const path = `/kms-key/${encodeURIComponent(params.id)}/cancel-deletion`
-    return this.core.request('POST', path, { decode: fromWireSuccessResponse })
+  getLiveBalance(): Promise<LiveBalance> {
+    return this.core.request('GET', '/live-balance', { decode: fromWireLiveBalance })
   }
 
   /**
-   * Decrypts a ciphertext.
+   * Retrieve Load Balancer details
    *
-   * Errors:
-   *
-   * **400**
-   * ### Errors
-   *
-   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
-   *
-   * Key is Disabled: The request was rejected because the specified KMS key is disabled.
-   *
-   * Invalid Usage: The request was rejected because the operation is only allowed on symmetric keys with usage "encrypt-decrypt".
-   *
-   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
    */
-  decrypt(
-    params: DecryptRequest & {
-      id: string
-    },
-  ): Promise<DecryptResponse> {
-    const path = `/kms-key/${encodeURIComponent(params.id)}/decrypt`
-    const body = toWireDecryptRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireDecryptResponse })
+  getLoadBalancer(params: GetLoadBalancerRequest): Promise<LoadBalancer> {
+    const path = `/load-balancer/${encodeURIComponent(params.id)}`
+    return this.core.request('GET', path, { decode: fromWireLoadBalancer })
   }
 
   /**
-   * Disables a KMS Key by setting its state to "disabled". This prevents the use of the KMS key for cryptographic and key lifecycle operations.
+   * Retrieve Load Balancer Service details
    *
-   * Errors:
-   *
-   * **400**
-   * ### Errors
-   *
-   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
-   *
-   * Key is Pending Deletion: The request was rejected because it was performed on a key that is pending deletion.
-   *
-   * Not on Default: The request was rejected because the operation is not allowed on the default key.
-   *
-   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
    */
-  disableKmsKey(params: DisableKmsKeyRequest): Promise<SuccessResponse> {
-    const path = `/kms-key/${encodeURIComponent(params.id)}/disable`
-    return this.core.request('POST', path, { decode: fromWireSuccessResponse })
+  getLoadBalancerService(params: GetLoadBalancerServiceRequest): Promise<LoadBalancerService> {
+    const path = `/load-balancer/${encodeURIComponent(params.id)}/service/${encodeURIComponent(params.serviceID)}`
+    return this.core.request('GET', path, { decode: fromWireLoadBalancerService })
   }
 
   /**
-   * Disable the periodic rotation of a KMS Key.
+   * Get Model details
    *
    * Errors:
    *
-   * **400**
-   * ### Errors
+   * **404**
+   * Not Found
    *
-   * Invalid Origin: The request was rejected because automatic key rotation can only be enabled on a KMS key with origin "exoscale-kms".
-   *
-   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
-   *
-   * Not on Default: The request was rejected because the operation is not allowed on the default key.
-   *
-   * Not on Replica: The request was rejected because the operation is not allowed on a replica.
-   *
-   * Key is Pending Deletion: The request was rejected because it was performed on a key that is pending deletion.
-   *
-   * Key is Disabled: The request was rejected because the specified KMS key is disabled.
-   *
-   * Invalid Usage: The request was rejected because the operation is only allowed on symmetric keys with usage "encrypt-decrypt".
-   *
-   * Conflict: The request was rejected because the automatic rotation is already enabled for this KMS Key.
-   *
-   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
    */
-  disableKmsKeyRotation(
-    params: DisableKmsKeyRotationRequest,
-  ): Promise<DisableKmsKeyRotationResponse> {
-    const path = `/kms-key/${encodeURIComponent(params.id)}/disable-key-rotation`
-    return this.core.request('POST', path, { decode: fromWireDisableKmsKeyRotationResponse })
+  getModel(params: GetModelRequest): Promise<GetModelResponse> {
+    const path = `/ai/model/${encodeURIComponent(params.id)}`
+    return this.core.request('GET', path, { decode: fromWireGetModelResponse })
   }
 
   /**
-   * Enables a KMS Key by setting its state to "enabled". It restores the ability to fully use the KMS key for cryptographic operations and key lifecycle operations.
+   * Retrieve Operation details
    *
-   * Errors:
-   *
-   * **400**
-   * ### Errors
-   *
-   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
-   *
-   * Key is Pending Deletion: The request was rejected because it was performed on a key that is pending deletion.
-   *
-   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   * @see https://community.exoscale.com/ Read more
    */
-  enableKmsKey(params: EnableKmsKeyRequest): Promise<SuccessResponse> {
-    const path = `/kms-key/${encodeURIComponent(params.id)}/enable`
-    return this.core.request('POST', path, { decode: fromWireSuccessResponse })
+  getOperation(params: GetOperationRequest): Promise<Operation> {
+    const path = `/operation/${encodeURIComponent(params.id)}`
+    return this.core.request('GET', path, { decode: fromWireOperation })
   }
 
   /**
-   * Enable the periodic rotation of a KMS Key.
-   *
-   * Errors:
-   *
-   * **400**
-   * ### Errors
-   *
-   * Invalid Origin: The request was rejected because automatic key rotation can only be enabled on a KMS key with origin "exoscale-kms".
-   *
-   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
-   *
-   * Not on Default: The request was rejected because the operation is not allowed on the default key.
-   *
-   * Not on Replica: The request was rejected because the operation is not allowed on a replica.
-   *
-   * Key is Pending Deletion: The request was rejected because it was performed on a key that is pending deletion.
-   *
-   * Key is Disabled: The request was rejected because the specified KMS key is disabled.
-   *
-   * Invalid Usage: The request was rejected because the operation is only allowed on symmetric keys with usage "encrypt-decrypt".
-   *
-   * Conflict: The request was rejected because the automatic rotation is already enabled for this KMS Key.
-   *
-   * Bad Request: The request was rejected because of an invalid request body or path parameter.
-   *
-   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   * Retrieve an organization
    */
-  enableKmsKeyRotation(
-    params: EnableKmsKeyRotationRequest & {
-      id: string
-    },
-  ): Promise<EnableKmsKeyRotationResponse> {
-    const path = `/kms-key/${encodeURIComponent(params.id)}/enable-key-rotation`
-    const body = toWireEnableKmsKeyRotationRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireEnableKmsKeyRotationResponse })
+  getOrganization(): Promise<Organization> {
+    return this.core.request('GET', '/organization', { decode: fromWireOrganization })
   }
 
   /**
-   * Encrypts a plaintext.
+   * Retrieve Private Network details
    *
-   * Errors:
-   *
-   * **400**
-   * ### Errors
-   *
-   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
-   *
-   * Key is Disabled: The request was rejected because the specified KMS key is disabled.
-   *
-   * Invalid Usage: The request was rejected because the operation is only allowed on symmetric keys with usage "encrypt-decrypt".
-   *
-   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   * @see https://community.exoscale.com/product/networking/private-network/ Read more
    */
-  encrypt(
-    params: EncryptRequest & {
-      id: string
-    },
-  ): Promise<EncryptResponse> {
-    const path = `/kms-key/${encodeURIComponent(params.id)}/encrypt`
-    const body = toWireEncryptRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireEncryptResponse })
+  getPrivateNetwork(params: GetPrivateNetworkRequest): Promise<PrivateNetwork> {
+    const path = `/private-network/${encodeURIComponent(params.id)}`
+    return this.core.request('GET', path, { decode: fromWirePrivateNetwork })
   }
 
   /**
-   * Generate a Data Encryption Key from a given KMS Key.
+   * Retrieve Resource Quota
+   */
+  getQuota(params: GetQuotaRequest): Promise<Quota> {
+    const path = `/quota/${encodeURIComponent(params.entity)}`
+    return this.core.request('GET', path, { decode: fromWireQuota })
+  }
+
+  /**
+   * Query the PTR DNS records for an elastic IP
+   *
+   * @see https://community.exoscale.com/product/compute/instances/ Read more
+   */
+  getReverseDNSElasticIP(params: GetReverseDNSElasticIPRequest): Promise<ReverseDNSRecord> {
+    const path = `/reverse-dns/elastic-ip/${encodeURIComponent(params.id)}`
+    return this.core.request('GET', path, { decode: fromWireReverseDNSRecord })
+  }
+
+  /**
+   * Query the PTR DNS records for an instance
+   *
+   * @see https://community.exoscale.com/product/compute/instances/ Read more
+   */
+  getReverseDNSInstance(params: GetReverseDNSInstanceRequest): Promise<ReverseDNSRecord> {
+    const path = `/reverse-dns/instance/${encodeURIComponent(params.id)}`
+    return this.core.request('GET', path, { decode: fromWireReverseDNSRecord })
+  }
+
+  /**
+   * Retrieve Security Group details
+   *
+   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
+   */
+  getSecurityGroup(params: GetSecurityGroupRequest): Promise<SecurityGroup> {
+    const path = `/security-group/${encodeURIComponent(params.id)}`
+    return this.core.request('GET', path, { decode: fromWireSecurityGroup })
+  }
+
+  /**
+   * Retrieve SKS cluster details
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
+   */
+  getSKSCluster(params: GetSKSClusterRequest): Promise<SKSCluster> {
+    const path = `/sks-cluster/${encodeURIComponent(params.id)}`
+    return this.core.request('GET', path, { decode: fromWireSKSCluster })
+  }
+
+  /**
+   * This operation returns the certificate for the given SKS cluster authority encoded in base64.
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
+   */
+  getSKSClusterAuthorityCert(
+    params: GetSKSClusterAuthorityCertRequest,
+  ): Promise<GetSKSClusterAuthorityCertResponse> {
+    const path = `/sks-cluster/${encodeURIComponent(params.id)}/authority/${encodeURIComponent(params.authority)}/cert`
+    return this.core.request('GET', path, { decode: fromWireGetSKSClusterAuthorityCertResponse })
+  }
+
+  /**
+   * Helps troubleshoot common problems when deploying a kubernetes cluster. Inspections run every couple of minutes.
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
+   */
+  getSKSClusterInspection(
+    params: GetSKSClusterInspectionRequest,
+  ): Promise<GetSKSClusterInspectionResponse> {
+    const path = `/sks-cluster/${encodeURIComponent(params.id)}/inspection`
+    return this.core.request('GET', path)
+  }
+
+  /**
+   * Retrieve SKS Nodepool details
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
+   */
+  getSKSNodepool(params: GetSKSNodepoolRequest): Promise<SKSNodepool> {
+    const path = `/sks-cluster/${encodeURIComponent(params.id)}/nodepool/${encodeURIComponent(params.sksNodepoolID)}`
+    return this.core.request('GET', path, { decode: fromWireSKSNodepool })
+  }
+
+  /**
+   * Retrieve Snapshot details
+   *
+   * @see https://community.exoscale.com/documentation/compute/snapshots/ Read more
+   */
+  getSnapshot(params: GetSnapshotRequest): Promise<Snapshot> {
+    const path = `/snapshot/${encodeURIComponent(params.id)}`
+    return this.core.request('GET', path, { decode: fromWireSnapshot })
+  }
+
+  /**
+   * Generates Presigned Download URL for SOS object
+   *
+   * @see https://community.exoscale.com/product/storage/object-storage/ Read more
+   */
+  getSOSPresignedURL(params: GetSOSPresignedURLRequest): Promise<GetSOSPresignedURLResponse> {
+    const path = `/sos/${encodeURIComponent(params.bucket)}/presigned-url`
+    const query: Record<string, string> = {}
+    if (params.key !== undefined) query['key'] = params.key
+    return this.core.request('GET', path, { query, decode: fromWireGetSOSPresignedURLResponse })
+  }
+
+  /**
+   * Retrieve SSH key details
+   *
+   * @see https://community.exoscale.com/documentation/compute/ssh-keypairs/ Read more
+   */
+  getSSHKey(params: GetSSHKeyRequest): Promise<SSHKey> {
+    const path = `/ssh-key/${encodeURIComponent(params.name)}`
+    return this.core.request('GET', path, { decode: fromWireSSHKey })
+  }
+
+  /**
+   * [BETA] Retrieve Subnet details
+   *
+   * @see https://community.exoscale.com/product/networking/vpc Read more
+   */
+  getSubnet(params: GetSubnetRequest): Promise<Subnet> {
+    const path = `/vpc/${encodeURIComponent(params.vpcID)}/subnet/${encodeURIComponent(params.id)}`
+    return this.core.request('GET', path, { decode: fromWireSubnet })
+  }
+
+  /**
+   * Retrieve Template details
+   *
+   * @see https://www.exoscale.com/templates/ Read more
+   */
+  getTemplate(params: GetTemplateRequest): Promise<Template> {
+    const path = `/template/${encodeURIComponent(params.id)}`
+    return this.core.request('GET', path, { decode: fromWireTemplate })
+  }
+
+  /**
+   * Returns aggregated usage reports for an organization
+   */
+  getUsageReport(params?: GetUsageReportRequest): Promise<GetUsageReportResponse> {
+    const query: Record<string, string> = {}
+    if (params?.period !== undefined) query['period'] = params?.period
+    return this.core.request('GET', '/usage-report', {
+      query,
+      decode: fromWireGetUsageReportResponse,
+    })
+  }
+
+  /**
+   * Get per-org Unit Of Measurement (UOM) consumption quota (UOM/min). Null means unlimited. UOM represents weighted units across different AI workloads (e.g., tokens for LLMs, minutes for TTS, pages for OCR).
+   *
+   * Errors:
+   *
+   * **404**
+   * Not Found
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/managed-inference/ Read more
+   */
+  getUserOrgConsumptionQuota(): Promise<OrgConsumptionQuotaResponse> {
+    return this.core.request('GET', '/ai/quota', { decode: fromWireOrgConsumptionQuotaResponse })
+  }
+
+  /**
+   * [BETA] Retrieve VPC details
+   *
+   * @see https://community.exoscale.com/product/networking/vpc Read more
+   */
+  getVpc(params: GetVpcRequest): Promise<Vpc> {
+    const path = `/vpc/${encodeURIComponent(params.id)}`
+    return this.core.request('GET', path, { decode: fromWireVpc })
+  }
+
+  /**
+   * List AI API keys for an organization
+   *
+   * Errors:
+   *
+   * **403**
+   * Forbidden
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/managed-inference/ Read more
+   */
+  listAIAPIKeys(): Promise<ListAIAPIKeysResponse> {
+    return this.core.request('GET', '/ai/api-key', { decode: fromWireListAIAPIKeysResponse })
+  }
+
+  /**
+   * List available instance types with authorization status based on GPU availability
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
+   */
+  listAIInstanceTypes(): Promise<ListAIInstanceTypesResponse> {
+    return this.core.request('GET', '/ai/instance-type', {
+      decode: fromWireListAIInstanceTypesResponse,
+    })
+  }
+
+  /**
+   * List Anti-affinity Groups
+   *
+   * @see https://community.exoscale.com/product/compute/instances/how-to/anti-affinity/ Read more
+   */
+  listAntiAffinityGroups(): Promise<ListAntiAffinityGroupsResponse> {
+    return this.core.request('GET', '/anti-affinity-group', {
+      decode: fromWireListAntiAffinityGroupsResponse,
+    })
+  }
+
+  /**
+   * List API keys
+   *
+   * @see https://community.exoscale.com/product/iam/how-to/key-mgmt/ Read more
+   */
+  listAPIKeys(): Promise<ListAPIKeysResponse> {
+    return this.core.request('GET', '/api-key', { decode: fromWireListAPIKeysResponse })
+  }
+
+  /**
+   * List block storage snapshots
+   *
+   * @see https://community.exoscale.com/documentation/block-storage/ Read more
+   */
+  listBlockStorageSnapshots(): Promise<ListBlockStorageSnapshotsResponse> {
+    return this.core.request('GET', '/block-storage-snapshot', {
+      decode: fromWireListBlockStorageSnapshotsResponse,
+    })
+  }
+
+  /**
+   * List block storage volumes
+   *
+   * @see https://community.exoscale.com/documentation/block-storage/ Read more
+   */
+  listBlockStorageVolumes(
+    params?: ListBlockStorageVolumesRequest,
+  ): Promise<ListBlockStorageVolumesResponse> {
+    const query: Record<string, string> = {}
+    if (params?.instanceID !== undefined) query['instance-id'] = params?.instanceID
+    return this.core.request('GET', '/block-storage', {
+      query,
+      decode: fromWireListBlockStorageVolumesResponse,
+    })
+  }
+
+  /**
+   * List DBaaS ClickHouse roles
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  listDBAASClickhouseRoles(params: ListDBAASClickhouseRolesRequest): Promise<DBAASClickhouseRoles> {
+    const path = `/dbaas-clickhouse/${encodeURIComponent(params.serviceName)}/role`
+    return this.core.request('GET', path, { decode: fromWireDBAASClickhouseRoles })
+  }
+
+  /**
+   * List DBaaS ClickHouse users
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  listDBAASClickhouseUsers(params: ListDBAASClickhouseUsersRequest): Promise<DBAASClickhouseUsers> {
+    const path = `/dbaas-clickhouse/${encodeURIComponent(params.serviceName)}/user`
+    return this.core.request('GET', path, { decode: fromWireDBAASClickhouseUsers })
+  }
+
+  /**
+   * [BETA] List available external endpoint types and their schemas for DBaaS external integrations
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  listDBAASExternalEndpointTypes(): Promise<ListDBAASExternalEndpointTypesResponse> {
+    return this.core.request('GET', '/dbaas-external-endpoint-types', {
+      decode: fromWireListDBAASExternalEndpointTypesResponse,
+    })
+  }
+
+  /**
+   * [BETA] List available external endpoints for integrations
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  listDBAASExternalEndpoints(): Promise<ListDBAASExternalEndpointsResponse> {
+    return this.core.request('GET', '/dbaas-external-endpoints', {
+      decode: fromWireListDBAASExternalEndpointsResponse,
+    })
+  }
+
+  /**
+   * [BETA] List all DBaaS connections between services and external endpoints
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  listDBAASExternalIntegrations(
+    params: ListDBAASExternalIntegrationsRequest,
+  ): Promise<ListDBAASExternalIntegrationsResponse> {
+    const path = `/dbaas-external-integrations/${encodeURIComponent(params.serviceName)}`
+    return this.core.request('GET', path, { decode: fromWireListDBAASExternalIntegrationsResponse })
+  }
+
+  /**
+   * [BETA] Get DBaaS integration settings
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  listDBAASIntegrationSettings(
+    params: ListDBAASIntegrationSettingsRequest,
+  ): Promise<ListDBAASIntegrationSettingsResponse> {
+    const path = `/dbaas-integration-settings/${encodeURIComponent(params.integrationType)}/${encodeURIComponent(params.sourceType)}/${encodeURIComponent(params.destType)}`
+    return this.core.request('GET', path, { decode: fromWireListDBAASIntegrationSettingsResponse })
+  }
+
+  /**
+   * [BETA] Get DBaaS integration types
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  listDBAASIntegrationTypes(): Promise<ListDBAASIntegrationTypesResponse> {
+    return this.core.request('GET', '/dbaas-integration-types', {
+      decode: fromWireListDBAASIntegrationTypesResponse,
+    })
+  }
+
+  /**
+   * List available service types for DBaaS
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  listDBAASServiceTypes(): Promise<ListDBAASServiceTypesResponse> {
+    return this.core.request('GET', '/dbaas-service-type', {
+      decode: fromWireListDBAASServiceTypesResponse,
+    })
+  }
+
+  /**
+   * List DBaaS services
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  listDBAASServices(): Promise<ListDBAASServicesResponse> {
+    return this.core.request('GET', '/dbaas-service', { decode: fromWireListDBAASServicesResponse })
+  }
+
+  /**
+   * List DBaaS Valkey users with ACL configuration
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  listDBAASValkeyUsers(params: ListDBAASValkeyUsersRequest): Promise<DBAASValkeyUsers> {
+    const path = `/dbaas-valkey/${encodeURIComponent(params.serviceName)}/user`
+    return this.core.request('GET', path, { decode: fromWireDBAASValkeyUsers })
+  }
+
+  /**
+   * List Deploy Targets
+   *
+   * @see https://www.exoscale.com/virtual-private-cloud/ Read more
+   */
+  listDeployTargets(): Promise<ListDeployTargetsResponse> {
+    return this.core.request('GET', '/deploy-target', { decode: fromWireListDeployTargetsResponse })
+  }
+
+  /**
+   * List Deployments
    *
    * Errors:
    *
    * **400**
-   * ### Errors
+   * Bad Request
    *
-   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
-   *
-   * Key is Disabled: The request was rejected because the specified KMS key is disabled.
-   *
-   * Invalid Usage: The request was rejected because the operation is only allowed on symmetric keys with usage "encrypt-decrypt".
-   *
-   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
    */
-  generateDataKey(
-    params: GenerateDataKeyRequest & {
-      id: string
-    },
-  ): Promise<GenerateDataKeyResponse> {
-    const path = `/kms-key/${encodeURIComponent(params.id)}/generate-data-key`
-    const body = toWireGenerateDataKeyRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireGenerateDataKeyResponse })
+  listDeployments(params?: ListDeploymentsRequest): Promise<ListDeploymentsResponse> {
+    const query: Record<string, string> = {}
+    if (params?.visibility !== undefined) query['visibility'] = params?.visibility
+    return this.core.request('GET', '/ai/deployment', {
+      query,
+      decode: fromWireListDeploymentsResponse,
+    })
+  }
+
+  /**
+   * List DNS domain records
+   *
+   * @see https://community.exoscale.com/product/networking/dns/overview/ Read more
+   */
+  listDNSDomainRecords(params: ListDNSDomainRecordsRequest): Promise<ListDNSDomainRecordsResponse> {
+    const path = `/dns-domain/${encodeURIComponent(params.domainID)}/record`
+    return this.core.request('GET', path, { decode: fromWireListDNSDomainRecordsResponse })
+  }
+
+  /**
+   * List DNS domains
+   *
+   * @see https://community.exoscale.com/product/networking/dns/quick-start/ Read more
+   */
+  listDNSDomains(): Promise<ListDNSDomainsResponse> {
+    return this.core.request('GET', '/dns-domain', { decode: fromWireListDNSDomainsResponse })
+  }
+
+  /**
+   * List Elastic IPs
+   *
+   * @see https://community.exoscale.com/product/networking/eip/ Read more
+   */
+  listElasticIPS(): Promise<ListElasticIPSResponse> {
+    return this.core.request('GET', '/elastic-ip', { decode: fromWireListElasticIPSResponse })
+  }
+
+  /**
+   * Retrieve Mutation Events for a given date range. Defaults to retrieving Events for the past 24 hours.
+   *          Both a `from` and `to` arguments can be specified to filter Events over a specific period.
+   *          Events will be the the most descriptive possible but not all fields are mandatory
+   *
+   * @see https://community.exoscale.com/platform/audit-trail/ Read more
+   */
+  listEvents(params?: ListEventsRequest): Promise<Event[]> {
+    const query: Record<string, string> = {}
+    if (params?.from !== undefined) query['from'] = isoDateTime(params?.from)
+    if (params?.to !== undefined) query['to'] = isoDateTime(params?.to)
+    return this.core.request('GET', '/event', {
+      query,
+      decode: (w) => (w as any[]).map(fromWireEvent),
+    })
+  }
+
+  /**
+   * List IAM Roles
+   *
+   * @see https://community.exoscale.com/product/iam/operation/role-mgmt/ Read more
+   */
+  listIAMRoles(): Promise<ListIAMRolesResponse> {
+    return this.core.request('GET', '/iam-role', { decode: fromWireListIAMRolesResponse })
+  }
+
+  /**
+   * List Instance Pools
+   *
+   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
+   */
+  listInstancePools(): Promise<ListInstancePoolsResponse> {
+    return this.core.request('GET', '/instance-pool', { decode: fromWireListInstancePoolsResponse })
+  }
+
+  /**
+   * List Compute instance Types
+   *
+   * @see https://www.exoscale.com/pricing/ Read more
+   */
+  listInstanceTypes(): Promise<ListInstanceTypesResponse> {
+    return this.core.request('GET', '/instance-type', { decode: fromWireListInstanceTypesResponse })
+  }
+
+  /**
+   * List Compute instances
+   *
+   * @see https://www.exoscale.com/compute/ Read more
+   */
+  listInstances(params?: ListInstancesRequest): Promise<ListInstancesResponse> {
+    const query: Record<string, string> = {}
+    if (params?.ipAddress !== undefined) query['ip-address'] = params?.ipAddress
+    if (params?.labels !== undefined) query['labels'] = params?.labels
+    if (params?.managerID !== undefined) query['manager-id'] = params?.managerID
+    if (params?.managerType !== undefined) query['manager-type'] = params?.managerType
+    return this.core.request('GET', '/instance', { query, decode: fromWireListInstancesResponse })
   }
 
   /**
@@ -11216,6 +10959,225 @@ export abstract class GeneratedExoscaleClient {
   listKmsKeyRotations(params: ListKmsKeyRotationsRequest): Promise<ListKmsKeyRotationsResponse> {
     const path = `/kms-key/${encodeURIComponent(params.id)}/list-key-rotations`
     return this.core.request('GET', path, { decode: fromWireListKmsKeyRotationsResponse })
+  }
+
+  /**
+   * Lists all KMS Keys in your organization in a given zone.
+   *
+   * Errors:
+   *
+   * **400**
+   * ### Errors
+   *
+   * Bad Request: The request was rejected because of an invalid request body or path parameter.
+   *
+   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   */
+  listKmsKeys(): Promise<ListKmsKeysResponse> {
+    return this.core.request('GET', '/kms-key', { decode: fromWireListKmsKeysResponse })
+  }
+
+  /**
+   * List Load Balancers
+   *
+   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
+   */
+  listLoadBalancers(): Promise<ListLoadBalancersResponse> {
+    return this.core.request('GET', '/load-balancer', { decode: fromWireListLoadBalancersResponse })
+  }
+
+  /**
+   * List Models
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
+   */
+  listModels(): Promise<ListModelsResponse> {
+    return this.core.request('GET', '/ai/model', { decode: fromWireListModelsResponse })
+  }
+
+  /**
+   * List Private Networks
+   *
+   * @see https://community.exoscale.com/product/networking/private-network/ Read more
+   */
+  listPrivateNetworks(): Promise<ListPrivateNetworksResponse> {
+    return this.core.request('GET', '/private-network', {
+      decode: fromWireListPrivateNetworksResponse,
+    })
+  }
+
+  /**
+   * List Organization Quotas
+   */
+  listQuotas(): Promise<ListQuotasResponse> {
+    return this.core.request('GET', '/quota', { decode: fromWireListQuotasResponse })
+  }
+
+  /**
+   * [BETA] List Subnet routes
+   *
+   * @see https://community.exoscale.com/product/networking/vpc Read more
+   */
+  listRoutes(params: ListRoutesRequest): Promise<ListRoutesResponse> {
+    const path = `/vpc/${encodeURIComponent(params.vpcID)}/subnet/${encodeURIComponent(params.subnetID)}/route`
+    return this.core.request('GET', path, { decode: fromWireListRoutesResponse })
+  }
+
+  /**
+   * Lists security groups. When visibility is set to public, lists public security groups.
+   * Public security groups are objects maintained by Exoscale which contain source addresses for
+   * relevant services hosted by Exoscale. They can be used a source in ingress rules and as a destination
+   * in egress rules.
+   *
+   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
+   */
+  listSecurityGroups(params?: ListSecurityGroupsRequest): Promise<ListSecurityGroupsResponse> {
+    const query: Record<string, string> = {}
+    if (params?.visibility !== undefined) query['visibility'] = params?.visibility
+    return this.core.request('GET', '/security-group', {
+      query,
+      decode: fromWireListSecurityGroupsResponse,
+    })
+  }
+
+  /**
+   * This operation returns the deprecated resources for a given cluster
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
+   */
+  listSKSClusterDeprecatedResources(
+    params: ListSKSClusterDeprecatedResourcesRequest,
+  ): Promise<SKSClusterDeprecatedResource[]> {
+    const path = `/sks-cluster-deprecated-resources/${encodeURIComponent(params.id)}`
+    return this.core.request('GET', path, {
+      decode: (w) => (w as any[]).map(fromWireSKSClusterDeprecatedResource),
+    })
+  }
+
+  /**
+   * List available versions for SKS clusters
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
+   */
+  listSKSClusterVersions(
+    params?: ListSKSClusterVersionsRequest,
+  ): Promise<ListSKSClusterVersionsResponse> {
+    const query: Record<string, string> = {}
+    if (params?.includeDeprecated !== undefined)
+      query['include-deprecated'] = params?.includeDeprecated
+    return this.core.request('GET', '/sks-cluster-version', {
+      query,
+      decode: fromWireListSKSClusterVersionsResponse,
+    })
+  }
+
+  /**
+   * List SKS clusters
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
+   */
+  listSKSClusters(): Promise<ListSKSClustersResponse> {
+    return this.core.request('GET', '/sks-cluster', { decode: fromWireListSKSClustersResponse })
+  }
+
+  /**
+   * List Snapshots
+   *
+   * @see https://community.exoscale.com/documentation/compute/snapshots/ Read more
+   */
+  listSnapshots(): Promise<ListSnapshotsResponse> {
+    return this.core.request('GET', '/snapshot', { decode: fromWireListSnapshotsResponse })
+  }
+
+  /**
+   * List SOS Buckets Usage
+   *
+   * @see https://community.exoscale.com/product/storage/object-storage/ Read more
+   */
+  listSOSBucketsUsage(): Promise<ListSOSBucketsUsageResponse> {
+    return this.core.request('GET', '/sos-buckets-usage', {
+      decode: fromWireListSOSBucketsUsageResponse,
+    })
+  }
+
+  /**
+   * List SSH keys
+   *
+   * @see https://community.exoscale.com/documentation/compute/ssh-keypairs/ Read more
+   */
+  listSSHKeys(): Promise<ListSSHKeysResponse> {
+    return this.core.request('GET', '/ssh-key', { decode: fromWireListSSHKeysResponse })
+  }
+
+  /**
+   * [BETA] List Subnets
+   *
+   * @see https://community.exoscale.com/product/networking/vpc Read more
+   */
+  listSubnets(params: ListSubnetsRequest): Promise<ListSubnetsResponse> {
+    const path = `/vpc/${encodeURIComponent(params.vpcID)}/subnet`
+    return this.core.request('GET', path, { decode: fromWireListSubnetsResponse })
+  }
+
+  /**
+   * List Templates
+   *
+   * @see https://www.exoscale.com/templates/ Read more
+   */
+  listTemplates(params?: ListTemplatesRequest): Promise<ListTemplatesResponse> {
+    const query: Record<string, string> = {}
+    if (params?.family !== undefined) query['family'] = params?.family
+    if (params?.visibility !== undefined) query['visibility'] = params?.visibility
+    return this.core.request('GET', '/template', { query, decode: fromWireListTemplatesResponse })
+  }
+
+  /**
+   * List Users
+   *
+   * @see https://community.exoscale.com/product/iam/operation/users-keys/ Read more
+   */
+  listUsers(): Promise<ListUsersResponse> {
+    return this.core.request('GET', '/user', { decode: fromWireListUsersResponse })
+  }
+
+  /**
+   * [BETA] List VPC routes
+   *
+   * @see https://community.exoscale.com/product/networking/vpc Read more
+   */
+  listVpcRoutes(params: ListVpcRoutesRequest): Promise<ListVpcRoutesResponse> {
+    const path = `/vpc/${encodeURIComponent(params.vpcID)}/route`
+    return this.core.request('GET', path, { decode: fromWireListVpcRoutesResponse })
+  }
+
+  /**
+   * [BETA] List VPCs
+   *
+   * @see https://community.exoscale.com/product/networking/vpc Read more
+   */
+  listVpcs(): Promise<ListVpcsResponse> {
+    return this.core.request('GET', '/vpc', { decode: fromWireListVpcsResponse })
+  }
+
+  /**
+   * List Zones
+   *
+   * @see https://www.exoscale.com/datacenters/ Read more
+   */
+  listZones(): Promise<ListZonesResponse> {
+    return this.core.request('GET', '/zone', { decode: fromWireListZonesResponse, skipAuth: true })
+  }
+
+  /**
+   * Promote a Snapshot to a Template
+   *
+   * @see https://community.exoscale.com/documentation/compute/snapshots/ Read more
+   * @see https://www.exoscale.com/templates/ Read more
+   */
+  promoteSnapshotToTemplate(params: PromoteSnapshotToTemplateRequest): Promise<Operation> {
+    const path = `/snapshot/${encodeURIComponent(params.id)}:promote`
+    const body = toWirePromoteSnapshotToTemplateRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
   }
 
   /**
@@ -11244,6 +11206,59 @@ export abstract class GeneratedExoscaleClient {
     const path = `/kms-key/${encodeURIComponent(params.id)}/re-encrypt`
     const body = toWireReEncryptRequest(params)
     return this.core.request('POST', path, { body, decode: fromWireReEncryptResponse })
+  }
+
+  /**
+   * Reboot a Compute instance
+   *
+   * @see https://www.exoscale.com/compute/ Read more
+   */
+  rebootInstance(params: RebootInstanceRequest): Promise<Operation> {
+    const path = `/instance/${encodeURIComponent(params.id)}:reboot`
+    return this.core.request('PUT', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Import SSH key
+   *
+   * @see https://community.exoscale.com/documentation/compute/ssh-keypairs/ Read more
+   */
+  registerSSHKey(params: RegisterSSHKeyRequest): Promise<Operation> {
+    const body = toWireRegisterSSHKeyRequest(params)
+    return this.core.request('POST', '/ssh-key', { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Register a Template
+   *
+   * @see https://www.exoscale.com/templates/ Read more
+   */
+  registerTemplate(params: RegisterTemplateRequest): Promise<Operation> {
+    const body = toWireRegisterTemplateRequest(params)
+    return this.core.request('POST', '/template', { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Remove an external source from a Security Group
+   *
+   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
+   */
+  removeExternalSourceFromSecurityGroup(
+    params: RemoveExternalSourceFromSecurityGroupRequest,
+  ): Promise<Operation> {
+    const path = `/security-group/${encodeURIComponent(params.id)}:remove-source`
+    const body = toWireRemoveExternalSourceFromSecurityGroupRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Remove instance destruction protection
+   *
+   * @see https://www.exoscale.com/compute/ Read more
+   */
+  removeInstanceProtection(params: RemoveInstanceProtectionRequest): Promise<Operation> {
+    const path = `/instance/${encodeURIComponent(params.id)}:remove-protection`
+    return this.core.request('PUT', path, { decode: fromWireOperation })
   }
 
   /**
@@ -11279,6 +11294,356 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
+   * Reset the credentials of a DBaaS ClickHouse user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  resetDBAASClickhouseUserPassword(
+    params: ResetDBAASClickhouseUserPasswordRequest,
+  ): Promise<DBAASUserClickhouseSecrets> {
+    const path = `/dbaas-clickhouse/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reset`
+    const body = toWireResetDBAASClickhouseUserPasswordRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireDBAASUserClickhouseSecrets })
+  }
+
+  /**
+   * If no password is provided one will be generated automatically.
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  resetDBAASGrafanaUserPassword(params: ResetDBAASGrafanaUserPasswordRequest): Promise<Operation> {
+    const path = `/dbaas-grafana/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reset`
+    const body = toWireResetDBAASGrafanaUserPasswordRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * If no password is provided one will be generated automatically.
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  resetDBAASKafkaUserPassword(params: ResetDBAASKafkaUserPasswordRequest): Promise<Operation> {
+    const path = `/dbaas-kafka/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reset`
+    const body = toWireResetDBAASKafkaUserPasswordRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * If no password is provided one will be generated automatically.
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  resetDBAASMysqlUserPassword(params: ResetDBAASMysqlUserPasswordRequest): Promise<Operation> {
+    const path = `/dbaas-mysql/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reset`
+    const body = toWireResetDBAASMysqlUserPasswordRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * If no password is provided one will be generated automatically.
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  resetDBAASOpensearchUserPassword(
+    params: ResetDBAASOpensearchUserPasswordRequest,
+  ): Promise<Operation> {
+    const path = `/dbaas-opensearch/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reset`
+    const body = toWireResetDBAASOpensearchUserPasswordRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * If no password is provided one will be generated automatically.
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  resetDBAASPostgresUserPassword(
+    params: ResetDBAASPostgresUserPasswordRequest,
+  ): Promise<Operation> {
+    const path = `/dbaas-postgres/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reset`
+    const body = toWireResetDBAASPostgresUserPasswordRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * If no password is provided one will be generated automatically.
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  resetDBAASValkeyUserPassword(params: ResetDBAASValkeyUserPasswordRequest): Promise<Operation> {
+    const path = `/dbaas-valkey/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reset`
+    const body = toWireResetDBAASValkeyUserPasswordRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Reset an Elastic IP field to its default value
+   *
+   * @see https://community.exoscale.com/product/networking/eip/ Read more
+   */
+  resetElasticIPField(params: ResetElasticIPFieldRequest): Promise<Operation> {
+    const path = `/elastic-ip/${encodeURIComponent(params.id)}/${encodeURIComponent(params.field)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Reset IAM Organization Policy
+   *
+   * @see https://community.exoscale.com/product/iam/operation/roles-policies/ Read more
+   */
+  resetIAMOrganizationPolicy(): Promise<Operation> {
+    return this.core.request('POST', '/iam-organization-policy:reset', {
+      decode: fromWireOperation,
+    })
+  }
+
+  /**
+   * This operation re-installs a Compute instance to a base template. If target template is provided it will be used to recreated instance from. Warning: the operation wipes all data stored on the disk.
+   *
+   * @see https://www.exoscale.com/compute/ Read more
+   */
+  resetInstance(params: ResetInstanceRequest): Promise<Operation> {
+    const path = `/instance/${encodeURIComponent(params.id)}:reset`
+    const body = toWireResetInstanceRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Reset Instance field
+   *
+   * @see https://www.exoscale.com/compute/ Read more
+   */
+  resetInstanceField(params: ResetInstanceFieldRequest): Promise<Operation> {
+    const path = `/instance/${encodeURIComponent(params.id)}/${encodeURIComponent(params.field)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Reset a compute instance password
+   *
+   * @see https://www.exoscale.com/compute/ Read more
+   */
+  resetInstancePassword(params: ResetInstancePasswordRequest): Promise<Operation> {
+    const path = `/instance/${encodeURIComponent(params.id)}:reset-password`
+    return this.core.request('PUT', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Reset an Instance Pool field to its default value
+   *
+   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
+   */
+  resetInstancePoolField(params: ResetInstancePoolFieldRequest): Promise<Operation> {
+    const path = `/instance-pool/${encodeURIComponent(params.id)}/${encodeURIComponent(params.field)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Reset a Load Balancer field to its default value
+   *
+   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
+   */
+  resetLoadBalancerField(params: ResetLoadBalancerFieldRequest): Promise<Operation> {
+    const path = `/load-balancer/${encodeURIComponent(params.id)}/${encodeURIComponent(params.field)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Reset a Load Balancer Service field to its default value
+   *
+   * @see https://community.exoscale.com/documentation/compute/ Read more
+   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
+   */
+  resetLoadBalancerServiceField(params: ResetLoadBalancerServiceFieldRequest): Promise<Operation> {
+    const path = `/load-balancer/${encodeURIComponent(params.id)}/service/${encodeURIComponent(params.serviceID)}/${encodeURIComponent(params.field)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Reset Private Network field
+   *
+   * @see https://community.exoscale.com/product/networking/private-network/ Read more
+   */
+  resetPrivateNetworkField(params: ResetPrivateNetworkFieldRequest): Promise<Operation> {
+    const path = `/private-network/${encodeURIComponent(params.id)}/${encodeURIComponent(params.field)}`
+    return this.core.request('DELETE', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * This operation resizes a Block storage volume. Note: the volume can only grow, cannot be shrunk. Only detached volumes or volumes attached to stopped instances can be resized.
+   *
+   * @see https://community.exoscale.com/documentation/block-storage/ Read more
+   */
+  resizeBlockStorageVolume(params: ResizeBlockStorageVolumeRequest): Promise<BlockStorageVolume> {
+    const path = `/block-storage/${encodeURIComponent(params.id)}:resize-volume`
+    const body = toWireResizeBlockStorageVolumeRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireBlockStorageVolume })
+  }
+
+  /**
+   * This operation resizes a Compute instance's disk volume. Note: the disk can only grow, cannot be shrunk.
+   *
+   * @see https://www.exoscale.com/compute/ Read more
+   */
+  resizeInstanceDisk(params: ResizeInstanceDiskRequest): Promise<Operation> {
+    const path = `/instance/${encodeURIComponent(params.id)}:resize-disk`
+    const body = toWireResizeInstanceDiskRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Reveal the secrets of a DBaaS ClickHouse user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  revealDBAASClickhouseUserPassword(
+    params: RevealDBAASClickhouseUserPasswordRequest,
+  ): Promise<DBAASUserClickhouseSecrets> {
+    const path = `/dbaas-clickhouse/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reveal`
+    return this.core.request('GET', path, { decode: fromWireDBAASUserClickhouseSecrets })
+  }
+
+  /**
+   * Reveal the secrets of a DBaaS Grafana user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  revealDBAASGrafanaUserPassword(
+    params: RevealDBAASGrafanaUserPasswordRequest,
+  ): Promise<DBAASUserGrafanaSecrets> {
+    const path = `/dbaas-grafana/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reveal`
+    return this.core.request('GET', path, { decode: fromWireDBAASUserGrafanaSecrets })
+  }
+
+  /**
+   * Reveal the secrets for DBaaS Kafka Connect
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  revealDBAASKafkaConnectPassword(
+    params: RevealDBAASKafkaConnectPasswordRequest,
+  ): Promise<DBAASUserKafkaConnectSecrets> {
+    const path = `/dbaas-kafka/${encodeURIComponent(params.serviceName)}/connect/password/reveal`
+    return this.core.request('GET', path, { decode: fromWireDBAASUserKafkaConnectSecrets })
+  }
+
+  /**
+   * Reveal the secrets of a DBaaS Kafka user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  revealDBAASKafkaUserPassword(
+    params: RevealDBAASKafkaUserPasswordRequest,
+  ): Promise<DBAASUserKafkaSecrets> {
+    const path = `/dbaas-kafka/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reveal`
+    return this.core.request('GET', path, { decode: fromWireDBAASUserKafkaSecrets })
+  }
+
+  /**
+   * Reveal the secrets of a DBaaS MySQL user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  revealDBAASMysqlUserPassword(
+    params: RevealDBAASMysqlUserPasswordRequest,
+  ): Promise<DBAASUserMysqlSecrets> {
+    const path = `/dbaas-mysql/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reveal`
+    return this.core.request('GET', path, { decode: fromWireDBAASUserMysqlSecrets })
+  }
+
+  /**
+   * Reveal the secrets of a DBaaS OpenSearch user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  revealDBAASOpensearchUserPassword(
+    params: RevealDBAASOpensearchUserPasswordRequest,
+  ): Promise<DBAASUserOpensearchSecrets> {
+    const path = `/dbaas-opensearch/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reveal`
+    return this.core.request('GET', path, { decode: fromWireDBAASUserOpensearchSecrets })
+  }
+
+  /**
+   * Reveal the secrets of a DBaaS Postgres user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  revealDBAASPostgresUserPassword(
+    params: RevealDBAASPostgresUserPasswordRequest,
+  ): Promise<DBAASUserPostgresSecrets> {
+    const path = `/dbaas-postgres/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reveal`
+    return this.core.request('GET', path, { decode: fromWireDBAASUserPostgresSecrets })
+  }
+
+  /**
+   * Reveal the secrets of a DBaaS Thanos user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  revealDBAASThanosUserPassword(
+    params: RevealDBAASThanosUserPasswordRequest,
+  ): Promise<DBAASUserThanosSecrets> {
+    const path = `/dbaas-thanos/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reveal`
+    return this.core.request('GET', path, { decode: fromWireDBAASUserThanosSecrets })
+  }
+
+  /**
+   * Reveal the secrets of a DBaaS Valkey user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  revealDBAASValkeyUserPassword(
+    params: RevealDBAASValkeyUserPasswordRequest,
+  ): Promise<DBAASUserValkeySecrets> {
+    const path = `/dbaas-valkey/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/password/reveal`
+    return this.core.request('GET', path, { decode: fromWireDBAASUserValkeySecrets })
+  }
+
+  /**
+   * Get Deployment API Key
+   *
+   * Errors:
+   *
+   * **404**
+   * Not Found
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
+   */
+  revealDeploymentAPIKey(
+    params: RevealDeploymentAPIKeyRequest,
+  ): Promise<RevealDeploymentAPIKeyResponse> {
+    const path = `/ai/deployment/${encodeURIComponent(params.id)}/api-key`
+    return this.core.request('GET', path, { decode: fromWireRevealDeploymentAPIKeyResponse })
+  }
+
+  /**
+   * Reveal the password used during instance creation or the latest password reset.
+   *             This is only available for VMs created against templates having the `password-enabled`
+   *             property set to `true`.
+   *
+   *             Passwords are transiently stored for at most 24 hours and intended to be retrieved shortly after
+   *             creation or resets.
+   *
+   * @see https://www.exoscale.com/compute/ Read more
+   */
+  revealInstancePassword(params: RevealInstancePasswordRequest): Promise<InstancePassword> {
+    const path = `/instance/${encodeURIComponent(params.id)}:password`
+    return this.core.request('GET', path, { decode: fromWireInstancePassword })
+  }
+
+  /**
+   * This operation reverts the snapshot to the Compute instance volume, restoring stored data as it was at the time of the snapshot.
+   * The Compute instance must be previously stopped.
+   *
+   * @see https://www.exoscale.com/compute/ Read more
+   */
+  revertInstanceToSnapshot(params: RevertInstanceToSnapshotRequest): Promise<Operation> {
+    const path = `/instance/${encodeURIComponent(params.instanceID)}:revert-snapshot`
+    const body = toWireRevertInstanceToSnapshotRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
    * Performs an immediate rotation of the key material for a symmetric key.
    *
    * Errors:
@@ -11303,685 +11668,6 @@ export abstract class GeneratedExoscaleClient {
   rotateKmsKey(params: RotateKmsKeyRequest): Promise<RotateKmsKeyResponse> {
     const path = `/kms-key/${encodeURIComponent(params.id)}/rotate`
     return this.core.request('POST', path, { decode: fromWireRotateKmsKeyResponse })
-  }
-
-  /**
-   * Schedules a KMS key for deletion after a delay. You can specify a delay of 7-30 days.
-   *
-   * Errors:
-   *
-   * **400**
-   * ### Errors
-   *
-   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
-   *
-   * Not on Default: The request was rejected because the operation is not allowed on the default key.
-   *
-   * Not on Replica: The request was rejected because the operation is not allowed on a replica.
-   *
-   * Bad Request: The request was rejected because of an invalid request body or path parameter.
-   *
-   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
-   */
-  scheduleKmsKeyDeletion(
-    params: ScheduleKmsKeyDeletionRequest & {
-      id: string
-    },
-  ): Promise<ScheduleKmsKeyDeletionResponse> {
-    const path = `/kms-key/${encodeURIComponent(params.id)}/schedule-deletion`
-    const body = toWireScheduleKmsKeyDeletionRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireScheduleKmsKeyDeletionResponse })
-  }
-
-  /**
-   * [BETA] Returns the live-balance of the current organization.
-   *
-   * Errors:
-   *
-   * **429**
-   * 429
-   */
-  getLiveBalance(): Promise<LiveBalance> {
-    return this.core.request('GET', '/live-balance', { decode: fromWireLiveBalance })
-  }
-
-  /**
-   * List Load Balancers
-   *
-   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
-   */
-  listLoadBalancers(): Promise<ListLoadBalancersResponse> {
-    return this.core.request('GET', '/load-balancer', { decode: fromWireListLoadBalancersResponse })
-  }
-
-  /**
-   * Create a Load Balancer
-   *
-   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
-   */
-  createLoadBalancer(params: CreateLoadBalancerRequest): Promise<Operation> {
-    const body = toWireCreateLoadBalancerRequest(params)
-    return this.core.request('POST', '/load-balancer', { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Delete a Load Balancer
-   *
-   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
-   */
-  deleteLoadBalancer(params: DeleteLoadBalancerRequest): Promise<Operation> {
-    const path = `/load-balancer/${encodeURIComponent(params.id)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Retrieve Load Balancer details
-   *
-   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
-   */
-  getLoadBalancer(params: GetLoadBalancerRequest): Promise<LoadBalancer> {
-    const path = `/load-balancer/${encodeURIComponent(params.id)}`
-    return this.core.request('GET', path, { decode: fromWireLoadBalancer })
-  }
-
-  /**
-   * Update a Load Balancer
-   *
-   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
-   */
-  updateLoadBalancer(params: UpdateLoadBalancerRequest): Promise<Operation> {
-    const path = `/load-balancer/${encodeURIComponent(params.id)}`
-    const body = toWireUpdateLoadBalancerRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Add a Load Balancer Service
-   *
-   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
-   */
-  addServiceToLoadBalancer(params: AddServiceToLoadBalancerRequest): Promise<Operation> {
-    const path = `/load-balancer/${encodeURIComponent(params.id)}/service`
-    const body = toWireAddServiceToLoadBalancerRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Delete a Load Balancer Service
-   *
-   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
-   */
-  deleteLoadBalancerService(params: DeleteLoadBalancerServiceRequest): Promise<Operation> {
-    const path = `/load-balancer/${encodeURIComponent(params.id)}/service/${encodeURIComponent(params.serviceID)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Retrieve Load Balancer Service details
-   *
-   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
-   */
-  getLoadBalancerService(params: GetLoadBalancerServiceRequest): Promise<LoadBalancerService> {
-    const path = `/load-balancer/${encodeURIComponent(params.id)}/service/${encodeURIComponent(params.serviceID)}`
-    return this.core.request('GET', path, { decode: fromWireLoadBalancerService })
-  }
-
-  /**
-   * Update a Load Balancer Service
-   *
-   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
-   */
-  updateLoadBalancerService(params: UpdateLoadBalancerServiceRequest): Promise<Operation> {
-    const path = `/load-balancer/${encodeURIComponent(params.id)}/service/${encodeURIComponent(params.serviceID)}`
-    const body = toWireUpdateLoadBalancerServiceRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Reset a Load Balancer Service field to its default value
-   *
-   * @see https://community.exoscale.com/documentation/compute/ Read more
-   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
-   */
-  resetLoadBalancerServiceField(params: ResetLoadBalancerServiceFieldRequest): Promise<Operation> {
-    const path = `/load-balancer/${encodeURIComponent(params.id)}/service/${encodeURIComponent(params.serviceID)}/${encodeURIComponent(params.field)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Reset a Load Balancer field to its default value
-   *
-   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
-   */
-  resetLoadBalancerField(params: ResetLoadBalancerFieldRequest): Promise<Operation> {
-    const path = `/load-balancer/${encodeURIComponent(params.id)}/${encodeURIComponent(params.field)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Retrieve Operation details
-   *
-   * @see https://community.exoscale.com/ Read more
-   */
-  getOperation(params: GetOperationRequest): Promise<Operation> {
-    const path = `/operation/${encodeURIComponent(params.id)}`
-    return this.core.request('GET', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Retrieve an organization
-   */
-  getOrganization(): Promise<Organization> {
-    return this.core.request('GET', '/organization', { decode: fromWireOrganization })
-  }
-
-  /**
-   * List Private Networks
-   *
-   * @see https://community.exoscale.com/product/networking/private-network/ Read more
-   */
-  listPrivateNetworks(): Promise<ListPrivateNetworksResponse> {
-    return this.core.request('GET', '/private-network', {
-      decode: fromWireListPrivateNetworksResponse,
-    })
-  }
-
-  /**
-   * Create a Private Network
-   *
-   * @see https://community.exoscale.com/product/networking/private-network/ Read more
-   */
-  createPrivateNetwork(params: CreatePrivateNetworkRequest): Promise<Operation> {
-    const body = toWireCreatePrivateNetworkRequest(params)
-    return this.core.request('POST', '/private-network', { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Delete a Private Network
-   *
-   * @see https://community.exoscale.com/product/networking/private-network/ Read more
-   */
-  deletePrivateNetwork(params: DeletePrivateNetworkRequest): Promise<Operation> {
-    const path = `/private-network/${encodeURIComponent(params.id)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Retrieve Private Network details
-   *
-   * @see https://community.exoscale.com/product/networking/private-network/ Read more
-   */
-  getPrivateNetwork(params: GetPrivateNetworkRequest): Promise<PrivateNetwork> {
-    const path = `/private-network/${encodeURIComponent(params.id)}`
-    return this.core.request('GET', path, { decode: fromWirePrivateNetwork })
-  }
-
-  /**
-   * Update a Private Network
-   *
-   * @see https://community.exoscale.com/product/networking/private-network/ Read more
-   */
-  updatePrivateNetwork(params: UpdatePrivateNetworkRequest): Promise<Operation> {
-    const path = `/private-network/${encodeURIComponent(params.id)}`
-    const body = toWireUpdatePrivateNetworkRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Reset Private Network field
-   *
-   * @see https://community.exoscale.com/product/networking/private-network/ Read more
-   */
-  resetPrivateNetworkField(params: ResetPrivateNetworkFieldRequest): Promise<Operation> {
-    const path = `/private-network/${encodeURIComponent(params.id)}/${encodeURIComponent(params.field)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Attach a Compute instance to a Private Network
-   *
-   * @see https://community.exoscale.com/product/networking/private-network/ Read more
-   */
-  attachInstanceToPrivateNetwork(
-    params: AttachInstanceToPrivateNetworkRequest,
-  ): Promise<Operation> {
-    const path = `/private-network/${encodeURIComponent(params.id)}:attach`
-    const body = toWireAttachInstanceToPrivateNetworkRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Detach a Compute instance from a Private Network
-   *
-   * @see https://community.exoscale.com/product/networking/private-network/ Read more
-   */
-  detachInstanceFromPrivateNetwork(
-    params: DetachInstanceFromPrivateNetworkRequest,
-  ): Promise<Operation> {
-    const path = `/private-network/${encodeURIComponent(params.id)}:detach`
-    const body = toWireDetachInstanceFromPrivateNetworkRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Update the IP address of an instance attached to a managed private network
-   *
-   * @see https://community.exoscale.com/product/networking/private-network/ Read more
-   */
-  updatePrivateNetworkInstanceIP(
-    params: UpdatePrivateNetworkInstanceIPRequest,
-  ): Promise<Operation> {
-    const path = `/private-network/${encodeURIComponent(params.id)}:update-ip`
-    const body = toWireUpdatePrivateNetworkInstanceIPRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * List Organization Quotas
-   */
-  listQuotas(): Promise<ListQuotasResponse> {
-    return this.core.request('GET', '/quota', { decode: fromWireListQuotasResponse })
-  }
-
-  /**
-   * Retrieve Resource Quota
-   */
-  getQuota(params: GetQuotaRequest): Promise<Quota> {
-    const path = `/quota/${encodeURIComponent(params.entity)}`
-    return this.core.request('GET', path, { decode: fromWireQuota })
-  }
-
-  /**
-   * Delete the PTR DNS record for an elastic IP
-   *
-   * @see https://community.exoscale.com/product/compute/instances/ Read more
-   */
-  deleteReverseDNSElasticIP(params: DeleteReverseDNSElasticIPRequest): Promise<Operation> {
-    const path = `/reverse-dns/elastic-ip/${encodeURIComponent(params.id)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Query the PTR DNS records for an elastic IP
-   *
-   * @see https://community.exoscale.com/product/compute/instances/ Read more
-   */
-  getReverseDNSElasticIP(params: GetReverseDNSElasticIPRequest): Promise<ReverseDNSRecord> {
-    const path = `/reverse-dns/elastic-ip/${encodeURIComponent(params.id)}`
-    return this.core.request('GET', path, { decode: fromWireReverseDNSRecord })
-  }
-
-  /**
-   * Update/Create the PTR DNS record for an elastic IP
-   *
-   * @see https://community.exoscale.com/product/compute/instances/ Read more
-   */
-  updateReverseDNSElasticIP(params: UpdateReverseDNSElasticIPRequest): Promise<Operation> {
-    const path = `/reverse-dns/elastic-ip/${encodeURIComponent(params.id)}`
-    const body = toWireUpdateReverseDNSElasticIPRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Delete the PTR DNS record for an instance
-   *
-   * @see https://community.exoscale.com/product/compute/instances/ Read more
-   */
-  deleteReverseDNSInstance(params: DeleteReverseDNSInstanceRequest): Promise<Operation> {
-    const path = `/reverse-dns/instance/${encodeURIComponent(params.id)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Query the PTR DNS records for an instance
-   *
-   * @see https://community.exoscale.com/product/compute/instances/ Read more
-   */
-  getReverseDNSInstance(params: GetReverseDNSInstanceRequest): Promise<ReverseDNSRecord> {
-    const path = `/reverse-dns/instance/${encodeURIComponent(params.id)}`
-    return this.core.request('GET', path, { decode: fromWireReverseDNSRecord })
-  }
-
-  /**
-   * Update/Create the PTR DNS record for an instance
-   *
-   * @see https://community.exoscale.com/product/compute/instances/ Read more
-   */
-  updateReverseDNSInstance(params: UpdateReverseDNSInstanceRequest): Promise<Operation> {
-    const path = `/reverse-dns/instance/${encodeURIComponent(params.id)}`
-    const body = toWireUpdateReverseDNSInstanceRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Lists security groups. When visibility is set to public, lists public security groups.
-   * Public security groups are objects maintained by Exoscale which contain source addresses for
-   * relevant services hosted by Exoscale. They can be used a source in ingress rules and as a destination
-   * in egress rules.
-   *
-   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
-   */
-  listSecurityGroups(params?: ListSecurityGroupsRequest): Promise<ListSecurityGroupsResponse> {
-    const query: Record<string, string> = {}
-    if (params?.visibility !== undefined) query['visibility'] = params?.visibility
-    return this.core.request('GET', '/security-group', {
-      query,
-      decode: fromWireListSecurityGroupsResponse,
-    })
-  }
-
-  /**
-   * Create a Security Group
-   *
-   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
-   */
-  createSecurityGroup(params: CreateSecurityGroupRequest): Promise<Operation> {
-    const body = toWireCreateSecurityGroupRequest(params)
-    return this.core.request('POST', '/security-group', { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Delete a Security Group
-   *
-   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
-   */
-  deleteSecurityGroup(params: DeleteSecurityGroupRequest): Promise<Operation> {
-    const path = `/security-group/${encodeURIComponent(params.id)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Retrieve Security Group details
-   *
-   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
-   */
-  getSecurityGroup(params: GetSecurityGroupRequest): Promise<SecurityGroup> {
-    const path = `/security-group/${encodeURIComponent(params.id)}`
-    return this.core.request('GET', path, { decode: fromWireSecurityGroup })
-  }
-
-  /**
-   * Create a Security Group rule
-   *
-   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
-   */
-  addRuleToSecurityGroup(params: AddRuleToSecurityGroupRequest): Promise<Operation> {
-    const path = `/security-group/${encodeURIComponent(params.id)}/rules`
-    const body = toWireAddRuleToSecurityGroupRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Delete a Security Group rule
-   *
-   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
-   */
-  deleteRuleFromSecurityGroup(params: DeleteRuleFromSecurityGroupRequest): Promise<Operation> {
-    const path = `/security-group/${encodeURIComponent(params.id)}/rules/${encodeURIComponent(params.ruleID)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Add an external source as a member of a Security Group
-   *
-   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
-   */
-  addExternalSourceToSecurityGroup(
-    params: AddExternalSourceToSecurityGroupRequest,
-  ): Promise<Operation> {
-    const path = `/security-group/${encodeURIComponent(params.id)}:add-source`
-    const body = toWireAddExternalSourceToSecurityGroupRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Attach a Compute instance to a Security Group
-   *
-   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
-   */
-  attachInstanceToSecurityGroup(params: AttachInstanceToSecurityGroupRequest): Promise<Operation> {
-    const path = `/security-group/${encodeURIComponent(params.id)}:attach`
-    const body = toWireAttachInstanceToSecurityGroupRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Detach a Compute instance from a Security Group
-   *
-   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
-   */
-  detachInstanceFromSecurityGroup(
-    params: DetachInstanceFromSecurityGroupRequest,
-  ): Promise<Operation> {
-    const path = `/security-group/${encodeURIComponent(params.id)}:detach`
-    const body = toWireDetachInstanceFromSecurityGroupRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Remove an external source from a Security Group
-   *
-   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
-   */
-  removeExternalSourceFromSecurityGroup(
-    params: RemoveExternalSourceFromSecurityGroupRequest,
-  ): Promise<Operation> {
-    const path = `/security-group/${encodeURIComponent(params.id)}:remove-source`
-    const body = toWireRemoveExternalSourceFromSecurityGroupRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * List SKS clusters
-   *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
-   */
-  listSKSClusters(): Promise<ListSKSClustersResponse> {
-    return this.core.request('GET', '/sks-cluster', { decode: fromWireListSKSClustersResponse })
-  }
-
-  /**
-   * Create an SKS cluster
-   *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
-   */
-  createSKSCluster(params: CreateSKSClusterRequest): Promise<Operation> {
-    const body = toWireCreateSKSClusterRequest(params)
-    return this.core.request('POST', '/sks-cluster', { body, decode: fromWireOperation })
-  }
-
-  /**
-   * This operation returns the deprecated resources for a given cluster
-   *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
-   */
-  listSKSClusterDeprecatedResources(
-    params: ListSKSClusterDeprecatedResourcesRequest,
-  ): Promise<SKSClusterDeprecatedResource[]> {
-    const path = `/sks-cluster-deprecated-resources/${encodeURIComponent(params.id)}`
-    return this.core.request('GET', path, {
-      decode: (w) => (w as any[]).map(fromWireSKSClusterDeprecatedResource),
-    })
-  }
-
-  /**
-   * This operation returns a Kubeconfig file encoded in base64.
-   *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
-   */
-  generateSKSClusterKubeconfig(
-    params: SKSKubeconfigRequest & {
-      id: string
-    },
-  ): Promise<GenerateSKSClusterKubeconfigResponse> {
-    const path = `/sks-cluster-kubeconfig/${encodeURIComponent(params.id)}`
-    const body = toWireSKSKubeconfigRequest(params)
-    return this.core.request('POST', path, {
-      body,
-      decode: fromWireGenerateSKSClusterKubeconfigResponse,
-    })
-  }
-
-  /**
-   * List available versions for SKS clusters
-   *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
-   */
-  listSKSClusterVersions(
-    params?: ListSKSClusterVersionsRequest,
-  ): Promise<ListSKSClusterVersionsResponse> {
-    const query: Record<string, string> = {}
-    if (params?.includeDeprecated !== undefined)
-      query['include-deprecated'] = params?.includeDeprecated
-    return this.core.request('GET', '/sks-cluster-version', {
-      query,
-      decode: fromWireListSKSClusterVersionsResponse,
-    })
-  }
-
-  /**
-   * Delete an SKS cluster
-   *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
-   */
-  deleteSKSCluster(params: DeleteSKSClusterRequest): Promise<Operation> {
-    const path = `/sks-cluster/${encodeURIComponent(params.id)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Retrieve SKS cluster details
-   *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
-   */
-  getSKSCluster(params: GetSKSClusterRequest): Promise<SKSCluster> {
-    const path = `/sks-cluster/${encodeURIComponent(params.id)}`
-    return this.core.request('GET', path, { decode: fromWireSKSCluster })
-  }
-
-  /**
-   * Update an SKS cluster
-   *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
-   */
-  updateSKSCluster(params: UpdateSKSClusterRequest): Promise<Operation> {
-    const path = `/sks-cluster/${encodeURIComponent(params.id)}`
-    const body = toWireUpdateSKSClusterRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * This operation returns the certificate for the given SKS cluster authority encoded in base64.
-   *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
-   */
-  getSKSClusterAuthorityCert(
-    params: GetSKSClusterAuthorityCertRequest,
-  ): Promise<GetSKSClusterAuthorityCertResponse> {
-    const path = `/sks-cluster/${encodeURIComponent(params.id)}/authority/${encodeURIComponent(params.authority)}/cert`
-    return this.core.request('GET', path, { decode: fromWireGetSKSClusterAuthorityCertResponse })
-  }
-
-  /**
-   * Generate a Karpenter ExoscaleNodeClass manifest for an SKS cluster, including its default security group and feature flags if present
-   *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
-   */
-  generateSKSKarpenterExoscaleNodeclass(
-    params: GenerateSKSKarpenterExoscaleNodeclassRequest,
-  ): Promise<GenerateSKSKarpenterExoscaleNodeclassResponse> {
-    const path = `/sks-cluster/${encodeURIComponent(params.id)}/generate-karpenter-exoscale-nodeclass`
-    return this.core.request('PUT', path, {
-      decode: fromWireGenerateSKSKarpenterExoscaleNodeclassResponse,
-    })
-  }
-
-  /**
-   * Generate a Karpenter NodePool manifest with minimal configuration for an SKS cluster
-   *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
-   */
-  generateSKSKarpenterNodepool(
-    params: GenerateSKSKarpenterNodepoolRequest,
-  ): Promise<GenerateSKSKarpenterNodepoolResponse> {
-    const path = `/sks-cluster/${encodeURIComponent(params.id)}/generate-karpenter-nodepool`
-    return this.core.request('PUT', path, { decode: fromWireGenerateSKSKarpenterNodepoolResponse })
-  }
-
-  /**
-   * Helps troubleshoot common problems when deploying a kubernetes cluster. Inspections run every couple of minutes.
-   *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
-   */
-  getSKSClusterInspection(
-    params: GetSKSClusterInspectionRequest,
-  ): Promise<GetSKSClusterInspectionResponse> {
-    const path = `/sks-cluster/${encodeURIComponent(params.id)}/inspection`
-    return this.core.request('GET', path)
-  }
-
-  /**
-   * Create a new SKS Nodepool
-   *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
-   */
-  createSKSNodepool(params: CreateSKSNodepoolRequest): Promise<Operation> {
-    const path = `/sks-cluster/${encodeURIComponent(params.id)}/nodepool`
-    const body = toWireCreateSKSNodepoolRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Delete an SKS Nodepool
-   *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
-   */
-  deleteSKSNodepool(params: DeleteSKSNodepoolRequest): Promise<Operation> {
-    const path = `/sks-cluster/${encodeURIComponent(params.id)}/nodepool/${encodeURIComponent(params.sksNodepoolID)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Retrieve SKS Nodepool details
-   *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
-   */
-  getSKSNodepool(params: GetSKSNodepoolRequest): Promise<SKSNodepool> {
-    const path = `/sks-cluster/${encodeURIComponent(params.id)}/nodepool/${encodeURIComponent(params.sksNodepoolID)}`
-    return this.core.request('GET', path, { decode: fromWireSKSNodepool })
-  }
-
-  /**
-   * Update an SKS Nodepool
-   *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
-   */
-  updateSKSNodepool(params: UpdateSKSNodepoolRequest): Promise<Operation> {
-    const path = `/sks-cluster/${encodeURIComponent(params.id)}/nodepool/${encodeURIComponent(params.sksNodepoolID)}`
-    const body = toWireUpdateSKSNodepoolRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * This operation evicts the specified Compute instances member from the Nodepool, shrinking it to `&lt;current nodepool size&gt; - &lt;# evicted members&gt;`.
-   *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
-   */
-  evictSKSNodepoolMembers(params: EvictSKSNodepoolMembersRequest): Promise<Operation> {
-    const path = `/sks-cluster/${encodeURIComponent(params.id)}/nodepool/${encodeURIComponent(params.sksNodepoolID)}:evict`
-    const body = toWireEvictSKSNodepoolMembersRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Scale a SKS Nodepool
-   *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
-   */
-  scaleSKSNodepool(params: ScaleSKSNodepoolRequest): Promise<Operation> {
-    const path = `/sks-cluster/${encodeURIComponent(params.id)}/nodepool/${encodeURIComponent(params.sksNodepoolID)}:scale`
-    const body = toWireScaleSKSNodepoolRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
   }
 
   /**
@@ -12025,6 +11711,735 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
+   * Scale Deployment
+   *
+   * Errors:
+   *
+   * **403**
+   * Forbidden
+   *
+   * **404**
+   * Not Found
+   *
+   * **409**
+   * Conflict
+   *
+   * **412**
+   * Precondition Failed
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
+   */
+  scaleDeployment(
+    params: ScaleDeploymentRequest & {
+      id: string
+    },
+  ): Promise<Operation> {
+    const path = `/ai/deployment/${encodeURIComponent(params.id)}/scale`
+    const body = toWireScaleDeploymentRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * This operation changes the Compute instance's type. Note: the new Instance Type must be within the same family (e.g. a standard instance cannot be scaled to gpu2 or storage).
+   *
+   * @see https://www.exoscale.com/compute/ Read more
+   */
+  scaleInstance(params: ScaleInstanceRequest): Promise<Operation> {
+    const path = `/instance/${encodeURIComponent(params.id)}:scale`
+    const body = toWireScaleInstanceRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Scale an Instance Pool
+   *
+   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
+   */
+  scaleInstancePool(params: ScaleInstancePoolRequest): Promise<Operation> {
+    const path = `/instance-pool/${encodeURIComponent(params.id)}:scale`
+    const body = toWireScaleInstancePoolRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Scale a SKS Nodepool
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
+   */
+  scaleSKSNodepool(params: ScaleSKSNodepoolRequest): Promise<Operation> {
+    const path = `/sks-cluster/${encodeURIComponent(params.id)}/nodepool/${encodeURIComponent(params.sksNodepoolID)}:scale`
+    const body = toWireScaleSKSNodepoolRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Schedules a KMS key for deletion after a delay. You can specify a delay of 7-30 days.
+   *
+   * Errors:
+   *
+   * **400**
+   * ### Errors
+   *
+   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
+   *
+   * Not on Default: The request was rejected because the operation is not allowed on the default key.
+   *
+   * Not on Replica: The request was rejected because the operation is not allowed on a replica.
+   *
+   * Bad Request: The request was rejected because of an invalid request body or path parameter.
+   *
+   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   */
+  scheduleKmsKeyDeletion(
+    params: ScheduleKmsKeyDeletionRequest & {
+      id: string
+    },
+  ): Promise<ScheduleKmsKeyDeletionResponse> {
+    const path = `/kms-key/${encodeURIComponent(params.id)}/schedule-deletion`
+    const body = toWireScheduleKmsKeyDeletionRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireScheduleKmsKeyDeletionResponse })
+  }
+
+  /**
+   * Initiate ClickHouse maintenance update
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  startDBAASClickhouseMaintenance(
+    params: StartDBAASClickhouseMaintenanceRequest,
+  ): Promise<Operation> {
+    const path = `/dbaas-clickhouse/${encodeURIComponent(params.name)}/maintenance/start`
+    return this.core.request('PUT', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Initiate Grafana maintenance update
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  startDBAASGrafanaMaintenance(params: StartDBAASGrafanaMaintenanceRequest): Promise<Operation> {
+    const path = `/dbaas-grafana/${encodeURIComponent(params.name)}/maintenance/start`
+    return this.core.request('PUT', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Initiate Kafka maintenance update
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  startDBAASKafkaMaintenance(params: StartDBAASKafkaMaintenanceRequest): Promise<Operation> {
+    const path = `/dbaas-kafka/${encodeURIComponent(params.name)}/maintenance/start`
+    return this.core.request('PUT', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Initiate MySQL maintenance update
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  startDBAASMysqlMaintenance(params: StartDBAASMysqlMaintenanceRequest): Promise<Operation> {
+    const path = `/dbaas-mysql/${encodeURIComponent(params.name)}/maintenance/start`
+    return this.core.request('PUT', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Initiate OpenSearch maintenance update
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  startDBAASOpensearchMaintenance(
+    params: StartDBAASOpensearchMaintenanceRequest,
+  ): Promise<Operation> {
+    const path = `/dbaas-opensearch/${encodeURIComponent(params.name)}/maintenance/start`
+    return this.core.request('PUT', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Initiate PostgreSQL maintenance update
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  startDBAASPGMaintenance(params: StartDBAASPGMaintenanceRequest): Promise<Operation> {
+    const path = `/dbaas-postgres/${encodeURIComponent(params.name)}/maintenance/start`
+    return this.core.request('PUT', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Initiate Thanos maintenance update
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  startDBAASThanosMaintenance(params: StartDBAASThanosMaintenanceRequest): Promise<Operation> {
+    const path = `/dbaas-thanos/${encodeURIComponent(params.name)}/maintenance/start`
+    return this.core.request('PUT', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Initiate Valkey maintenance update
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  startDBAASValkeyMaintenance(params: StartDBAASValkeyMaintenanceRequest): Promise<Operation> {
+    const path = `/dbaas-valkey/${encodeURIComponent(params.name)}/maintenance/start`
+    return this.core.request('PUT', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * This operation starts a virtual machine, potentially using a rescue profile if specified
+   *
+   * @see https://www.exoscale.com/compute/ Read more
+   */
+  startInstance(params: StartInstanceRequest): Promise<Operation> {
+    const path = `/instance/${encodeURIComponent(params.id)}:start`
+    const body = toWireStartInstanceRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Stop a DBaaS MySQL migration
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  stopDBAASMysqlMigration(params: StopDBAASMysqlMigrationRequest): Promise<Operation> {
+    const path = `/dbaas-mysql/${encodeURIComponent(params.name)}/migration/stop`
+    return this.core.request('POST', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Stop a DBaaS PostgreSQL migration
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  stopDBAASPGMigration(params: StopDBAASPGMigrationRequest): Promise<Operation> {
+    const path = `/dbaas-postgres/${encodeURIComponent(params.name)}/migration/stop`
+    return this.core.request('POST', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Stop a DBaaS Valkey migration
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  stopDBAASValkeyMigration(params: StopDBAASValkeyMigrationRequest): Promise<Operation> {
+    const path = `/dbaas-valkey/${encodeURIComponent(params.name)}/migration/stop`
+    return this.core.request('POST', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Stop a Compute instance
+   *
+   * @see https://www.exoscale.com/compute/ Read more
+   */
+  stopInstance(params: StopInstanceRequest): Promise<Operation> {
+    const path = `/instance/${encodeURIComponent(params.id)}:stop`
+    return this.core.request('PUT', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Update block storage volume snapshot
+   *
+   * @see https://community.exoscale.com/documentation/block-storage/ Read more
+   */
+  updateBlockStorageSnapshot(params: UpdateBlockStorageSnapshotRequest): Promise<Operation> {
+    const path = `/block-storage-snapshot/${encodeURIComponent(params.id)}`
+    const body = toWireUpdateBlockStorageSnapshotRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Update block storage volume
+   *
+   * @see https://community.exoscale.com/documentation/block-storage/ Read more
+   */
+  updateBlockStorageVolume(params: UpdateBlockStorageVolumeRequest): Promise<Operation> {
+    const path = `/block-storage/${encodeURIComponent(params.id)}`
+    const body = toWireUpdateBlockStorageVolumeRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * [BETA] Update DataDog external integration endpoint
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  updateDBAASExternalEndpointDatadog(
+    params: DBAASEndpointDatadogInputUpdate & {
+      endpointID: string
+    },
+  ): Promise<Operation> {
+    const path = `/dbaas-external-endpoint-datadog/${encodeURIComponent(params.endpointID)}`
+    const body = toWireDBAASEndpointDatadogInputUpdate(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * [BETA] Update ElasticSearch Logs external integration endpoint
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  updateDBAASExternalEndpointElasticsearch(
+    params: DBAASEndpointElasticsearchInputUpdate & {
+      endpointID: string
+    },
+  ): Promise<Operation> {
+    const path = `/dbaas-external-endpoint-elasticsearch/${encodeURIComponent(params.endpointID)}`
+    const body = toWireDBAASEndpointElasticsearchInputUpdate(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * [BETA] Update OpenSearch Logs external integration endpoint
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  updateDBAASExternalEndpointOpensearch(
+    params: DBAASEndpointOpensearchInputUpdate & {
+      endpointID: string
+    },
+  ): Promise<Operation> {
+    const path = `/dbaas-external-endpoint-opensearch/${encodeURIComponent(params.endpointID)}`
+    const body = toWireDBAASEndpointOpensearchInputUpdate(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * [BETA] Update Prometheus external integration endpoint
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  updateDBAASExternalEndpointPrometheus(
+    params: DBAASEndpointPrometheusPayload & {
+      endpointID: string
+    },
+  ): Promise<Operation> {
+    const path = `/dbaas-external-endpoint-prometheus/${encodeURIComponent(params.endpointID)}`
+    const body = toWireDBAASEndpointPrometheusPayload(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * [BETA] Update RSyslog external integration endpoint
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  updateDBAASExternalEndpointRsyslog(
+    params: DBAASEndpointRsyslogInputUpdate & {
+      endpointID: string
+    },
+  ): Promise<Operation> {
+    const path = `/dbaas-external-endpoint-rsyslog/${encodeURIComponent(params.endpointID)}`
+    const body = toWireDBAASEndpointRsyslogInputUpdate(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * [BETA] Manage Datadog integration settings
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  updateDBAASExternalIntegrationSettingsDatadog(
+    params: UpdateDBAASExternalIntegrationSettingsDatadogRequest,
+  ): Promise<Operation> {
+    const path = `/dbaas-external-integration-settings-datadog/${encodeURIComponent(params.integrationID)}`
+    const body = toWireUpdateDBAASExternalIntegrationSettingsDatadogRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * [BETA] Update a existing DBaaS integration
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  updateDBAASIntegration(params: UpdateDBAASIntegrationRequest): Promise<Operation> {
+    const path = `/dbaas-integration/${encodeURIComponent(params.id)}`
+    const body = toWireUpdateDBAASIntegrationRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Create a DBaaS OpenSearch ACL configuration
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  updateDBAASOpensearchAclConfig(
+    params: DBAASOpensearchAclConfig & {
+      name: DBAASServiceName
+    },
+  ): Promise<Operation> {
+    const path = `/dbaas-opensearch/${encodeURIComponent(params.name)}/acl-config`
+    const body = toWireDBAASOpensearchAclConfig(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Update a DBaaS PostgreSQL connection pool
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  updateDBAASPGConnectionPool(params: UpdateDBAASPGConnectionPoolRequest): Promise<Operation> {
+    const path = `/dbaas-postgres/${encodeURIComponent(params.serviceName)}/connection-pool/${encodeURIComponent(params.connectionPoolName)}`
+    const body = toWireUpdateDBAASPGConnectionPoolRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Update access control for one service user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  updateDBAASPostgresAllowReplication(
+    params: UpdateDBAASPostgresAllowReplicationRequest,
+  ): Promise<DBAASPostgresUsers> {
+    const path = `/dbaas-postgres/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}/allow-replication`
+    const body = toWireUpdateDBAASPostgresAllowReplicationRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireDBAASPostgresUsers })
+  }
+
+  /**
+   * Update a DBaaS ClickHouse service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  updateDBAASServiceClickhouse(params: UpdateDBAASServiceClickhouseRequest): Promise<Operation> {
+    const path = `/dbaas-clickhouse/${encodeURIComponent(params.name)}`
+    const body = toWireUpdateDBAASServiceClickhouseRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Update a DBaaS Grafana service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  updateDBAASServiceGrafana(params: UpdateDBAASServiceGrafanaRequest): Promise<Operation> {
+    const path = `/dbaas-grafana/${encodeURIComponent(params.name)}`
+    const body = toWireUpdateDBAASServiceGrafanaRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Update a DBaaS Kafka service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  updateDBAASServiceKafka(params: UpdateDBAASServiceKafkaRequest): Promise<Operation> {
+    const path = `/dbaas-kafka/${encodeURIComponent(params.name)}`
+    const body = toWireUpdateDBAASServiceKafkaRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Update a DBaaS MySQL service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  updateDBAASServiceMysql(params: UpdateDBAASServiceMysqlRequest): Promise<Operation> {
+    const path = `/dbaas-mysql/${encodeURIComponent(params.name)}`
+    const body = toWireUpdateDBAASServiceMysqlRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Update a DBaaS OpenSearch service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  updateDBAASServiceOpensearch(params: UpdateDBAASServiceOpensearchRequest): Promise<Operation> {
+    const path = `/dbaas-opensearch/${encodeURIComponent(params.name)}`
+    const body = toWireUpdateDBAASServiceOpensearchRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Update a DBaaS PostgreSQL service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  updateDBAASServicePG(params: UpdateDBAASServicePGRequest): Promise<Operation> {
+    const path = `/dbaas-postgres/${encodeURIComponent(params.name)}`
+    const body = toWireUpdateDBAASServicePGRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Update a DBaaS Thanos service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  updateDBAASServiceThanos(params: UpdateDBAASServiceThanosRequest): Promise<Operation> {
+    const path = `/dbaas-thanos/${encodeURIComponent(params.name)}`
+    const body = toWireUpdateDBAASServiceThanosRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Update a DBaaS Valkey service
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  updateDBAASServiceValkey(params: UpdateDBAASServiceValkeyRequest): Promise<Operation> {
+    const path = `/dbaas-valkey/${encodeURIComponent(params.name)}`
+    const body = toWireUpdateDBAASServiceValkeyRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Update access control for one DBaaS Valkey service user
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  updateDBAASValkeyUserAccessControl(
+    params: UpdateDBAASValkeyUserAccessControlRequest,
+  ): Promise<Operation> {
+    const path = `/dbaas-valkey/${encodeURIComponent(params.serviceName)}/user/${encodeURIComponent(params.username)}`
+    const body = toWireUpdateDBAASValkeyUserAccessControlRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Update AI deployment
+   *
+   * Errors:
+   *
+   * **400**
+   * Bad Request
+   *
+   * **403**
+   * Forbidden
+   *
+   * **404**
+   * Not Found
+   *
+   * **409**
+   * Conflict
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
+   */
+  updateDeployment(
+    params: UpdateDeploymentRequest & {
+      id: string
+    },
+  ): Promise<Operation> {
+    const path = `/ai/deployment/${encodeURIComponent(params.id)}`
+    const body = toWireUpdateDeploymentRequest(params)
+    return this.core.request('PATCH', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Update DNS domain record
+   *
+   * @see https://community.exoscale.com/product/networking/dns/overview/ Read more
+   */
+  updateDNSDomainRecord(params: UpdateDNSDomainRecordRequest): Promise<Operation> {
+    const path = `/dns-domain/${encodeURIComponent(params.domainID)}/record/${encodeURIComponent(params.recordID)}`
+    const body = toWireUpdateDNSDomainRecordRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Update an Elastic IP
+   *
+   * @see https://community.exoscale.com/product/networking/eip/ Read more
+   */
+  updateElasticIP(params: UpdateElasticIPRequest): Promise<Operation> {
+    const path = `/elastic-ip/${encodeURIComponent(params.id)}`
+    const body = toWireUpdateElasticIPRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Update IAM Organization Policy
+   *
+   * @see https://community.exoscale.com/product/iam/operation/roles-policies/ Read more
+   */
+  updateIAMOrganizationPolicy(params: IAMPolicy): Promise<Operation> {
+    const body = toWireIAMPolicy(params)
+    return this.core.request('PUT', '/iam-organization-policy', { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Update IAM Role
+   *
+   * @see https://community.exoscale.com/product/iam/operation/role-mgmt/ Read more
+   */
+  updateIAMRole(params: UpdateIAMRoleRequest): Promise<Operation> {
+    const path = `/iam-role/${encodeURIComponent(params.id)}`
+    const body = toWireUpdateIAMRoleRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Update IAM Role Policy
+   *
+   * @see https://community.exoscale.com/product/iam/operation/role-mgmt/ Read more
+   */
+  updateIAMRolePolicy(
+    params: IAMPolicy & {
+      id: string
+    },
+  ): Promise<Operation> {
+    const path = `/iam-role/${encodeURIComponent(params.id)}:policy`
+    const body = toWireIAMPolicy(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Update a Compute instance
+   *
+   * @see https://www.exoscale.com/compute/ Read more
+   */
+  updateInstance(params: UpdateInstanceRequest): Promise<Operation> {
+    const path = `/instance/${encodeURIComponent(params.id)}`
+    const body = toWireUpdateInstanceRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Update an Instance Pool
+   *
+   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
+   */
+  updateInstancePool(params: UpdateInstancePoolRequest): Promise<Operation> {
+    const path = `/instance-pool/${encodeURIComponent(params.id)}`
+    const body = toWireUpdateInstancePoolRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Update a Load Balancer
+   *
+   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
+   */
+  updateLoadBalancer(params: UpdateLoadBalancerRequest): Promise<Operation> {
+    const path = `/load-balancer/${encodeURIComponent(params.id)}`
+    const body = toWireUpdateLoadBalancerRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Update a Load Balancer Service
+   *
+   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
+   */
+  updateLoadBalancerService(params: UpdateLoadBalancerServiceRequest): Promise<Operation> {
+    const path = `/load-balancer/${encodeURIComponent(params.id)}/service/${encodeURIComponent(params.serviceID)}`
+    const body = toWireUpdateLoadBalancerServiceRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Update a Private Network
+   *
+   * @see https://community.exoscale.com/product/networking/private-network/ Read more
+   */
+  updatePrivateNetwork(params: UpdatePrivateNetworkRequest): Promise<Operation> {
+    const path = `/private-network/${encodeURIComponent(params.id)}`
+    const body = toWireUpdatePrivateNetworkRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Update the IP address of an instance attached to a managed private network
+   *
+   * @see https://community.exoscale.com/product/networking/private-network/ Read more
+   */
+  updatePrivateNetworkInstanceIP(
+    params: UpdatePrivateNetworkInstanceIPRequest,
+  ): Promise<Operation> {
+    const path = `/private-network/${encodeURIComponent(params.id)}:update-ip`
+    const body = toWireUpdatePrivateNetworkInstanceIPRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Update/Create the PTR DNS record for an elastic IP
+   *
+   * @see https://community.exoscale.com/product/compute/instances/ Read more
+   */
+  updateReverseDNSElasticIP(params: UpdateReverseDNSElasticIPRequest): Promise<Operation> {
+    const path = `/reverse-dns/elastic-ip/${encodeURIComponent(params.id)}`
+    const body = toWireUpdateReverseDNSElasticIPRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Update/Create the PTR DNS record for an instance
+   *
+   * @see https://community.exoscale.com/product/compute/instances/ Read more
+   */
+  updateReverseDNSInstance(params: UpdateReverseDNSInstanceRequest): Promise<Operation> {
+    const path = `/reverse-dns/instance/${encodeURIComponent(params.id)}`
+    const body = toWireUpdateReverseDNSInstanceRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Update an SKS cluster
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
+   */
+  updateSKSCluster(params: UpdateSKSClusterRequest): Promise<Operation> {
+    const path = `/sks-cluster/${encodeURIComponent(params.id)}`
+    const body = toWireUpdateSKSClusterRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Update an SKS Nodepool
+   *
+   * @see https://community.exoscale.com/documentation/sks/ Read more
+   */
+  updateSKSNodepool(params: UpdateSKSNodepoolRequest): Promise<Operation> {
+    const path = `/sks-cluster/${encodeURIComponent(params.id)}/nodepool/${encodeURIComponent(params.sksNodepoolID)}`
+    const body = toWireUpdateSKSNodepoolRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * [BETA] Update a Subnet
+   *
+   * @see https://community.exoscale.com/product/networking/vpc Read more
+   */
+  updateSubnet(params: UpdateSubnetRequest): Promise<Subnet> {
+    const path = `/vpc/${encodeURIComponent(params.vpcID)}/subnet/${encodeURIComponent(params.id)}`
+    const body = toWireUpdateSubnetRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireSubnet })
+  }
+
+  /**
+   * Update template attributes
+   *
+   * @see https://www.exoscale.com/templates/ Read more
+   */
+  updateTemplate(params: UpdateTemplateRequest): Promise<Operation> {
+    const path = `/template/${encodeURIComponent(params.id)}`
+    const body = toWireUpdateTemplateRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Update a User's IAM role
+   *
+   * @see https://community.exoscale.com/product/iam/operation/users-keys/ Read more
+   */
+  updateUserRole(params: UpdateUserRoleRequest): Promise<Operation> {
+    const path = `/user/${encodeURIComponent(params.id)}`
+    const body = toWireUpdateUserRoleRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * [BETA] Update a VPC
+   *
+   * @see https://community.exoscale.com/product/networking/vpc Read more
+   */
+  updateVpc(params: UpdateVpcRequest): Promise<Vpc> {
+    const path = `/vpc/${encodeURIComponent(params.id)}`
+    const body = toWireUpdateVpcRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireVpc })
+  }
+
+  /**
    * Upgrade an SKS cluster
    *
    * @see https://community.exoscale.com/documentation/sks/ Read more
@@ -12043,420 +12458,5 @@ export abstract class GeneratedExoscaleClient {
   upgradeSKSClusterServiceLevel(params: UpgradeSKSClusterServiceLevelRequest): Promise<Operation> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}/upgrade-service-level`
     return this.core.request('PUT', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Get the active template for a given kube version and variant (standard | nvidia)
-   *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
-   */
-  getActiveNodepoolTemplate(
-    params: GetActiveNodepoolTemplateRequest,
-  ): Promise<GetActiveNodepoolTemplateResponse> {
-    const path = `/sks-template/${encodeURIComponent(params.kubeVersion)}/${encodeURIComponent(params.variant)}`
-    return this.core.request('GET', path, { decode: fromWireGetActiveNodepoolTemplateResponse })
-  }
-
-  /**
-   * List Snapshots
-   *
-   * @see https://community.exoscale.com/documentation/compute/snapshots/ Read more
-   */
-  listSnapshots(): Promise<ListSnapshotsResponse> {
-    return this.core.request('GET', '/snapshot', { decode: fromWireListSnapshotsResponse })
-  }
-
-  /**
-   * Delete a Snapshot
-   *
-   * @see https://community.exoscale.com/documentation/compute/snapshots/ Read more
-   */
-  deleteSnapshot(params: DeleteSnapshotRequest): Promise<Operation> {
-    const path = `/snapshot/${encodeURIComponent(params.id)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Retrieve Snapshot details
-   *
-   * @see https://community.exoscale.com/documentation/compute/snapshots/ Read more
-   */
-  getSnapshot(params: GetSnapshotRequest): Promise<Snapshot> {
-    const path = `/snapshot/${encodeURIComponent(params.id)}`
-    return this.core.request('GET', path, { decode: fromWireSnapshot })
-  }
-
-  /**
-   * Export a Snapshot
-   *
-   * @see https://community.exoscale.com/documentation/compute/snapshots/ Read more
-   */
-  exportSnapshot(params: ExportSnapshotRequest): Promise<Operation> {
-    const path = `/snapshot/${encodeURIComponent(params.id)}:export`
-    return this.core.request('POST', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Promote a Snapshot to a Template
-   *
-   * @see https://community.exoscale.com/documentation/compute/snapshots/ Read more
-   * @see https://www.exoscale.com/templates/ Read more
-   */
-  promoteSnapshotToTemplate(params: PromoteSnapshotToTemplateRequest): Promise<Operation> {
-    const path = `/snapshot/${encodeURIComponent(params.id)}:promote`
-    const body = toWirePromoteSnapshotToTemplateRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * List SOS Buckets Usage
-   *
-   * @see https://community.exoscale.com/product/storage/object-storage/ Read more
-   */
-  listSOSBucketsUsage(): Promise<ListSOSBucketsUsageResponse> {
-    return this.core.request('GET', '/sos-buckets-usage', {
-      decode: fromWireListSOSBucketsUsageResponse,
-    })
-  }
-
-  /**
-   * Generates Presigned Download URL for SOS object
-   *
-   * @see https://community.exoscale.com/product/storage/object-storage/ Read more
-   */
-  getSOSPresignedURL(params: GetSOSPresignedURLRequest): Promise<GetSOSPresignedURLResponse> {
-    const path = `/sos/${encodeURIComponent(params.bucket)}/presigned-url`
-    const query: Record<string, string> = {}
-    if (params.key !== undefined) query['key'] = params.key
-    return this.core.request('GET', path, { query, decode: fromWireGetSOSPresignedURLResponse })
-  }
-
-  /**
-   * List SSH keys
-   *
-   * @see https://community.exoscale.com/documentation/compute/ssh-keypairs/ Read more
-   */
-  listSSHKeys(): Promise<ListSSHKeysResponse> {
-    return this.core.request('GET', '/ssh-key', { decode: fromWireListSSHKeysResponse })
-  }
-
-  /**
-   * Import SSH key
-   *
-   * @see https://community.exoscale.com/documentation/compute/ssh-keypairs/ Read more
-   */
-  registerSSHKey(params: RegisterSSHKeyRequest): Promise<Operation> {
-    const body = toWireRegisterSSHKeyRequest(params)
-    return this.core.request('POST', '/ssh-key', { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Delete a SSH key
-   *
-   * @see https://community.exoscale.com/documentation/compute/ssh-keypairs/ Read more
-   */
-  deleteSSHKey(params: DeleteSSHKeyRequest): Promise<Operation> {
-    const path = `/ssh-key/${encodeURIComponent(params.name)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Retrieve SSH key details
-   *
-   * @see https://community.exoscale.com/documentation/compute/ssh-keypairs/ Read more
-   */
-  getSSHKey(params: GetSSHKeyRequest): Promise<SSHKey> {
-    const path = `/ssh-key/${encodeURIComponent(params.name)}`
-    return this.core.request('GET', path, { decode: fromWireSSHKey })
-  }
-
-  /**
-   * List Templates
-   *
-   * @see https://www.exoscale.com/templates/ Read more
-   */
-  listTemplates(params?: ListTemplatesRequest): Promise<ListTemplatesResponse> {
-    const query: Record<string, string> = {}
-    if (params?.family !== undefined) query['family'] = params?.family
-    if (params?.visibility !== undefined) query['visibility'] = params?.visibility
-    return this.core.request('GET', '/template', { query, decode: fromWireListTemplatesResponse })
-  }
-
-  /**
-   * Register a Template
-   *
-   * @see https://www.exoscale.com/templates/ Read more
-   */
-  registerTemplate(params: RegisterTemplateRequest): Promise<Operation> {
-    const body = toWireRegisterTemplateRequest(params)
-    return this.core.request('POST', '/template', { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Delete a Template
-   *
-   * @see https://www.exoscale.com/templates/ Read more
-   */
-  deleteTemplate(params: DeleteTemplateRequest): Promise<Operation> {
-    const path = `/template/${encodeURIComponent(params.id)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Retrieve Template details
-   *
-   * @see https://www.exoscale.com/templates/ Read more
-   */
-  getTemplate(params: GetTemplateRequest): Promise<Template> {
-    const path = `/template/${encodeURIComponent(params.id)}`
-    return this.core.request('GET', path, { decode: fromWireTemplate })
-  }
-
-  /**
-   * Copy a Template from a zone to another
-   *
-   * @see https://www.exoscale.com/templates/ Read more
-   */
-  copyTemplate(params: CopyTemplateRequest): Promise<Operation> {
-    const path = `/template/${encodeURIComponent(params.id)}`
-    const body = toWireCopyTemplateRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Update template attributes
-   *
-   * @see https://www.exoscale.com/templates/ Read more
-   */
-  updateTemplate(params: UpdateTemplateRequest): Promise<Operation> {
-    const path = `/template/${encodeURIComponent(params.id)}`
-    const body = toWireUpdateTemplateRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Returns aggregated usage reports for an organization
-   */
-  getUsageReport(params?: GetUsageReportRequest): Promise<GetUsageReportResponse> {
-    const query: Record<string, string> = {}
-    if (params?.period !== undefined) query['period'] = params?.period
-    return this.core.request('GET', '/usage-report', {
-      query,
-      decode: fromWireGetUsageReportResponse,
-    })
-  }
-
-  /**
-   * List Users
-   *
-   * @see https://community.exoscale.com/product/iam/operation/users-keys/ Read more
-   */
-  listUsers(): Promise<ListUsersResponse> {
-    return this.core.request('GET', '/user', { decode: fromWireListUsersResponse })
-  }
-
-  /**
-   * Create a User
-   *
-   * @see https://community.exoscale.com/product/iam/operation/users-keys/ Read more
-   */
-  createUser(params: CreateUserRequest): Promise<Operation> {
-    const body = toWireCreateUserRequest(params)
-    return this.core.request('POST', '/user', { body, decode: fromWireOperation })
-  }
-
-  /**
-   * Delete User
-   *
-   * @see https://community.exoscale.com/product/iam/operation/users-keys/ Read more
-   */
-  deleteUser(params: DeleteUserRequest): Promise<Operation> {
-    const path = `/user/${encodeURIComponent(params.id)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
-  }
-
-  /**
-   * Update a User's IAM role
-   *
-   * @see https://community.exoscale.com/product/iam/operation/users-keys/ Read more
-   */
-  updateUserRole(params: UpdateUserRoleRequest): Promise<Operation> {
-    const path = `/user/${encodeURIComponent(params.id)}`
-    const body = toWireUpdateUserRoleRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * [BETA] List VPCs
-   *
-   * @see https://community.exoscale.com/product/networking/vpc Read more
-   */
-  listVpcs(): Promise<ListVpcsResponse> {
-    return this.core.request('GET', '/vpc', { decode: fromWireListVpcsResponse })
-  }
-
-  /**
-   * [BETA] Create a VPC
-   *
-   * @see https://community.exoscale.com/product/networking/vpc Read more
-   */
-  createVpc(params: CreateVpcRequest): Promise<Operation> {
-    const body = toWireCreateVpcRequest(params)
-    return this.core.request('POST', '/vpc', { body, decode: fromWireOperation })
-  }
-
-  /**
-   * [BETA] Delete a VPC
-   *
-   * @see https://community.exoscale.com/product/networking/vpc Read more
-   */
-  deleteVpc(params: DeleteVpcRequest): Promise<void> {
-    const path = `/vpc/${encodeURIComponent(params.id)}`
-    return this.core.request('DELETE', path)
-  }
-
-  /**
-   * [BETA] Retrieve VPC details
-   *
-   * @see https://community.exoscale.com/product/networking/vpc Read more
-   */
-  getVpc(params: GetVpcRequest): Promise<Vpc> {
-    const path = `/vpc/${encodeURIComponent(params.id)}`
-    return this.core.request('GET', path, { decode: fromWireVpc })
-  }
-
-  /**
-   * [BETA] Update a VPC
-   *
-   * @see https://community.exoscale.com/product/networking/vpc Read more
-   */
-  updateVpc(params: UpdateVpcRequest): Promise<Vpc> {
-    const path = `/vpc/${encodeURIComponent(params.id)}`
-    const body = toWireUpdateVpcRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireVpc })
-  }
-
-  /**
-   * [BETA] List VPC routes
-   *
-   * @see https://community.exoscale.com/product/networking/vpc Read more
-   */
-  listVpcRoutes(params: ListVpcRoutesRequest): Promise<ListVpcRoutesResponse> {
-    const path = `/vpc/${encodeURIComponent(params.vpcID)}/route`
-    return this.core.request('GET', path, { decode: fromWireListVpcRoutesResponse })
-  }
-
-  /**
-   * [BETA] List Subnets
-   *
-   * @see https://community.exoscale.com/product/networking/vpc Read more
-   */
-  listSubnets(params: ListSubnetsRequest): Promise<ListSubnetsResponse> {
-    const path = `/vpc/${encodeURIComponent(params.vpcID)}/subnet`
-    return this.core.request('GET', path, { decode: fromWireListSubnetsResponse })
-  }
-
-  /**
-   * [BETA] Create a Subnet
-   *
-   * @see https://community.exoscale.com/product/networking/vpc Read more
-   */
-  createSubnet(params: CreateSubnetRequest): Promise<Operation> {
-    const path = `/vpc/${encodeURIComponent(params.vpcID)}/subnet`
-    const body = toWireCreateSubnetRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * [BETA] Delete a Subnet
-   *
-   * @see https://community.exoscale.com/product/networking/vpc Read more
-   */
-  deleteSubnet(params: DeleteSubnetRequest): Promise<void> {
-    const path = `/vpc/${encodeURIComponent(params.vpcID)}/subnet/${encodeURIComponent(params.id)}`
-    return this.core.request('DELETE', path)
-  }
-
-  /**
-   * [BETA] Retrieve Subnet details
-   *
-   * @see https://community.exoscale.com/product/networking/vpc Read more
-   */
-  getSubnet(params: GetSubnetRequest): Promise<Subnet> {
-    const path = `/vpc/${encodeURIComponent(params.vpcID)}/subnet/${encodeURIComponent(params.id)}`
-    return this.core.request('GET', path, { decode: fromWireSubnet })
-  }
-
-  /**
-   * [BETA] Update a Subnet
-   *
-   * @see https://community.exoscale.com/product/networking/vpc Read more
-   */
-  updateSubnet(params: UpdateSubnetRequest): Promise<Subnet> {
-    const path = `/vpc/${encodeURIComponent(params.vpcID)}/subnet/${encodeURIComponent(params.id)}`
-    const body = toWireUpdateSubnetRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireSubnet })
-  }
-
-  /**
-   * [BETA] Attach a Compute instance to a Subnet
-   *
-   * @see https://community.exoscale.com/product/networking/vpc Read more
-   */
-  attachInstanceToSubnet(params: AttachInstanceToSubnetRequest): Promise<Operation> {
-    const path = `/vpc/${encodeURIComponent(params.vpcID)}/subnet/${encodeURIComponent(params.subnetID)}/attach`
-    const body = toWireAttachInstanceToSubnetRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * [BETA] Detach a Compute instance from a Subnet
-   *
-   * @see https://community.exoscale.com/product/networking/vpc Read more
-   */
-  detachInstanceFromSubnet(params: DetachInstanceFromSubnetRequest): Promise<Operation> {
-    const path = `/vpc/${encodeURIComponent(params.vpcID)}/subnet/${encodeURIComponent(params.subnetID)}/detach`
-    const body = toWireDetachInstanceFromSubnetRequest(params)
-    return this.core.request('PUT', path, { body, decode: fromWireOperation })
-  }
-
-  /**
-   * [BETA] List Subnet routes
-   *
-   * @see https://community.exoscale.com/product/networking/vpc Read more
-   */
-  listRoutes(params: ListRoutesRequest): Promise<ListRoutesResponse> {
-    const path = `/vpc/${encodeURIComponent(params.vpcID)}/subnet/${encodeURIComponent(params.subnetID)}/route`
-    return this.core.request('GET', path, { decode: fromWireListRoutesResponse })
-  }
-
-  /**
-   * [BETA] Create a route
-   *
-   * @see https://community.exoscale.com/product/networking/vpc Read more
-   */
-  createRoute(params: CreateRouteRequest): Promise<Route> {
-    const path = `/vpc/${encodeURIComponent(params.vpcID)}/subnet/${encodeURIComponent(params.subnetID)}/route`
-    const body = toWireCreateRouteRequest(params)
-    return this.core.request('POST', path, { body, decode: fromWireRoute })
-  }
-
-  /**
-   * [BETA] Delete a route
-   *
-   * @see https://community.exoscale.com/product/networking/vpc Read more
-   */
-  deleteRoute(params: DeleteRouteRequest): Promise<void> {
-    const path = `/vpc/${encodeURIComponent(params.vpcID)}/subnet/${encodeURIComponent(params.subnetID)}/route/${encodeURIComponent(params.id)}`
-    return this.core.request('DELETE', path)
-  }
-
-  /**
-   * List Zones
-   *
-   * @see https://www.exoscale.com/datacenters/ Read more
-   */
-  listZones(): Promise<ListZonesResponse> {
-    return this.core.request('GET', '/zone', { decode: fromWireListZonesResponse, skipAuth: true })
   }
 }

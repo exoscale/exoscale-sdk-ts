@@ -1,6 +1,7 @@
 // Generates src/generated/operations.ts: one flat method per OpenAPI
-// operationId on GeneratedExoscaleClient, with all parameters (path, query,
-// body) merged into a single params object argument.
+// operationId on GeneratedExoscaleClient, ordered alphabetically by
+// operationId, with all parameters (path, query, body) merged into a single
+// params object argument.
 //
 // Request type rules (collision-free):
 //   - inline body          -> generated <Op>Request interface (params merged in)
@@ -70,9 +71,13 @@ export function generateOperations(spec: Spec, registry: TypeRegistry): string {
   const usedWireFns = new Set<string>()
   let usesIso = false
 
-  const ops = spec.operations.map((op) =>
-    renderOperation(op, spec, registry, usedTypes, usedWireFns, () => (usesIso = true)),
-  )
+  // Flat order by operationId: deterministic and independent of the spec's
+  // path ordering.
+  const ops = [...spec.operations]
+    .sort((a, b) => (a.operationId < b.operationId ? -1 : 1))
+    .map((op) =>
+      renderOperation(op, spec, registry, usedTypes, usedWireFns, () => (usesIso = true)),
+    )
 
   const imports: string[] = []
   const wireFns = [...usedWireFns].sort()

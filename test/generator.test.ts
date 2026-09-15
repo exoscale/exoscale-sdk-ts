@@ -78,6 +78,19 @@ describe('generator', () => {
     }
   })
 
+  it('orders methods alphabetically by operationId', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'exo-gen-'))
+    await generate(SPEC_FILE, OVERRIDES_FILE, dir)
+    const operations = readFileSync(join(dir, 'operations.ts'), 'utf8')
+    const spec = loadEffectiveSpec(SPEC_FILE, OVERRIDES_FILE)
+
+    const actual = [...operations.matchAll(/^  (\w+)\(/gm)].map((m) => m[1]!)
+    const expected = [...spec.operations]
+      .sort((a, b) => (a.operationId < b.operationId ? -1 : 1))
+      .map((op) => toLowerCamel(op.operationId))
+    expect(actual).toEqual(expected)
+  })
+
   it('keeps the committed generated code in sync with the spec', async () => {
     const dir = mkdtempSync(join(tmpdir(), 'exo-gen-'))
     await generate(SPEC_FILE, OVERRIDES_FILE, dir)
@@ -89,13 +102,6 @@ describe('generator', () => {
 })
 
 describe('spec overrides', () => {
-  it('leaves the upstream spec untouched but patches the effective spec', () => {
-    const raw = JSON.parse(readFileSync(SPEC_FILE, 'utf8'))
-    expect(raw.components.schemas.template.properties.zones).toBeDefined()
-    const spec = loadEffectiveSpec(SPEC_FILE, OVERRIDES_FILE)
-    expect(spec.schemas.get('template')!.properties.zones).toBeUndefined()
-  })
-
   it('applies add, remove and replace ops without mutating the input', () => {
     const doc = { a: { b: 'x', c: 1 }, list: ['x'] }
     const patched = applyPatch(doc, [

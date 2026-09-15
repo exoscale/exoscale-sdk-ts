@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { mkdtempSync, readFileSync } from 'node:fs'
+import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -20,6 +20,37 @@ describe('generator', () => {
     await generate(SPEC_FILE, OVERRIDES_FILE, dir2)
     for (const name of ['schemas.ts', 'operations.ts']) {
       expect(readFileSync(join(dir1, name), 'utf8')).toBe(readFileSync(join(dir2, name), 'utf8'))
+    }
+  })
+
+  it('output is invariant to spec serialization order', async () => {
+    const raw = JSON.parse(readFileSync(SPEC_FILE, 'utf8'))
+    // Arrays under these keys are structural (their order must not matter);
+    // other arrays (e.g. examples) are content and keep their order.
+    const STRUCTURAL = new Set(['parameters', 'enum', 'required', 'tags', 'type'])
+    const shuffle = (v: any, key: string | undefined): any => {
+      if (Array.isArray(v)) {
+        const items = v.map((x) => shuffle(x, key))
+        return STRUCTURAL.has(key ?? '') ? items.reverse() : items
+      }
+      if (v !== null && typeof v === 'object') {
+        const out: Record<string, any> = {}
+        for (const k of Object.keys(v).reverse()) out[k] = shuffle(v[k], k)
+        return out
+      }
+      return v
+    }
+
+    const dir = mkdtempSync(join(tmpdir(), 'exo-gen-'))
+    const shuffledFile = join(dir, 'shuffled.json')
+    writeFileSync(shuffledFile, JSON.stringify(shuffle(raw, undefined)))
+
+    const dirA = mkdtempSync(join(tmpdir(), 'exo-gen-'))
+    const dirB = mkdtempSync(join(tmpdir(), 'exo-gen-'))
+    await generate(SPEC_FILE, OVERRIDES_FILE, dirA)
+    await generate(shuffledFile, OVERRIDES_FILE, dirB)
+    for (const name of ['schemas.ts', 'operations.ts']) {
+      expect(readFileSync(join(dirA, name), 'utf8')).toBe(readFileSync(join(dirB, name), 'utf8'))
     }
   })
 

@@ -263,8 +263,11 @@ function renderOperation(
   const funcName = toLowerCamel(op.operationId)
   const doc = operationDoc(op, spec)
 
-  const pathParams = op.parameters.filter((p) => p.in === 'path')
-  const queryParams = op.parameters.filter((p) => p.in === 'query')
+  // Path params first, then query params, each sorted by name: the output must
+  // not depend on the spec's ordering of the parameters array.
+  const byName = (a: Parameter, b: Parameter) => (a.name < b.name ? -1 : 1)
+  const pathParams = op.parameters.filter((p) => p.in === 'path').sort(byName)
+  const queryParams = op.parameters.filter((p) => p.in === 'query').sort(byName)
   const hasParams = pathParams.length > 0 || queryParams.length > 0
 
   const params = new Map<string, ParamInfo>()
@@ -353,7 +356,7 @@ function renderOperation(
     bodyToWire = `toWire${ref}(params)`
     usedWireFns.add(`toWire${ref}`)
     if (hasParams) {
-      const extra = op.parameters
+      const extra = [...pathParams, ...queryParams]
         .map((p) => {
           const info = params.get(p.name)!
           return `${info.doc ? `${info.doc}\n      ` : ''}${info.tsName}${p.in === 'path' ? '' : '?'}: ${info.typeExpr}`
@@ -367,7 +370,7 @@ function renderOperation(
   } else if (hasParams) {
     const name = `${typeName}Request`
     registry.declareObject(name)
-    const fields: ReqField[] = op.parameters.map((p) => {
+    const fields: ReqField[] = [...pathParams, ...queryParams].map((p) => {
       const info = params.get(p.name)!
       return {
         wireName: p.name,

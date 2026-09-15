@@ -39,7 +39,7 @@ export interface AccessKey {
   /**
    * IAM Access Key version
    */
-  version?: 'v2' | 'v1'
+  version?: 'v1' | 'v2'
 }
 
 /** @internal */
@@ -116,7 +116,7 @@ export interface AccessKeyResource {
   /**
    * Resource type
    */
-  resourceType?: 'product' | 'bucket'
+  resourceType?: 'bucket' | 'product'
 }
 
 /** @internal */
@@ -375,14 +375,14 @@ export interface BlockStorageSnapshot {
    * Read-only
    */
   state?:
-    | 'partially-destroyed'
-    | 'destroying'
-    | 'creating'
-    | 'created'
-    | 'promoting'
-    | 'error'
-    | 'destroyed'
     | 'allocated'
+    | 'created'
+    | 'creating'
+    | 'destroyed'
+    | 'destroying'
+    | 'error'
+    | 'partially-destroyed'
+    | 'promoting'
   /**
    * Original Volume size
    *
@@ -503,15 +503,15 @@ export interface BlockStorageVolume {
    * Read-only
    */
   state?:
-    | 'snapshotting'
-    | 'deleted'
-    | 'creating'
-    | 'detached'
-    | 'deleting'
-    | 'attaching'
-    | 'error'
     | 'attached'
+    | 'attaching'
+    | 'creating'
+    | 'deleted'
+    | 'deleting'
+    | 'detached'
     | 'detaching'
+    | 'error'
+    | 'snapshotting'
 }
 
 /** @internal */
@@ -816,7 +816,7 @@ export interface CreateKmsKeyResponse {
   originZone: string
   revision: RevisionStamp
   source: 'exoscale-kms'
-  status: 'enabled' | 'disabled' | 'pending-deletion'
+  status: 'disabled' | 'enabled' | 'pending-deletion'
   /**
    * The timestamp indicating exactly when the current key status was last transitioned.
    */
@@ -3627,11 +3627,11 @@ export interface DBAASNodeState {
   /**
    * Role of this node. Only returned for a subset of service types
    */
-  role?: 'standby' | 'master' | 'read-replica'
+  role?: 'master' | 'read-replica' | 'standby'
   /**
    * Current state of the service node
    */
-  state: 'leaving' | 'running' | 'syncing_data' | 'setting_up_vm' | 'unknown'
+  state: 'leaving' | 'running' | 'setting_up_vm' | 'syncing_data' | 'unknown'
 }
 
 /** @internal */
@@ -3687,7 +3687,7 @@ export interface DBAASNodeStateProgressUpdate {
   /**
    * Key identifying this phase
    */
-  phase: 'stream' | 'basebackup' | 'prepare' | 'finalize'
+  phase: 'basebackup' | 'finalize' | 'prepare' | 'stream'
   /**
    * Unit for current/min/max values. New units may be added.
    *                         If null should be treated as generic unit
@@ -3835,7 +3835,7 @@ export type DBAASPGPoolSize = number
  */
 export type DBAASPGPoolUsername = string
 
-export type DBAASPGTargetVersions = '14' | '17' | '15' | '18' | '13' | '16'
+export type DBAASPGTargetVersions = '13' | '14' | '15' | '16' | '17' | '18'
 
 /**
  * DBaaS plan
@@ -4478,7 +4478,7 @@ export interface DBAASServiceComponents {
   /**
    * Network access route
    */
-  route: 'dynamic' | 'private' | 'public' | 'privatelink'
+  route: 'dynamic' | 'private' | 'privatelink' | 'public'
   /**
    * Whether the endpoint is encrypted or accepts plaintext.
    *                                            By default endpoints are always encrypted and
@@ -5358,7 +5358,7 @@ export interface DBAASServiceMaintenance {
   /**
    * Day of week for installing updates
    */
-  dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
+  dow: 'friday' | 'monday' | 'never' | 'saturday' | 'sunday' | 'thursday' | 'tuesday' | 'wednesday'
   /**
    * Time for installing updates, UTC
    *
@@ -5791,7 +5791,7 @@ export interface DBAASServiceNotification {
   /**
    * Notification level
    */
-  level: 'warning' | 'notice'
+  level: 'notice' | 'warning'
   /**
    * Human notification message
    *
@@ -5805,7 +5805,7 @@ export interface DBAASServiceNotification {
   /**
    * Notification type
    */
-  type: 'service_powered_off_removal' | 'service_end_of_life'
+  type: 'service_end_of_life' | 'service_powered_off_removal'
 }
 
 /** @internal */
@@ -8235,7 +8235,7 @@ export interface DeployTarget {
   /**
    * Deploy Target type
    */
-  type?: 'edge' | 'dedicated'
+  type?: 'dedicated' | 'edge'
 }
 
 /** @internal */
@@ -8390,22 +8390,22 @@ export interface DNSDomainRecord {
    * DNS domain record type
    */
   type?:
-    | 'NS'
-    | 'CAA'
-    | 'NAPTR'
-    | 'POOL'
     | 'A'
-    | 'HINFO'
-    | 'CNAME'
-    | 'SOA'
-    | 'SSHFP'
-    | 'SRV'
     | 'AAAA'
-    | 'MX'
-    | 'TXT'
     | 'ALIAS'
-    | 'URL'
+    | 'CAA'
+    | 'CNAME'
+    | 'HINFO'
+    | 'MX'
+    | 'NAPTR'
+    | 'NS'
+    | 'POOL'
+    | 'SOA'
     | 'SPF'
+    | 'SRV'
+    | 'SSHFP'
+    | 'TXT'
+    | 'URL'
   /**
    * DNS domain record update date
    *
@@ -8532,7 +8532,7 @@ export interface ElasticIPHealthcheck {
   /**
    * Health check mode
    */
-  mode: 'tcp' | 'http' | 'https'
+  mode: 'http' | 'https' | 'tcp'
   /**
    * Health check port
    *
@@ -8725,46 +8725,46 @@ export function fromWireEncryptResponse(w: any): EncryptResponse {
   return v
 }
 
-export type EnumComponentRoute = 'dynamic' | 'private' | 'public' | 'privatelink'
+export type EnumComponentRoute = 'dynamic' | 'private' | 'privatelink' | 'public'
 
 export type EnumComponentUsage = 'primary' | 'replica'
 
 export type EnumDatadogSite =
-  | 'us3.datadoghq.com'
-  | 'ddog-gov.com'
-  | 'datadoghq.eu'
-  | 'us5.datadoghq.com'
   | 'ap1.datadoghq.com'
   | 'datadoghq.com'
+  | 'datadoghq.eu'
+  | 'ddog-gov.com'
+  | 'us3.datadoghq.com'
+  | 'us5.datadoghq.com'
 
 export type EnumExternalEndpointTypes =
-  'prometheus' | 'opensearch' | 'rsyslog' | 'datadog' | 'elasticsearch'
+  'datadog' | 'elasticsearch' | 'opensearch' | 'prometheus' | 'rsyslog'
 
 export type EnumIntegrationTypes = 'datasource' | 'logs' | 'metrics'
 
 export type EnumKafkaAuthMethod = 'certificate' | 'sasl'
 
-export type EnumMasterLinkStatus = 'up' | 'down'
+export type EnumMasterLinkStatus = 'down' | 'up'
 
 export type EnumMigrationMethod = 'dump' | 'replication'
 
-export type EnumMigrationStatus = 'running' | 'syncing' | 'failed' | 'done'
+export type EnumMigrationStatus = 'done' | 'failed' | 'running' | 'syncing'
 
 export type EnumMysqlAuthenticationPlugin = 'caching_sha2_password' | 'mysql_native_password'
 
-export type EnumOpensearchRulePermission = 'admin' | 'read' | 'deny' | 'readwrite' | 'write'
+export type EnumOpensearchRulePermission = 'admin' | 'deny' | 'read' | 'readwrite' | 'write'
 
-export type EnumPGPoolMode = 'transaction' | 'statement' | 'session'
+export type EnumPGPoolMode = 'session' | 'statement' | 'transaction'
 
-export type EnumPGSynchronousReplication = 'quorum' | 'off'
+export type EnumPGSynchronousReplication = 'off' | 'quorum'
 
-export type EnumPGVariant = 'timescale' | 'aiven'
+export type EnumPGVariant = 'aiven' | 'timescale'
 
 export type EnumRsyslogFormat = 'custom' | 'rfc3164' | 'rfc5424'
 
-export type EnumServiceState = 'running' | 'rebuilding' | 'rebalancing' | 'poweroff'
+export type EnumServiceState = 'poweroff' | 'rebalancing' | 'rebuilding' | 'running'
 
-export type EnumSortOrder = 'desc' | 'asc'
+export type EnumSortOrder = 'asc' | 'desc'
 
 export interface EnvImpactDetail {
   /**
@@ -9362,7 +9362,7 @@ export interface GetDeploymentResponse {
   /**
    * Deployment state
    */
-  state: 'ready' | 'creating' | 'preparing' | 'error' | 'deploying' | 'scaling' | 'updating'
+  state: 'creating' | 'deploying' | 'error' | 'preparing' | 'ready' | 'scaling' | 'updating'
   /**
    * Deployment state details
    */
@@ -9376,7 +9376,7 @@ export interface GetDeploymentResponse {
   /**
    * Deployment visibility: private for your organization's deployments, public for Exoscale Managed Inference deployments.
    */
-  visibility: 'public' | 'private'
+  visibility: 'private' | 'public'
 }
 
 /** @internal */
@@ -9487,7 +9487,7 @@ export interface GetKmsKeyResponse {
   revision: RevisionStamp
   rotation: KeyRotationConfig
   source: 'exoscale-kms'
-  status: 'enabled' | 'disabled' | 'pending-deletion'
+  status: 'disabled' | 'enabled' | 'pending-deletion'
   /**
    * The timestamp indicating exactly when the current key status was last transitioned.
    */
@@ -9575,7 +9575,7 @@ export interface GetModelResponse {
   /**
    * Model state
    */
-  state: 'ready' | 'creating' | 'downloading' | 'error' | 'created'
+  state: 'created' | 'creating' | 'downloading' | 'error' | 'ready'
   /**
    * Update time
    *
@@ -9875,7 +9875,7 @@ export function fromWireIAMRole(w: any): IAMRole {
 
 export interface IAMServicePolicy {
   rules?: IAMServicePolicyRule[]
-  type?: 'rules' | 'allow' | 'deny'
+  type?: 'allow' | 'deny' | 'rules'
 }
 
 /** @internal */
@@ -10669,7 +10669,7 @@ export interface InstancePool {
    * Read-only
    */
   state?:
-    'scaling-up' | 'scaling-down' | 'destroying' | 'creating' | 'suspended' | 'running' | 'updating'
+    'creating' | 'destroying' | 'running' | 'scaling-down' | 'scaling-up' | 'suspended' | 'updating'
   /**
    * Instances template
    */
@@ -10804,15 +10804,15 @@ export function fromWireInstanceRef(w: any): InstanceRef {
 }
 
 export type InstanceState =
-  | 'expunging'
-  | 'starting'
-  | 'destroying'
-  | 'running'
-  | 'stopping'
-  | 'stopped'
-  | 'migrating'
-  | 'error'
   | 'destroyed'
+  | 'destroying'
+  | 'error'
+  | 'expunging'
+  | 'migrating'
+  | 'running'
+  | 'starting'
+  | 'stopped'
+  | 'stopping'
 
 /**
  * Compute instance type
@@ -10836,19 +10836,19 @@ export interface InstanceType {
    * Read-only
    */
   family?:
-    | 'gpu3'
-    | 'gpua30'
-    | 'gpu3080ti'
-    | 'gpu2'
+    | 'colossus'
+    | 'cpu'
     | 'gpu'
-    | 'memory'
+    | 'gpu2'
+    | 'gpu3'
+    | 'gpu3080ti'
+    | 'gpua30'
     | 'gpua5000'
     | 'gpub300'
     | 'gpurtx6000pro'
-    | 'storage'
+    | 'memory'
     | 'standard'
-    | 'colossus'
-    | 'cpu'
+    | 'storage'
   /**
    * GPU count
    *
@@ -10873,18 +10873,18 @@ export interface InstanceType {
    * Read-only
    */
   size?:
-    | 'large'
+    | 'colossus'
+    | 'extra-large'
     | 'huge'
     | 'jumbo'
+    | 'large'
     | 'medium'
     | 'mega'
-    | 'small'
-    | 'extra-large'
-    | 'titan48c'
-    | 'titan'
     | 'micro'
-    | 'colossus'
+    | 'small'
     | 'tiny'
+    | 'titan'
+    | 'titan48c'
   /**
    * Instance Type available zones
    *
@@ -11632,7 +11632,7 @@ export interface JSONSchemaGrafanaSMTPServer {
    *
    * @example "NoStartTLS"
    */
-  starttlsPolicy?: 'OpportunisticStartTLS' | 'MandatoryStartTLS' | 'NoStartTLS'
+  starttlsPolicy?: 'MandatoryStartTLS' | 'NoStartTLS' | 'OpportunisticStartTLS'
   /**
    * Username for SMTP authentication
    *
@@ -11702,7 +11702,7 @@ export interface JSONSchemaGrafana {
    *
    * @example "ok"
    */
-  alertingNodataORNullvalues?: 'alerting' | 'no_data' | 'keep_state' | 'ok'
+  alertingNodataORNullvalues?: 'alerting' | 'keep_state' | 'no_data' | 'ok'
   /**
    * Allow embedding Grafana dashboards with iframe/frame/object/embed tags. Disabled by default to limit impact of clickjacking
    *
@@ -11740,7 +11740,7 @@ export interface JSONSchemaGrafana {
    *
    * @example "lax"
    */
-  cookieSamesite?: 'lax' | 'strict' | 'none'
+  cookieSamesite?: 'lax' | 'none' | 'strict'
   /**
    * Serve the web frontend using a custom CNAME pointing to the Aiven DNS name
    *
@@ -11848,7 +11848,7 @@ export interface JSONSchemaGrafana {
    *
    * @example "Viewer"
    */
-  userAutoAssignOrgRole?: 'Viewer' | 'Admin' | 'Editor'
+  userAutoAssignOrgRole?: 'Admin' | 'Editor' | 'Viewer'
   /**
    * Users with view-only permission can edit but not save dashboards
    *
@@ -12055,7 +12055,7 @@ export interface JSONSchemaKafka {
   /**
    * Specify the final compression type for a given topic. This configuration accepts the standard compression codecs ('gzip', 'snappy', 'lz4', 'zstd'). It additionally accepts 'uncompressed' which is equivalent to no compression; and 'producer' which means retain the original compression codec set by the producer.
    */
-  compressionType?: 'gzip' | 'snappy' | 'lz4' | 'zstd' | 'uncompressed' | 'producer'
+  compressionType?: 'gzip' | 'lz4' | 'producer' | 'snappy' | 'uncompressed' | 'zstd'
   /**
    * Idle connections timeout: the server socket processor threads close the connections that idle for longer than this.
    *
@@ -12482,7 +12482,7 @@ export interface JSONSchemaKafkaConnect {
   /**
    * Defines what client configurations can be overridden by the connector. Default is None
    */
-  connectorClientConfigOverridePolicy?: 'None' | 'All'
+  connectorClientConfigOverridePolicy?: 'All' | 'None'
   /**
    * What to do when there is no initial offset in Kafka or if the current offset does not exist any more on the server. Default is earliest
    */
@@ -12498,7 +12498,7 @@ export interface JSONSchemaKafkaConnect {
   /**
    * Transaction read isolation level. read_uncommitted is the default, but read_committed can be used if consume-exactly-once behavior is desired.
    */
-  consumerIsolationLevel?: 'read_uncommitted' | 'read_committed'
+  consumerIsolationLevel?: 'read_committed' | 'read_uncommitted'
   /**
    * Records are fetched in batches by the consumer.If the first record batch in the first non-empty partition of the fetch is larger than this limit, the batch will still be returned to ensure that the consumer can make progress.
    *
@@ -12558,7 +12558,7 @@ export interface JSONSchemaKafkaConnect {
   /**
    * Specify the default compression type for producers. This configuration accepts the standard compression codecs ('gzip', 'snappy', 'lz4', 'zstd'). It additionally accepts 'none' which is the default and equivalent to no compression.
    */
-  producerCompressionType?: 'gzip' | 'snappy' | 'lz4' | 'zstd' | 'none'
+  producerCompressionType?: 'gzip' | 'lz4' | 'none' | 'snappy' | 'zstd'
   /**
    * This setting gives the upper bound on the delay for batching: once there is batch.size worth of records for a partition it will be sent immediately regardless of this setting, however if there are fewer than this many bytes accumulated for this partition the producer will 'linger' for the specified time waiting for more records to show up. Defaults to 0.
    *
@@ -12688,7 +12688,7 @@ export interface JSONSchemaKafkaRest {
    *
    * @defaultValue "topic_name"
    */
-  nameStrategy?: 'topic_name' | 'record_name' | 'topic_record_name'
+  nameStrategy?: 'record_name' | 'topic_name' | 'topic_record_name'
   /**
    * If true, validate that given schema is registered under expected subject name by the used name strategy when producing messages.
    *
@@ -12704,7 +12704,7 @@ export interface JSONSchemaKafkaRest {
   /**
    * Specify the default compression type for producers. This configuration accepts the standard compression codecs ('gzip', 'snappy', 'lz4', 'zstd'). It additionally accepts 'none' which is the default and equivalent to no compression.
    */
-  producerCompressionType?: 'gzip' | 'snappy' | 'lz4' | 'zstd' | 'none'
+  producerCompressionType?: 'gzip' | 'lz4' | 'none' | 'snappy' | 'zstd'
   /**
    * Wait for up to the given delay to allow batching records together
    *
@@ -12918,7 +12918,7 @@ export interface JSONSchemaMysql {
    *
    * @example "TempTable"
    */
-  internalTmpMemStorageEngine?: 'TempTable' | 'MEMORY'
+  internalTmpMemStorageEngine?: 'MEMORY' | 'TempTable'
   /**
    * The slow log output destination when slow_query_log is ON. To enable MySQL AI Insights, choose INSIGHTS. To use MySQL AI Insights and the mysql.slow_log table at the same time, choose INSIGHTS,TABLE. To only use the mysql.slow_log table, choose TABLE. To silence slow logs, choose NONE.
    *
@@ -13734,7 +13734,7 @@ export interface JSONSchemaOpensearchSearchBackpressure {
   /**
    * The search backpressure mode. Valid values are monitor_only, enforced, or disabled. Default is monitor_only
    */
-  mode?: 'monitor_only' | 'enforced' | 'disabled'
+  mode?: 'disabled' | 'enforced' | 'monitor_only'
   /**
    * Node duress settings
    */
@@ -14674,7 +14674,7 @@ export interface JSONSchemaPG {
    *
    * @defaultValue "worker"
    */
-  ioMethod?: 'worker' | 'sync' | 'io_uring'
+  ioMethod?: 'io_uring' | 'sync' | 'worker'
   /**
    * EXPERIMENTAL: Number of IO worker processes, for io_method=worker. Version 18 and up only. Changing this parameter causes a service restart.
    *
@@ -14692,7 +14692,7 @@ export interface JSONSchemaPG {
   /**
    * Controls the amount of detail written in the server log for each message that is logged.
    */
-  logErrorVerbosity?: 'TERSE' | 'DEFAULT' | 'VERBOSE'
+  logErrorVerbosity?: 'DEFAULT' | 'TERSE' | 'VERBOSE'
   /**
    * Choose from one of the available log formats.
    */
@@ -14826,7 +14826,7 @@ export interface JSONSchemaPG {
   /**
    * Controls which statements are counted. Specify top to track top-level statements (those issued directly by clients), all to also track nested statements (such as statements invoked within functions), or none to disable statement statistics collection. The default is `top`.
    */
-  pgStatStatementsTrack?: 'all' | 'top' | 'none'
+  pgStatStatementsTrack?: 'all' | 'none' | 'top'
   /**
    * PostgreSQL temporary file limit in KiB, -1 for unlimited
    *
@@ -14860,7 +14860,7 @@ export interface JSONSchemaPG {
   /**
    * Enables tracking of function call counts and time used.
    */
-  trackFunctions?: 'all' | 'pl' | 'none'
+  trackFunctions?: 'all' | 'none' | 'pl'
   /**
    * Enables timing of database I/O calls. The default is `off`. When on, it will repeatedly query the operating system for the current time, which may cause significant overhead on some platforms.
    *
@@ -15032,7 +15032,7 @@ export interface JSONSchemaPgaudit {
    * @defaultValue "log"
    */
   logLevel?:
-    'debug1' | 'debug2' | 'debug3' | 'debug4' | 'debug5' | 'info' | 'notice' | 'warning' | 'log'
+    'debug1' | 'debug2' | 'debug3' | 'debug4' | 'debug5' | 'info' | 'log' | 'notice' | 'warning'
   /**
    * Crop parameters representation and whole statements if they exceed this threshold.
    * A (default) value of -1 disable the truncation.
@@ -15163,7 +15163,7 @@ export interface JSONSchemaPgbouncer {
    * @defaultValue "transaction"
    * @example "session"
    */
-  autodbPoolMode?: 'transaction' | 'session' | 'statement'
+  autodbPoolMode?: 'session' | 'statement' | 'transaction'
   /**
    * If non-zero then create automatically a pool of that size per user when a pool doesn't exist.
    *
@@ -15597,14 +15597,14 @@ export interface JSONSchemaValkey {
    * @defaultValue "noeviction"
    */
   maxmemoryPolicy?:
-    | 'noeviction'
+    | 'allkeys-lfu'
     | 'allkeys-lru'
-    | 'volatile-lru'
     | 'allkeys-random'
+    | 'noeviction'
+    | 'volatile-lfu'
+    | 'volatile-lru'
     | 'volatile-random'
     | 'volatile-ttl'
-    | 'volatile-lfu'
-    | 'allkeys-lfu'
     | null
   /**
    * Set notify-keyspace-events option
@@ -15802,7 +15802,7 @@ export type Labels = Record<string, string>
 /**
  * List of AI API keys
  *
- * @example {"ai-api-keys":[{"updated-at":"2026-03-25T10:00:00Z","name":"default-public-key","scope":"public","id":"11111111-1111-1111-1111-111111111111","org-uuid":"22222222-2222-2222-2222-222222222222","created-at":"2026-03-25T10:00:00Z"}]}
+ * @example {"ai-api-keys":[{"created-at":"2026-03-25T10:00:00Z","id":"11111111-1111-1111-1111-111111111111","name":"default-public-key","org-uuid":"22222222-2222-2222-2222-222222222222","scope":"public","updated-at":"2026-03-25T10:00:00Z"}]}
  */
 export interface ListAIAPIKeysResponse {
   aiAPIKeys: ListAIAPIKeysResponseEntry[]
@@ -15987,7 +15987,7 @@ export interface ListDeploymentsResponseEntry {
   /**
    * Deployment state
    */
-  state: 'ready' | 'creating' | 'preparing' | 'error' | 'deploying' | 'scaling' | 'updating'
+  state: 'creating' | 'deploying' | 'error' | 'preparing' | 'ready' | 'scaling' | 'updating'
   /**
    * Update time
    *
@@ -15997,7 +15997,7 @@ export interface ListDeploymentsResponseEntry {
   /**
    * Deployment visibility: private for your organization's deployments, public for Exoscale Managed Inference deployments.
    */
-  visibility: 'public' | 'private'
+  visibility: 'private' | 'public'
 }
 
 /** @internal */
@@ -16153,7 +16153,7 @@ export interface ListKmsKeysResponseEntry {
   revision: RevisionStamp
   rotation: KeyRotationConfig
   source: 'exoscale-kms'
-  status: 'enabled' | 'disabled' | 'pending-deletion'
+  status: 'disabled' | 'enabled' | 'pending-deletion'
   /**
    * The precise time when the key entered its current configuration phase.
    */
@@ -16260,7 +16260,7 @@ export interface ListModelsResponseEntry {
   /**
    * Model state
    */
-  state: 'ready' | 'creating' | 'downloading' | 'error' | 'created'
+  state: 'created' | 'creating' | 'downloading' | 'error' | 'ready'
   /**
    * Update time
    *
@@ -16354,7 +16354,7 @@ export interface ListSubnetEntry {
   /**
    * Subnet address family
    */
-  addressfamily?: 'inet4' | 'dual'
+  addressfamily?: 'dual' | 'inet4'
   /**
    * Subnet creation date
    */
@@ -16558,7 +16558,7 @@ export interface LoadBalancer {
    *
    * Read-only
    */
-  state?: 'creating' | 'migrated' | 'deleting' | 'running' | 'migrating' | 'error'
+  state?: 'creating' | 'deleting' | 'error' | 'migrated' | 'migrating' | 'running'
 }
 
 /** @internal */
@@ -16675,11 +16675,11 @@ export interface LoadBalancerService {
    *
    * Read-only
    */
-  state?: 'creating' | 'deleting' | 'running' | 'updating' | 'error'
+  state?: 'creating' | 'deleting' | 'error' | 'running' | 'updating'
   /**
    * Load balancing strategy
    */
-  strategy?: 'round-robin' | 'maglev-hash' | 'source-hash'
+  strategy?: 'maglev-hash' | 'round-robin' | 'source-hash'
   /**
    * Port on which the network traffic will be forwarded to on the receiving instance
    *
@@ -16741,7 +16741,7 @@ export interface LoadBalancerServiceHealthcheck {
   /**
    * Healthcheck mode
    */
-  mode?: 'tcp' | 'http' | 'https'
+  mode?: 'http' | 'https' | 'tcp'
   /**
    * Healthcheck port
    *
@@ -16813,7 +16813,7 @@ export interface Manager {
   /**
    * Manager type
    */
-  type?: 'sks-nodepool' | 'instance-pool'
+  type?: 'instance-pool' | 'sks-nodepool'
 }
 
 /** @internal */
@@ -16964,8 +16964,8 @@ export type NvidiaMigProfileB300269gb =
 
 export type NvidiaMigProfileRtxpro600096gb =
   | '1g.24gb'
-  | '1g.24gb+me'
   | '1g.24gb+gfx'
+  | '1g.24gb+me'
   | '1g.24gb+me.all'
   | '1g.24gb-me'
   | '2g.48gb'
@@ -17073,17 +17073,17 @@ export interface Operation {
    * Read-only
    */
   reason?:
-    | 'incorrect'
-    | 'unknown'
-    | 'unavailable'
-    | 'forbidden'
     | 'busy'
-    | 'fault'
-    | 'partial'
-    | 'not-found'
-    | 'interrupted'
-    | 'unsupported'
     | 'conflict'
+    | 'fault'
+    | 'forbidden'
+    | 'incorrect'
+    | 'interrupted'
+    | 'not-found'
+    | 'partial'
+    | 'unavailable'
+    | 'unknown'
+    | 'unsupported'
   /**
    * Related resource reference
    *
@@ -17488,7 +17488,7 @@ export function fromWirePrivateNetworkRef(w: any): PrivateNetworkRef {
   return v
 }
 
-export type PublicIPAssignment = 'inet4' | 'dual' | 'none'
+export type PublicIPAssignment = 'dual' | 'inet4' | 'none'
 
 /**
  * Organization Quota
@@ -18191,7 +18191,7 @@ export interface SecurityGroupRule {
   /**
    * Network flow direction to match
    */
-  flowDirection?: 'ingress' | 'egress'
+  flowDirection?: 'egress' | 'ingress'
   /**
    * ICMP details
    */
@@ -18209,7 +18209,7 @@ export interface SecurityGroupRule {
   /**
    * Network protocol
    */
-  protocol?: 'tcp' | 'esp' | 'all' | 'icmp' | 'udp' | 'gre' | 'ah' | 'ipip' | 'icmpv6'
+  protocol?: 'ah' | 'all' | 'esp' | 'gre' | 'icmp' | 'icmpv6' | 'ipip' | 'tcp' | 'udp'
   /**
    * Security Group allowed
    */
@@ -18483,7 +18483,7 @@ export interface SKSCluster {
   /**
    * Cluster level
    */
-  level?: 'starter' | 'pro'
+  level?: 'pro' | 'starter'
   /**
    * Cluster name
    *
@@ -18506,17 +18506,17 @@ export interface SKSCluster {
    * Read-only
    */
   state?:
-    | 'rotating-csi-credentials'
-    | 'rotating-ccm-credentials'
     | 'creating'
-    | 'upgrading'
     | 'deleting'
+    | 'error'
+    | 'resuming'
+    | 'rotating-ccm-credentials'
+    | 'rotating-csi-credentials'
+    | 'rotating-karpenter-credentials'
     | 'running'
     | 'suspending'
     | 'updating'
-    | 'error'
-    | 'rotating-karpenter-credentials'
-    | 'resuming'
+    | 'upgrading'
   /**
    * Control plane Kubernetes version
    */
@@ -18767,7 +18767,7 @@ export interface SKSNodepool {
    * * IPv4 (`inet4`) addressing only;
    * * IPv4 and IPv6 (`dual`) addressing.
    */
-  publicIPAssignment?: 'inet4' | 'dual'
+  publicIPAssignment?: 'dual' | 'inet4'
   /**
    * Nodepool Security Groups
    *
@@ -18786,14 +18786,14 @@ export interface SKSNodepool {
    * Read-only
    */
   state?:
-    | 'renewing-token'
     | 'creating'
-    | 'deleting'
-    | 'running'
     | 'degraded'
+    | 'deleting'
+    | 'error'
+    | 'renewing-token'
+    | 'running'
     | 'scaling'
     | 'updating'
-    | 'error'
   /**
    * Nodepool taints
    */
@@ -19075,7 +19075,7 @@ export interface Snapshot {
   /**
    * Snapshot state
    */
-  state?: 'snapshotting' | 'deleted' | 'exporting' | 'ready' | 'deleting' | 'error' | 'exported'
+  state?: 'deleted' | 'deleting' | 'error' | 'exported' | 'exporting' | 'ready' | 'snapshotting'
 }
 
 /** @internal */
@@ -19284,7 +19284,7 @@ export interface Subnet {
   /**
    * Subnet address family
    */
-  addressfamily?: 'inet4' | 'dual'
+  addressfamily?: 'dual' | 'inet4'
   /**
    * Subnet creation date
    */
@@ -19354,7 +19354,7 @@ export interface SuccessResponse {
   /**
    * @defaultValue "success"
    */
-  status: 'success' | 'target-registered' | 'already-applied'
+  status: 'already-applied' | 'success' | 'target-registered'
 }
 
 /** @internal */
@@ -19776,11 +19776,11 @@ export function fromWireZoneImpact(w: any): ZoneImpact {
 }
 
 export type ZoneName =
-  | 'ch-dk-2'
-  | 'de-muc-1'
-  | 'ch-gva-2'
   | 'at-vie-1'
-  | 'de-fra-1'
-  | 'bg-sof-1'
   | 'at-vie-2'
+  | 'bg-sof-1'
+  | 'ch-dk-2'
+  | 'ch-gva-2'
+  | 'de-fra-1'
+  | 'de-muc-1'
   | 'hr-zag-1'

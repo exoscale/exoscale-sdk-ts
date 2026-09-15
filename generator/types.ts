@@ -57,14 +57,16 @@ function scalarType(schema: JSON): string {
 
 // enumUnion renders an inline literal union, or null when the values are not
 // safe as TS literal identifiers (ported rule: any value containing ',' or
-// starting with a non-alphanumeric char disables the enum).
+// starting with a non-alphanumeric char disables the enum). Values are sorted
+// so the output does not depend on the spec's ordering of enum members.
 function enumUnion(schema: JSON): string | null {
   if (!Array.isArray(schema.enum)) return null
   for (const v of schema.enum) {
     const s = String(v)
     if (s === '' || s.includes(',') || !isAlphanumeric(s[0])) return null
   }
-  return schema.enum
+  return [...schema.enum]
+    .sort((a: any, b: any) => (String(a) < String(b) ? -1 : 1))
     .map((v: any) =>
       typeof v === 'number' || typeof v === 'boolean' ? String(v) : JSON.stringify(v),
     )

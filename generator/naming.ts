@@ -690,16 +690,32 @@ function constraintLine(schema: JSON): string {
   return parts.join(', ')
 }
 
+// stableStringify renders a JSON value with object keys sorted recursively,
+// so rendered defaults and examples do not depend on the spec's key ordering.
+// Array order is content and is preserved.
+function stableStringify(value: any): string {
+  if (value !== null && typeof value === 'object') {
+    if (Array.isArray(value)) {
+      return `[${value.map(stableStringify).join(',')}]`
+    }
+    const entries = Object.keys(value)
+      .sort()
+      .map((k) => `${JSON.stringify(k)}:${stableStringify(value[k])}`)
+    return `{${entries.join(',')}}`
+  }
+  return JSON.stringify(value)
+}
+
 // schemaTags renders the JSDoc block tags for a schema's default, example and
 // deprecation status. Returns an empty list when there is nothing to tag.
 function schemaTags(schema: JSON): string[] {
   const tags: string[] = []
   if (schema.deprecated === true) tags.push('@deprecated')
   if (schema.default !== undefined && schema.default !== null) {
-    tags.push(`@defaultValue ${JSON.stringify(schema.default)}`)
+    tags.push(`@defaultValue ${stableStringify(schema.default)}`)
   }
   if (schema.example !== undefined && schema.example !== null) {
-    tags.push(`@example ${JSON.stringify(schema.example)}`)
+    tags.push(`@example ${stableStringify(schema.example)}`)
   }
   return tags
 }

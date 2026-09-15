@@ -746,7 +746,7 @@ export interface CreateDBAASServiceClickhouseRequestMaintenance {
   /**
    * Day of week for installing updates
    */
-  dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
+  dow: 'friday' | 'monday' | 'never' | 'saturday' | 'sunday' | 'thursday' | 'tuesday' | 'wednesday'
   /**
    * Time for installing updates, UTC
    *
@@ -830,7 +830,7 @@ export interface UpdateDBAASServiceClickhouseRequestMaintenance {
   /**
    * Day of week for installing updates
    */
-  dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
+  dow: 'friday' | 'monday' | 'never' | 'saturday' | 'sunday' | 'thursday' | 'tuesday' | 'wednesday'
   /**
    * Time for installing updates, UTC
    *
@@ -908,8 +908,8 @@ export interface ListDBAASClickhouseRolesRequest {
 }
 
 export interface DeleteDBAASClickhouseRoleRequest {
-  serviceName: DBAASServiceName
   roleUuid: string
+  serviceName: DBAASServiceName
 }
 
 export interface ListDBAASClickhouseUsersRequest {
@@ -1160,7 +1160,7 @@ export interface CreateDBAASServiceGrafanaRequestMaintenance {
   /**
    * Day of week for installing updates
    */
-  dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
+  dow: 'friday' | 'monday' | 'never' | 'saturday' | 'sunday' | 'thursday' | 'tuesday' | 'wednesday'
   /**
    * Time for installing updates, UTC
    *
@@ -1230,7 +1230,7 @@ export interface UpdateDBAASServiceGrafanaRequestMaintenance {
   /**
    * Day of week for installing updates
    */
-  dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
+  dow: 'friday' | 'monday' | 'never' | 'saturday' | 'sunday' | 'thursday' | 'tuesday' | 'wednesday'
   /**
    * Time for installing updates, UTC
    *
@@ -1345,9 +1345,9 @@ export function toWireCreateDBAASIntegrationRequest(
 }
 
 export interface ListDBAASIntegrationSettingsRequest {
+  destType: string
   integrationType: string
   sourceType: string
-  destType: string
 }
 /**
  * The JSON schema representing the settings for the given integration type, source, and destination service types.
@@ -1466,7 +1466,7 @@ export interface CreateDBAASServiceKafkaRequestMaintenance {
   /**
    * Day of week for installing updates
    */
-  dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
+  dow: 'friday' | 'monday' | 'never' | 'saturday' | 'sunday' | 'thursday' | 'tuesday' | 'wednesday'
   /**
    * Time for installing updates, UTC
    *
@@ -1602,7 +1602,7 @@ export interface UpdateDBAASServiceKafkaRequestMaintenance {
   /**
    * Day of week for installing updates
    */
-  dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
+  dow: 'friday' | 'monday' | 'never' | 'saturday' | 'sunday' | 'thursday' | 'tuesday' | 'wednesday'
   /**
    * Time for installing updates, UTC
    *
@@ -1716,13 +1716,13 @@ export interface StartDBAASKafkaMaintenanceRequest {
 }
 
 export interface DeleteDBAASKafkaSchemaRegistryAclConfigRequest {
-  name: DBAASServiceName
   aclID: DBAASKafkaAclID
+  name: DBAASServiceName
 }
 
 export interface DeleteDBAASKafkaTopicAclConfigRequest {
-  name: DBAASServiceName
   aclID: DBAASKafkaAclID
+  name: DBAASServiceName
 }
 
 export interface RevealDBAASKafkaConnectPasswordRequest {
@@ -1848,7 +1848,7 @@ export interface CreateDBAASServiceMysqlRequestMaintenance {
   /**
    * Day of week for installing updates
    */
-  dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
+  dow: 'friday' | 'monday' | 'never' | 'saturday' | 'sunday' | 'thursday' | 'tuesday' | 'wednesday'
   /**
    * Time for installing updates, UTC
    *
@@ -2059,7 +2059,7 @@ export interface UpdateDBAASServiceMysqlRequestMaintenance {
   /**
    * Day of week for installing updates
    */
-  dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
+  dow: 'friday' | 'monday' | 'never' | 'saturday' | 'sunday' | 'thursday' | 'tuesday' | 'wednesday'
   /**
    * Time for installing updates, UTC
    *
@@ -2232,8 +2232,8 @@ export function toWireCreateDBAASMysqlDatabaseRequest(
 }
 
 export interface DeleteDBAASMysqlDatabaseRequest {
-  serviceName: DBAASServiceName
   databaseName: DBAASMysqlDatabaseName
+  serviceName: DBAASServiceName
 }
 
 export interface CreateDBAASMysqlUserRequest {
@@ -2373,7 +2373,7 @@ export interface CreateDBAASServiceOpensearchRequestMaintenance {
   /**
    * Day of week for installing updates
    */
-  dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
+  dow: 'friday' | 'monday' | 'never' | 'saturday' | 'sunday' | 'thursday' | 'tuesday' | 'wednesday'
   /**
    * Time for installing updates, UTC
    *
@@ -2596,7 +2596,7 @@ export interface UpdateDBAASServiceOpensearchRequestMaintenance {
   /**
    * Day of week for installing updates
    */
-  dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
+  dow: 'friday' | 'monday' | 'never' | 'saturday' | 'sunday' | 'thursday' | 'tuesday' | 'wednesday'
   /**
    * Time for installing updates, UTC
    *
@@ -2852,7 +2852,7 @@ export interface CreateDBAASServicePGRequestMaintenance {
   /**
    * Day of week for installing updates
    */
-  dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
+  dow: 'friday' | 'monday' | 'never' | 'saturday' | 'sunday' | 'thursday' | 'tuesday' | 'wednesday'
   /**
    * Time for installing updates, UTC
    *
@@ -3104,7 +3104,7 @@ export interface UpdateDBAASServicePGRequestMaintenance {
   /**
    * Day of week for installing updates
    */
-  dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
+  dow: 'friday' | 'monday' | 'never' | 'saturday' | 'sunday' | 'thursday' | 'tuesday' | 'wednesday'
   /**
    * Time for installing updates, UTC
    *
@@ -3336,13 +3336,13 @@ export function toWireCreateDBAASPGConnectionPoolRequest(
 }
 
 export interface DeleteDBAASPGConnectionPoolRequest {
-  serviceName: DBAASServiceName
   connectionPoolName: DBAASPGPoolName
+  serviceName: DBAASServiceName
 }
 
 export interface UpdateDBAASPGConnectionPoolRequest {
-  serviceName: DBAASServiceName
   connectionPoolName: DBAASPGPoolName
+  serviceName: DBAASServiceName
   /**
    * Service database name
    */
@@ -3403,8 +3403,8 @@ export function toWireCreateDBAASPGDatabaseRequest(
 }
 
 export interface DeleteDBAASPGDatabaseRequest {
-  serviceName: DBAASServiceName
   databaseName: DBAASPGDatabaseName
+  serviceName: DBAASServiceName
 }
 
 export interface CreateDBAASPostgresUserRequest {
@@ -3527,7 +3527,7 @@ export interface GetDBAASServiceMetricsRequest {
   /**
    * Metrics time period (default: hour)
    */
-  period?: 'hour' | 'week' | 'year' | 'month' | 'day'
+  period?: 'day' | 'hour' | 'month' | 'week' | 'year'
 }
 /** @internal */
 export function toWireGetDBAASServiceMetricsRequest(
@@ -4174,8 +4174,8 @@ export function toWireCreateDBAASTaskMigrationCheckRequest(
 }
 
 export interface GetDBAASTaskRequest {
-  service: DBAASServiceName
   id: string
+  service: DBAASServiceName
 }
 
 export interface DeleteDBAASServiceThanosRequest {
@@ -4193,7 +4193,7 @@ export interface CreateDBAASServiceThanosRequestMaintenance {
   /**
    * Day of week for installing updates
    */
-  dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
+  dow: 'friday' | 'monday' | 'never' | 'saturday' | 'sunday' | 'thursday' | 'tuesday' | 'wednesday'
   /**
    * Time for installing updates, UTC
    *
@@ -4258,7 +4258,7 @@ export interface UpdateDBAASServiceThanosRequestMaintenance {
   /**
    * Day of week for installing updates
    */
-  dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
+  dow: 'friday' | 'monday' | 'never' | 'saturday' | 'sunday' | 'thursday' | 'tuesday' | 'wednesday'
   /**
    * Time for installing updates, UTC
    *
@@ -4340,7 +4340,7 @@ export interface CreateDBAASServiceValkeyRequestMaintenance {
   /**
    * Day of week for installing updates
    */
-  dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
+  dow: 'friday' | 'monday' | 'never' | 'saturday' | 'sunday' | 'thursday' | 'tuesday' | 'wednesday'
   /**
    * Time for installing updates, UTC
    *
@@ -4496,7 +4496,7 @@ export interface UpdateDBAASServiceValkeyRequestMaintenance {
   /**
    * Day of week for installing updates
    */
-  dow: 'saturday' | 'tuesday' | 'never' | 'wednesday' | 'sunday' | 'friday' | 'monday' | 'thursday'
+  dow: 'friday' | 'monday' | 'never' | 'saturday' | 'sunday' | 'thursday' | 'tuesday' | 'wednesday'
   /**
    * Time for installing updates, UTC
    *
@@ -4788,19 +4788,19 @@ export interface CreateDNSDomainRecordRequest {
    * DNS domain record type
    */
   type:
-    | 'NS'
-    | 'CAA'
-    | 'NAPTR'
-    | 'POOL'
     | 'A'
-    | 'HINFO'
-    | 'CNAME'
-    | 'SSHFP'
-    | 'SRV'
     | 'AAAA'
-    | 'MX'
-    | 'TXT'
     | 'ALIAS'
+    | 'CAA'
+    | 'CNAME'
+    | 'HINFO'
+    | 'MX'
+    | 'NAPTR'
+    | 'NS'
+    | 'POOL'
+    | 'SRV'
+    | 'SSHFP'
+    | 'TXT'
     | 'URL'
 }
 /** @internal */
@@ -4961,8 +4961,8 @@ export function toWireUpdateElasticIPRequest(v: UpdateElasticIPRequest): Record<
 }
 
 export interface ResetElasticIPFieldRequest {
-  id: string
   field: 'description'
+  id: string
 }
 
 export interface AttachInstanceToElasticIPRequest {
@@ -5217,10 +5217,10 @@ export function fromWireAssumeIAMRoleResponse(w: any): AssumeIAMRoleResponse {
 }
 
 export interface ListInstancesRequest {
-  managerID?: string
-  managerType?: 'instance-pool'
   ipAddress?: string
   labels?: string
+  managerID?: string
+  managerType?: 'instance-pool'
 }
 /**
  * Private Network
@@ -5553,7 +5553,7 @@ export interface CreateInstancePoolRequest {
   /**
    * Determines public IP assignment of the Instances. Type `none` is final and can't be changed later on.
    */
-  publicIPAssignment?: 'inet4' | 'dual' | 'none'
+  publicIPAssignment?: 'dual' | 'inet4' | 'none'
   /**
    * Instance Pool Security Groups
    *
@@ -5696,7 +5696,7 @@ export interface UpdateInstancePoolRequest {
   /**
    * Determines public IP assignment of the Instances.
    */
-  publicIPAssignment?: 'inet4' | 'dual'
+  publicIPAssignment?: 'dual' | 'inet4'
   /**
    * Instance Pool Security Groups
    *
@@ -5766,18 +5766,18 @@ export function toWireUpdateInstancePoolRequest(
 }
 
 export interface ResetInstancePoolFieldRequest {
-  id: string
   field:
     | 'anti-affinity-groups'
+    | 'deploy-target'
     | 'description'
-    | 'labels'
-    | 'security-groups'
     | 'elastic-ips'
+    | 'ipv6-enabled'
+    | 'labels'
     | 'private-networks'
+    | 'security-groups'
     | 'ssh-key'
     | 'user-data'
-    | 'deploy-target'
-    | 'ipv6-enabled'
+  id: string
 }
 
 export interface EvictInstancePoolMembersRequest {
@@ -5875,8 +5875,8 @@ export function toWireUpdateInstanceRequest(v: UpdateInstanceRequest): Record<st
 }
 
 export interface ResetInstanceFieldRequest {
-  id: string
   field: 'labels'
+  id: string
 }
 
 export interface AddInstanceProtectionRequest {
@@ -5965,7 +5965,7 @@ export interface StartInstanceRequest {
   /**
    * Boot in Rescue Mode, using named profile (supported: netboot, netboot-efi)
    */
-  rescueProfile?: 'netboot-efi' | 'netboot'
+  rescueProfile?: 'netboot' | 'netboot-efi'
 }
 /** @internal */
 export function toWireStartInstanceRequest(v: StartInstanceRequest): Record<string, unknown> {
@@ -6138,7 +6138,7 @@ export interface AddServiceToLoadBalancerRequest {
   /**
    * Load balancing strategy
    */
-  strategy: 'round-robin' | 'maglev-hash' | 'source-hash'
+  strategy: 'maglev-hash' | 'round-robin' | 'source-hash'
   /**
    * Port on which the network traffic will be forwarded to on the receiving instance
    *
@@ -6205,7 +6205,7 @@ export interface UpdateLoadBalancerServiceRequest {
   /**
    * Load balancing strategy
    */
-  strategy?: 'round-robin' | 'maglev-hash' | 'source-hash'
+  strategy?: 'maglev-hash' | 'round-robin' | 'source-hash'
   /**
    * Port on which the network traffic will be forwarded to on the receiving instance
    *
@@ -6230,14 +6230,14 @@ export function toWireUpdateLoadBalancerServiceRequest(
 }
 
 export interface ResetLoadBalancerServiceFieldRequest {
+  field: 'description'
   id: string
   serviceID: string
-  field: 'description'
 }
 
 export interface ResetLoadBalancerFieldRequest {
-  id: string
   field: 'description' | 'labels'
+  id: string
 }
 
 export interface GetOperationRequest {
@@ -6364,8 +6364,8 @@ export function toWireUpdatePrivateNetworkRequest(
 }
 
 export interface ResetPrivateNetworkFieldRequest {
-  id: string
   field: 'labels'
+  id: string
 }
 
 /**
@@ -6608,7 +6608,7 @@ export interface AddRuleToSecurityGroupRequest {
   /**
    * Network flow direction to match
    */
-  flowDirection: 'ingress' | 'egress'
+  flowDirection: 'egress' | 'ingress'
   /**
    * ICMP details (default: -1 (ANY))
    */
@@ -6620,7 +6620,7 @@ export interface AddRuleToSecurityGroupRequest {
   /**
    * Network protocol
    */
-  protocol: 'tcp' | 'esp' | 'all' | 'icmp' | 'udp' | 'gre' | 'ah' | 'ipip' | 'icmpv6'
+  protocol: 'ah' | 'all' | 'esp' | 'gre' | 'icmp' | 'icmpv6' | 'ipip' | 'tcp' | 'udp'
   /**
    * Security Group allowed
    */
@@ -6776,7 +6776,7 @@ export interface CreateSKSClusterRequest {
   /**
    * Cluster service level
    */
-  level: 'starter' | 'pro'
+  level: 'pro' | 'starter'
   /**
    * Cluster name
    *
@@ -6921,8 +6921,8 @@ export function toWireUpdateSKSClusterRequest(v: UpdateSKSClusterRequest): Recor
 }
 
 export interface GetSKSClusterAuthorityCertRequest {
+  authority: 'aggregation' | 'control-plane' | 'kubelet'
   id: string
-  authority: 'control-plane' | 'aggregation' | 'kubelet'
 }
 export interface GetSKSClusterAuthorityCertResponse {
   cacert?: string
@@ -7050,7 +7050,7 @@ export interface CreateSKSNodepoolRequest {
    * * IPv4 (`inet4`) addressing only (default);
    * * both IPv4 and IPv6 (`dual`) addressing.
    */
-  publicIPAssignment?: 'inet4' | 'dual'
+  publicIPAssignment?: 'dual' | 'inet4'
   /**
    * Nodepool Security Groups
    *
@@ -7179,7 +7179,7 @@ export interface UpdateSKSNodepoolRequest {
    * * IPv4 (`inet4`) addressing only;
    * * both IPv4 and IPv6 (`dual`) addressing.
    */
-  publicIPAssignment?: 'inet4' | 'dual'
+  publicIPAssignment?: 'dual' | 'inet4'
   /**
    * Nodepool Security Groups
    *
@@ -7293,7 +7293,7 @@ export interface UpgradeSKSClusterServiceLevelRequest {
 
 export interface GetActiveNodepoolTemplateRequest {
   kubeVersion: string
-  variant: 'standard' | 'nvidia'
+  variant: 'nvidia' | 'standard'
 }
 export interface GetActiveNodepoolTemplateResponse {
   activeTemplate?: string
@@ -7442,8 +7442,8 @@ export interface GetSSHKeyRequest {
 }
 
 export interface ListTemplatesRequest {
-  visibility?: 'private' | 'public'
   family?: string
+  visibility?: 'private' | 'public'
 }
 export interface ListTemplatesResponse {
   templates?: Template[]
@@ -7864,18 +7864,18 @@ export function toWireCreateSubnetRequest(v: CreateSubnetRequest): Record<string
 }
 
 export interface DeleteSubnetRequest {
-  vpcID: string
   id: string
+  vpcID: string
 }
 
 export interface GetSubnetRequest {
-  vpcID: string
   id: string
+  vpcID: string
 }
 
 export interface UpdateSubnetRequest {
-  vpcID: string
   id: string
+  vpcID: string
   /**
    * Subnet description
    *
@@ -7903,8 +7903,8 @@ export function toWireUpdateSubnetRequest(v: UpdateSubnetRequest): Record<string
 }
 
 export interface AttachInstanceToSubnetRequest {
-  vpcID: string
   subnetID: string
+  vpcID: string
   /**
    * Compute instance
    */
@@ -7925,8 +7925,8 @@ export function toWireAttachInstanceToSubnetRequest(
 }
 
 export interface DetachInstanceFromSubnetRequest {
-  vpcID: string
   subnetID: string
+  vpcID: string
   /**
    * Compute instance
    */
@@ -7942,8 +7942,8 @@ export function toWireDetachInstanceFromSubnetRequest(
 }
 
 export interface ListRoutesRequest {
-  vpcID: string
   subnetID: string
+  vpcID: string
 }
 export interface ListRoutesResponse {
   routes?: ListRouteEntry[]
@@ -7958,8 +7958,8 @@ export function fromWireListRoutesResponse(w: any): ListRoutesResponse {
 }
 
 export interface CreateRouteRequest {
-  vpcID: string
   subnetID: string
+  vpcID: string
   /**
    * Route description
    *
@@ -7985,9 +7985,9 @@ export function toWireCreateRouteRequest(v: CreateRouteRequest): Record<string, 
 }
 
 export interface DeleteRouteRequest {
-  vpcID: string
-  subnetID: string
   id: string
+  subnetID: string
+  vpcID: string
 }
 
 export interface ListZonesResponse {
@@ -10638,10 +10638,10 @@ export abstract class GeneratedExoscaleClient {
    */
   listInstances(params?: ListInstancesRequest): Promise<ListInstancesResponse> {
     const query: Record<string, string> = {}
-    if (params?.managerID !== undefined) query['manager-id'] = params?.managerID
-    if (params?.managerType !== undefined) query['manager-type'] = params?.managerType
     if (params?.ipAddress !== undefined) query['ip-address'] = params?.ipAddress
     if (params?.labels !== undefined) query['labels'] = params?.labels
+    if (params?.managerID !== undefined) query['manager-id'] = params?.managerID
+    if (params?.managerType !== undefined) query['manager-type'] = params?.managerType
     return this.core.request('GET', '/instance', { query, decode: fromWireListInstancesResponse })
   }
 
@@ -12177,8 +12177,8 @@ export abstract class GeneratedExoscaleClient {
    */
   listTemplates(params?: ListTemplatesRequest): Promise<ListTemplatesResponse> {
     const query: Record<string, string> = {}
-    if (params?.visibility !== undefined) query['visibility'] = params?.visibility
     if (params?.family !== undefined) query['family'] = params?.family
+    if (params?.visibility !== undefined) query['visibility'] = params?.visibility
     return this.core.request('GET', '/template', { query, decode: fromWireListTemplatesResponse })
   }
 

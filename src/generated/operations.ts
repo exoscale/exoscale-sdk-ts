@@ -66,6 +66,7 @@ import {
   fromWireIAMAPIKeyCreated,
   fromWireIAMPolicy,
   fromWireIAMRole,
+  fromWireIAMSystemRole,
   fromWireImpactBreakdown,
   fromWireImpactValueWithUnit,
   fromWireInstance,
@@ -106,6 +107,7 @@ import {
   fromWireSubnet,
   fromWireSuccessResponse,
   fromWireTemplate,
+  fromWireUpdateAIAPIKeyResponse,
   fromWireUser,
   fromWireVpc,
   fromWireZone,
@@ -178,7 +180,9 @@ import {
   toWireSecurityGroupRef,
   toWireSecurityGroupResource,
   toWireTemplateRef,
+  toWireUpdateAIAPIKeyRequest,
   toWireUpdateDeploymentRequest,
+  toWireVpcDHCPOptions,
   toWireZone,
 } from './schemas.js'
 import type {
@@ -294,6 +298,7 @@ import type {
   IAMAssumeRolePolicy,
   IAMPolicy,
   IAMRole,
+  IAMSystemRole,
   ImpactBreakdown,
   ImpactValueWithUnit,
   Instance,
@@ -375,9 +380,12 @@ import type {
   SuccessResponse,
   Template,
   TemplateRef,
+  UpdateAIAPIKeyRequest,
+  UpdateAIAPIKeyResponse,
   UpdateDeploymentRequest,
   User,
   Vpc,
+  VpcDHCPOptions,
   Zone,
 } from './schemas.js'
 import { isoDateTime, type ClientCore } from '../core.js'
@@ -3193,6 +3201,10 @@ export interface CreateVpcRequest {
    */
   description?: string
   /**
+   * DHCP options
+   */
+  dhcpOptions?: VpcDHCPOptions
+  /**
    * Resource labels
    */
   labels?: Labels
@@ -3207,13 +3219,10 @@ export interface CreateVpcRequest {
 export function toWireCreateVpcRequest(v: CreateVpcRequest): Record<string, unknown> {
   const o: Record<string, unknown> = {}
   if (v.description !== undefined) o['description'] = v.description
+  if (v.dhcpOptions !== undefined) o['dhcp-options'] = toWireVpcDHCPOptions(v.dhcpOptions)
   if (v.labels !== undefined) o['labels'] = v.labels
   if (v.name !== undefined) o['name'] = v.name
   return o
-}
-
-export interface DeleteAIAPIKeyRequest {
-  id: string
 }
 
 export interface DeleteAntiAffinityGroupRequest {
@@ -4966,10 +4975,6 @@ export function fromWireListDeployTargetsResponse(w: any): ListDeployTargetsResp
   return v
 }
 
-export interface ListDeploymentsRequest {
-  visibility?: string
-}
-
 export interface ListDNSDomainRecordsRequest {
   domainID: string
 }
@@ -5023,6 +5028,18 @@ export function fromWireListIAMRolesResponse(w: any): ListIAMRolesResponse {
   const v = {} as ListIAMRolesResponse
   if (w['iam-roles'] !== undefined)
     v.iamRoles = (w['iam-roles'] as any[]).map((x) => fromWireIAMRole(x))
+  return v
+}
+
+export interface ListIAMSystemRolesResponse {
+  iamSystemRoles?: IAMSystemRole[]
+}
+
+/** @internal */
+export function fromWireListIAMSystemRolesResponse(w: any): ListIAMSystemRolesResponse {
+  const v = {} as ListIAMSystemRolesResponse
+  if (w['iam-system-roles'] !== undefined)
+    v.iamSystemRoles = (w['iam-system-roles'] as any[]).map((x) => fromWireIAMSystemRole(x))
   return v
 }
 
@@ -5204,6 +5221,10 @@ export function fromWireListLoadBalancersResponse(w: any): ListLoadBalancersResp
   if (w['load-balancers'] !== undefined)
     v.loadBalancers = (w['load-balancers'] as any[]).map((x) => fromWireLoadBalancer(x))
   return v
+}
+
+export interface ListModelsRequest {
+  visibility?: string
 }
 
 export interface ListPrivateNetworksResponse {
@@ -5875,6 +5896,10 @@ export function toWireRevertInstanceToSnapshotRequest(
   const o: Record<string, unknown> = {}
   if (v.id !== undefined) o['id'] = v.id
   return o
+}
+
+export interface RevokeAIAPIKeyRequest {
+  id: string
 }
 
 export interface RotateKmsKeyRequest {
@@ -7962,6 +7987,10 @@ export interface UpdateVpcRequest {
    */
   description?: string | null
   /**
+   * DHCP options (only allowed if VPC has no instances attached)
+   */
+  dhcpOptions?: VpcDHCPOptions
+  /**
    * Resource labels
    */
   labels?: Labels | null
@@ -7976,6 +8005,7 @@ export interface UpdateVpcRequest {
 export function toWireUpdateVpcRequest(v: UpdateVpcRequest): Record<string, unknown> {
   const o: Record<string, unknown> = {}
   if (v.description !== undefined) o['description'] = v.description === null ? null : v.description
+  if (v.dhcpOptions !== undefined) o['dhcp-options'] = toWireVpcDHCPOptions(v.dhcpOptions)
   if (v.labels !== undefined) o['labels'] = v.labels === null ? null : v.labels
   if (v.name !== undefined) o['name'] = v.name === null ? null : v.name
   return o
@@ -8801,24 +8831,6 @@ export abstract class GeneratedExoscaleClient {
     const path = `/kms-key/${encodeURIComponent(params.id)}/decrypt`
     const body = toWireDecryptRequest(params)
     return this.core.request('POST', path, { body, decode: fromWireDecryptResponse })
-  }
-
-  /**
-   * Delete AI API key
-   *
-   * Errors:
-   *
-   * **403**
-   * Forbidden
-   *
-   * **404**
-   * Not Found
-   *
-   * @see https://www.exoscale.com/ai-cloud-infrastructure/managed-inference/ Read more
-   */
-  deleteAIAPIKey(params: DeleteAIAPIKeyRequest): Promise<Operation> {
-    const path = `/ai/api-key/${encodeURIComponent(params.id)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
   }
 
   /**
@@ -10311,7 +10323,7 @@ export abstract class GeneratedExoscaleClient {
    * **500**
    * Internal server error
    *
-   * @see https://www.exoscale.com/sustainability/ Read more
+   * @see https://community.exoscale.com/platform/environmental-impact/ Read more
    */
   getImpactEstimate(params: GetImpactEstimateRequest): Promise<GetImpactEstimateResponse> {
     const body = toWireGetImpactEstimateRequest(params)
@@ -10332,7 +10344,7 @@ export abstract class GeneratedExoscaleClient {
    * **500**
    * Internal server error
    *
-   * @see https://www.exoscale.com/sustainability/ Read more
+   * @see https://community.exoscale.com/platform/environmental-impact/ Read more
    */
   getImpactReport(params?: GetImpactReportRequest): Promise<ImpactBreakdown> {
     const query: Record<string, string> = {}
@@ -10849,13 +10861,8 @@ export abstract class GeneratedExoscaleClient {
    *
    * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
    */
-  listDeployments(params?: ListDeploymentsRequest): Promise<ListDeploymentsResponse> {
-    const query: Record<string, string> = {}
-    if (params?.visibility !== undefined) query['visibility'] = params?.visibility
-    return this.core.request('GET', '/ai/deployment', {
-      query,
-      decode: fromWireListDeploymentsResponse,
-    })
+  listDeployments(): Promise<ListDeploymentsResponse> {
+    return this.core.request('GET', '/ai/deployment', { decode: fromWireListDeploymentsResponse })
   }
 
   /**
@@ -10910,6 +10917,17 @@ export abstract class GeneratedExoscaleClient {
    */
   listIAMRoles(): Promise<ListIAMRolesResponse> {
     return this.core.request('GET', '/iam-role', { decode: fromWireListIAMRolesResponse })
+  }
+
+  /**
+   * List IAM System Roles
+   *
+   * @see https://community.exoscale.com/product/iam/operation/role-mgmt/ Read more
+   */
+  listIAMSystemRoles(): Promise<ListIAMSystemRolesResponse> {
+    return this.core.request('GET', '/iam-system-role', {
+      decode: fromWireListIAMSystemRolesResponse,
+    })
   }
 
   /**
@@ -10991,8 +11009,10 @@ export abstract class GeneratedExoscaleClient {
    *
    * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
    */
-  listModels(): Promise<ListModelsResponse> {
-    return this.core.request('GET', '/ai/model', { decode: fromWireListModelsResponse })
+  listModels(params?: ListModelsRequest): Promise<ListModelsResponse> {
+    const query: Record<string, string> = {}
+    if (params?.visibility !== undefined) query['visibility'] = params?.visibility
+    return this.core.request('GET', '/ai/model', { query, decode: fromWireListModelsResponse })
   }
 
   /**
@@ -11644,6 +11664,27 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
+   * Revoke an AI API key. Key will be deleted after 30 days of retention
+   *
+   * Errors:
+   *
+   * **403**
+   * Forbidden
+   *
+   * **404**
+   * Not Found
+   *
+   * **500**
+   * Internal Server Error
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/managed-inference/ Read more
+   */
+  revokeAIAPIKey(params: RevokeAIAPIKeyRequest): Promise<Operation> {
+    const path = `/ai/api-key/${encodeURIComponent(params.id)}/revoke`
+    return this.core.request('POST', path, { decode: fromWireOperation })
+  }
+
+  /**
    * Performs an immediate rotation of the key material for a symmetric key.
    *
    * Errors:
@@ -11933,6 +11974,32 @@ export abstract class GeneratedExoscaleClient {
   stopInstance(params: StopInstanceRequest): Promise<Operation> {
     const path = `/instance/${encodeURIComponent(params.id)}:stop`
     return this.core.request('PUT', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Update the models and deployments accessible by an AI API key.
+   *
+   * Errors:
+   *
+   * **400**
+   * Bad Request
+   *
+   * **403**
+   * Forbidden
+   *
+   * **404**
+   * Not Found
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/managed-inference/ Read more
+   */
+  updateAIAPIKey(
+    params: UpdateAIAPIKeyRequest & {
+      id: string
+    },
+  ): Promise<UpdateAIAPIKeyResponse> {
+    const path = `/ai/api-key/${encodeURIComponent(params.id)}`
+    const body = toWireUpdateAIAPIKeyRequest(params)
+    return this.core.request('PATCH', path, { body, decode: fromWireUpdateAIAPIKeyResponse })
   }
 
   /**

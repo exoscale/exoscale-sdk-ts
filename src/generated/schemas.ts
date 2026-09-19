@@ -137,91 +137,45 @@ export function fromWireAccessKeyResource(w: any): AccessKeyResource {
   return v
 }
 
-/**
- * AI API key metadata
- */
-export interface AIAPIKey {
+export interface AIAPIKeyDeploymentRef {
   /**
-   * Creation timestamp
-   *
-   * Read-only
-   */
-  createdAT: Date
-  /**
-   * AI API key ID
-   *
-   * Read-only
+   * Deployment ID
    */
   id: string
-  /**
-   * Human-readable name for the AI API key
-   */
-  name: string
-  /**
-   * Organization UUID that owns this key
-   *
-   * Read-only
-   */
-  orgUuid: string
-  /**
-   * Key scope: 'public' for all deployments, or a specific deployment UUID
-   */
-  scope: string
-  /**
-   * Last update timestamp
-   *
-   * Read-only
-   */
-  updatedAT: Date
 }
 
 /** @internal */
-export function toWireAIAPIKey(v: AIAPIKey): Record<string, unknown> {
+export function toWireAIAPIKeyDeploymentRef(v: AIAPIKeyDeploymentRef): Record<string, unknown> {
   const o: Record<string, unknown> = {}
-  if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
   if (v.id !== undefined) o['id'] = v.id
-  if (v.name !== undefined) o['name'] = v.name
-  if (v.orgUuid !== undefined) o['org-uuid'] = v.orgUuid
-  if (v.scope !== undefined) o['scope'] = v.scope
-  if (v.updatedAT !== undefined) o['updated-at'] = v.updatedAT.toISOString()
   return o
 }
 
 /** @internal */
-export function fromWireAIAPIKey(w: any): AIAPIKey {
-  const v = {} as AIAPIKey
-  v.createdAT = new Date(w['created-at'])
+export function fromWireAIAPIKeyDeploymentRef(w: any): AIAPIKeyDeploymentRef {
+  const v = {} as AIAPIKeyDeploymentRef
   v.id = w['id']
-  v.name = w['name']
-  v.orgUuid = w['org-uuid']
-  v.scope = w['scope']
-  v.updatedAT = new Date(w['updated-at'])
   return v
 }
 
 /**
- * AI API key plaintext value
+ * Deployment IDs accepted as input.
+ *
+ * Unique items
  */
-export interface AIAPIKeyValue {
-  /**
-   * Plaintext AI API key value
-   */
-  value: string
-}
+export type AIAPIKeyDeployments = string
 
-/** @internal */
-export function toWireAIAPIKeyValue(v: AIAPIKeyValue): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.value !== undefined) o['value'] = v.value
-  return o
-}
+/**
+ * Private deployment access. ["all"] means access to all deployments, otherwise deployments are returned as objects.
+ */
+export type AIAPIKeyDeploymentsResponse = unknown
 
-/** @internal */
-export function fromWireAIAPIKeyValue(w: any): AIAPIKeyValue {
-  const v = {} as AIAPIKeyValue
-  v.value = w['value']
-  return v
-}
+/**
+ * Public model access. An empty array denies access to all public models, ["all"] grants access to all public models, otherwise the array is an allowlist of model names.
+ *
+ * Unique items
+ */
+export type AIAPIKeyModels = string
 
 /**
  * Anti-affinity Group
@@ -299,37 +253,40 @@ export function fromWireAntiAffinityGroupRef(w: any): AntiAffinityGroupRef {
 }
 
 /**
- * Usage breakdown for one API key, grouped by model
+ * Usage breakdown for one API key, grouped by product-name
  */
 export interface APIKeyUsageEntry {
-  /**
-   * Map of model-uuid to accumulated counters. Keys are model UUIDs.
-   */
-  models: Record<string, ModelUsageCounters>
   /**
    * Organization that owns this API key
    */
   organizationID: string
+  /**
+   * Map of product-name to accumulated counters. Keys are product names.
+   */
+  productNames: Record<string, ModelUsageCounters>
 }
 
 /** @internal */
 export function toWireAPIKeyUsageEntry(v: APIKeyUsageEntry): Record<string, unknown> {
   const o: Record<string, unknown> = {}
-  if (v.models !== undefined)
-    o['models'] = Object.fromEntries(
-      Object.entries(v.models).map(([k, val]) => [k, toWireModelUsageCounters(val)]),
-    )
   if (v.organizationID !== undefined) o['organization-id'] = v.organizationID
+  if (v.productNames !== undefined)
+    o['product-names'] = Object.fromEntries(
+      Object.entries(v.productNames).map(([k, val]) => [k, toWireModelUsageCounters(val)]),
+    )
   return o
 }
 
 /** @internal */
 export function fromWireAPIKeyUsageEntry(w: any): APIKeyUsageEntry {
   const v = {} as APIKeyUsageEntry
-  v.models = Object.fromEntries(
-    Object.entries(w['models'] ?? {}).map(([k, val]) => [k, fromWireModelUsageCounters(val)]),
-  )
   v.organizationID = w['organization-id']
+  v.productNames = Object.fromEntries(
+    Object.entries(w['product-names'] ?? {}).map(([k, val]) => [
+      k,
+      fromWireModelUsageCounters(val),
+    ]),
+  )
   return v
 }
 
@@ -577,34 +534,34 @@ export function fromWireBlockStorageVolumeRef(w: any): BlockStorageVolumeRef {
 }
 
 /**
- * Request to create a new AI API key
+ * Request to create a new AI API key. Missing models or deployments default to an empty array.
  */
 export interface CreateAIAPIKeyRequest {
+  deployments?: AIAPIKeyDeployments
+  models?: AIAPIKeyModels
   /**
    * Human-readable name for the AI API key
    *
    * Length 1-50, Pattern `^[A-Za-z0-9](?:[A-Za-z0-9 _'()-]*[A-Za-z0-9])?$`
    */
   name: string
-  /**
-   * Key scope: 'public' for all deployments, or a specific deployment UUID
-   */
-  scope: string
 }
 
 /** @internal */
 export function toWireCreateAIAPIKeyRequest(v: CreateAIAPIKeyRequest): Record<string, unknown> {
   const o: Record<string, unknown> = {}
+  if (v.deployments !== undefined) o['deployments'] = v.deployments
+  if (v.models !== undefined) o['models'] = v.models
   if (v.name !== undefined) o['name'] = v.name
-  if (v.scope !== undefined) o['scope'] = v.scope
   return o
 }
 
 /** @internal */
 export function fromWireCreateAIAPIKeyRequest(w: any): CreateAIAPIKeyRequest {
   const v = {} as CreateAIAPIKeyRequest
+  if (w['deployments'] !== undefined) v.deployments = w['deployments']
+  if (w['models'] !== undefined) v.models = w['models']
   v.name = w['name']
-  v.scope = w['scope']
   return v
 }
 
@@ -613,34 +570,23 @@ export function fromWireCreateAIAPIKeyRequest(w: any): CreateAIAPIKeyRequest {
  */
 export interface CreateAIAPIKeyResponse {
   /**
-   * Creation timestamp
-   *
    * Read-only
    */
   createdAT: Date
+  deployments: AIAPIKeyDeploymentsResponse
   /**
-   * AI API key ID
-   *
    * Read-only
    */
   id: string
-  /**
-   * Human-readable name for the AI API key
-   */
+  models: AIAPIKeyModels
   name: string
-  /**
-   * Organization UUID that owns this key
-   *
-   * Read-only
-   */
-  orgUuid: string
-  /**
-   * Key scope: 'public' for all deployments, or a specific deployment UUID
-   */
-  scope: string
   /**
    * Last update timestamp
    *
+   * Read-only
+   */
+  revokedAT?: Date | null
+  /**
    * Read-only
    */
   updatedAT: Date
@@ -654,10 +600,12 @@ export interface CreateAIAPIKeyResponse {
 export function toWireCreateAIAPIKeyResponse(v: CreateAIAPIKeyResponse): Record<string, unknown> {
   const o: Record<string, unknown> = {}
   if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
+  if (v.deployments !== undefined) o['deployments'] = v.deployments
   if (v.id !== undefined) o['id'] = v.id
+  if (v.models !== undefined) o['models'] = v.models
   if (v.name !== undefined) o['name'] = v.name
-  if (v.orgUuid !== undefined) o['org-uuid'] = v.orgUuid
-  if (v.scope !== undefined) o['scope'] = v.scope
+  if (v.revokedAT !== undefined)
+    o['revoked-at'] = v.revokedAT === null ? null : v.revokedAT.toISOString()
   if (v.updatedAT !== undefined) o['updated-at'] = v.updatedAT.toISOString()
   if (v.value !== undefined) o['value'] = v.value
   return o
@@ -667,10 +615,11 @@ export function toWireCreateAIAPIKeyResponse(v: CreateAIAPIKeyResponse): Record<
 export function fromWireCreateAIAPIKeyResponse(w: any): CreateAIAPIKeyResponse {
   const v = {} as CreateAIAPIKeyResponse
   v.createdAT = new Date(w['created-at'])
+  v.deployments = w['deployments']
   v.id = w['id']
+  v.models = w['models']
   v.name = w['name']
-  v.orgUuid = w['org-uuid']
-  v.scope = w['scope']
+  if (w['revoked-at'] !== undefined) v.revokedAT = new Date(w['revoked-at'])
   v.updatedAT = new Date(w['updated-at'])
   v.value = w['value']
   return v
@@ -9158,28 +9107,20 @@ export interface GetAIAPIKeyResponse {
    * Read-only
    */
   createdAT: Date
+  deployments: AIAPIKeyDeploymentsResponse
   /**
    * AI API key ID
    *
    * Read-only
    */
   id: string
+  models: AIAPIKeyModels
   /**
    * Human-readable name for the AI API key
    */
   name: string
   /**
-   * Organization UUID that owns this key
-   *
-   * Read-only
-   */
-  orgUuid: string
-  /**
-   * Key scope: 'public' for all deployments, or a specific deployment UUID
-   */
-  scope: string
-  /**
-   * Last update timestamp
+   * Revocation timestamp. Null when the API key is active.
    *
    * Read-only
    */
@@ -9190,10 +9131,10 @@ export interface GetAIAPIKeyResponse {
 export function toWireGetAIAPIKeyResponse(v: GetAIAPIKeyResponse): Record<string, unknown> {
   const o: Record<string, unknown> = {}
   if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
+  if (v.deployments !== undefined) o['deployments'] = v.deployments
   if (v.id !== undefined) o['id'] = v.id
+  if (v.models !== undefined) o['models'] = v.models
   if (v.name !== undefined) o['name'] = v.name
-  if (v.orgUuid !== undefined) o['org-uuid'] = v.orgUuid
-  if (v.scope !== undefined) o['scope'] = v.scope
   if (v.updatedAT !== undefined) o['updated-at'] = v.updatedAT.toISOString()
   return o
 }
@@ -9202,10 +9143,10 @@ export function toWireGetAIAPIKeyResponse(v: GetAIAPIKeyResponse): Record<string
 export function fromWireGetAIAPIKeyResponse(w: any): GetAIAPIKeyResponse {
   const v = {} as GetAIAPIKeyResponse
   v.createdAT = new Date(w['created-at'])
+  v.deployments = w['deployments']
   v.id = w['id']
+  v.models = w['models']
   v.name = w['name']
-  v.orgUuid = w['org-uuid']
-  v.scope = w['scope']
   v.updatedAT = new Date(w['updated-at'])
   return v
 }
@@ -9373,10 +9314,6 @@ export interface GetDeploymentResponse {
    * Read-only
    */
   updatedAT?: Date
-  /**
-   * Deployment visibility: private for your organization's deployments, public for Exoscale Managed Inference deployments.
-   */
-  visibility: 'private' | 'public'
 }
 
 /** @internal */
@@ -9398,7 +9335,6 @@ export function toWireGetDeploymentResponse(v: GetDeploymentResponse): Record<st
   if (v.state !== undefined) o['state'] = v.state
   if (v.stateDetails !== undefined) o['state-details'] = v.stateDetails
   if (v.updatedAT !== undefined) o['updated-at'] = v.updatedAT.toISOString()
-  if (v.visibility !== undefined) o['visibility'] = v.visibility
   return o
 }
 
@@ -9421,7 +9357,6 @@ export function fromWireGetDeploymentResponse(w: any): GetDeploymentResponse {
   v.state = w['state']
   if (w['state-details'] !== undefined) v.stateDetails = w['state-details']
   if (w['updated-at'] !== undefined) v.updatedAT = new Date(w['updated-at'])
-  v.visibility = w['visibility']
   return v
 }
 
@@ -9555,11 +9490,21 @@ export interface GetModelResponse {
    */
   createdAT: Date
   /**
+   * Model deprecation date
+   *
+   * Read-only
+   */
+  deprecationDate?: Date | null
+  /**
    * Model ID
    *
    * Read-only
    */
   id: string
+  /**
+   * Model lifecycle state
+   */
+  lifecycleStatus?: 'active' | 'deprecated' | 'eol' | null | 'preview' | null
   /**
    * Model size in bytes
    *
@@ -9582,17 +9527,26 @@ export interface GetModelResponse {
    * Read-only
    */
   updatedAT: Date
+  /**
+   * Model visibility
+   */
+  visibility?: 'private' | 'public'
 }
 
 /** @internal */
 export function toWireGetModelResponse(v: GetModelResponse): Record<string, unknown> {
   const o: Record<string, unknown> = {}
   if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
+  if (v.deprecationDate !== undefined)
+    o['deprecation-date'] = v.deprecationDate === null ? null : v.deprecationDate.toISOString()
   if (v.id !== undefined) o['id'] = v.id
+  if (v.lifecycleStatus !== undefined)
+    o['lifecycle-status'] = v.lifecycleStatus === null ? null : v.lifecycleStatus
   if (v.modelSize !== undefined) o['model-size'] = v.modelSize
   if (v.name !== undefined) o['name'] = v.name
   if (v.state !== undefined) o['state'] = v.state
   if (v.updatedAT !== undefined) o['updated-at'] = v.updatedAT.toISOString()
+  if (v.visibility !== undefined) o['visibility'] = v.visibility
   return o
 }
 
@@ -9600,11 +9554,14 @@ export function toWireGetModelResponse(v: GetModelResponse): Record<string, unkn
 export function fromWireGetModelResponse(w: any): GetModelResponse {
   const v = {} as GetModelResponse
   v.createdAT = new Date(w['created-at'])
+  if (w['deprecation-date'] !== undefined) v.deprecationDate = new Date(w['deprecation-date'])
   v.id = w['id']
+  if (w['lifecycle-status'] !== undefined) v.lifecycleStatus = w['lifecycle-status']
   v.modelSize = w['model-size']
   v.name = w['name']
   v.state = w['state']
   v.updatedAT = new Date(w['updated-at'])
+  if (w['visibility'] !== undefined) v.visibility = w['visibility']
   return v
 }
 
@@ -9919,6 +9876,90 @@ export function fromWireIAMServicePolicyRule(w: any): IAMServicePolicyRule {
   return v
 }
 
+/**
+ * IAM System Role
+ */
+export interface IAMSystemRole {
+  /**
+   * IAM Assume System Role Policy
+   */
+  assumeRolePolicy?: IAMAssumeRolePolicy
+  /**
+   * IAM System Role description
+   *
+   * Length 1-255
+   */
+  description?: string
+  /**
+   * IAM System Role mutability
+   */
+  editable?: boolean
+  /**
+   * IAM System Role ID
+   *
+   * Read-only
+   */
+  id?: string
+  /**
+   * IAM System Role Labels
+   */
+  labels?: Labels
+  /**
+   * Maximum TTL requester is allowed to ask for when assuming a system role
+   *
+   * Min >0
+   */
+  maxSessionTtl?: number
+  /**
+   * IAM System Role name
+   *
+   * Length 1-255
+   */
+  name?: string
+  /**
+   * IAM System Role permissions
+   *
+   * Unique items
+   */
+  permissions?: string[]
+  /**
+   * IAM System Role Policy
+   */
+  policy?: IAMPolicy
+}
+
+/** @internal */
+export function toWireIAMSystemRole(v: IAMSystemRole): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.assumeRolePolicy !== undefined)
+    o['assume-role-policy'] = toWireIAMAssumeRolePolicy(v.assumeRolePolicy)
+  if (v.description !== undefined) o['description'] = v.description
+  if (v.editable !== undefined) o['editable'] = v.editable
+  if (v.id !== undefined) o['id'] = v.id
+  if (v.labels !== undefined) o['labels'] = v.labels
+  if (v.maxSessionTtl !== undefined) o['max-session-ttl'] = v.maxSessionTtl
+  if (v.name !== undefined) o['name'] = v.name
+  if (v.permissions !== undefined) o['permissions'] = v.permissions
+  if (v.policy !== undefined) o['policy'] = toWireIAMPolicy(v.policy)
+  return o
+}
+
+/** @internal */
+export function fromWireIAMSystemRole(w: any): IAMSystemRole {
+  const v = {} as IAMSystemRole
+  if (w['assume-role-policy'] !== undefined)
+    v.assumeRolePolicy = fromWireIAMAssumeRolePolicy(w['assume-role-policy'])
+  if (w['description'] !== undefined) v.description = w['description']
+  if (w['editable'] !== undefined) v.editable = w['editable']
+  if (w['id'] !== undefined) v.id = w['id']
+  if (w['labels'] !== undefined) v.labels = w['labels']
+  if (w['max-session-ttl'] !== undefined) v.maxSessionTtl = w['max-session-ttl']
+  if (w['name'] !== undefined) v.name = w['name']
+  if (w['permissions'] !== undefined) v.permissions = w['permissions']
+  if (w['policy'] !== undefined) v.policy = fromWireIAMPolicy(w['policy'])
+  return v
+}
+
 export interface ImpactBreakdown {
   impact: Record<string, ImpactValueWithUnit>
   zones: Record<string, ZoneImpact>
@@ -10106,7 +10147,7 @@ export function fromWireInferenceEngineParameterEntry(w: any): InferenceEnginePa
 /**
  * Inference engine version
  *
- * @defaultValue "0.28.0"
+ * @defaultValue "0.29.0"
  */
 export type InferenceEngineVersion =
   | '0.12.0'
@@ -10131,6 +10172,7 @@ export type InferenceEngineVersion =
   | '0.27.0'
   | '0.27.1'
   | '0.28.0'
+  | '0.29.0'
 
 /**
  * Router flush payload: the router's full in-memory usage map with flush identity fields
@@ -10560,6 +10602,42 @@ export function fromWireInstancePassword(w: any): InstancePassword {
 }
 
 /**
+ * Instance Pool Error Reason
+ */
+export interface InstancePoolErrorReason {
+  /**
+   * Error cause
+   */
+  cause?: string
+  /**
+   * Job ID at the origin of error
+   */
+  jobID?: string
+  /**
+   * Error type
+   */
+  type?: string
+}
+
+/** @internal */
+export function toWireInstancePoolErrorReason(v: InstancePoolErrorReason): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.cause !== undefined) o['cause'] = v.cause
+  if (v.jobID !== undefined) o['job-id'] = v.jobID
+  if (v.type !== undefined) o['type'] = v.type
+  return o
+}
+
+/** @internal */
+export function fromWireInstancePoolErrorReason(w: any): InstancePoolErrorReason {
+  const v = {} as InstancePoolErrorReason
+  if (w['cause'] !== undefined) v.cause = w['cause']
+  if (w['job-id'] !== undefined) v.jobID = w['job-id']
+  if (w['type'] !== undefined) v.type = w['type']
+  return v
+}
+
+/**
  * Instance Pool
  */
 export interface InstancePool {
@@ -10591,6 +10669,10 @@ export interface InstancePool {
    * Instances Elastic IPs
    */
   elasticIPS?: ElasticIPRef[]
+  /**
+   * Instance Pool Error Reason
+   */
+  errorReason?: InstancePoolErrorReason
   /**
    * Instance Pool ID
    *
@@ -10669,7 +10751,14 @@ export interface InstancePool {
    * Read-only
    */
   state?:
-    'creating' | 'destroying' | 'running' | 'scaling-down' | 'scaling-up' | 'suspended' | 'updating'
+    | 'creating'
+    | 'destroying'
+    | 'error'
+    | 'running'
+    | 'scaling-down'
+    | 'scaling-up'
+    | 'suspended'
+    | 'updating'
   /**
    * Instances template
    */
@@ -10693,6 +10782,7 @@ export function toWireInstancePool(v: InstancePool): Record<string, unknown> {
   if (v.description !== undefined) o['description'] = v.description
   if (v.diskSize !== undefined) o['disk-size'] = v.diskSize
   if (v.elasticIPS !== undefined) o['elastic-ips'] = v.elasticIPS.map((x) => toWireElasticIPRef(x))
+  if (v.errorReason !== undefined) o['error-reason'] = toWireInstancePoolErrorReason(v.errorReason)
   if (v.id !== undefined) o['id'] = v.id
   if (v.instancePrefix !== undefined) o['instance-prefix'] = v.instancePrefix
   if (v.instanceType !== undefined) o['instance-type'] = toWireInstanceTypeRef(v.instanceType)
@@ -10730,6 +10820,8 @@ export function fromWireInstancePool(w: any): InstancePool {
   if (w['disk-size'] !== undefined) v.diskSize = w['disk-size']
   if (w['elastic-ips'] !== undefined)
     v.elasticIPS = (w['elastic-ips'] as any[]).map((x) => fromWireElasticIPRef(x))
+  if (w['error-reason'] !== undefined)
+    v.errorReason = fromWireInstancePoolErrorReason(w['error-reason'])
   if (w['id'] !== undefined) v.id = w['id']
   if (w['instance-prefix'] !== undefined) v.instancePrefix = w['instance-prefix']
   if (w['instance-type'] !== undefined) v.instanceType = fromWireInstanceTypeRef(w['instance-type'])
@@ -15802,7 +15894,7 @@ export type Labels = Record<string, string>
 /**
  * List of AI API keys
  *
- * @example {"ai-api-keys":[{"created-at":"2026-03-25T10:00:00Z","id":"11111111-1111-1111-1111-111111111111","name":"default-public-key","org-uuid":"22222222-2222-2222-2222-222222222222","scope":"public","updated-at":"2026-03-25T10:00:00Z"}]}
+ * @example {"ai-api-keys":[{"created-at":"2026-03-25T10:00:00Z","deployments":[],"id":"11111111-1111-1111-1111-111111111111","models":["all"],"name":"default-public-key","revoked-at":"2026-03-25T10:00:00Z","updated-at":"2026-03-25T10:00:00Z"},{"created-at":"2026-03-25T10:00:00Z","deployments":[{"id":"33333333-3333-3333-3333-333333333333"},{"id":"44444444-4444-4444-4444-444444444444"}],"id":"22222222-2222-2222-2222-222222222222","models":["GLM 5.2","Kimi 2.7"],"name":"restricted-key","revoked-at":"","updated-at":"2026-03-25T10:00:00Z"}]}
  */
 export interface ListAIAPIKeysResponse {
   aiAPIKeys: ListAIAPIKeysResponseEntry[]
@@ -15828,34 +15920,23 @@ export function fromWireListAIAPIKeysResponse(w: any): ListAIAPIKeysResponse {
  */
 export interface ListAIAPIKeysResponseEntry {
   /**
-   * Creation timestamp
-   *
    * Read-only
    */
   createdAT: Date
+  deployments: AIAPIKeyDeploymentsResponse
   /**
-   * AI API key ID
-   *
    * Read-only
    */
   id: string
-  /**
-   * Human-readable name for the AI API key
-   */
+  models: AIAPIKeyModels
   name: string
   /**
-   * Organization UUID that owns this key
+   * Revocation timestamp. Null when the API key is active.
    *
    * Read-only
    */
-  orgUuid: string
+  revokedAT: Date | null
   /**
-   * Key scope: 'public' for all deployments, or a specific deployment UUID
-   */
-  scope: string
-  /**
-   * Last update timestamp
-   *
    * Read-only
    */
   updatedAT: Date
@@ -15867,10 +15948,12 @@ export function toWireListAIAPIKeysResponseEntry(
 ): Record<string, unknown> {
   const o: Record<string, unknown> = {}
   if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
+  if (v.deployments !== undefined) o['deployments'] = v.deployments
   if (v.id !== undefined) o['id'] = v.id
+  if (v.models !== undefined) o['models'] = v.models
   if (v.name !== undefined) o['name'] = v.name
-  if (v.orgUuid !== undefined) o['org-uuid'] = v.orgUuid
-  if (v.scope !== undefined) o['scope'] = v.scope
+  if (v.revokedAT !== undefined)
+    o['revoked-at'] = v.revokedAT === null ? null : v.revokedAT.toISOString()
   if (v.updatedAT !== undefined) o['updated-at'] = v.updatedAT.toISOString()
   return o
 }
@@ -15879,10 +15962,11 @@ export function toWireListAIAPIKeysResponseEntry(
 export function fromWireListAIAPIKeysResponseEntry(w: any): ListAIAPIKeysResponseEntry {
   const v = {} as ListAIAPIKeysResponseEntry
   v.createdAT = new Date(w['created-at'])
+  v.deployments = w['deployments']
   v.id = w['id']
+  v.models = w['models']
   v.name = w['name']
-  v.orgUuid = w['org-uuid']
-  v.scope = w['scope']
+  v.revokedAT = new Date(w['revoked-at'])
   v.updatedAT = new Date(w['updated-at'])
   return v
 }
@@ -15994,10 +16078,6 @@ export interface ListDeploymentsResponseEntry {
    * Read-only
    */
   updatedAT?: Date
-  /**
-   * Deployment visibility: private for your organization's deployments, public for Exoscale Managed Inference deployments.
-   */
-  visibility: 'private' | 'public'
 }
 
 /** @internal */
@@ -16016,7 +16096,6 @@ export function toWireListDeploymentsResponseEntry(
   if (v.serviceLevel !== undefined) o['service-level'] = v.serviceLevel
   if (v.state !== undefined) o['state'] = v.state
   if (v.updatedAT !== undefined) o['updated-at'] = v.updatedAT.toISOString()
-  if (v.visibility !== undefined) o['visibility'] = v.visibility
   return o
 }
 
@@ -16034,7 +16113,6 @@ export function fromWireListDeploymentsResponseEntry(w: any): ListDeploymentsRes
   if (w['service-level'] !== undefined) v.serviceLevel = w['service-level']
   v.state = w['state']
   if (w['updated-at'] !== undefined) v.updatedAT = new Date(w['updated-at'])
-  v.visibility = w['visibility']
   return v
 }
 
@@ -16246,6 +16324,10 @@ export interface ListModelsResponseEntry {
    */
   id: string
   /**
+   * Model lifecycle state
+   */
+  lifecycleStatus?: 'active' | 'deprecated' | 'eol' | null | 'preview' | null
+  /**
    * Model size in bytes
    *
    * Min 0
@@ -16267,6 +16349,10 @@ export interface ListModelsResponseEntry {
    * Read-only
    */
   updatedAT: Date
+  /**
+   * Model visibility
+   */
+  visibility?: 'private' | 'public'
 }
 
 /** @internal */
@@ -16274,10 +16360,13 @@ export function toWireListModelsResponseEntry(v: ListModelsResponseEntry): Recor
   const o: Record<string, unknown> = {}
   if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
   if (v.id !== undefined) o['id'] = v.id
+  if (v.lifecycleStatus !== undefined)
+    o['lifecycle-status'] = v.lifecycleStatus === null ? null : v.lifecycleStatus
   if (v.modelSize !== undefined) o['model-size'] = v.modelSize
   if (v.name !== undefined) o['name'] = v.name
   if (v.state !== undefined) o['state'] = v.state
   if (v.updatedAT !== undefined) o['updated-at'] = v.updatedAT.toISOString()
+  if (v.visibility !== undefined) o['visibility'] = v.visibility
   return o
 }
 
@@ -16286,10 +16375,12 @@ export function fromWireListModelsResponseEntry(w: any): ListModelsResponseEntry
   const v = {} as ListModelsResponseEntry
   v.createdAT = new Date(w['created-at'])
   v.id = w['id']
+  if (w['lifecycle-status'] !== undefined) v.lifecycleStatus = w['lifecycle-status']
   v.modelSize = w['model-size']
   v.name = w['name']
   v.state = w['state']
   v.updatedAT = new Date(w['updated-at'])
+  if (w['visibility'] !== undefined) v.visibility = w['visibility']
   return v
 }
 
@@ -16432,6 +16523,10 @@ export interface ListVpcEntry {
    */
   description?: string
   /**
+   * DHCP options
+   */
+  dhcpOptions?: VpcDHCPOptions
+  /**
    * VPC ID
    */
   id?: string
@@ -16453,6 +16548,7 @@ export function toWireListVpcEntry(v: ListVpcEntry): Record<string, unknown> {
   if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
   if (v.default !== undefined) o['default'] = v.default
   if (v.description !== undefined) o['description'] = v.description
+  if (v.dhcpOptions !== undefined) o['dhcp-options'] = toWireVpcDHCPOptions(v.dhcpOptions)
   if (v.id !== undefined) o['id'] = v.id
   if (v.labels !== undefined) o['labels'] = v.labels
   if (v.name !== undefined) o['name'] = v.name
@@ -16465,6 +16561,7 @@ export function fromWireListVpcEntry(w: any): ListVpcEntry {
   if (w['created-at'] !== undefined) v.createdAT = new Date(w['created-at'])
   if (w['default'] !== undefined) v.default = w['default']
   if (w['description'] !== undefined) v.description = w['description']
+  if (w['dhcp-options'] !== undefined) v.dhcpOptions = fromWireVpcDHCPOptions(w['dhcp-options'])
   if (w['id'] !== undefined) v.id = w['id']
   if (w['labels'] !== undefined) v.labels = w['labels']
   if (w['name'] !== undefined) v.name = w['name']
@@ -19465,10 +19562,6 @@ export interface Template {
    * Read-only
    */
   visibility?: 'private' | 'public'
-  /**
-   * Zones availability
-   */
-  zones?: ZoneName[]
 }
 
 /** @internal */
@@ -19492,7 +19585,6 @@ export function toWireTemplate(v: Template): Record<string, unknown> {
   if (v.url !== undefined) o['url'] = v.url
   if (v.version !== undefined) o['version'] = v.version
   if (v.visibility !== undefined) o['visibility'] = v.visibility
-  if (v.zones !== undefined) o['zones'] = v.zones
   return o
 }
 
@@ -19517,7 +19609,6 @@ export function fromWireTemplate(w: any): Template {
   if (w['url'] !== undefined) v.url = w['url']
   if (w['version'] !== undefined) v.version = w['version']
   if (w['visibility'] !== undefined) v.visibility = w['visibility']
-  if (w['zones'] !== undefined) v.zones = w['zones']
   return v
 }
 
@@ -19542,6 +19633,63 @@ export function toWireTemplateRef(v: TemplateRef): Record<string, unknown> {
 export function fromWireTemplateRef(w: any): TemplateRef {
   const v = {} as TemplateRef
   if (w['id'] !== undefined) v.id = w['id']
+  return v
+}
+
+/**
+ * Update the models and/or deployments accessible by an AI API key. Omitted properties are left unchanged.
+ */
+export interface UpdateAIAPIKeyRequest {
+  deployments?: AIAPIKeyDeployments
+  models?: AIAPIKeyModels
+}
+
+/** @internal */
+export function toWireUpdateAIAPIKeyRequest(v: UpdateAIAPIKeyRequest): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.deployments !== undefined) o['deployments'] = v.deployments
+  if (v.models !== undefined) o['models'] = v.models
+  return o
+}
+
+/** @internal */
+export function fromWireUpdateAIAPIKeyRequest(w: any): UpdateAIAPIKeyRequest {
+  const v = {} as UpdateAIAPIKeyRequest
+  if (w['deployments'] !== undefined) v.deployments = w['deployments']
+  if (w['models'] !== undefined) v.models = w['models']
+  return v
+}
+
+export interface UpdateAIAPIKeyResponse {
+  createdAT: Date
+  deployments: AIAPIKeyDeploymentsResponse
+  id: string
+  models: AIAPIKeyModels
+  name: string
+  updatedAT: Date
+}
+
+/** @internal */
+export function toWireUpdateAIAPIKeyResponse(v: UpdateAIAPIKeyResponse): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
+  if (v.deployments !== undefined) o['deployments'] = v.deployments
+  if (v.id !== undefined) o['id'] = v.id
+  if (v.models !== undefined) o['models'] = v.models
+  if (v.name !== undefined) o['name'] = v.name
+  if (v.updatedAT !== undefined) o['updated-at'] = v.updatedAT.toISOString()
+  return o
+}
+
+/** @internal */
+export function fromWireUpdateAIAPIKeyResponse(w: any): UpdateAIAPIKeyResponse {
+  const v = {} as UpdateAIAPIKeyResponse
+  v.createdAT = new Date(w['created-at'])
+  v.deployments = w['deployments']
+  v.id = w['id']
+  v.models = w['models']
+  v.name = w['name']
+  v.updatedAT = new Date(w['updated-at'])
   return v
 }
 
@@ -19665,6 +19813,10 @@ export interface Vpc {
    */
   description?: string
   /**
+   * DHCP options
+   */
+  dhcpOptions?: VpcDHCPOptions
+  /**
    * VPC ID
    */
   id?: string
@@ -19686,6 +19838,7 @@ export function toWireVpc(v: Vpc): Record<string, unknown> {
   if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
   if (v.default !== undefined) o['default'] = v.default
   if (v.description !== undefined) o['description'] = v.description
+  if (v.dhcpOptions !== undefined) o['dhcp-options'] = toWireVpcDHCPOptions(v.dhcpOptions)
   if (v.id !== undefined) o['id'] = v.id
   if (v.labels !== undefined) o['labels'] = v.labels
   if (v.name !== undefined) o['name'] = v.name
@@ -19698,9 +19851,46 @@ export function fromWireVpc(w: any): Vpc {
   if (w['created-at'] !== undefined) v.createdAT = new Date(w['created-at'])
   if (w['default'] !== undefined) v.default = w['default']
   if (w['description'] !== undefined) v.description = w['description']
+  if (w['dhcp-options'] !== undefined) v.dhcpOptions = fromWireVpcDHCPOptions(w['dhcp-options'])
   if (w['id'] !== undefined) v.id = w['id']
   if (w['labels'] !== undefined) v.labels = w['labels']
   if (w['name'] !== undefined) v.name = w['name']
+  return v
+}
+
+/**
+ * VPC DHCP options
+ */
+export interface VpcDHCPOptions {
+  /**
+   * DNS Servers
+   */
+  dnsServers?: string[]
+  /**
+   * Domain search list, limited to 255 octets post RFC3397 compression
+   */
+  domainSearch?: string[]
+  /**
+   * NTP Servers
+   */
+  ntpServers?: string[]
+}
+
+/** @internal */
+export function toWireVpcDHCPOptions(v: VpcDHCPOptions): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.dnsServers !== undefined) o['dns-servers'] = v.dnsServers
+  if (v.domainSearch !== undefined) o['domain-search'] = v.domainSearch
+  if (v.ntpServers !== undefined) o['ntp-servers'] = v.ntpServers
+  return o
+}
+
+/** @internal */
+export function fromWireVpcDHCPOptions(w: any): VpcDHCPOptions {
+  const v = {} as VpcDHCPOptions
+  if (w['dns-servers'] !== undefined) v.dnsServers = w['dns-servers']
+  if (w['domain-search'] !== undefined) v.domainSearch = w['domain-search']
+  if (w['ntp-servers'] !== undefined) v.ntpServers = w['ntp-servers']
   return v
 }
 

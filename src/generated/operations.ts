@@ -55,6 +55,7 @@ import {
   fromWireEncryptResponse,
   fromWireEnvImpactReport,
   fromWireEvent,
+  fromWireFocusReport,
   fromWireGenerateDataKeyResponse,
   fromWireGetAIAPIKeyResponse,
   fromWireGetDeploymentLogsResponse,
@@ -62,10 +63,12 @@ import {
   fromWireGetInferenceEngineHelpResponse,
   fromWireGetKmsKeyResponse,
   fromWireGetModelResponse,
+  fromWireGetPublicKeyResponse,
   fromWireIAMAPIKey,
   fromWireIAMAPIKeyCreated,
   fromWireIAMPolicy,
   fromWireIAMRole,
+  fromWireIAMSystemRole,
   fromWireImpactBreakdown,
   fromWireImpactValueWithUnit,
   fromWireInstance,
@@ -75,6 +78,8 @@ import {
   fromWireListAIAPIKeysResponse,
   fromWireListAIInstanceTypesResponse,
   fromWireListDeploymentsResponse,
+  fromWireListKeyStoresResponse,
+  fromWireListKeyStoresResponseEntry,
   fromWireListKmsKeyRotationsResponse,
   fromWireListKmsKeysResponse,
   fromWireListModelsResponse,
@@ -102,17 +107,22 @@ import {
   fromWireSSHKey,
   fromWireScheduleKmsKeyDeletionResponse,
   fromWireSecurityGroup,
+  fromWireSignResponse,
   fromWireSnapshot,
   fromWireSubnet,
   fromWireSuccessResponse,
   fromWireTemplate,
+  fromWireUpdateAIAPIKeyResponse,
   fromWireUser,
+  fromWireVerifyResponse,
   fromWireVpc,
   fromWireZone,
   toWireAntiAffinityGroupRef,
   toWireBlockStorageSnapshotRef,
+  toWireCPUManagerConfig,
   toWireCreateAIAPIKeyRequest,
   toWireCreateDeploymentRequest,
+  toWireCreateKeyStoreRequest,
   toWireCreateKmsKeyRequest,
   toWireCreateModelRequest,
   toWireDBAASClickhouseUserRoleInput,
@@ -177,8 +187,13 @@ import {
   toWireScheduleKmsKeyDeletionRequest,
   toWireSecurityGroupRef,
   toWireSecurityGroupResource,
+  toWireSignRequest,
   toWireTemplateRef,
+  toWireUpdateAIAPIKeyRequest,
   toWireUpdateDeploymentRequest,
+  toWireUpdateKeyStoreRequest,
+  toWireVerifyRequest,
+  toWireVpcDHCPOptions,
   toWireZone,
 } from './schemas.js'
 import type {
@@ -187,9 +202,11 @@ import type {
   BlockStorageSnapshot,
   BlockStorageSnapshotRef,
   BlockStorageVolume,
+  CPUManagerConfig,
   CreateAIAPIKeyRequest,
   CreateAIAPIKeyResponse,
   CreateDeploymentRequest,
+  CreateKeyStoreRequest,
   CreateKmsKeyRequest,
   CreateKmsKeyResponse,
   CreateModelRequest,
@@ -281,19 +298,23 @@ import type {
   EnumSortOrder,
   EnvImpactReport,
   Event,
+  FocusReport,
   GenerateDataKeyRequest,
   GenerateDataKeyResponse,
   GetAIAPIKeyResponse,
   GetDeploymentLogsResponse,
   GetDeploymentResponse,
   GetInferenceEngineHelpResponse,
+  GetKeyStoreResponse,
   GetKmsKeyResponse,
   GetModelResponse,
+  GetPublicKeyResponse,
   IAMAPIKey,
   IAMAPIKeyCreated,
   IAMAssumeRolePolicy,
   IAMPolicy,
   IAMRole,
+  IAMSystemRole,
   ImpactBreakdown,
   ImpactValueWithUnit,
   Instance,
@@ -323,6 +344,8 @@ import type {
   ListAIAPIKeysResponse,
   ListAIInstanceTypesResponse,
   ListDeploymentsResponse,
+  ListKeyStoresResponse,
+  ListKeyStoresResponseEntry,
   ListKmsKeyRotationsResponse,
   ListKmsKeysResponse,
   ListModelsResponse,
@@ -354,6 +377,7 @@ import type {
   SKSAuditCreate,
   SKSAuditUpdate,
   SKSCluster,
+  SKSClusterAllowedNetworks,
   SKSClusterDeprecatedResource,
   SKSClusterLabels,
   SKSKubeconfigRequest,
@@ -370,14 +394,22 @@ import type {
   SecurityGroup,
   SecurityGroupRef,
   SecurityGroupResource,
+  SignRequest,
+  SignResponse,
   Snapshot,
   Subnet,
   SuccessResponse,
   Template,
   TemplateRef,
+  UpdateAIAPIKeyRequest,
+  UpdateAIAPIKeyResponse,
   UpdateDeploymentRequest,
+  UpdateKeyStoreRequest,
   User,
+  VerifyRequest,
+  VerifyResponse,
   Vpc,
+  VpcDHCPOptions,
   Zone,
 } from './schemas.js'
 import { isoDateTime, type ClientCore } from '../core.js'
@@ -716,6 +748,10 @@ export function toWireAttachInstanceToSubnetRequest(
 }
 
 export interface CancelKmsKeyDeletionRequest {
+  id: string
+}
+
+export interface ConnectKeyStoreRequest {
   id: string
 }
 
@@ -2523,6 +2559,54 @@ export function toWireCreateIAMRoleRequest(v: CreateIAMRoleRequest): Record<stri
   return o
 }
 
+/**
+ * VPC Subnet attachment
+ */
+export interface CreateInstanceRequestVpcSubnets {
+  /**
+   * Subnet ID
+   */
+  id: string
+  /**
+   * Instance IPv4. Random one if unset
+   */
+  ipv4?: string
+}
+
+/** @internal */
+export function toWireCreateInstanceRequestVpcSubnets(
+  v: CreateInstanceRequestVpcSubnets,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.id !== undefined) o['id'] = v.id
+  if (v.ipv4 !== undefined) o['ipv4'] = v.ipv4
+  return o
+}
+
+/**
+ * Attach the Instance to VPC Subnets
+ */
+export interface CreateInstanceRequestVpc {
+  /**
+   * VPC ID
+   */
+  id: string
+  /**
+   * VPC Subnets to attach the Instance to
+   */
+  subnets: CreateInstanceRequestVpcSubnets[]
+}
+
+/** @internal */
+export function toWireCreateInstanceRequestVpc(
+  v: CreateInstanceRequestVpc,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.id !== undefined) o['id'] = v.id
+  if (v.subnets !== undefined)
+    o['subnets'] = v.subnets.map((x) => toWireCreateInstanceRequestVpcSubnets(x))
+  return o
+}
 export interface CreateInstanceRequest {
   /**
    * Instance Anti-affinity Groups
@@ -2608,6 +2692,10 @@ export interface CreateInstanceRequest {
    * Length 1-32768
    */
   userData?: string
+  /**
+   * Attach the Instance to VPC Subnets
+   */
+  vpc?: CreateInstanceRequestVpc
 }
 /** @internal */
 export function toWireCreateInstanceRequest(v: CreateInstanceRequest): Record<string, unknown> {
@@ -2633,6 +2721,7 @@ export function toWireCreateInstanceRequest(v: CreateInstanceRequest): Record<st
   if (v.template !== undefined) o['template'] = toWireTemplateRef(v.template)
   if (v.tpmEnabled !== undefined) o['tpm-enabled'] = v.tpmEnabled
   if (v.userData !== undefined) o['user-data'] = v.userData
+  if (v.vpc !== undefined) o['vpc'] = toWireCreateInstanceRequestVpc(v.vpc)
   return o
 }
 
@@ -2916,6 +3005,10 @@ export interface CreateSKSClusterRequest {
    */
   addons?: string[]
   /**
+   * EXPERIMENTAL: List of ranges of allowed IPs using CIDR notation. Defaults to `["0.0.0.0/0"]`, allowing access to all IPs. (default: ["0.0.0.0/0"])
+   */
+  allowedNetworks?: SKSClusterAllowedNetworks
+  /**
    * Kubernetes Audit Log Configuration
    */
   audit?: SKSAuditCreate
@@ -2948,6 +3041,12 @@ export interface CreateSKSClusterRequest {
    */
   featureGates?: string[]
   /**
+   * A list of Karpenter controller feature gates to enable for the Karpenter controller binary
+   *
+   * Unique items
+   */
+  karpenterFeatureGates?: string[]
+  /**
    * Cluster Labels
    */
   labels?: SKSClusterLabels
@@ -2978,6 +3077,7 @@ export interface CreateSKSClusterRequest {
 export function toWireCreateSKSClusterRequest(v: CreateSKSClusterRequest): Record<string, unknown> {
   const o: Record<string, unknown> = {}
   if (v.addons !== undefined) o['addons'] = v.addons
+  if (v.allowedNetworks !== undefined) o['allowed-networks'] = v.allowedNetworks
   if (v.audit !== undefined) o['audit'] = toWireSKSAuditCreate(v.audit)
   if (v.autoUpgrade !== undefined) o['auto-upgrade'] = v.autoUpgrade
   if (v.cni !== undefined) o['cni'] = v.cni
@@ -2987,6 +3087,7 @@ export function toWireCreateSKSClusterRequest(v: CreateSKSClusterRequest): Recor
   if (v.description !== undefined) o['description'] = v.description === null ? null : v.description
   if (v.enableKubeProxy !== undefined) o['enable-kube-proxy'] = v.enableKubeProxy
   if (v.featureGates !== undefined) o['feature-gates'] = v.featureGates
+  if (v.karpenterFeatureGates !== undefined) o['karpenter-feature-gates'] = v.karpenterFeatureGates
   if (v.labels !== undefined) o['labels'] = v.labels
   if (v.level !== undefined) o['level'] = v.level
   if (v.name !== undefined) o['name'] = v.name
@@ -3010,6 +3111,10 @@ export interface CreateSKSNodepoolRequest {
    * Max items 8, Unique items
    */
   antiAffinityGroups?: AntiAffinityGroupRef[]
+  /**
+   * CPU manager config
+   */
+  cpuManagerConfig?: CPUManagerConfig | null
   /**
    * Nodepool Deploy Target
    */
@@ -3098,6 +3203,9 @@ export function toWireCreateSKSNodepoolRequest(
   if (v.addons !== undefined) o['addons'] = v.addons
   if (v.antiAffinityGroups !== undefined)
     o['anti-affinity-groups'] = v.antiAffinityGroups.map((x) => toWireAntiAffinityGroupRef(x))
+  if (v.cpuManagerConfig !== undefined)
+    o['cpu-manager-config'] =
+      v.cpuManagerConfig === null ? null : toWireCPUManagerConfig(v.cpuManagerConfig)
   if (v.deployTarget !== undefined) o['deploy-target'] = toWireDeployTargetRef(v.deployTarget)
   if (v.description !== undefined) o['description'] = v.description
   if (v.diskSize !== undefined) o['disk-size'] = v.diskSize
@@ -3193,6 +3301,10 @@ export interface CreateVpcRequest {
    */
   description?: string
   /**
+   * DHCP options
+   */
+  dhcpOptions?: VpcDHCPOptions
+  /**
    * Resource labels
    */
   labels?: Labels
@@ -3207,13 +3319,10 @@ export interface CreateVpcRequest {
 export function toWireCreateVpcRequest(v: CreateVpcRequest): Record<string, unknown> {
   const o: Record<string, unknown> = {}
   if (v.description !== undefined) o['description'] = v.description
+  if (v.dhcpOptions !== undefined) o['dhcp-options'] = toWireVpcDHCPOptions(v.dhcpOptions)
   if (v.labels !== undefined) o['labels'] = v.labels
   if (v.name !== undefined) o['name'] = v.name
   return o
-}
-
-export interface DeleteAIAPIKeyRequest {
-  id: string
 }
 
 export interface DeleteAntiAffinityGroupRequest {
@@ -3381,6 +3490,10 @@ export interface DeleteInstancePoolRequest {
   id: string
 }
 
+export interface DeleteKeyStoreRequest {
+  id: string
+}
+
 export interface DeleteLoadBalancerRequest {
   id: string
 }
@@ -3545,6 +3658,10 @@ export interface DisableKmsKeyRequest {
 }
 
 export interface DisableKmsKeyRotationRequest {
+  id: string
+}
+
+export interface DisconnectKeyStoreRequest {
   id: string
 }
 
@@ -4479,6 +4596,10 @@ export interface GetEnvImpactRequest {
   period: string
 }
 
+export interface GetFocusReportRequest {
+  period: string
+}
+
 export interface GetIAMRoleRequest {
   id: string
 }
@@ -4550,6 +4671,10 @@ export interface GetInstanceTypeRequest {
   id: string
 }
 
+export interface GetKeyStoreRequest {
+  id: string
+}
+
 export interface GetKmsKeyRequest {
   id: string
 }
@@ -4572,6 +4697,10 @@ export interface GetOperationRequest {
 }
 
 export interface GetPrivateNetworkRequest {
+  id: string
+}
+
+export interface GetPublicKeyRequest {
   id: string
 }
 
@@ -4966,10 +5095,6 @@ export function fromWireListDeployTargetsResponse(w: any): ListDeployTargetsResp
   return v
 }
 
-export interface ListDeploymentsRequest {
-  visibility?: string
-}
-
 export interface ListDNSDomainRecordsRequest {
   domainID: string
 }
@@ -5023,6 +5148,18 @@ export function fromWireListIAMRolesResponse(w: any): ListIAMRolesResponse {
   const v = {} as ListIAMRolesResponse
   if (w['iam-roles'] !== undefined)
     v.iamRoles = (w['iam-roles'] as any[]).map((x) => fromWireIAMRole(x))
+  return v
+}
+
+export interface ListIAMSystemRolesResponse {
+  iamSystemRoles?: IAMSystemRole[]
+}
+
+/** @internal */
+export function fromWireListIAMSystemRolesResponse(w: any): ListIAMSystemRolesResponse {
+  const v = {} as ListIAMSystemRolesResponse
+  if (w['iam-system-roles'] !== undefined)
+    v.iamSystemRoles = (w['iam-system-roles'] as any[]).map((x) => fromWireIAMSystemRole(x))
   return v
 }
 
@@ -5204,6 +5341,10 @@ export function fromWireListLoadBalancersResponse(w: any): ListLoadBalancersResp
   if (w['load-balancers'] !== undefined)
     v.loadBalancers = (w['load-balancers'] as any[]).map((x) => fromWireLoadBalancer(x))
   return v
+}
+
+export interface ListModelsRequest {
+  visibility?: string
 }
 
 export interface ListPrivateNetworksResponse {
@@ -5875,6 +6016,10 @@ export function toWireRevertInstanceToSnapshotRequest(
   const o: Record<string, unknown> = {}
   if (v.id !== undefined) o['id'] = v.id
   return o
+}
+
+export interface RevokeAIAPIKeyRequest {
+  id: string
 }
 
 export interface RotateKmsKeyRequest {
@@ -7519,23 +7664,23 @@ export interface UpdateLoadBalancerRequest {
    *
    * Max length 255
    */
-  description?: string
-  labels?: Labels
+  description?: string | null
+  labels?: Labels | null
   /**
    * Load Balancer name
    *
    * Length 1-255
    */
-  name?: string
+  name?: string | null
 }
 /** @internal */
 export function toWireUpdateLoadBalancerRequest(
   v: UpdateLoadBalancerRequest,
 ): Record<string, unknown> {
   const o: Record<string, unknown> = {}
-  if (v.description !== undefined) o['description'] = v.description
-  if (v.labels !== undefined) o['labels'] = v.labels
-  if (v.name !== undefined) o['name'] = v.name
+  if (v.description !== undefined) o['description'] = v.description === null ? null : v.description
+  if (v.labels !== undefined) o['labels'] = v.labels === null ? null : v.labels
+  if (v.name !== undefined) o['name'] = v.name === null ? null : v.name
   return o
 }
 
@@ -7547,7 +7692,7 @@ export interface UpdateLoadBalancerServiceRequest {
    *
    * Max length 255
    */
-  description?: string
+  description?: string | null
   /**
    * Healthcheck configuration
    */
@@ -7557,41 +7702,41 @@ export interface UpdateLoadBalancerServiceRequest {
    *
    * Max length 255
    */
-  name?: string
+  name?: string | null
   /**
    * Port exposed on the Load Balancer's public IP
    *
    * Min 1, Max 65535
    */
-  port?: number
+  port?: number | null
   /**
    * Network traffic protocol
    */
-  protocol?: 'tcp' | 'udp'
+  protocol?: 'tcp' | 'udp' | null
   /**
    * Load balancing strategy
    */
-  strategy?: 'maglev-hash' | 'round-robin' | 'source-hash'
+  strategy?: 'maglev-hash' | 'round-robin' | 'source-hash' | null
   /**
    * Port on which the network traffic will be forwarded to on the receiving instance
    *
    * Min 1, Max 65535
    */
-  targetPort?: number
+  targetPort?: number | null
 }
 /** @internal */
 export function toWireUpdateLoadBalancerServiceRequest(
   v: UpdateLoadBalancerServiceRequest,
 ): Record<string, unknown> {
   const o: Record<string, unknown> = {}
-  if (v.description !== undefined) o['description'] = v.description
+  if (v.description !== undefined) o['description'] = v.description === null ? null : v.description
   if (v.healthcheck !== undefined)
     o['healthcheck'] = toWireLoadBalancerServiceHealthcheck(v.healthcheck)
-  if (v.name !== undefined) o['name'] = v.name
-  if (v.port !== undefined) o['port'] = v.port
-  if (v.protocol !== undefined) o['protocol'] = v.protocol
-  if (v.strategy !== undefined) o['strategy'] = v.strategy
-  if (v.targetPort !== undefined) o['target-port'] = v.targetPort
+  if (v.name !== undefined) o['name'] = v.name === null ? null : v.name
+  if (v.port !== undefined) o['port'] = v.port === null ? null : v.port
+  if (v.protocol !== undefined) o['protocol'] = v.protocol === null ? null : v.protocol
+  if (v.strategy !== undefined) o['strategy'] = v.strategy === null ? null : v.strategy
+  if (v.targetPort !== undefined) o['target-port'] = v.targetPort === null ? null : v.targetPort
   return o
 }
 
@@ -7720,6 +7865,10 @@ export interface UpdateSKSClusterRequest {
    */
   addons?: string[]
   /**
+   * EXPERIMENTAL: List of ranges of allowed IPs using CIDR notation. Defaults to `["0.0.0.0/0"]`, allowing access to all IPs. (default: ["0.0.0.0/0"])
+   */
+  allowedNetworks?: SKSClusterAllowedNetworks
+  /**
    * Kubernetes Audit Log Configuration
    */
   audit?: SKSAuditUpdate
@@ -7744,6 +7893,12 @@ export interface UpdateSKSClusterRequest {
    */
   featureGates?: string[] | null
   /**
+   * A list of Karpenter controller feature gates to enable for the Karpenter controller binary
+   *
+   * Unique items
+   */
+  karpenterFeatureGates?: string[] | null
+  /**
    * Cluster labels
    */
   labels?: SKSClusterLabels
@@ -7762,12 +7917,15 @@ export interface UpdateSKSClusterRequest {
 export function toWireUpdateSKSClusterRequest(v: UpdateSKSClusterRequest): Record<string, unknown> {
   const o: Record<string, unknown> = {}
   if (v.addons !== undefined) o['addons'] = v.addons
+  if (v.allowedNetworks !== undefined) o['allowed-networks'] = v.allowedNetworks
   if (v.audit !== undefined) o['audit'] = toWireSKSAuditUpdate(v.audit)
   if (v.autoUpgrade !== undefined) o['auto-upgrade'] = v.autoUpgrade
   if (v.description !== undefined) o['description'] = v.description === null ? null : v.description
   if (v.enableOperatorsCA !== undefined) o['enable-operators-ca'] = v.enableOperatorsCA
   if (v.featureGates !== undefined)
     o['feature-gates'] = v.featureGates === null ? null : v.featureGates
+  if (v.karpenterFeatureGates !== undefined)
+    o['karpenter-feature-gates'] = v.karpenterFeatureGates === null ? null : v.karpenterFeatureGates
   if (v.labels !== undefined) o['labels'] = v.labels
   if (v.name !== undefined) o['name'] = v.name
   if (v.oidc !== undefined) o['oidc'] = v.oidc === null ? null : toWireSKSOidc(v.oidc)
@@ -7783,6 +7941,10 @@ export interface UpdateSKSNodepoolRequest {
    * Max items 8, Unique items
    */
   antiAffinityGroups?: AntiAffinityGroupRef[]
+  /**
+   * CPU manager config
+   */
+  cpuManagerConfig?: CPUManagerConfig | null
   /**
    * Nodepool Deploy Target
    */
@@ -7864,6 +8026,9 @@ export function toWireUpdateSKSNodepoolRequest(
   const o: Record<string, unknown> = {}
   if (v.antiAffinityGroups !== undefined)
     o['anti-affinity-groups'] = v.antiAffinityGroups.map((x) => toWireAntiAffinityGroupRef(x))
+  if (v.cpuManagerConfig !== undefined)
+    o['cpu-manager-config'] =
+      v.cpuManagerConfig === null ? null : toWireCPUManagerConfig(v.cpuManagerConfig)
   if (v.deployTarget !== undefined)
     o['deploy-target'] = v.deployTarget === null ? null : toWireDeployTargetRef(v.deployTarget)
   if (v.description !== undefined) o['description'] = v.description
@@ -7962,6 +8127,10 @@ export interface UpdateVpcRequest {
    */
   description?: string | null
   /**
+   * DHCP options (only allowed if VPC has no instances attached)
+   */
+  dhcpOptions?: VpcDHCPOptions
+  /**
    * Resource labels
    */
   labels?: Labels | null
@@ -7976,6 +8145,7 @@ export interface UpdateVpcRequest {
 export function toWireUpdateVpcRequest(v: UpdateVpcRequest): Record<string, unknown> {
   const o: Record<string, unknown> = {}
   if (v.description !== undefined) o['description'] = v.description === null ? null : v.description
+  if (v.dhcpOptions !== undefined) o['dhcp-options'] = toWireVpcDHCPOptions(v.dhcpOptions)
   if (v.labels !== undefined) o['labels'] = v.labels === null ? null : v.labels
   if (v.name !== undefined) o['name'] = v.name === null ? null : v.name
   return o
@@ -8136,7 +8306,7 @@ export abstract class GeneratedExoscaleClient {
    * Errors:
    *
    * **400**
-   * ### Errors
+   * Errors
    *
    * Key Not Found: The request was rejected because the specified KMS Key could not be found.
    *
@@ -8148,6 +8318,25 @@ export abstract class GeneratedExoscaleClient {
    */
   cancelKmsKeyDeletion(params: CancelKmsKeyDeletionRequest): Promise<SuccessResponse> {
     const path = `/kms-key/${encodeURIComponent(params.id)}/cancel-deletion`
+    return this.core.request('POST', path, { decode: fromWireSuccessResponse })
+  }
+
+  /**
+   * Connects an External Key Store once its customer-managed XKS proxy passes a health check, then resumes periodic proxy health checks and lets keys backed by this store be used for cryptographic operations.
+   *
+   * Errors:
+   *
+   * **400**
+   * Errors
+   *
+   * Not Found: The request was rejected because no key store with the given id exists in the organization.
+   *
+   * Key Store Proxy Unhealthy: The request was rejected because the customer-managed XKS proxy failed its health check.
+   *
+   * Bad Request: The request was rejected because of an invalid path parameter.
+   */
+  connectKeyStore(params: ConnectKeyStoreRequest): Promise<SuccessResponse> {
+    const path = `/key-store/${encodeURIComponent(params.id)}/connect`
     return this.core.request('POST', path, { decode: fromWireSuccessResponse })
   }
 
@@ -8636,12 +8825,34 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
+   * Create an External Key Store after validating the configured customer-managed XKS proxy.
+   *
+   * Errors:
+   *
+   * **400**
+   * Errors
+   *
+   * Name Conflict: The request was rejected because a key store with the same name already exists in the organization.
+   *
+   * Key Store Proxy Unhealthy: The request was rejected because the customer-managed XKS proxy failed its health check.
+   *
+   * Bad Request: The request was rejected because of an invalid request body, path parameter, proxy endpoint, or proxy credentials.
+   */
+  createKeyStore(params: CreateKeyStoreRequest): Promise<ListKeyStoresResponseEntry> {
+    const body = toWireCreateKeyStoreRequest(params)
+    return this.core.request('POST', '/key-store', {
+      body,
+      decode: fromWireListKeyStoresResponseEntry,
+    })
+  }
+
+  /**
    * Create a customer-managed unique KMS Key in your organization. A KMS Key is a logical representation of a cryptographic key material. It also includes metadata such as a UUID, a name and its state.
    *
    * Errors:
    *
    * **400**
-   * ### Errors
+   * Errors
    *
    * Name Conflict: The request was rejected because a key with the same name already exists in the target zone.
    *
@@ -8783,7 +8994,7 @@ export abstract class GeneratedExoscaleClient {
    * Errors:
    *
    * **400**
-   * ### Errors
+   * Errors
    *
    * Key Not Found: The request was rejected because the specified KMS Key could not be found.
    *
@@ -8801,24 +9012,6 @@ export abstract class GeneratedExoscaleClient {
     const path = `/kms-key/${encodeURIComponent(params.id)}/decrypt`
     const body = toWireDecryptRequest(params)
     return this.core.request('POST', path, { body, decode: fromWireDecryptResponse })
-  }
-
-  /**
-   * Delete AI API key
-   *
-   * Errors:
-   *
-   * **403**
-   * Forbidden
-   *
-   * **404**
-   * Not Found
-   *
-   * @see https://www.exoscale.com/ai-cloud-infrastructure/managed-inference/ Read more
-   */
-  deleteAIAPIKey(params: DeleteAIAPIKeyRequest): Promise<Operation> {
-    const path = `/ai/api-key/${encodeURIComponent(params.id)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
   }
 
   /**
@@ -9227,6 +9420,25 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
+   * Deletes an External Key Store when no KMS keys reference it.
+   *
+   * Errors:
+   *
+   * **400**
+   * Errors
+   *
+   * Not Found: The request was rejected because no key store with the given id exists in the organization.
+   *
+   * Key Store Is Referenced: The request was rejected because one or more KMS keys reference the key store.
+   *
+   * Bad Request: The request was rejected because of an invalid path parameter.
+   */
+  deleteKeyStore(params: DeleteKeyStoreRequest): Promise<SuccessResponse> {
+    const path = `/key-store/${encodeURIComponent(params.id)}`
+    return this.core.request('DELETE', path, { decode: fromWireSuccessResponse })
+  }
+
+  /**
    * Delete a Load Balancer
    *
    * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
@@ -9484,7 +9696,7 @@ export abstract class GeneratedExoscaleClient {
    * Errors:
    *
    * **400**
-   * ### Errors
+   * Errors
    *
    * Key Not Found: The request was rejected because the specified KMS Key could not be found.
    *
@@ -9505,9 +9717,7 @@ export abstract class GeneratedExoscaleClient {
    * Errors:
    *
    * **400**
-   * ### Errors
-   *
-   * Invalid Origin: The request was rejected because automatic key rotation can only be enabled on a KMS key with origin "exoscale-kms".
+   * Errors
    *
    * Key Not Found: The request was rejected because the specified KMS Key could not be found.
    *
@@ -9533,6 +9743,23 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
+   * Disconnects an External Key Store and suspends periodic proxy health checks; keys backed by this store remain intact but cannot be used for cryptographic operations until it is reconnected.
+   *
+   * Errors:
+   *
+   * **400**
+   * Errors
+   *
+   * Not Found: The request was rejected because no key store with the given id exists in the organization.
+   *
+   * Bad Request: The request was rejected because of an invalid path parameter.
+   */
+  disconnectKeyStore(params: DisconnectKeyStoreRequest): Promise<SuccessResponse> {
+    const path = `/key-store/${encodeURIComponent(params.id)}/disconnect`
+    return this.core.request('POST', path, { decode: fromWireSuccessResponse })
+  }
+
+  /**
    * Temporarily enable writes for MySQL services in read-only mode due to filled up storage
    *
    * @see https://community.exoscale.com/product/dbaas/ Read more
@@ -9548,7 +9775,7 @@ export abstract class GeneratedExoscaleClient {
    * Errors:
    *
    * **400**
-   * ### Errors
+   * Errors
    *
    * Key Not Found: The request was rejected because the specified KMS Key could not be found.
    *
@@ -9567,9 +9794,7 @@ export abstract class GeneratedExoscaleClient {
    * Errors:
    *
    * **400**
-   * ### Errors
-   *
-   * Invalid Origin: The request was rejected because automatic key rotation can only be enabled on a KMS key with origin "exoscale-kms".
+   * Errors
    *
    * Key Not Found: The request was rejected because the specified KMS Key could not be found.
    *
@@ -9615,7 +9840,7 @@ export abstract class GeneratedExoscaleClient {
    * Errors:
    *
    * **400**
-   * ### Errors
+   * Errors
    *
    * Key Not Found: The request was rejected because the specified KMS Key could not be found.
    *
@@ -9673,7 +9898,7 @@ export abstract class GeneratedExoscaleClient {
    * Errors:
    *
    * **400**
-   * ### Errors
+   * Errors
    *
    * Key Not Found: The request was rejected because the specified KMS Key could not be found.
    *
@@ -10282,6 +10507,14 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
+   * [BETA] Returns a presigned URL for the organization's focus report for the period
+   */
+  getFocusReport(params: GetFocusReportRequest): Promise<FocusReport> {
+    const path = `/focus-report/${encodeURIComponent(params.period)}`
+    return this.core.request('GET', path, { decode: fromWireFocusReport })
+  }
+
+  /**
    * Retrieve IAM Organization Policy
    *
    * @see https://community.exoscale.com/product/iam/operation/roles-policies/ Read more
@@ -10311,7 +10544,7 @@ export abstract class GeneratedExoscaleClient {
    * **500**
    * Internal server error
    *
-   * @see https://www.exoscale.com/sustainability/ Read more
+   * @see https://community.exoscale.com/platform/environmental-impact/ Read more
    */
   getImpactEstimate(params: GetImpactEstimateRequest): Promise<GetImpactEstimateResponse> {
     const body = toWireGetImpactEstimateRequest(params)
@@ -10332,7 +10565,7 @@ export abstract class GeneratedExoscaleClient {
    * **500**
    * Internal server error
    *
-   * @see https://www.exoscale.com/sustainability/ Read more
+   * @see https://community.exoscale.com/platform/environmental-impact/ Read more
    */
   getImpactReport(params?: GetImpactReportRequest): Promise<ImpactBreakdown> {
     const query: Record<string, string> = {}
@@ -10391,12 +10624,29 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
+   * Fetch an External Key Store including its latest XKS health observation when available.
+   *
+   * Errors:
+   *
+   * **400**
+   * Errors
+   *
+   * Not Found: The request was rejected because no key store with the given id exists in the organization.
+   *
+   * Bad Request: The request was rejected because of an invalid path parameter.
+   */
+  getKeyStore(params: GetKeyStoreRequest): Promise<GetKeyStoreResponse> {
+    const path = `/key-store/${encodeURIComponent(params.id)}`
+    return this.core.request('GET', path)
+  }
+
+  /**
    * Retrieve KMS Key details.
    *
    * Errors:
    *
    * **400**
-   * ### Errors
+   * Errors
    *
    * Key Not Found: The request was rejected because the specified KMS Key could not be found.
    *
@@ -10479,6 +10729,27 @@ export abstract class GeneratedExoscaleClient {
   getPrivateNetwork(params: GetPrivateNetworkRequest): Promise<PrivateNetwork> {
     const path = `/private-network/${encodeURIComponent(params.id)}`
     return this.core.request('GET', path, { decode: fromWirePrivateNetwork })
+  }
+
+  /**
+   * Retrieve the public key material of an asymmetric KMS key.
+   *
+   * Errors:
+   *
+   * **400**
+   * Errors
+   *
+   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
+   *
+   * Key is Disabled: The request was rejected because the specified KMS Key is disabled (or pending deletion).
+   *
+   * Invalid Usage: The request was rejected because the specified KMS Key does not have public key material (its key-spec is symmetric).
+   *
+   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   */
+  getPublicKey(params: GetPublicKeyRequest): Promise<GetPublicKeyResponse> {
+    const path = `/kms-key/${encodeURIComponent(params.id)}/get-public-key`
+    return this.core.request('GET', path, { decode: fromWireGetPublicKeyResponse })
   }
 
   /**
@@ -10849,13 +11120,8 @@ export abstract class GeneratedExoscaleClient {
    *
    * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
    */
-  listDeployments(params?: ListDeploymentsRequest): Promise<ListDeploymentsResponse> {
-    const query: Record<string, string> = {}
-    if (params?.visibility !== undefined) query['visibility'] = params?.visibility
-    return this.core.request('GET', '/ai/deployment', {
-      query,
-      decode: fromWireListDeploymentsResponse,
-    })
+  listDeployments(): Promise<ListDeploymentsResponse> {
+    return this.core.request('GET', '/ai/deployment', { decode: fromWireListDeploymentsResponse })
   }
 
   /**
@@ -10913,6 +11179,17 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
+   * List IAM System Roles
+   *
+   * @see https://community.exoscale.com/product/iam/operation/role-mgmt/ Read more
+   */
+  listIAMSystemRoles(): Promise<ListIAMSystemRolesResponse> {
+    return this.core.request('GET', '/iam-system-role', {
+      decode: fromWireListIAMSystemRolesResponse,
+    })
+  }
+
+  /**
    * List Instance Pools
    *
    * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
@@ -10945,12 +11222,26 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
+   * Lists all key stores configured for an organization.
+   *
+   * Errors:
+   *
+   * **400**
+   * Errors
+   *
+   * Bad Request: The request was rejected because of an invalid path parameter.
+   */
+  listKeyStores(): Promise<ListKeyStoresResponse> {
+    return this.core.request('GET', '/key-store', { decode: fromWireListKeyStoresResponse })
+  }
+
+  /**
    * List all the key material versions of a KMS Key.
    *
    * Errors:
    *
    * **400**
-   * ### Errors
+   * Errors
    *
    * Key Not Found: The request was rejected because the specified KMS Key could not be found.
    *
@@ -10967,7 +11258,7 @@ export abstract class GeneratedExoscaleClient {
    * Errors:
    *
    * **400**
-   * ### Errors
+   * Errors
    *
    * Bad Request: The request was rejected because of an invalid request body or path parameter.
    *
@@ -10991,8 +11282,10 @@ export abstract class GeneratedExoscaleClient {
    *
    * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
    */
-  listModels(): Promise<ListModelsResponse> {
-    return this.core.request('GET', '/ai/model', { decode: fromWireListModelsResponse })
+  listModels(params?: ListModelsRequest): Promise<ListModelsResponse> {
+    const query: Record<string, string> = {}
+    if (params?.visibility !== undefined) query['visibility'] = params?.visibility
+    return this.core.request('GET', '/ai/model', { query, decode: fromWireListModelsResponse })
   }
 
   /**
@@ -11186,7 +11479,7 @@ export abstract class GeneratedExoscaleClient {
    * Errors:
    *
    * **400**
-   * ### Errors
+   * Errors
    *
    * Key Not Found: The request was rejected because the specified KMS Key could not be found.
    *
@@ -11267,7 +11560,7 @@ export abstract class GeneratedExoscaleClient {
    * Errors:
    *
    * **400**
-   * ### Errors
+   * Errors
    *
    * Key Not Found: The request was rejected because the specified KMS Key could not be found.
    *
@@ -11644,12 +11937,33 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
+   * Revoke an AI API key. Key will be deleted after 30 days of retention
+   *
+   * Errors:
+   *
+   * **403**
+   * Forbidden
+   *
+   * **404**
+   * Not Found
+   *
+   * **500**
+   * Internal Server Error
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/managed-inference/ Read more
+   */
+  revokeAIAPIKey(params: RevokeAIAPIKeyRequest): Promise<Operation> {
+    const path = `/ai/api-key/${encodeURIComponent(params.id)}/revoke`
+    return this.core.request('POST', path, { decode: fromWireOperation })
+  }
+
+  /**
    * Performs an immediate rotation of the key material for a symmetric key.
    *
    * Errors:
    *
    * **400**
-   * ### Errors
+   * Errors
    *
    * Key Not Found: The request was rejected because the specified KMS Key could not be found.
    *
@@ -11778,7 +12092,7 @@ export abstract class GeneratedExoscaleClient {
    * Errors:
    *
    * **400**
-   * ### Errors
+   * Errors
    *
    * Key Not Found: The request was rejected because the specified KMS Key could not be found.
    *
@@ -11798,6 +12112,34 @@ export abstract class GeneratedExoscaleClient {
     const path = `/kms-key/${encodeURIComponent(params.id)}/schedule-deletion`
     const body = toWireScheduleKmsKeyDeletionRequest(params)
     return this.core.request('POST', path, { body, decode: fromWireScheduleKmsKeyDeletionResponse })
+  }
+
+  /**
+   * Signs a message or digest using a KMS key with usage `sign-verify`.
+   *
+   * Errors:
+   *
+   * **400**
+   * Errors
+   *
+   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
+   *
+   * Key is Disabled: The request was rejected because the specified KMS Key is disabled (or pending deletion).
+   *
+   * Invalid Usage: The request was rejected because the operation is only allowed on keys with usage "sign-verify".
+   *
+   * Invalid Argument: The request was rejected because `message-type`, `message`, or `signing-algorithm` is invalid.
+   *
+   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   */
+  sign(
+    params: SignRequest & {
+      id: string
+    },
+  ): Promise<SignResponse> {
+    const path = `/kms-key/${encodeURIComponent(params.id)}/sign`
+    const body = toWireSignRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireSignResponse })
   }
 
   /**
@@ -11933,6 +12275,32 @@ export abstract class GeneratedExoscaleClient {
   stopInstance(params: StopInstanceRequest): Promise<Operation> {
     const path = `/instance/${encodeURIComponent(params.id)}:stop`
     return this.core.request('PUT', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Update the models and deployments accessible by an AI API key.
+   *
+   * Errors:
+   *
+   * **400**
+   * Bad Request
+   *
+   * **403**
+   * Forbidden
+   *
+   * **404**
+   * Not Found
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/managed-inference/ Read more
+   */
+  updateAIAPIKey(
+    params: UpdateAIAPIKeyRequest & {
+      id: string
+    },
+  ): Promise<UpdateAIAPIKeyResponse> {
+    const path = `/ai/api-key/${encodeURIComponent(params.id)}`
+    const body = toWireUpdateAIAPIKeyRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireUpdateAIAPIKeyResponse })
   }
 
   /**
@@ -12306,6 +12674,30 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
+   * Updates an External Key Store with a new description, endpoint, or credentials.
+   *
+   * Errors:
+   *
+   * **400**
+   * Errors
+   *
+   * Not Found: The request was rejected because no key store with the given id exists in the organization.
+   *
+   * Bad Request: The request was rejected because of an invalid path parameter.
+   *
+   * Conflict: The request was rejected because the key store was concurrently modified. Retry with the latest state.
+   */
+  updateKeyStore(
+    params: UpdateKeyStoreRequest & {
+      id: string
+    },
+  ): Promise<GetKeyStoreResponse> {
+    const path = `/key-store/${encodeURIComponent(params.id)}/update`
+    const body = toWireUpdateKeyStoreRequest(params)
+    return this.core.request('POST', path, { body })
+  }
+
+  /**
    * Update a Load Balancer
    *
    * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
@@ -12458,5 +12850,35 @@ export abstract class GeneratedExoscaleClient {
   upgradeSKSClusterServiceLevel(params: UpgradeSKSClusterServiceLevelRequest): Promise<Operation> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}/upgrade-service-level`
     return this.core.request('PUT', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Verifies a signature against the public key of a KMS key with usage `sign-verify`.
+   *
+   * Errors:
+   *
+   * **400**
+   * Errors
+   *
+   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
+   *
+   * Key is Disabled: The request was rejected because the specified KMS Key is disabled (or pending deletion).
+   *
+   * Invalid Usage: The request was rejected because the operation is only allowed on keys with usage "sign-verify".
+   *
+   * Invalid Argument: The request was rejected because `message-type`, `message`, or `signing-algorithm` is invalid.
+   *
+   * Invalid Signature: The request was rejected because `signature` is not a valid signature for `message` under this key.
+   *
+   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   */
+  verify(
+    params: VerifyRequest & {
+      id: string
+    },
+  ): Promise<VerifyResponse> {
+    const path = `/kms-key/${encodeURIComponent(params.id)}/verify`
+    const body = toWireVerifyRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireVerifyResponse })
   }
 }

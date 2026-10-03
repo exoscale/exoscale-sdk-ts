@@ -137,91 +137,50 @@ export function fromWireAccessKeyResource(w: any): AccessKeyResource {
   return v
 }
 
-/**
- * AI API key metadata
- */
-export interface AIAPIKey {
+export interface AIAPIKeyDeploymentRef {
   /**
-   * Creation timestamp
-   *
-   * Read-only
-   */
-  createdAT: Date
-  /**
-   * AI API key ID
-   *
-   * Read-only
+   * Deployment ID
    */
   id: string
-  /**
-   * Human-readable name for the AI API key
-   */
-  name: string
-  /**
-   * Organization UUID that owns this key
-   *
-   * Read-only
-   */
-  orgUuid: string
-  /**
-   * Key scope: 'public' for all deployments, or a specific deployment UUID
-   */
-  scope: string
-  /**
-   * Last update timestamp
-   *
-   * Read-only
-   */
-  updatedAT: Date
 }
 
 /** @internal */
-export function toWireAIAPIKey(v: AIAPIKey): Record<string, unknown> {
+export function toWireAIAPIKeyDeploymentRef(v: AIAPIKeyDeploymentRef): Record<string, unknown> {
   const o: Record<string, unknown> = {}
-  if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
   if (v.id !== undefined) o['id'] = v.id
-  if (v.name !== undefined) o['name'] = v.name
-  if (v.orgUuid !== undefined) o['org-uuid'] = v.orgUuid
-  if (v.scope !== undefined) o['scope'] = v.scope
-  if (v.updatedAT !== undefined) o['updated-at'] = v.updatedAT.toISOString()
   return o
 }
 
 /** @internal */
-export function fromWireAIAPIKey(w: any): AIAPIKey {
-  const v = {} as AIAPIKey
-  v.createdAT = new Date(w['created-at'])
+export function fromWireAIAPIKeyDeploymentRef(w: any): AIAPIKeyDeploymentRef {
+  const v = {} as AIAPIKeyDeploymentRef
   v.id = w['id']
-  v.name = w['name']
-  v.orgUuid = w['org-uuid']
-  v.scope = w['scope']
-  v.updatedAT = new Date(w['updated-at'])
   return v
 }
 
 /**
- * AI API key plaintext value
+ * Allowlist of deployments. An empty array denies access to all deployments. Grant access to all deployments with all-deployments instead.
+ *
+ * Unique items
  */
-export interface AIAPIKeyValue {
-  /**
-   * Plaintext AI API key value
-   */
-  value: string
+export type AIAPIKeyDeployments = AIAPIKeyDeploymentRef
+
+/** @internal */
+export function toWireAIAPIKeyDeployments(v: AIAPIKeyDeployments): unknown[] {
+  return v.map((x) => toWireAIAPIKeyDeploymentRef(x))
 }
 
 /** @internal */
-export function toWireAIAPIKeyValue(v: AIAPIKeyValue): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.value !== undefined) o['value'] = v.value
-  return o
+export function fromWireAIAPIKeyDeployments(w: any): AIAPIKeyDeployments {
+  return (w as any[]).map((x) => fromWireAIAPIKeyDeploymentRef(x))
 }
 
-/** @internal */
-export function fromWireAIAPIKeyValue(w: any): AIAPIKeyValue {
-  const v = {} as AIAPIKeyValue
-  v.value = w['value']
-  return v
-}
+/**
+ * Allowlist of public model names. An empty array denies access to all public models. Grant access to all public models with all-models instead.
+ *
+ * Unique items
+ */
+export type AIAPIKeyModels = string
 
 /**
  * Anti-affinity Group
@@ -299,37 +258,40 @@ export function fromWireAntiAffinityGroupRef(w: any): AntiAffinityGroupRef {
 }
 
 /**
- * Usage breakdown for one API key, grouped by model
+ * Usage breakdown for one API key, grouped by product-name
  */
 export interface APIKeyUsageEntry {
-  /**
-   * Map of model-uuid to accumulated counters. Keys are model UUIDs.
-   */
-  models: Record<string, ModelUsageCounters>
   /**
    * Organization that owns this API key
    */
   organizationID: string
+  /**
+   * Map of product-name to accumulated counters. Keys are product names.
+   */
+  productNames: Record<string, ModelUsageCounters>
 }
 
 /** @internal */
 export function toWireAPIKeyUsageEntry(v: APIKeyUsageEntry): Record<string, unknown> {
   const o: Record<string, unknown> = {}
-  if (v.models !== undefined)
-    o['models'] = Object.fromEntries(
-      Object.entries(v.models).map(([k, val]) => [k, toWireModelUsageCounters(val)]),
-    )
   if (v.organizationID !== undefined) o['organization-id'] = v.organizationID
+  if (v.productNames !== undefined)
+    o['product-names'] = Object.fromEntries(
+      Object.entries(v.productNames).map(([k, val]) => [k, toWireModelUsageCounters(val)]),
+    )
   return o
 }
 
 /** @internal */
 export function fromWireAPIKeyUsageEntry(w: any): APIKeyUsageEntry {
   const v = {} as APIKeyUsageEntry
-  v.models = Object.fromEntries(
-    Object.entries(w['models'] ?? {}).map(([k, val]) => [k, fromWireModelUsageCounters(val)]),
-  )
   v.organizationID = w['organization-id']
+  v.productNames = Object.fromEntries(
+    Object.entries(w['product-names'] ?? {}).map(([k, val]) => [
+      k,
+      fromWireModelUsageCounters(val),
+    ]),
+  )
   return v
 }
 
@@ -577,34 +539,107 @@ export function fromWireBlockStorageVolumeRef(w: any): BlockStorageVolumeRef {
 }
 
 /**
- * Request to create a new AI API key
+ * CPU manager config
+ */
+export interface CPUManagerConfig {
+  /**
+   * CPU management policy used by the kubelet. The "static" policy grants exclusive CPUs to Guaranteed pods requesting integer CPU limits. When set to "static", a CPU reservation must be provided via kube-reserved or system-reserved
+   */
+  cpuManagerPolicy?: 'none' | 'static'
+  /**
+   * CPU manager policy options used by the kubelet. They refine the behavior of the "static" cpu-manager-policy and are only valid when the policy is "static"
+   *
+   * Unique items
+   */
+  cpuManagerPolicyOptions?: string[]
+  /**
+   * CPU manager reconcile period used by the kubelet, as a duration string (for example "10s").
+   */
+  cpuManagerReconcilePeriod?: string
+  /**
+   * Resources reserved for node components
+   */
+  kubeReserved?: ReservedResources
+  /**
+   * Resources reserved for system components
+   */
+  systemReserved?: ReservedResources
+}
+
+/** @internal */
+export function toWireCPUManagerConfig(v: CPUManagerConfig): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.cpuManagerPolicy !== undefined) o['cpu-manager-policy'] = v.cpuManagerPolicy
+  if (v.cpuManagerPolicyOptions !== undefined)
+    o['cpu-manager-policy-options'] = v.cpuManagerPolicyOptions
+  if (v.cpuManagerReconcilePeriod !== undefined)
+    o['cpu-manager-reconcile-period'] = v.cpuManagerReconcilePeriod
+  if (v.kubeReserved !== undefined) o['kube-reserved'] = toWireReservedResources(v.kubeReserved)
+  if (v.systemReserved !== undefined)
+    o['system-reserved'] = toWireReservedResources(v.systemReserved)
+  return o
+}
+
+/** @internal */
+export function fromWireCPUManagerConfig(w: any): CPUManagerConfig {
+  const v = {} as CPUManagerConfig
+  if (w['cpu-manager-policy'] !== undefined) v.cpuManagerPolicy = w['cpu-manager-policy']
+  if (w['cpu-manager-policy-options'] !== undefined)
+    v.cpuManagerPolicyOptions = w['cpu-manager-policy-options']
+  if (w['cpu-manager-reconcile-period'] !== undefined)
+    v.cpuManagerReconcilePeriod = w['cpu-manager-reconcile-period']
+  if (w['kube-reserved'] !== undefined)
+    v.kubeReserved = fromWireReservedResources(w['kube-reserved'])
+  if (w['system-reserved'] !== undefined)
+    v.systemReserved = fromWireReservedResources(w['system-reserved'])
+  return v
+}
+
+/**
+ * Request to create a new AI API key.
  */
 export interface CreateAIAPIKeyRequest {
+  /**
+   * Grant access to all deployments of the organization. Takes precedence over the deployments array, which is ignored when set.
+   *
+   * @defaultValue false
+   */
+  allDeployments?: boolean
+  /**
+   * Grant access to all public models. Takes precedence over the models array, which is ignored when set.
+   *
+   * @defaultValue false
+   */
+  allModels?: boolean
+  deployments?: AIAPIKeyDeployments
+  models?: AIAPIKeyModels
   /**
    * Human-readable name for the AI API key
    *
    * Length 1-50, Pattern `^[A-Za-z0-9](?:[A-Za-z0-9 _'()-]*[A-Za-z0-9])?$`
    */
   name: string
-  /**
-   * Key scope: 'public' for all deployments, or a specific deployment UUID
-   */
-  scope: string
 }
 
 /** @internal */
 export function toWireCreateAIAPIKeyRequest(v: CreateAIAPIKeyRequest): Record<string, unknown> {
   const o: Record<string, unknown> = {}
+  if (v.allDeployments !== undefined) o['all-deployments'] = v.allDeployments
+  if (v.allModels !== undefined) o['all-models'] = v.allModels
+  if (v.deployments !== undefined) o['deployments'] = toWireAIAPIKeyDeployments(v.deployments)
+  if (v.models !== undefined) o['models'] = v.models
   if (v.name !== undefined) o['name'] = v.name
-  if (v.scope !== undefined) o['scope'] = v.scope
   return o
 }
 
 /** @internal */
 export function fromWireCreateAIAPIKeyRequest(w: any): CreateAIAPIKeyRequest {
   const v = {} as CreateAIAPIKeyRequest
+  if (w['all-deployments'] !== undefined) v.allDeployments = w['all-deployments']
+  if (w['all-models'] !== undefined) v.allModels = w['all-models']
+  if (w['deployments'] !== undefined) v.deployments = fromWireAIAPIKeyDeployments(w['deployments'])
+  if (w['models'] !== undefined) v.models = w['models']
   v.name = w['name']
-  v.scope = w['scope']
   return v
 }
 
@@ -613,34 +648,31 @@ export function fromWireCreateAIAPIKeyRequest(w: any): CreateAIAPIKeyRequest {
  */
 export interface CreateAIAPIKeyResponse {
   /**
-   * Creation timestamp
-   *
+   * True when the key has access to all deployments of the organization.
+   */
+  allDeployments: boolean
+  /**
+   * True when the key has access to all public models.
+   */
+  allModels: boolean
+  /**
    * Read-only
    */
   createdAT: Date
+  deployments: AIAPIKeyDeployments
   /**
-   * AI API key ID
-   *
    * Read-only
    */
   id: string
-  /**
-   * Human-readable name for the AI API key
-   */
+  models: AIAPIKeyModels
   name: string
-  /**
-   * Organization UUID that owns this key
-   *
-   * Read-only
-   */
-  orgUuid: string
-  /**
-   * Key scope: 'public' for all deployments, or a specific deployment UUID
-   */
-  scope: string
   /**
    * Last update timestamp
    *
+   * Read-only
+   */
+  revokedAT?: Date | null
+  /**
    * Read-only
    */
   updatedAT: Date
@@ -653,11 +685,15 @@ export interface CreateAIAPIKeyResponse {
 /** @internal */
 export function toWireCreateAIAPIKeyResponse(v: CreateAIAPIKeyResponse): Record<string, unknown> {
   const o: Record<string, unknown> = {}
+  if (v.allDeployments !== undefined) o['all-deployments'] = v.allDeployments
+  if (v.allModels !== undefined) o['all-models'] = v.allModels
   if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
+  if (v.deployments !== undefined) o['deployments'] = toWireAIAPIKeyDeployments(v.deployments)
   if (v.id !== undefined) o['id'] = v.id
+  if (v.models !== undefined) o['models'] = v.models
   if (v.name !== undefined) o['name'] = v.name
-  if (v.orgUuid !== undefined) o['org-uuid'] = v.orgUuid
-  if (v.scope !== undefined) o['scope'] = v.scope
+  if (v.revokedAT !== undefined)
+    o['revoked-at'] = v.revokedAT === null ? null : v.revokedAT.toISOString()
   if (v.updatedAT !== undefined) o['updated-at'] = v.updatedAT.toISOString()
   if (v.value !== undefined) o['value'] = v.value
   return o
@@ -666,11 +702,14 @@ export function toWireCreateAIAPIKeyResponse(v: CreateAIAPIKeyResponse): Record<
 /** @internal */
 export function fromWireCreateAIAPIKeyResponse(w: any): CreateAIAPIKeyResponse {
   const v = {} as CreateAIAPIKeyResponse
+  v.allDeployments = w['all-deployments']
+  v.allModels = w['all-models']
   v.createdAT = new Date(w['created-at'])
+  v.deployments = fromWireAIAPIKeyDeployments(w['deployments'])
   v.id = w['id']
+  v.models = w['models']
   v.name = w['name']
-  v.orgUuid = w['org-uuid']
-  v.scope = w['scope']
+  if (w['revoked-at'] !== undefined) v.revokedAT = new Date(w['revoked-at'])
   v.updatedAT = new Date(w['updated-at'])
   v.value = w['value']
   return v
@@ -748,11 +787,66 @@ export function fromWireCreateDeploymentRequest(w: any): CreateDeploymentRequest
   return v
 }
 
+export interface CreateKeyStoreRequest {
+  /**
+   * An optional detailed description providing additional context about the key store's intended use case.
+   *
+   * Max length 1024
+   */
+  description?: string
+  /**
+   * A human-readable display name uniquely identifying the key store within the organization.
+   *
+   * Length 1-256
+   */
+  name: string
+  proxy: KeyStoreProxy
+  /**
+   * The key store type. Only external key stores are supported for this API version.
+   *
+   * @defaultValue "external-key-store"
+   */
+  type?: 'external-key-store'
+}
+
+/** @internal */
+export function toWireCreateKeyStoreRequest(v: CreateKeyStoreRequest): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.description !== undefined) o['description'] = v.description
+  if (v.name !== undefined) o['name'] = v.name
+  if (v.proxy !== undefined) o['proxy'] = toWireKeyStoreProxy(v.proxy)
+  if (v.type !== undefined) o['type'] = v.type
+  return o
+}
+
+/** @internal */
+export function fromWireCreateKeyStoreRequest(w: any): CreateKeyStoreRequest {
+  const v = {} as CreateKeyStoreRequest
+  if (w['description'] !== undefined) v.description = w['description']
+  v.name = w['name']
+  v.proxy = fromWireKeyStoreProxy(w['proxy'])
+  if (w['type'] !== undefined) v.type = w['type']
+  return v
+}
+
 export interface CreateKmsKeyRequest {
   /**
    * An optional detailed description providing additional context about the key's intended use case.
    */
   description?: string
+  /**
+   * The cryptographic key specification defining the key's algorithm and, for asymmetric keys, its curve or modulus size.
+   *
+   * @defaultValue "AES_256"
+   */
+  keySpec?:
+    | 'AES_256'
+    | 'ECC_EDWARDS25519'
+    | 'ECC_NIST_P256'
+    | 'ECC_NIST_P384'
+    | 'ECC_NIST_P521'
+    | 'RSA_3072'
+    | 'RSA_4096'
   /**
    * True if this is a multi-zone key.
    *
@@ -764,18 +858,28 @@ export interface CreateKmsKeyRequest {
    */
   name: string
   /**
+   * Indicates the source of the key material, either generated and held within Exoscale KMS, or backed by an external key store.
+   *
+   * @defaultValue "exoscale-kms"
+   */
+  source?: 'exoscale-kms' | 'external-key-store'
+  /**
    * @defaultValue "encrypt-decrypt"
    */
-  usage?: 'encrypt-decrypt'
+  usage?: 'encrypt-decrypt' | 'sign-verify'
+  xks?: XksKey
 }
 
 /** @internal */
 export function toWireCreateKmsKeyRequest(v: CreateKmsKeyRequest): Record<string, unknown> {
   const o: Record<string, unknown> = {}
   if (v.description !== undefined) o['description'] = v.description
+  if (v.keySpec !== undefined) o['key-spec'] = v.keySpec
   if (v.multiZone !== undefined) o['multi-zone'] = v.multiZone
   if (v.name !== undefined) o['name'] = v.name
+  if (v.source !== undefined) o['source'] = v.source
   if (v.usage !== undefined) o['usage'] = v.usage
+  if (v.xks !== undefined) o['xks'] = toWireXksKey(v.xks)
   return o
 }
 
@@ -783,9 +887,12 @@ export function toWireCreateKmsKeyRequest(v: CreateKmsKeyRequest): Record<string
 export function fromWireCreateKmsKeyRequest(w: any): CreateKmsKeyRequest {
   const v = {} as CreateKmsKeyRequest
   if (w['description'] !== undefined) v.description = w['description']
+  if (w['key-spec'] !== undefined) v.keySpec = w['key-spec']
   if (w['multi-zone'] !== undefined) v.multiZone = w['multi-zone']
   v.name = w['name']
+  if (w['source'] !== undefined) v.source = w['source']
   if (w['usage'] !== undefined) v.usage = w['usage']
+  if (w['xks'] !== undefined) v.xks = fromWireXksKey(w['xks'])
   return v
 }
 
@@ -803,6 +910,10 @@ export interface CreateKmsKeyResponse {
    */
   id: string
   /**
+   * The cryptographic key specification used to generate the key, defining its algorithm and, for asymmetric keys, its curve or modulus size.
+   */
+  keySpec: string
+  /**
    * True if this is a multi-zone key.
    */
   multiZone: boolean
@@ -815,7 +926,11 @@ export interface CreateKmsKeyResponse {
    */
   originZone: string
   revision: RevisionStamp
-  source: 'exoscale-kms'
+  rotation?: KeyRotationConfig
+  /**
+   * Indicates the source of the key material, either generated and held within Exoscale KMS, or backed by an external key store.
+   */
+  source: 'exoscale-kms' | 'external-key-store'
   status: 'disabled' | 'enabled' | 'pending-deletion'
   /**
    * The timestamp indicating exactly when the current key status was last transitioned.
@@ -825,6 +940,7 @@ export interface CreateKmsKeyResponse {
    * The cryptographic operation constraints allowed on this key.
    */
   usage: string
+  xks?: XksKey
 }
 
 /** @internal */
@@ -833,14 +949,17 @@ export function toWireCreateKmsKeyResponse(v: CreateKmsKeyResponse): Record<stri
   if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
   if (v.description !== undefined) o['description'] = v.description
   if (v.id !== undefined) o['id'] = v.id
+  if (v.keySpec !== undefined) o['key-spec'] = v.keySpec
   if (v.multiZone !== undefined) o['multi-zone'] = v.multiZone
   if (v.name !== undefined) o['name'] = v.name
   if (v.originZone !== undefined) o['origin-zone'] = v.originZone
   if (v.revision !== undefined) o['revision'] = toWireRevisionStamp(v.revision)
+  if (v.rotation !== undefined) o['rotation'] = toWireKeyRotationConfig(v.rotation)
   if (v.source !== undefined) o['source'] = v.source
   if (v.status !== undefined) o['status'] = v.status
   if (v.statusSince !== undefined) o['status-since'] = v.statusSince.toISOString()
   if (v.usage !== undefined) o['usage'] = v.usage
+  if (v.xks !== undefined) o['xks'] = toWireXksKey(v.xks)
   return o
 }
 
@@ -850,14 +969,17 @@ export function fromWireCreateKmsKeyResponse(w: any): CreateKmsKeyResponse {
   v.createdAT = new Date(w['created-at'])
   if (w['description'] !== undefined) v.description = w['description']
   v.id = w['id']
+  v.keySpec = w['key-spec']
   v.multiZone = w['multi-zone']
   v.name = w['name']
   v.originZone = w['origin-zone']
   v.revision = fromWireRevisionStamp(w['revision'])
+  if (w['rotation'] !== undefined) v.rotation = fromWireKeyRotationConfig(w['rotation'])
   v.source = w['source']
   v.status = w['status']
   v.statusSince = new Date(w['status-since'])
   v.usage = w['usage']
+  if (w['xks'] !== undefined) v.xks = fromWireXksKey(w['xks'])
   return v
 }
 
@@ -8956,6 +9078,7 @@ export interface ErrorResponse {
    * An absolute or relative URI reference pointing to human-readable documentation concerning the specific problem type encountered.
    */
   type: string
+  xksProxyError?: XksProxyErrorDetail
 }
 
 /** @internal */
@@ -8965,6 +9088,8 @@ export function toWireErrorResponse(v: ErrorResponse): Record<string, unknown> {
   if (v.status !== undefined) o['status'] = v.status
   if (v.title !== undefined) o['title'] = v.title
   if (v.type !== undefined) o['type'] = v.type
+  if (v.xksProxyError !== undefined)
+    o['xks-proxy-error'] = toWireXksProxyErrorDetail(v.xksProxyError)
   return o
 }
 
@@ -8975,6 +9100,8 @@ export function fromWireErrorResponse(w: any): ErrorResponse {
   v.status = w['status']
   v.title = w['title']
   v.type = w['type']
+  if (w['xks-proxy-error'] !== undefined)
+    v.xksProxyError = fromWireXksProxyErrorDetail(w['xks-proxy-error'])
   return v
 }
 
@@ -9090,6 +9217,38 @@ export function fromWireEvent(w: any): Event {
   return v
 }
 
+/**
+ * Focus report download URL
+ */
+export interface FocusReport {
+  /**
+   * URL expiration in seconds
+   *
+   * Min >0
+   */
+  expiresIn?: number
+  /**
+   * Focus report presigned URL
+   */
+  presignedURL?: string
+}
+
+/** @internal */
+export function toWireFocusReport(v: FocusReport): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.expiresIn !== undefined) o['expires_in'] = v.expiresIn
+  if (v.presignedURL !== undefined) o['presigned_url'] = v.presignedURL
+  return o
+}
+
+/** @internal */
+export function fromWireFocusReport(w: any): FocusReport {
+  const v = {} as FocusReport
+  if (w['expires_in'] !== undefined) v.expiresIn = w['expires_in']
+  if (w['presigned_url'] !== undefined) v.presignedURL = w['presigned_url']
+  return v
+}
+
 export interface GenerateDataKeyRequest {
   /**
    * Min 1, Max 1024
@@ -9153,31 +9312,41 @@ export function fromWireGenerateDataKeyResponse(w: any): GenerateDataKeyResponse
  */
 export interface GetAIAPIKeyResponse {
   /**
+   * True when the key has access to all deployments of the organization.
+   *
+   * Read-only
+   */
+  allDeployments: boolean
+  /**
+   * True when the key has access to all public models.
+   *
+   * Read-only
+   */
+  allModels: boolean
+  /**
    * Creation timestamp
    *
    * Read-only
    */
   createdAT: Date
+  deployments: AIAPIKeyDeployments
   /**
    * AI API key ID
    *
    * Read-only
    */
   id: string
+  models: AIAPIKeyModels
   /**
    * Human-readable name for the AI API key
    */
   name: string
   /**
-   * Organization UUID that owns this key
+   * Revocation timestamp. Null when the API key is active.
    *
    * Read-only
    */
-  orgUuid: string
-  /**
-   * Key scope: 'public' for all deployments, or a specific deployment UUID
-   */
-  scope: string
+  revokedAT: Date | null
   /**
    * Last update timestamp
    *
@@ -9189,11 +9358,15 @@ export interface GetAIAPIKeyResponse {
 /** @internal */
 export function toWireGetAIAPIKeyResponse(v: GetAIAPIKeyResponse): Record<string, unknown> {
   const o: Record<string, unknown> = {}
+  if (v.allDeployments !== undefined) o['all-deployments'] = v.allDeployments
+  if (v.allModels !== undefined) o['all-models'] = v.allModels
   if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
+  if (v.deployments !== undefined) o['deployments'] = toWireAIAPIKeyDeployments(v.deployments)
   if (v.id !== undefined) o['id'] = v.id
+  if (v.models !== undefined) o['models'] = v.models
   if (v.name !== undefined) o['name'] = v.name
-  if (v.orgUuid !== undefined) o['org-uuid'] = v.orgUuid
-  if (v.scope !== undefined) o['scope'] = v.scope
+  if (v.revokedAT !== undefined)
+    o['revoked-at'] = v.revokedAT === null ? null : v.revokedAT.toISOString()
   if (v.updatedAT !== undefined) o['updated-at'] = v.updatedAT.toISOString()
   return o
 }
@@ -9201,11 +9374,14 @@ export function toWireGetAIAPIKeyResponse(v: GetAIAPIKeyResponse): Record<string
 /** @internal */
 export function fromWireGetAIAPIKeyResponse(w: any): GetAIAPIKeyResponse {
   const v = {} as GetAIAPIKeyResponse
+  v.allDeployments = w['all-deployments']
+  v.allModels = w['all-models']
   v.createdAT = new Date(w['created-at'])
+  v.deployments = fromWireAIAPIKeyDeployments(w['deployments'])
   v.id = w['id']
+  v.models = w['models']
   v.name = w['name']
-  v.orgUuid = w['org-uuid']
-  v.scope = w['scope']
+  v.revokedAT = new Date(w['revoked-at'])
   v.updatedAT = new Date(w['updated-at'])
   return v
 }
@@ -9373,10 +9549,6 @@ export interface GetDeploymentResponse {
    * Read-only
    */
   updatedAT?: Date
-  /**
-   * Deployment visibility: private for your organization's deployments, public for Exoscale Managed Inference deployments.
-   */
-  visibility: 'private' | 'public'
 }
 
 /** @internal */
@@ -9398,7 +9570,6 @@ export function toWireGetDeploymentResponse(v: GetDeploymentResponse): Record<st
   if (v.state !== undefined) o['state'] = v.state
   if (v.stateDetails !== undefined) o['state-details'] = v.stateDetails
   if (v.updatedAT !== undefined) o['updated-at'] = v.updatedAT.toISOString()
-  if (v.visibility !== undefined) o['visibility'] = v.visibility
   return o
 }
 
@@ -9421,7 +9592,6 @@ export function fromWireGetDeploymentResponse(w: any): GetDeploymentResponse {
   v.state = w['state']
   if (w['state-details'] !== undefined) v.stateDetails = w['state-details']
   if (w['updated-at'] !== undefined) v.updatedAT = new Date(w['updated-at'])
-  v.visibility = w['visibility']
   return v
 }
 
@@ -9449,6 +9619,8 @@ export function fromWireGetInferenceEngineHelpResponse(w: any): GetInferenceEngi
   return v
 }
 
+export type GetKeyStoreResponse = string
+
 export interface GetKmsKeyResponse {
   /**
    * The UTC timestamp showing when the KMS key was originally provisioned.
@@ -9463,6 +9635,10 @@ export interface GetKmsKeyResponse {
    * The globally unique identifier (UUID) of the retrieved KMS key.
    */
   id: string
+  /**
+   * The cryptographic key specification used to generate the key, defining its algorithm and, for asymmetric keys, its curve or modulus size.
+   */
+  keySpec: string
   material: KeyMaterial
   /**
    * True if this is a multi-zone key.
@@ -9486,7 +9662,10 @@ export interface GetKmsKeyResponse {
   replicasStatus?: ReplicaState[]
   revision: RevisionStamp
   rotation: KeyRotationConfig
-  source: 'exoscale-kms'
+  /**
+   * Indicates the source of the key material, either generated and held within Exoscale KMS, or backed by an external key store.
+   */
+  source: 'exoscale-kms' | 'external-key-store'
   status: 'disabled' | 'enabled' | 'pending-deletion'
   /**
    * The timestamp indicating exactly when the current key status was last transitioned.
@@ -9496,6 +9675,7 @@ export interface GetKmsKeyResponse {
    * The cryptographic operation constraints allowed on this key.
    */
   usage: string
+  xks?: XksKey
 }
 
 /** @internal */
@@ -9505,6 +9685,7 @@ export function toWireGetKmsKeyResponse(v: GetKmsKeyResponse): Record<string, un
   if (v.deleteAT !== undefined) o['delete-at'] = v.deleteAT.toISOString()
   if (v.description !== undefined) o['description'] = v.description
   if (v.id !== undefined) o['id'] = v.id
+  if (v.keySpec !== undefined) o['key-spec'] = v.keySpec
   if (v.material !== undefined) o['material'] = toWireKeyMaterial(v.material)
   if (v.multiZone !== undefined) o['multi-zone'] = v.multiZone
   if (v.name !== undefined) o['name'] = v.name
@@ -9518,6 +9699,7 @@ export function toWireGetKmsKeyResponse(v: GetKmsKeyResponse): Record<string, un
   if (v.status !== undefined) o['status'] = v.status
   if (v.statusSince !== undefined) o['status-since'] = v.statusSince.toISOString()
   if (v.usage !== undefined) o['usage'] = v.usage
+  if (v.xks !== undefined) o['xks'] = toWireXksKey(v.xks)
   return o
 }
 
@@ -9528,6 +9710,7 @@ export function fromWireGetKmsKeyResponse(w: any): GetKmsKeyResponse {
   if (w['delete-at'] !== undefined) v.deleteAT = new Date(w['delete-at'])
   if (w['description'] !== undefined) v.description = w['description']
   v.id = w['id']
+  v.keySpec = w['key-spec']
   v.material = fromWireKeyMaterial(w['material'])
   v.multiZone = w['multi-zone']
   v.name = w['name']
@@ -9541,6 +9724,7 @@ export function fromWireGetKmsKeyResponse(w: any): GetKmsKeyResponse {
   v.status = w['status']
   v.statusSince = new Date(w['status-since'])
   v.usage = w['usage']
+  if (w['xks'] !== undefined) v.xks = fromWireXksKey(w['xks'])
   return v
 }
 
@@ -9555,11 +9739,21 @@ export interface GetModelResponse {
    */
   createdAT: Date
   /**
+   * Model deprecation date
+   *
+   * Read-only
+   */
+  deprecationDate?: Date | null
+  /**
    * Model ID
    *
    * Read-only
    */
   id: string
+  /**
+   * Model lifecycle state
+   */
+  lifecycleStatus?: 'active' | 'deprecated' | 'eol' | null | 'preview' | null
   /**
    * Model size in bytes
    *
@@ -9582,17 +9776,26 @@ export interface GetModelResponse {
    * Read-only
    */
   updatedAT: Date
+  /**
+   * Model visibility
+   */
+  visibility?: 'private' | 'public'
 }
 
 /** @internal */
 export function toWireGetModelResponse(v: GetModelResponse): Record<string, unknown> {
   const o: Record<string, unknown> = {}
   if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
+  if (v.deprecationDate !== undefined)
+    o['deprecation-date'] = v.deprecationDate === null ? null : v.deprecationDate.toISOString()
   if (v.id !== undefined) o['id'] = v.id
+  if (v.lifecycleStatus !== undefined)
+    o['lifecycle-status'] = v.lifecycleStatus === null ? null : v.lifecycleStatus
   if (v.modelSize !== undefined) o['model-size'] = v.modelSize
   if (v.name !== undefined) o['name'] = v.name
   if (v.state !== undefined) o['state'] = v.state
   if (v.updatedAT !== undefined) o['updated-at'] = v.updatedAT.toISOString()
+  if (v.visibility !== undefined) o['visibility'] = v.visibility
   return o
 }
 
@@ -9600,39 +9803,53 @@ export function toWireGetModelResponse(v: GetModelResponse): Record<string, unkn
 export function fromWireGetModelResponse(w: any): GetModelResponse {
   const v = {} as GetModelResponse
   v.createdAT = new Date(w['created-at'])
+  if (w['deprecation-date'] !== undefined) v.deprecationDate = new Date(w['deprecation-date'])
   v.id = w['id']
+  if (w['lifecycle-status'] !== undefined) v.lifecycleStatus = w['lifecycle-status']
   v.modelSize = w['model-size']
   v.name = w['name']
   v.state = w['state']
   v.updatedAT = new Date(w['updated-at'])
+  if (w['visibility'] !== undefined) v.visibility = w['visibility']
   return v
 }
 
-/**
- * GPU usage for an organization
- */
-export interface GetOrganizationUsageResponse {
+export interface GetPublicKeyResponse {
   /**
-   * Total GPU count
-   *
-   * Min 0, Read-only
+   * The UUID of the KMS key the public key material belongs to.
    */
-  gpu: number
+  keyID?: string
+  /**
+   * The cryptographic key specification of the key pair, defining its algorithm and curve.
+   */
+  keySpec?: string
+  /**
+   * The Base64-encoded X.509 SubjectPublicKeyInfo (SPKI) DER encoding of the key's public key.
+   */
+  publicKey?: string
+  /**
+   * The usage of the key pair, either `encrypt-decrypt` or `sign-verify`.
+   */
+  usage?: string
 }
 
 /** @internal */
-export function toWireGetOrganizationUsageResponse(
-  v: GetOrganizationUsageResponse,
-): Record<string, unknown> {
+export function toWireGetPublicKeyResponse(v: GetPublicKeyResponse): Record<string, unknown> {
   const o: Record<string, unknown> = {}
-  if (v.gpu !== undefined) o['gpu'] = v.gpu
+  if (v.keyID !== undefined) o['key-id'] = v.keyID
+  if (v.keySpec !== undefined) o['key-spec'] = v.keySpec
+  if (v.publicKey !== undefined) o['public-key'] = v.publicKey
+  if (v.usage !== undefined) o['usage'] = v.usage
   return o
 }
 
 /** @internal */
-export function fromWireGetOrganizationUsageResponse(w: any): GetOrganizationUsageResponse {
-  const v = {} as GetOrganizationUsageResponse
-  v.gpu = w['gpu']
+export function fromWireGetPublicKeyResponse(w: any): GetPublicKeyResponse {
+  const v = {} as GetPublicKeyResponse
+  if (w['key-id'] !== undefined) v.keyID = w['key-id']
+  if (w['key-spec'] !== undefined) v.keySpec = w['key-spec']
+  if (w['public-key'] !== undefined) v.publicKey = w['public-key']
+  if (w['usage'] !== undefined) v.usage = w['usage']
   return v
 }
 
@@ -9919,6 +10136,90 @@ export function fromWireIAMServicePolicyRule(w: any): IAMServicePolicyRule {
   return v
 }
 
+/**
+ * IAM System Role
+ */
+export interface IAMSystemRole {
+  /**
+   * IAM Assume System Role Policy
+   */
+  assumeRolePolicy?: IAMAssumeRolePolicy
+  /**
+   * IAM System Role description
+   *
+   * Length 1-255
+   */
+  description?: string
+  /**
+   * IAM System Role mutability
+   */
+  editable?: boolean
+  /**
+   * IAM System Role ID
+   *
+   * Read-only
+   */
+  id?: string
+  /**
+   * IAM System Role Labels
+   */
+  labels?: Labels
+  /**
+   * Maximum TTL requester is allowed to ask for when assuming a system role
+   *
+   * Min >0
+   */
+  maxSessionTtl?: number
+  /**
+   * IAM System Role name
+   *
+   * Length 1-255
+   */
+  name?: string
+  /**
+   * IAM System Role permissions
+   *
+   * Unique items
+   */
+  permissions?: string[]
+  /**
+   * IAM System Role Policy
+   */
+  policy?: IAMPolicy
+}
+
+/** @internal */
+export function toWireIAMSystemRole(v: IAMSystemRole): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.assumeRolePolicy !== undefined)
+    o['assume-role-policy'] = toWireIAMAssumeRolePolicy(v.assumeRolePolicy)
+  if (v.description !== undefined) o['description'] = v.description
+  if (v.editable !== undefined) o['editable'] = v.editable
+  if (v.id !== undefined) o['id'] = v.id
+  if (v.labels !== undefined) o['labels'] = v.labels
+  if (v.maxSessionTtl !== undefined) o['max-session-ttl'] = v.maxSessionTtl
+  if (v.name !== undefined) o['name'] = v.name
+  if (v.permissions !== undefined) o['permissions'] = v.permissions
+  if (v.policy !== undefined) o['policy'] = toWireIAMPolicy(v.policy)
+  return o
+}
+
+/** @internal */
+export function fromWireIAMSystemRole(w: any): IAMSystemRole {
+  const v = {} as IAMSystemRole
+  if (w['assume-role-policy'] !== undefined)
+    v.assumeRolePolicy = fromWireIAMAssumeRolePolicy(w['assume-role-policy'])
+  if (w['description'] !== undefined) v.description = w['description']
+  if (w['editable'] !== undefined) v.editable = w['editable']
+  if (w['id'] !== undefined) v.id = w['id']
+  if (w['labels'] !== undefined) v.labels = w['labels']
+  if (w['max-session-ttl'] !== undefined) v.maxSessionTtl = w['max-session-ttl']
+  if (w['name'] !== undefined) v.name = w['name']
+  if (w['permissions'] !== undefined) v.permissions = w['permissions']
+  if (w['policy'] !== undefined) v.policy = fromWireIAMPolicy(w['policy'])
+  return v
+}
+
 export interface ImpactBreakdown {
   impact: Record<string, ImpactValueWithUnit>
   zones: Record<string, ZoneImpact>
@@ -10106,7 +10407,7 @@ export function fromWireInferenceEngineParameterEntry(w: any): InferenceEnginePa
 /**
  * Inference engine version
  *
- * @defaultValue "0.28.0"
+ * @defaultValue "0.30.0"
  */
 export type InferenceEngineVersion =
   | '0.12.0'
@@ -10131,6 +10432,8 @@ export type InferenceEngineVersion =
   | '0.27.0'
   | '0.27.1'
   | '0.28.0'
+  | '0.29.0'
+  | '0.30.0'
 
 /**
  * Router flush payload: the router's full in-memory usage map with flush identity fields
@@ -10560,6 +10863,42 @@ export function fromWireInstancePassword(w: any): InstancePassword {
 }
 
 /**
+ * Instance Pool Error Reason
+ */
+export interface InstancePoolErrorReason {
+  /**
+   * Error cause
+   */
+  cause?: string
+  /**
+   * Job ID at the origin of error
+   */
+  jobID?: string
+  /**
+   * Error type
+   */
+  type?: string
+}
+
+/** @internal */
+export function toWireInstancePoolErrorReason(v: InstancePoolErrorReason): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.cause !== undefined) o['cause'] = v.cause
+  if (v.jobID !== undefined) o['job-id'] = v.jobID
+  if (v.type !== undefined) o['type'] = v.type
+  return o
+}
+
+/** @internal */
+export function fromWireInstancePoolErrorReason(w: any): InstancePoolErrorReason {
+  const v = {} as InstancePoolErrorReason
+  if (w['cause'] !== undefined) v.cause = w['cause']
+  if (w['job-id'] !== undefined) v.jobID = w['job-id']
+  if (w['type'] !== undefined) v.type = w['type']
+  return v
+}
+
+/**
  * Instance Pool
  */
 export interface InstancePool {
@@ -10591,6 +10930,10 @@ export interface InstancePool {
    * Instances Elastic IPs
    */
   elasticIPS?: ElasticIPRef[]
+  /**
+   * Instance Pool Error Reason
+   */
+  errorReason?: InstancePoolErrorReason
   /**
    * Instance Pool ID
    *
@@ -10669,7 +11012,14 @@ export interface InstancePool {
    * Read-only
    */
   state?:
-    'creating' | 'destroying' | 'running' | 'scaling-down' | 'scaling-up' | 'suspended' | 'updating'
+    | 'creating'
+    | 'destroying'
+    | 'error'
+    | 'running'
+    | 'scaling-down'
+    | 'scaling-up'
+    | 'suspended'
+    | 'updating'
   /**
    * Instances template
    */
@@ -10693,6 +11043,7 @@ export function toWireInstancePool(v: InstancePool): Record<string, unknown> {
   if (v.description !== undefined) o['description'] = v.description
   if (v.diskSize !== undefined) o['disk-size'] = v.diskSize
   if (v.elasticIPS !== undefined) o['elastic-ips'] = v.elasticIPS.map((x) => toWireElasticIPRef(x))
+  if (v.errorReason !== undefined) o['error-reason'] = toWireInstancePoolErrorReason(v.errorReason)
   if (v.id !== undefined) o['id'] = v.id
   if (v.instancePrefix !== undefined) o['instance-prefix'] = v.instancePrefix
   if (v.instanceType !== undefined) o['instance-type'] = toWireInstanceTypeRef(v.instanceType)
@@ -10730,6 +11081,8 @@ export function fromWireInstancePool(w: any): InstancePool {
   if (w['disk-size'] !== undefined) v.diskSize = w['disk-size']
   if (w['elastic-ips'] !== undefined)
     v.elasticIPS = (w['elastic-ips'] as any[]).map((x) => fromWireElasticIPRef(x))
+  if (w['error-reason'] !== undefined)
+    v.errorReason = fromWireInstancePoolErrorReason(w['error-reason'])
   if (w['id'] !== undefined) v.id = w['id']
   if (w['instance-prefix'] !== undefined) v.instancePrefix = w['instance-prefix']
   if (w['instance-type'] !== undefined) v.instanceType = fromWireInstanceTypeRef(w['instance-type'])
@@ -13338,6 +13691,266 @@ export function fromWireJSONSchemaOpensearchAuthFailureListeners(
   return v
 }
 
+export interface JSONSchemaOpensearchClusterClusterRemoteStore {
+  /**
+   * The amount of time to wait for the cluster state upload to complete. Defaults to 20s.
+   *
+   * Pattern `^\d+\s*(?:[dhms]|ms|micros|nanos)$`
+   *
+   * @example "20s"
+   */
+  stateGlobalMetadataUploadTimeout?: string
+  /**
+   * The amount of time to wait for the manifest file upload to complete. The manifest file contains the details of each of the files uploaded for a single cluster state, both index metadata files and global metadata files. Defaults to 20s.
+   *
+   * Pattern `^\d+\s*(?:[dhms]|ms|micros|nanos)$`
+   *
+   * @example "20s"
+   */
+  stateMetadataManifestUploadTimeout?: string
+  /**
+   * The default value of the translog buffer interval used when performing periodic translog updates. This setting is only effective when the index setting `index.remote_store.translog.buffer_interval` is not present. Defaults to 650ms.
+   *
+   * Pattern `^\d+\s*(?:[dhms]|ms|micros|nanos)$`
+   *
+   * @example "650ms"
+   */
+  translogBufferInterval?: string
+  /**
+   * Sets the maximum number of open translog files for remote-backed indexes. This limits the total number of translog files per shard. After reaching this limit, the remote store flushes the translog files. Default is 1000. The minimum required is 100.
+   *
+   * Min 100, Max 2147483647
+   *
+   * @example 1000
+   */
+  translogMaxReaders?: number
+}
+
+/** @internal */
+export function toWireJSONSchemaOpensearchClusterClusterRemoteStore(
+  v: JSONSchemaOpensearchClusterClusterRemoteStore,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.stateGlobalMetadataUploadTimeout !== undefined)
+    o['state.global_metadata.upload_timeout'] = v.stateGlobalMetadataUploadTimeout
+  if (v.stateMetadataManifestUploadTimeout !== undefined)
+    o['state.metadata_manifest.upload_timeout'] = v.stateMetadataManifestUploadTimeout
+  if (v.translogBufferInterval !== undefined)
+    o['translog.buffer_interval'] = v.translogBufferInterval
+  if (v.translogMaxReaders !== undefined) o['translog.max_readers'] = v.translogMaxReaders
+  return o
+}
+
+/** @internal */
+export function fromWireJSONSchemaOpensearchClusterClusterRemoteStore(
+  w: any,
+): JSONSchemaOpensearchClusterClusterRemoteStore {
+  const v = {} as JSONSchemaOpensearchClusterClusterRemoteStore
+  if (w['state.global_metadata.upload_timeout'] !== undefined)
+    v.stateGlobalMetadataUploadTimeout = w['state.global_metadata.upload_timeout']
+  if (w['state.metadata_manifest.upload_timeout'] !== undefined)
+    v.stateMetadataManifestUploadTimeout = w['state.metadata_manifest.upload_timeout']
+  if (w['translog.buffer_interval'] !== undefined)
+    v.translogBufferInterval = w['translog.buffer_interval']
+  if (w['translog.max_readers'] !== undefined) v.translogMaxReaders = w['translog.max_readers']
+  return v
+}
+
+export interface JSONSchemaOpensearchClusterClusterSearchRequestSlowlogThreshold {
+  /**
+   * Debug threshold for total request took time. The value should be in the form count and unit, where unit one of (s,m,h,d,nanos,ms,micros) or -1. Default is -1
+   *
+   * Pattern `^[^\r\n]*$`
+   */
+  debug?: string
+  /**
+   * Info threshold for total request took time. The value should be in the form count and unit, where unit one of (s,m,h,d,nanos,ms,micros) or -1. Default is -1
+   *
+   * Pattern `^[^\r\n]*$`
+   */
+  info?: string
+  /**
+   * Trace threshold for total request took time. The value should be in the form count and unit, where unit one of (s,m,h,d,nanos,ms,micros) or -1. Default is -1
+   *
+   * Pattern `^[^\r\n]*$`
+   */
+  trace?: string
+  /**
+   * Warning threshold for total request took time. The value should be in the form count and unit, where unit one of (s,m,h,d,nanos,ms,micros) or -1. Default is -1
+   *
+   * Pattern `^[^\r\n]*$`
+   */
+  warn?: string
+}
+
+/** @internal */
+export function toWireJSONSchemaOpensearchClusterClusterSearchRequestSlowlogThreshold(
+  v: JSONSchemaOpensearchClusterClusterSearchRequestSlowlogThreshold,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.debug !== undefined) o['debug'] = v.debug
+  if (v.info !== undefined) o['info'] = v.info
+  if (v.trace !== undefined) o['trace'] = v.trace
+  if (v.warn !== undefined) o['warn'] = v.warn
+  return o
+}
+
+/** @internal */
+export function fromWireJSONSchemaOpensearchClusterClusterSearchRequestSlowlogThreshold(
+  w: any,
+): JSONSchemaOpensearchClusterClusterSearchRequestSlowlogThreshold {
+  const v = {} as JSONSchemaOpensearchClusterClusterSearchRequestSlowlogThreshold
+  if (w['debug'] !== undefined) v.debug = w['debug']
+  if (w['info'] !== undefined) v.info = w['info']
+  if (w['trace'] !== undefined) v.trace = w['trace']
+  if (w['warn'] !== undefined) v.warn = w['warn']
+  return v
+}
+
+export interface JSONSchemaOpensearchClusterClusterSearchRequestSlowlog {
+  /**
+   * Log level
+   *
+   * @defaultValue "trace"
+   */
+  level?: 'debug' | 'info' | 'trace' | 'warn'
+  threshold?: JSONSchemaOpensearchClusterClusterSearchRequestSlowlogThreshold
+}
+
+/** @internal */
+export function toWireJSONSchemaOpensearchClusterClusterSearchRequestSlowlog(
+  v: JSONSchemaOpensearchClusterClusterSearchRequestSlowlog,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.level !== undefined) o['level'] = v.level
+  if (v.threshold !== undefined)
+    o['threshold'] = toWireJSONSchemaOpensearchClusterClusterSearchRequestSlowlogThreshold(
+      v.threshold,
+    )
+  return o
+}
+
+/** @internal */
+export function fromWireJSONSchemaOpensearchClusterClusterSearchRequestSlowlog(
+  w: any,
+): JSONSchemaOpensearchClusterClusterSearchRequestSlowlog {
+  const v = {} as JSONSchemaOpensearchClusterClusterSearchRequestSlowlog
+  if (w['level'] !== undefined) v.level = w['level']
+  if (w['threshold'] !== undefined)
+    v.threshold = fromWireJSONSchemaOpensearchClusterClusterSearchRequestSlowlogThreshold(
+      w['threshold'],
+    )
+  return v
+}
+
+/**
+ * Cluster settings
+ */
+export interface JSONSchemaOpensearchCluster {
+  /**
+   * Defines a limit of how much total remote data can be referenced as a ratio of the size of the disk reserved for the file cache. This is designed to be a safeguard to prevent oversubscribing a cluster. Defaults to 0.
+   *
+   * Min 0, Max 100
+   *
+   * @example 5
+   */
+  clusterFilecacheRemoteDataRatio?: number | null
+  clusterRemoteStore?: JSONSchemaOpensearchClusterClusterRemoteStore
+  /**
+   * When set to true, OpenSearch attempts to evenly distribute the primary shards between the cluster nodes. Enabling this setting does not always guarantee an equal number of primary shards on each node, especially in the event of a failover. Changing this setting to false after it was set to true does not invoke redistribution of primary shards. Default is false.
+   *
+   * @example false
+   */
+  clusterRoutingAllocationBalancePreferPrimary?: boolean
+  clusterSearchRequestSlowlog?: JSONSchemaOpensearchClusterClusterSearchRequestSlowlog
+}
+
+/** @internal */
+export function toWireJSONSchemaOpensearchCluster(
+  v: JSONSchemaOpensearchCluster,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.clusterFilecacheRemoteDataRatio !== undefined)
+    o['cluster.filecache.remote_data_ratio'] =
+      v.clusterFilecacheRemoteDataRatio === null ? null : v.clusterFilecacheRemoteDataRatio
+  if (v.clusterRemoteStore !== undefined)
+    o['cluster.remote_store'] = toWireJSONSchemaOpensearchClusterClusterRemoteStore(
+      v.clusterRemoteStore,
+    )
+  if (v.clusterRoutingAllocationBalancePreferPrimary !== undefined)
+    o['cluster.routing.allocation.balance.prefer_primary'] =
+      v.clusterRoutingAllocationBalancePreferPrimary
+  if (v.clusterSearchRequestSlowlog !== undefined)
+    o['cluster.search.request.slowlog'] =
+      toWireJSONSchemaOpensearchClusterClusterSearchRequestSlowlog(v.clusterSearchRequestSlowlog)
+  return o
+}
+
+/** @internal */
+export function fromWireJSONSchemaOpensearchCluster(w: any): JSONSchemaOpensearchCluster {
+  const v = {} as JSONSchemaOpensearchCluster
+  if (w['cluster.filecache.remote_data_ratio'] !== undefined)
+    v.clusterFilecacheRemoteDataRatio = w['cluster.filecache.remote_data_ratio']
+  if (w['cluster.remote_store'] !== undefined)
+    v.clusterRemoteStore = fromWireJSONSchemaOpensearchClusterClusterRemoteStore(
+      w['cluster.remote_store'],
+    )
+  if (w['cluster.routing.allocation.balance.prefer_primary'] !== undefined)
+    v.clusterRoutingAllocationBalancePreferPrimary =
+      w['cluster.routing.allocation.balance.prefer_primary']
+  if (w['cluster.search.request.slowlog'] !== undefined)
+    v.clusterSearchRequestSlowlog = fromWireJSONSchemaOpensearchClusterClusterSearchRequestSlowlog(
+      w['cluster.search.request.slowlog'],
+    )
+  return v
+}
+
+/**
+ * Watermark settings
+ */
+export interface JSONSchemaOpensearchDiskWatermarks {
+  /**
+   * The flood stage watermark for disk usage.
+   *
+   * @example 95
+   */
+  floodStage: number
+  /**
+   * The high watermark for disk usage.
+   *
+   * @example 90
+   */
+  high: number
+  /**
+   * The low watermark for disk usage.
+   *
+   * @example 85
+   */
+  low: number
+}
+
+/** @internal */
+export function toWireJSONSchemaOpensearchDiskWatermarks(
+  v: JSONSchemaOpensearchDiskWatermarks,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.floodStage !== undefined) o['flood_stage'] = v.floodStage
+  if (v.high !== undefined) o['high'] = v.high
+  if (v.low !== undefined) o['low'] = v.low
+  return o
+}
+
+/** @internal */
+export function fromWireJSONSchemaOpensearchDiskWatermarks(
+  w: any,
+): JSONSchemaOpensearchDiskWatermarks {
+  const v = {} as JSONSchemaOpensearchDiskWatermarks
+  v.floodStage = w['flood_stage']
+  v.high = w['high']
+  v.low = w['low']
+  return v
+}
+
 /**
  * Opensearch Email Sender Settings
  */
@@ -13471,6 +14084,301 @@ export function fromWireJSONSchemaOpensearchIsmHistory(w: any): JSONSchemaOpense
     v.ismHistoryRolloverCheckPeriod = w['ism_history_rollover_check_period']
   if (w['ism_history_rollover_retention_period'] !== undefined)
     v.ismHistoryRolloverRetentionPeriod = w['ism_history_rollover_retention_period']
+  return v
+}
+
+/**
+ * ML Commons settings
+ */
+export interface JSONSchemaOpensearchMlCommons {
+  /**
+   * Enable or disable model access control for ML Commons. When enabled, access to ML models is controlled by security permissions. Defaults to false.
+   *
+   * @example false
+   */
+  mlCommonsModelAccessControlEnabled?: boolean
+  /**
+   * Native memory threshold percentage for ML Commons. Controls the maximum percentage of native memory that can be used by ML Commons operations. Defaults to 90%.
+   *
+   * Min 1, Max 100
+   *
+   * @example 90
+   */
+  mlCommonsNativeMemoryThreshold?: number
+  /**
+   * Enable or disable running ML Commons tasks only on ML nodes. When enabled, ML tasks will only execute on nodes designated as ML nodes. Defaults to true.
+   *
+   * @example false
+   */
+  mlCommonsOnlyRunOnMlNode?: boolean
+}
+
+/** @internal */
+export function toWireJSONSchemaOpensearchMlCommons(
+  v: JSONSchemaOpensearchMlCommons,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.mlCommonsModelAccessControlEnabled !== undefined)
+    o['ml_commons_model_access_control_enabled'] = v.mlCommonsModelAccessControlEnabled
+  if (v.mlCommonsNativeMemoryThreshold !== undefined)
+    o['ml_commons_native_memory_threshold'] = v.mlCommonsNativeMemoryThreshold
+  if (v.mlCommonsOnlyRunOnMlNode !== undefined)
+    o['ml_commons_only_run_on_ml_node'] = v.mlCommonsOnlyRunOnMlNode
+  return o
+}
+
+/** @internal */
+export function fromWireJSONSchemaOpensearchMlCommons(w: any): JSONSchemaOpensearchMlCommons {
+  const v = {} as JSONSchemaOpensearchMlCommons
+  if (w['ml_commons_model_access_control_enabled'] !== undefined)
+    v.mlCommonsModelAccessControlEnabled = w['ml_commons_model_access_control_enabled']
+  if (w['ml_commons_native_memory_threshold'] !== undefined)
+    v.mlCommonsNativeMemoryThreshold = w['ml_commons_native_memory_threshold']
+  if (w['ml_commons_only_run_on_ml_node'] !== undefined)
+    v.mlCommonsOnlyRunOnMlNode = w['ml_commons_only_run_on_ml_node']
+  return v
+}
+
+export interface JSONSchemaOpensearchRemoteStore {
+  /**
+   * The variance factor that is used together with the moving average to calculate the dynamic bytes lag threshold for activating remote segment backpressure. Defaults to 10.
+   *
+   * Min 1
+   *
+   * @example 10
+   */
+  segmentPressureBytesLagVarianceFactor?: number
+  /**
+   * The minimum consecutive failure count for activating remote segment backpressure. Defaults to 5.
+   *
+   * Min 1, Max 2147483647
+   *
+   * @example 5
+   */
+  segmentPressureConsecutiveFailuresLimit?: number
+  /**
+   * Enables remote segment backpressure. Default is `true`
+   *
+   * @example true
+   */
+  segmentPressureEnabled?: boolean
+  /**
+   * The variance factor that is used together with the moving average to calculate the dynamic time lag threshold for activating remote segment backpressure. Defaults to 10.
+   *
+   * Min 1
+   *
+   * @example 10
+   */
+  segmentPressureTimeLagVarianceFactor?: number
+}
+
+/** @internal */
+export function toWireJSONSchemaOpensearchRemoteStore(
+  v: JSONSchemaOpensearchRemoteStore,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.segmentPressureBytesLagVarianceFactor !== undefined)
+    o['segment.pressure.bytes_lag.variance_factor'] = v.segmentPressureBytesLagVarianceFactor
+  if (v.segmentPressureConsecutiveFailuresLimit !== undefined)
+    o['segment.pressure.consecutive_failures.limit'] = v.segmentPressureConsecutiveFailuresLimit
+  if (v.segmentPressureEnabled !== undefined)
+    o['segment.pressure.enabled'] = v.segmentPressureEnabled
+  if (v.segmentPressureTimeLagVarianceFactor !== undefined)
+    o['segment.pressure.time_lag.variance_factor'] = v.segmentPressureTimeLagVarianceFactor
+  return o
+}
+
+/** @internal */
+export function fromWireJSONSchemaOpensearchRemoteStore(w: any): JSONSchemaOpensearchRemoteStore {
+  const v = {} as JSONSchemaOpensearchRemoteStore
+  if (w['segment.pressure.bytes_lag.variance_factor'] !== undefined)
+    v.segmentPressureBytesLagVarianceFactor = w['segment.pressure.bytes_lag.variance_factor']
+  if (w['segment.pressure.consecutive_failures.limit'] !== undefined)
+    v.segmentPressureConsecutiveFailuresLimit = w['segment.pressure.consecutive_failures.limit']
+  if (w['segment.pressure.enabled'] !== undefined)
+    v.segmentPressureEnabled = w['segment.pressure.enabled']
+  if (w['segment.pressure.time_lag.variance_factor'] !== undefined)
+    v.segmentPressureTimeLagVarianceFactor = w['segment.pressure.time_lag.variance_factor']
+  return v
+}
+
+/**
+ * Top N queries monitoring by CPU
+ */
+export interface JSONSchemaOpensearchSearchInsightsTopQueriesCPU {
+  /**
+   * Enable or disable top N query monitoring by the metric
+   *
+   * @defaultValue false
+   */
+  enabled?: boolean
+  /**
+   * Specify the value of N for the top N queries by the metric
+   *
+   * Min 1
+   */
+  topNSize?: number
+  /**
+   * Configure the window size of the top N queries. The value should be a time value with unit, e.g. 1m, 5s, 1h.
+   *
+   * Pattern `^\d+\s*(?:[dhms]|ms|micros|nanos)$`
+   */
+  windowSize?: string
+}
+
+/** @internal */
+export function toWireJSONSchemaOpensearchSearchInsightsTopQueriesCPU(
+  v: JSONSchemaOpensearchSearchInsightsTopQueriesCPU,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.enabled !== undefined) o['enabled'] = v.enabled
+  if (v.topNSize !== undefined) o['top_n_size'] = v.topNSize
+  if (v.windowSize !== undefined) o['window_size'] = v.windowSize
+  return o
+}
+
+/** @internal */
+export function fromWireJSONSchemaOpensearchSearchInsightsTopQueriesCPU(
+  w: any,
+): JSONSchemaOpensearchSearchInsightsTopQueriesCPU {
+  const v = {} as JSONSchemaOpensearchSearchInsightsTopQueriesCPU
+  if (w['enabled'] !== undefined) v.enabled = w['enabled']
+  if (w['top_n_size'] !== undefined) v.topNSize = w['top_n_size']
+  if (w['window_size'] !== undefined) v.windowSize = w['window_size']
+  return v
+}
+
+/**
+ * Top N queries monitoring by latency
+ */
+export interface JSONSchemaOpensearchSearchInsightsTopQueriesLatency {
+  /**
+   * Enable or disable top N query monitoring by the metric
+   *
+   * @defaultValue false
+   */
+  enabled?: boolean
+  /**
+   * Specify the value of N for the top N queries by the metric
+   *
+   * Min 1
+   */
+  topNSize?: number
+  /**
+   * Configure the window size of the top N queries. The value should be a time value with unit, e.g. 1m, 5s, 1h.
+   *
+   * Pattern `^\d+\s*(?:[dhms]|ms|micros|nanos)$`
+   */
+  windowSize?: string
+}
+
+/** @internal */
+export function toWireJSONSchemaOpensearchSearchInsightsTopQueriesLatency(
+  v: JSONSchemaOpensearchSearchInsightsTopQueriesLatency,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.enabled !== undefined) o['enabled'] = v.enabled
+  if (v.topNSize !== undefined) o['top_n_size'] = v.topNSize
+  if (v.windowSize !== undefined) o['window_size'] = v.windowSize
+  return o
+}
+
+/** @internal */
+export function fromWireJSONSchemaOpensearchSearchInsightsTopQueriesLatency(
+  w: any,
+): JSONSchemaOpensearchSearchInsightsTopQueriesLatency {
+  const v = {} as JSONSchemaOpensearchSearchInsightsTopQueriesLatency
+  if (w['enabled'] !== undefined) v.enabled = w['enabled']
+  if (w['top_n_size'] !== undefined) v.topNSize = w['top_n_size']
+  if (w['window_size'] !== undefined) v.windowSize = w['window_size']
+  return v
+}
+
+/**
+ * Top N queries monitoring by memory
+ */
+export interface JSONSchemaOpensearchSearchInsightsTopQueriesMemory {
+  /**
+   * Enable or disable top N query monitoring by the metric
+   *
+   * @defaultValue false
+   */
+  enabled?: boolean
+  /**
+   * Specify the value of N for the top N queries by the metric
+   *
+   * Min 1
+   */
+  topNSize?: number
+  /**
+   * Configure the window size of the top N queries. The value should be a time value with unit, e.g. 1m, 5s, 1h.
+   *
+   * Pattern `^\d+\s*(?:[dhms]|ms|micros|nanos)$`
+   */
+  windowSize?: string
+}
+
+/** @internal */
+export function toWireJSONSchemaOpensearchSearchInsightsTopQueriesMemory(
+  v: JSONSchemaOpensearchSearchInsightsTopQueriesMemory,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.enabled !== undefined) o['enabled'] = v.enabled
+  if (v.topNSize !== undefined) o['top_n_size'] = v.topNSize
+  if (v.windowSize !== undefined) o['window_size'] = v.windowSize
+  return o
+}
+
+/** @internal */
+export function fromWireJSONSchemaOpensearchSearchInsightsTopQueriesMemory(
+  w: any,
+): JSONSchemaOpensearchSearchInsightsTopQueriesMemory {
+  const v = {} as JSONSchemaOpensearchSearchInsightsTopQueriesMemory
+  if (w['enabled'] !== undefined) v.enabled = w['enabled']
+  if (w['top_n_size'] !== undefined) v.topNSize = w['top_n_size']
+  if (w['window_size'] !== undefined) v.windowSize = w['window_size']
+  return v
+}
+
+export interface JSONSchemaOpensearchSearchInsightsTopQueries {
+  /**
+   * Top N queries monitoring by CPU
+   */
+  cpu?: JSONSchemaOpensearchSearchInsightsTopQueriesCPU
+  /**
+   * Top N queries monitoring by latency
+   */
+  latency?: JSONSchemaOpensearchSearchInsightsTopQueriesLatency
+  /**
+   * Top N queries monitoring by memory
+   */
+  memory?: JSONSchemaOpensearchSearchInsightsTopQueriesMemory
+}
+
+/** @internal */
+export function toWireJSONSchemaOpensearchSearchInsightsTopQueries(
+  v: JSONSchemaOpensearchSearchInsightsTopQueries,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.cpu !== undefined) o['cpu'] = toWireJSONSchemaOpensearchSearchInsightsTopQueriesCPU(v.cpu)
+  if (v.latency !== undefined)
+    o['latency'] = toWireJSONSchemaOpensearchSearchInsightsTopQueriesLatency(v.latency)
+  if (v.memory !== undefined)
+    o['memory'] = toWireJSONSchemaOpensearchSearchInsightsTopQueriesMemory(v.memory)
+  return o
+}
+
+/** @internal */
+export function fromWireJSONSchemaOpensearchSearchInsightsTopQueries(
+  w: any,
+): JSONSchemaOpensearchSearchInsightsTopQueries {
+  const v = {} as JSONSchemaOpensearchSearchInsightsTopQueries
+  if (w['cpu'] !== undefined)
+    v.cpu = fromWireJSONSchemaOpensearchSearchInsightsTopQueriesCPU(w['cpu'])
+  if (w['latency'] !== undefined)
+    v.latency = fromWireJSONSchemaOpensearchSearchInsightsTopQueriesLatency(w['latency'])
+  if (w['memory'] !== undefined)
+    v.memory = fromWireJSONSchemaOpensearchSearchInsightsTopQueriesMemory(w['memory'])
   return v
 }
 
@@ -13784,6 +14692,72 @@ export function fromWireJSONSchemaOpensearchSearchBackpressure(
 }
 
 /**
+ * Segment Replication Backpressure Settings
+ */
+export interface JSONSchemaOpensearchSegrep {
+  /**
+   * The maximum number of indexing checkpoints that a replica shard can fall behind when copying from primary. Once `segrep.pressure.checkpoint.limit` is breached along with `segrep.pressure.time.limit`, the segment replication backpressure mechanism is initiated. Default is 4 checkpoints.
+   *
+   * Min 0
+   *
+   * @defaultValue 4
+   * @example 4
+   */
+  pressureCheckpointLimit?: number
+  /**
+   * Enables the segment replication backpressure mechanism. Default is false.
+   *
+   * @defaultValue false
+   * @example false
+   */
+  pressureEnabled?: boolean
+  /**
+   * The maximum number of stale replica shards that can exist in a replication group. Once `segrep.pressure.replica.stale.limit` is breached, the segment replication backpressure mechanism is initiated. Default is .5, which is 50% of a replication group.
+   *
+   * Min 0, Max 1
+   *
+   * @defaultValue 0.5
+   * @example 0.5
+   */
+  pressureReplicaStaleLimit?: number
+  /**
+   * The maximum amount of time that a replica shard can take to copy from the primary shard. Once segrep.pressure.time.limit is breached along with segrep.pressure.checkpoint.limit, the segment replication backpressure mechanism is initiated. Default is 5 minutes.
+   *
+   * Pattern `^\d+\s*(?:[dhms]|ms|micros|nanos)$`
+   *
+   * @defaultValue "5m"
+   * @example "5m"
+   */
+  pressureTimeLimit?: string
+}
+
+/** @internal */
+export function toWireJSONSchemaOpensearchSegrep(
+  v: JSONSchemaOpensearchSegrep,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.pressureCheckpointLimit !== undefined)
+    o['pressure.checkpoint.limit'] = v.pressureCheckpointLimit
+  if (v.pressureEnabled !== undefined) o['pressure.enabled'] = v.pressureEnabled
+  if (v.pressureReplicaStaleLimit !== undefined)
+    o['pressure.replica.stale.limit'] = v.pressureReplicaStaleLimit
+  if (v.pressureTimeLimit !== undefined) o['pressure.time.limit'] = v.pressureTimeLimit
+  return o
+}
+
+/** @internal */
+export function fromWireJSONSchemaOpensearchSegrep(w: any): JSONSchemaOpensearchSegrep {
+  const v = {} as JSONSchemaOpensearchSegrep
+  if (w['pressure.checkpoint.limit'] !== undefined)
+    v.pressureCheckpointLimit = w['pressure.checkpoint.limit']
+  if (w['pressure.enabled'] !== undefined) v.pressureEnabled = w['pressure.enabled']
+  if (w['pressure.replica.stale.limit'] !== undefined)
+    v.pressureReplicaStaleLimit = w['pressure.replica.stale.limit']
+  if (w['pressure.time.limit'] !== undefined) v.pressureTimeLimit = w['pressure.time.limit']
+  return v
+}
+
+/**
  * Operating factor
  */
 export interface JSONSchemaOpensearchShardIndexingPressureOperatingFactor {
@@ -13994,6 +14968,10 @@ export interface JSONSchemaOpensearch {
    */
   authFailureListeners?: JSONSchemaOpensearchAuthFailureListeners
   /**
+   * Cluster settings
+   */
+  cluster?: JSONSchemaOpensearchCluster
+  /**
    * Controls the number of shards allowed in the cluster per data node
    *
    * Min 100, Max 10000
@@ -14008,9 +14986,25 @@ export interface JSONSchemaOpensearch {
    */
   clusterRoutingAllocationNodeConcurrentRecoveries?: number
   /**
+   * Watermark settings
+   */
+  diskWatermarks?: JSONSchemaOpensearchDiskWatermarks
+  /**
    * Opensearch Email Sender Settings
    */
   emailSender?: JSONSchemaOpensearchEmailSender
+  /**
+   * Enable remote-backed storage
+   *
+   * @example true
+   */
+  enableRemoteBackedStorage?: boolean
+  /**
+   * Enable searchable snapshots
+   *
+   * @example true
+   */
+  enableSearchableSnapshots?: boolean
   /**
    * Enable/Disable security audit
    *
@@ -14018,6 +15012,12 @@ export interface JSONSchemaOpensearch {
    * @example true
    */
   enableSecurityAudit?: boolean
+  /**
+   * Enable/Disable snapshot API for custom repositories, this requires security management to be enabled
+   *
+   * @example false
+   */
+  enableSnapshotAPI?: boolean
   /**
    * Maximum content length for HTTP requests to the OpenSearch HTTP API, in bytes.
    *
@@ -14107,6 +15107,18 @@ export interface JSONSchemaOpensearch {
    */
   knnMemoryCircuitBreakerLimit?: number
   /**
+   * ML Commons settings
+   */
+  mlCommons?: JSONSchemaOpensearchMlCommons
+  /**
+   * Defines a limit of how much total remote data can be referenced as a ratio of the size of the disk reserved for the file cache. This is designed to be a safeguard to prevent oversubscribing a cluster. Defaults to 5gb. Requires restarting all OpenSearch nodes.
+   *
+   * Pattern `\d+(?:b|kb|mb|gb|tb)`
+   *
+   * @example "5gb"
+   */
+  nodeSearchCacheSize?: string | null
+  /**
    * Compatibility mode sets OpenSearch to report its version as 7.10 so clients continue to work. Default is false
    *
    * @example true
@@ -14124,6 +15136,7 @@ export interface JSONSchemaOpensearch {
    * Max items 32
    */
   reindexRemoteWhitelist?: string[] | null
+  remoteStore?: JSONSchemaOpensearchRemoteStore
   /**
    * Script compilation circuit breaker limits the number of inline script compilations within a period of time. Default is use-context
    *
@@ -14132,6 +15145,7 @@ export interface JSONSchemaOpensearch {
    * @example "75/5m"
    */
   scriptMaxCompilationsRate?: string
+  searchInsightsTopQueries?: JSONSchemaOpensearchSearchInsightsTopQueries
   /**
    * Search Backpressure Settings
    */
@@ -14144,6 +15158,10 @@ export interface JSONSchemaOpensearch {
    * @example 10000
    */
   searchMaxBuckets?: number | null
+  /**
+   * Segment Replication Backpressure Settings
+   */
+  segrep?: JSONSchemaOpensearchSegrep
   /**
    * Shard indexing back pressure settings
    */
@@ -14228,14 +15246,22 @@ export function toWireJSONSchemaOpensearch(v: JSONSchemaOpensearch): Record<stri
     o['auth_failure_listeners'] = toWireJSONSchemaOpensearchAuthFailureListeners(
       v.authFailureListeners,
     )
+  if (v.cluster !== undefined) o['cluster'] = toWireJSONSchemaOpensearchCluster(v.cluster)
   if (v.clusterMaxShardsPerNode !== undefined)
     o['cluster_max_shards_per_node'] = v.clusterMaxShardsPerNode
   if (v.clusterRoutingAllocationNodeConcurrentRecoveries !== undefined)
     o['cluster_routing_allocation_node_concurrent_recoveries'] =
       v.clusterRoutingAllocationNodeConcurrentRecoveries
+  if (v.diskWatermarks !== undefined)
+    o['disk_watermarks'] = toWireJSONSchemaOpensearchDiskWatermarks(v.diskWatermarks)
   if (v.emailSender !== undefined)
     o['email-sender'] = toWireJSONSchemaOpensearchEmailSender(v.emailSender)
+  if (v.enableRemoteBackedStorage !== undefined)
+    o['enable_remote_backed_storage'] = v.enableRemoteBackedStorage
+  if (v.enableSearchableSnapshots !== undefined)
+    o['enable_searchable_snapshots'] = v.enableSearchableSnapshots
   if (v.enableSecurityAudit !== undefined) o['enable_security_audit'] = v.enableSecurityAudit
+  if (v.enableSnapshotAPI !== undefined) o['enable_snapshot_api'] = v.enableSnapshotAPI
   if (v.httpMaxContentLength !== undefined) o['http_max_content_length'] = v.httpMaxContentLength
   if (v.httpMaxHeaderSize !== undefined) o['http_max_header_size'] = v.httpMaxHeaderSize
   if (v.httpMaxInitialLineLength !== undefined)
@@ -14263,6 +15289,9 @@ export function toWireJSONSchemaOpensearch(v: JSONSchemaOpensearch): Record<stri
     o['knn_memory_circuit_breaker_enabled'] = v.knnMemoryCircuitBreakerEnabled
   if (v.knnMemoryCircuitBreakerLimit !== undefined)
     o['knn_memory_circuit_breaker_limit'] = v.knnMemoryCircuitBreakerLimit
+  if (v.mlCommons !== undefined) o['ml-commons'] = toWireJSONSchemaOpensearchMlCommons(v.mlCommons)
+  if (v.nodeSearchCacheSize !== undefined)
+    o['node.search.cache.size'] = v.nodeSearchCacheSize === null ? null : v.nodeSearchCacheSize
   if (v.overrideMainResponseVersion !== undefined)
     o['override_main_response_version'] = v.overrideMainResponseVersion
   if (v.pluginsAlertingFilterByBackendRoles !== undefined)
@@ -14270,12 +15299,19 @@ export function toWireJSONSchemaOpensearch(v: JSONSchemaOpensearch): Record<stri
   if (v.reindexRemoteWhitelist !== undefined)
     o['reindex_remote_whitelist'] =
       v.reindexRemoteWhitelist === null ? null : v.reindexRemoteWhitelist
+  if (v.remoteStore !== undefined)
+    o['remote_store'] = toWireJSONSchemaOpensearchRemoteStore(v.remoteStore)
   if (v.scriptMaxCompilationsRate !== undefined)
     o['script_max_compilations_rate'] = v.scriptMaxCompilationsRate
+  if (v.searchInsightsTopQueries !== undefined)
+    o['search.insights.top_queries'] = toWireJSONSchemaOpensearchSearchInsightsTopQueries(
+      v.searchInsightsTopQueries,
+    )
   if (v.searchBackpressure !== undefined)
     o['search_backpressure'] = toWireJSONSchemaOpensearchSearchBackpressure(v.searchBackpressure)
   if (v.searchMaxBuckets !== undefined)
     o['search_max_buckets'] = v.searchMaxBuckets === null ? null : v.searchMaxBuckets
+  if (v.segrep !== undefined) o['segrep'] = toWireJSONSchemaOpensearchSegrep(v.segrep)
   if (v.shardIndexingPressure !== undefined)
     o['shard_indexing_pressure'] = toWireJSONSchemaOpensearchShardIndexingPressure(
       v.shardIndexingPressure,
@@ -14312,14 +15348,22 @@ export function fromWireJSONSchemaOpensearch(w: any): JSONSchemaOpensearch {
     v.authFailureListeners = fromWireJSONSchemaOpensearchAuthFailureListeners(
       w['auth_failure_listeners'],
     )
+  if (w['cluster'] !== undefined) v.cluster = fromWireJSONSchemaOpensearchCluster(w['cluster'])
   if (w['cluster_max_shards_per_node'] !== undefined)
     v.clusterMaxShardsPerNode = w['cluster_max_shards_per_node']
   if (w['cluster_routing_allocation_node_concurrent_recoveries'] !== undefined)
     v.clusterRoutingAllocationNodeConcurrentRecoveries =
       w['cluster_routing_allocation_node_concurrent_recoveries']
+  if (w['disk_watermarks'] !== undefined)
+    v.diskWatermarks = fromWireJSONSchemaOpensearchDiskWatermarks(w['disk_watermarks'])
   if (w['email-sender'] !== undefined)
     v.emailSender = fromWireJSONSchemaOpensearchEmailSender(w['email-sender'])
+  if (w['enable_remote_backed_storage'] !== undefined)
+    v.enableRemoteBackedStorage = w['enable_remote_backed_storage']
+  if (w['enable_searchable_snapshots'] !== undefined)
+    v.enableSearchableSnapshots = w['enable_searchable_snapshots']
   if (w['enable_security_audit'] !== undefined) v.enableSecurityAudit = w['enable_security_audit']
+  if (w['enable_snapshot_api'] !== undefined) v.enableSnapshotAPI = w['enable_snapshot_api']
   if (w['http_max_content_length'] !== undefined)
     v.httpMaxContentLength = w['http_max_content_length']
   if (w['http_max_header_size'] !== undefined) v.httpMaxHeaderSize = w['http_max_header_size']
@@ -14347,17 +15391,27 @@ export function fromWireJSONSchemaOpensearch(w: any): JSONSchemaOpensearch {
     v.knnMemoryCircuitBreakerEnabled = w['knn_memory_circuit_breaker_enabled']
   if (w['knn_memory_circuit_breaker_limit'] !== undefined)
     v.knnMemoryCircuitBreakerLimit = w['knn_memory_circuit_breaker_limit']
+  if (w['ml-commons'] !== undefined)
+    v.mlCommons = fromWireJSONSchemaOpensearchMlCommons(w['ml-commons'])
+  if (w['node.search.cache.size'] !== undefined) v.nodeSearchCacheSize = w['node.search.cache.size']
   if (w['override_main_response_version'] !== undefined)
     v.overrideMainResponseVersion = w['override_main_response_version']
   if (w['plugins_alerting_filter_by_backend_roles'] !== undefined)
     v.pluginsAlertingFilterByBackendRoles = w['plugins_alerting_filter_by_backend_roles']
   if (w['reindex_remote_whitelist'] !== undefined)
     v.reindexRemoteWhitelist = w['reindex_remote_whitelist']
+  if (w['remote_store'] !== undefined)
+    v.remoteStore = fromWireJSONSchemaOpensearchRemoteStore(w['remote_store'])
   if (w['script_max_compilations_rate'] !== undefined)
     v.scriptMaxCompilationsRate = w['script_max_compilations_rate']
+  if (w['search.insights.top_queries'] !== undefined)
+    v.searchInsightsTopQueries = fromWireJSONSchemaOpensearchSearchInsightsTopQueries(
+      w['search.insights.top_queries'],
+    )
   if (w['search_backpressure'] !== undefined)
     v.searchBackpressure = fromWireJSONSchemaOpensearchSearchBackpressure(w['search_backpressure'])
   if (w['search_max_buckets'] !== undefined) v.searchMaxBuckets = w['search_max_buckets']
+  if (w['segrep'] !== undefined) v.segrep = fromWireJSONSchemaOpensearchSegrep(w['segrep'])
   if (w['shard_indexing_pressure'] !== undefined)
     v.shardIndexingPressure = fromWireJSONSchemaOpensearchShardIndexingPressure(
       w['shard_indexing_pressure'],
@@ -15764,6 +16818,149 @@ export function fromWireKeyRotationConfig(w: any): KeyRotationConfig {
   return v
 }
 
+export interface KeyStoreHealth {
+  /**
+   * Timestamp of the latest completed health check.
+   */
+  checkedAT?: Date
+  /**
+   * Normalized error detail for unhealthy observations.
+   */
+  errorDetail?: string
+  /**
+   * Base64-encoded raw successful AWS GetHealthStatus JSON metadata.
+   */
+  metadataJSON?: string
+  /**
+   * Latest normalized XKS proxy health status.
+   */
+  status?: 'healthy' | 'unhealthy' | 'unknown'
+  /**
+   * Normalized reason for the latest status.
+   */
+  statusReason?: string
+}
+
+/** @internal */
+export function toWireKeyStoreHealth(v: KeyStoreHealth): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.checkedAT !== undefined) o['checked-at'] = v.checkedAT.toISOString()
+  if (v.errorDetail !== undefined) o['error-detail'] = v.errorDetail
+  if (v.metadataJSON !== undefined) o['metadata-json'] = v.metadataJSON
+  if (v.status !== undefined) o['status'] = v.status
+  if (v.statusReason !== undefined) o['status-reason'] = v.statusReason
+  return o
+}
+
+/** @internal */
+export function fromWireKeyStoreHealth(w: any): KeyStoreHealth {
+  const v = {} as KeyStoreHealth
+  if (w['checked-at'] !== undefined) v.checkedAT = new Date(w['checked-at'])
+  if (w['error-detail'] !== undefined) v.errorDetail = w['error-detail']
+  if (w['metadata-json'] !== undefined) v.metadataJSON = w['metadata-json']
+  if (w['status'] !== undefined) v.status = w['status']
+  if (w['status-reason'] !== undefined) v.statusReason = w['status-reason']
+  return v
+}
+
+export interface KeyStoreProxy {
+  auth: KeyStoreProxyAuth
+  /**
+   * Public URL used to route communication to the customer-managed XKS proxy.
+   */
+  endpoint: string
+}
+
+/** @internal */
+export function toWireKeyStoreProxy(v: KeyStoreProxy): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.auth !== undefined) o['auth'] = toWireKeyStoreProxyAuth(v.auth)
+  if (v.endpoint !== undefined) o['endpoint'] = v.endpoint
+  return o
+}
+
+/** @internal */
+export function fromWireKeyStoreProxy(w: any): KeyStoreProxy {
+  const v = {} as KeyStoreProxy
+  v.auth = fromWireKeyStoreProxyAuth(w['auth'])
+  v.endpoint = w['endpoint']
+  return v
+}
+
+export interface KeyStoreProxyAuth {
+  /**
+   * Access key used to sign requests sent to the XKS proxy.
+   */
+  key: string
+  /**
+   * Secret key used to sign requests sent to the XKS proxy. This value is never returned by the API.
+   */
+  secret: string
+}
+
+/** @internal */
+export function toWireKeyStoreProxyAuth(v: KeyStoreProxyAuth): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.key !== undefined) o['key'] = v.key
+  if (v.secret !== undefined) o['secret'] = v.secret
+  return o
+}
+
+/** @internal */
+export function fromWireKeyStoreProxyAuth(w: any): KeyStoreProxyAuth {
+  const v = {} as KeyStoreProxyAuth
+  v.key = w['key']
+  v.secret = w['secret']
+  return v
+}
+
+export interface KeyStoreProxyAuthResponse {
+  /**
+   * Access key used to sign requests sent to the XKS proxy.
+   */
+  key?: string
+}
+
+/** @internal */
+export function toWireKeyStoreProxyAuthResponse(
+  v: KeyStoreProxyAuthResponse,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.key !== undefined) o['key'] = v.key
+  return o
+}
+
+/** @internal */
+export function fromWireKeyStoreProxyAuthResponse(w: any): KeyStoreProxyAuthResponse {
+  const v = {} as KeyStoreProxyAuthResponse
+  if (w['key'] !== undefined) v.key = w['key']
+  return v
+}
+
+export interface KeyStoreProxyResponse {
+  auth?: KeyStoreProxyAuthResponse
+  /**
+   * Public URL used to route communication to the customer-managed XKS proxy.
+   */
+  endpoint?: string
+}
+
+/** @internal */
+export function toWireKeyStoreProxyResponse(v: KeyStoreProxyResponse): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.auth !== undefined) o['auth'] = toWireKeyStoreProxyAuthResponse(v.auth)
+  if (v.endpoint !== undefined) o['endpoint'] = v.endpoint
+  return o
+}
+
+/** @internal */
+export function fromWireKeyStoreProxyResponse(w: any): KeyStoreProxyResponse {
+  const v = {} as KeyStoreProxyResponse
+  if (w['auth'] !== undefined) v.auth = fromWireKeyStoreProxyAuthResponse(w['auth'])
+  if (w['endpoint'] !== undefined) v.endpoint = w['endpoint']
+  return v
+}
+
 /**
  * Kubelet image GC options
  */
@@ -15802,7 +16999,7 @@ export type Labels = Record<string, string>
 /**
  * List of AI API keys
  *
- * @example {"ai-api-keys":[{"created-at":"2026-03-25T10:00:00Z","id":"11111111-1111-1111-1111-111111111111","name":"default-public-key","org-uuid":"22222222-2222-2222-2222-222222222222","scope":"public","updated-at":"2026-03-25T10:00:00Z"}]}
+ * @example {"ai-api-keys":[{"all-deployments":false,"all-models":true,"created-at":"2026-03-25T10:00:00Z","deployments":[],"id":"11111111-1111-1111-1111-111111111111","models":[],"name":"default-public-key","revoked-at":"2026-03-25T10:00:00Z","updated-at":"2026-03-25T10:00:00Z"},{"all-deployments":false,"all-models":false,"created-at":"2026-03-25T10:00:00Z","deployments":[{"id":"33333333-3333-3333-3333-333333333333"},{"id":"44444444-4444-4444-4444-444444444444"}],"id":"22222222-2222-2222-2222-222222222222","models":["GLM 5.2","Kimi 2.7"],"name":"restricted-key","revoked-at":"","updated-at":"2026-03-25T10:00:00Z"}]}
  */
 export interface ListAIAPIKeysResponse {
   aiAPIKeys: ListAIAPIKeysResponseEntry[]
@@ -15828,34 +17025,35 @@ export function fromWireListAIAPIKeysResponse(w: any): ListAIAPIKeysResponse {
  */
 export interface ListAIAPIKeysResponseEntry {
   /**
-   * Creation timestamp
+   * True when the key has access to all deployments of the organization.
    *
+   * Read-only
+   */
+  allDeployments: boolean
+  /**
+   * True when the key has access to all public models.
+   *
+   * Read-only
+   */
+  allModels: boolean
+  /**
    * Read-only
    */
   createdAT: Date
+  deployments: AIAPIKeyDeployments
   /**
-   * AI API key ID
-   *
    * Read-only
    */
   id: string
-  /**
-   * Human-readable name for the AI API key
-   */
+  models: AIAPIKeyModels
   name: string
   /**
-   * Organization UUID that owns this key
+   * Revocation timestamp. Null when the API key is active.
    *
    * Read-only
    */
-  orgUuid: string
+  revokedAT: Date | null
   /**
-   * Key scope: 'public' for all deployments, or a specific deployment UUID
-   */
-  scope: string
-  /**
-   * Last update timestamp
-   *
    * Read-only
    */
   updatedAT: Date
@@ -15866,11 +17064,15 @@ export function toWireListAIAPIKeysResponseEntry(
   v: ListAIAPIKeysResponseEntry,
 ): Record<string, unknown> {
   const o: Record<string, unknown> = {}
+  if (v.allDeployments !== undefined) o['all-deployments'] = v.allDeployments
+  if (v.allModels !== undefined) o['all-models'] = v.allModels
   if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
+  if (v.deployments !== undefined) o['deployments'] = toWireAIAPIKeyDeployments(v.deployments)
   if (v.id !== undefined) o['id'] = v.id
+  if (v.models !== undefined) o['models'] = v.models
   if (v.name !== undefined) o['name'] = v.name
-  if (v.orgUuid !== undefined) o['org-uuid'] = v.orgUuid
-  if (v.scope !== undefined) o['scope'] = v.scope
+  if (v.revokedAT !== undefined)
+    o['revoked-at'] = v.revokedAT === null ? null : v.revokedAT.toISOString()
   if (v.updatedAT !== undefined) o['updated-at'] = v.updatedAT.toISOString()
   return o
 }
@@ -15878,11 +17080,14 @@ export function toWireListAIAPIKeysResponseEntry(
 /** @internal */
 export function fromWireListAIAPIKeysResponseEntry(w: any): ListAIAPIKeysResponseEntry {
   const v = {} as ListAIAPIKeysResponseEntry
+  v.allDeployments = w['all-deployments']
+  v.allModels = w['all-models']
   v.createdAT = new Date(w['created-at'])
+  v.deployments = fromWireAIAPIKeyDeployments(w['deployments'])
   v.id = w['id']
+  v.models = w['models']
   v.name = w['name']
-  v.orgUuid = w['org-uuid']
-  v.scope = w['scope']
+  v.revokedAT = new Date(w['revoked-at'])
   v.updatedAT = new Date(w['updated-at'])
   return v
 }
@@ -15994,10 +17199,6 @@ export interface ListDeploymentsResponseEntry {
    * Read-only
    */
   updatedAT?: Date
-  /**
-   * Deployment visibility: private for your organization's deployments, public for Exoscale Managed Inference deployments.
-   */
-  visibility: 'private' | 'public'
 }
 
 /** @internal */
@@ -16016,7 +17217,6 @@ export function toWireListDeploymentsResponseEntry(
   if (v.serviceLevel !== undefined) o['service-level'] = v.serviceLevel
   if (v.state !== undefined) o['state'] = v.state
   if (v.updatedAT !== undefined) o['updated-at'] = v.updatedAT.toISOString()
-  if (v.visibility !== undefined) o['visibility'] = v.visibility
   return o
 }
 
@@ -16034,7 +17234,91 @@ export function fromWireListDeploymentsResponseEntry(w: any): ListDeploymentsRes
   if (w['service-level'] !== undefined) v.serviceLevel = w['service-level']
   v.state = w['state']
   if (w['updated-at'] !== undefined) v.updatedAT = new Date(w['updated-at'])
-  v.visibility = w['visibility']
+  return v
+}
+
+export interface ListKeyStoresResponse {
+  /**
+   * The key stores configured for the organization.
+   */
+  keyStores?: ListKeyStoresResponseEntry[]
+}
+
+/** @internal */
+export function toWireListKeyStoresResponse(v: ListKeyStoresResponse): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.keyStores !== undefined)
+    o['key-stores'] = v.keyStores.map((x) => toWireListKeyStoresResponseEntry(x))
+  return o
+}
+
+/** @internal */
+export function fromWireListKeyStoresResponse(w: any): ListKeyStoresResponse {
+  const v = {} as ListKeyStoresResponse
+  if (w['key-stores'] !== undefined)
+    v.keyStores = (w['key-stores'] as any[]).map((x) => fromWireListKeyStoresResponseEntry(x))
+  return v
+}
+
+export interface ListKeyStoresResponseEntry {
+  /**
+   * The creation timestamp.
+   */
+  createdAT?: Date
+  /**
+   * An optional detailed description providing additional context about the key store's intended use case.
+   */
+  description?: string
+  /**
+   * The globally unique identifier assigned to the key store.
+   */
+  id?: string
+  /**
+   * The display name assigned to the key store.
+   */
+  name?: string
+  proxy?: KeyStoreProxyResponse
+  /**
+   * The current connection status of the key store.
+   */
+  status?: 'connected' | 'disconnected'
+  /**
+   * The timestamp indicating when the current key store status last transitioned.
+   */
+  statusSince?: Date
+  /**
+   * The key store type.
+   */
+  type?: 'external-key-store'
+}
+
+/** @internal */
+export function toWireListKeyStoresResponseEntry(
+  v: ListKeyStoresResponseEntry,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
+  if (v.description !== undefined) o['description'] = v.description
+  if (v.id !== undefined) o['id'] = v.id
+  if (v.name !== undefined) o['name'] = v.name
+  if (v.proxy !== undefined) o['proxy'] = toWireKeyStoreProxyResponse(v.proxy)
+  if (v.status !== undefined) o['status'] = v.status
+  if (v.statusSince !== undefined) o['status-since'] = v.statusSince.toISOString()
+  if (v.type !== undefined) o['type'] = v.type
+  return o
+}
+
+/** @internal */
+export function fromWireListKeyStoresResponseEntry(w: any): ListKeyStoresResponseEntry {
+  const v = {} as ListKeyStoresResponseEntry
+  if (w['created-at'] !== undefined) v.createdAT = new Date(w['created-at'])
+  if (w['description'] !== undefined) v.description = w['description']
+  if (w['id'] !== undefined) v.id = w['id']
+  if (w['name'] !== undefined) v.name = w['name']
+  if (w['proxy'] !== undefined) v.proxy = fromWireKeyStoreProxyResponse(w['proxy'])
+  if (w['status'] !== undefined) v.status = w['status']
+  if (w['status-since'] !== undefined) v.statusSince = new Date(w['status-since'])
+  if (w['type'] !== undefined) v.type = w['type']
   return v
 }
 
@@ -16133,6 +17417,10 @@ export interface ListKmsKeysResponseEntry {
    * The globally unique identifier (UUID) tracking this key entity.
    */
   id: string
+  /**
+   * The cryptographic key specification used to generate the key, defining its algorithm and, for asymmetric keys, its curve or modulus size.
+   */
+  keySpec: string
   material: KeyMaterial
   /**
    * True if this is a multi-zone key.
@@ -16152,7 +17440,10 @@ export interface ListKmsKeysResponseEntry {
   replicas?: string[]
   revision: RevisionStamp
   rotation: KeyRotationConfig
-  source: 'exoscale-kms'
+  /**
+   * Indicates the source of the key material, either generated and held within Exoscale KMS, or backed by an external key store.
+   */
+  source: 'exoscale-kms' | 'external-key-store'
   status: 'disabled' | 'enabled' | 'pending-deletion'
   /**
    * The precise time when the key entered its current configuration phase.
@@ -16162,6 +17453,7 @@ export interface ListKmsKeysResponseEntry {
    * The cryptographic operation constraints allowed on this key.
    */
   usage: string
+  xks?: XksKey
 }
 
 /** @internal */
@@ -16173,6 +17465,7 @@ export function toWireListKmsKeysResponseEntry(
   if (v.deleteAT !== undefined) o['delete-at'] = v.deleteAT.toISOString()
   if (v.description !== undefined) o['description'] = v.description
   if (v.id !== undefined) o['id'] = v.id
+  if (v.keySpec !== undefined) o['key-spec'] = v.keySpec
   if (v.material !== undefined) o['material'] = toWireKeyMaterial(v.material)
   if (v.multiZone !== undefined) o['multi-zone'] = v.multiZone
   if (v.name !== undefined) o['name'] = v.name
@@ -16184,6 +17477,7 @@ export function toWireListKmsKeysResponseEntry(
   if (v.status !== undefined) o['status'] = v.status
   if (v.statusSince !== undefined) o['status-since'] = v.statusSince.toISOString()
   if (v.usage !== undefined) o['usage'] = v.usage
+  if (v.xks !== undefined) o['xks'] = toWireXksKey(v.xks)
   return o
 }
 
@@ -16194,6 +17488,7 @@ export function fromWireListKmsKeysResponseEntry(w: any): ListKmsKeysResponseEnt
   if (w['delete-at'] !== undefined) v.deleteAT = new Date(w['delete-at'])
   if (w['description'] !== undefined) v.description = w['description']
   v.id = w['id']
+  v.keySpec = w['key-spec']
   v.material = fromWireKeyMaterial(w['material'])
   v.multiZone = w['multi-zone']
   v.name = w['name']
@@ -16205,6 +17500,7 @@ export function fromWireListKmsKeysResponseEntry(w: any): ListKmsKeysResponseEnt
   v.status = w['status']
   v.statusSince = new Date(w['status-since'])
   v.usage = w['usage']
+  if (w['xks'] !== undefined) v.xks = fromWireXksKey(w['xks'])
   return v
 }
 
@@ -16246,6 +17542,10 @@ export interface ListModelsResponseEntry {
    */
   id: string
   /**
+   * Model lifecycle state
+   */
+  lifecycleStatus?: 'active' | 'deprecated' | 'eol' | null | 'preview' | null
+  /**
    * Model size in bytes
    *
    * Min 0
@@ -16267,6 +17567,10 @@ export interface ListModelsResponseEntry {
    * Read-only
    */
   updatedAT: Date
+  /**
+   * Model visibility
+   */
+  visibility?: 'private' | 'public'
 }
 
 /** @internal */
@@ -16274,10 +17578,13 @@ export function toWireListModelsResponseEntry(v: ListModelsResponseEntry): Recor
   const o: Record<string, unknown> = {}
   if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
   if (v.id !== undefined) o['id'] = v.id
+  if (v.lifecycleStatus !== undefined)
+    o['lifecycle-status'] = v.lifecycleStatus === null ? null : v.lifecycleStatus
   if (v.modelSize !== undefined) o['model-size'] = v.modelSize
   if (v.name !== undefined) o['name'] = v.name
   if (v.state !== undefined) o['state'] = v.state
   if (v.updatedAT !== undefined) o['updated-at'] = v.updatedAT.toISOString()
+  if (v.visibility !== undefined) o['visibility'] = v.visibility
   return o
 }
 
@@ -16286,10 +17593,12 @@ export function fromWireListModelsResponseEntry(w: any): ListModelsResponseEntry
   const v = {} as ListModelsResponseEntry
   v.createdAT = new Date(w['created-at'])
   v.id = w['id']
+  if (w['lifecycle-status'] !== undefined) v.lifecycleStatus = w['lifecycle-status']
   v.modelSize = w['model-size']
   v.name = w['name']
   v.state = w['state']
   v.updatedAT = new Date(w['updated-at'])
+  if (w['visibility'] !== undefined) v.visibility = w['visibility']
   return v
 }
 
@@ -16432,6 +17741,10 @@ export interface ListVpcEntry {
    */
   description?: string
   /**
+   * DHCP options
+   */
+  dhcpOptions?: VpcDHCPOptions
+  /**
    * VPC ID
    */
   id?: string
@@ -16453,6 +17766,7 @@ export function toWireListVpcEntry(v: ListVpcEntry): Record<string, unknown> {
   if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
   if (v.default !== undefined) o['default'] = v.default
   if (v.description !== undefined) o['description'] = v.description
+  if (v.dhcpOptions !== undefined) o['dhcp-options'] = toWireVpcDHCPOptions(v.dhcpOptions)
   if (v.id !== undefined) o['id'] = v.id
   if (v.labels !== undefined) o['labels'] = v.labels
   if (v.name !== undefined) o['name'] = v.name
@@ -16465,6 +17779,7 @@ export function fromWireListVpcEntry(w: any): ListVpcEntry {
   if (w['created-at'] !== undefined) v.createdAT = new Date(w['created-at'])
   if (w['default'] !== undefined) v.default = w['default']
   if (w['description'] !== undefined) v.description = w['description']
+  if (w['dhcp-options'] !== undefined) v.dhcpOptions = fromWireVpcDHCPOptions(w['dhcp-options'])
   if (w['id'] !== undefined) v.id = w['id']
   if (w['labels'] !== undefined) v.labels = w['labels']
   if (w['name'] !== undefined) v.name = w['name']
@@ -17234,15 +18549,15 @@ export function fromWireOrganization(w: any): Organization {
 }
 
 /**
- * Organization GPU usage
+ * Organization usage
  */
 export interface OrganizationUsage {
   /**
-   * Total GPU count (sum of all GPU types)
+   * Count of active AI API keys
    *
    * Min 0
    */
-  gpu: number
+  aiAPIKey?: number
   /**
    * GPU3 count
    *
@@ -17278,7 +18593,7 @@ export interface OrganizationUsage {
 /** @internal */
 export function toWireOrganizationUsage(v: OrganizationUsage): Record<string, unknown> {
   const o: Record<string, unknown> = {}
-  if (v.gpu !== undefined) o['gpu'] = v.gpu
+  if (v.aiAPIKey !== undefined) o['ai-api-key'] = v.aiAPIKey
   if (v.gpu3 !== undefined) o['gpu3'] = v.gpu3
   if (v.gpu3080ti !== undefined) o['gpu3080ti'] = v.gpu3080ti
   if (v.gpua30 !== undefined) o['gpua30'] = v.gpua30
@@ -17290,7 +18605,7 @@ export function toWireOrganizationUsage(v: OrganizationUsage): Record<string, un
 /** @internal */
 export function fromWireOrganizationUsage(w: any): OrganizationUsage {
   const v = {} as OrganizationUsage
-  v.gpu = w['gpu']
+  if (w['ai-api-key'] !== undefined) v.aiAPIKey = w['ai-api-key']
   if (w['gpu3'] !== undefined) v.gpu3 = w['gpu3']
   if (w['gpu3080ti'] !== undefined) v.gpu3080ti = w['gpu3080ti']
   if (w['gpua30'] !== undefined) v.gpua30 = w['gpua30']
@@ -17768,6 +19083,42 @@ export function toWireReplicateKmsKeyRequest(v: ReplicateKmsKeyRequest): Record<
 export function fromWireReplicateKmsKeyRequest(w: any): ReplicateKmsKeyRequest {
   const v = {} as ReplicateKmsKeyRequest
   v.zone = w['zone']
+  return v
+}
+
+/**
+ * Resources reserved for kube or system components.
+ */
+export interface ReservedResources {
+  /**
+   * CPU reservation, e.g., "200m"
+   */
+  cpu: string
+  /**
+   * Ephemeral storage reservation, e.g., "1Gi"
+   */
+  ephemeralStorage?: string
+  /**
+   * Memory reservation, e.g., "512Mi"
+   */
+  memory?: string
+}
+
+/** @internal */
+export function toWireReservedResources(v: ReservedResources): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.cpu !== undefined) o['cpu'] = v.cpu
+  if (v.ephemeralStorage !== undefined) o['ephemeral-storage'] = v.ephemeralStorage
+  if (v.memory !== undefined) o['memory'] = v.memory
+  return o
+}
+
+/** @internal */
+export function fromWireReservedResources(w: any): ReservedResources {
+  const v = {} as ReservedResources
+  v.cpu = w['cpu']
+  if (w['ephemeral-storage'] !== undefined) v.ephemeralStorage = w['ephemeral-storage']
+  if (w['memory'] !== undefined) v.memory = w['memory']
   return v
 }
 
@@ -18283,6 +19634,84 @@ export function fromWireSetOrgConsumptionQuotaRequest(w: any): SetOrgConsumption
   return v
 }
 
+export interface SignRequest {
+  /**
+   * The Base64-encoded message to sign (1-4096 decoded bytes). Its meaning depends on `message-type`, either the raw plaintext message or an already-hashed digest.
+   *
+   * Length 1-5464
+   */
+  message: string
+  /**
+   * How `message` should be interpreted.
+   *
+   * @defaultValue "raw"
+   */
+  messageType?: 'digest' | 'raw'
+  /**
+   * The signing algorithm to use. Must match the family implied by the key's `key-spec`.
+   */
+  signingAlgorithm:
+    | 'ECDSA_SHA_256'
+    | 'ECDSA_SHA_384'
+    | 'ECDSA_SHA_512'
+    | 'ED25519_PH_SHA_512'
+    | 'EDDSA_ED25519'
+    | 'RSASSA_PSS_SHA_256'
+    | 'RSASSA_PSS_SHA_384'
+    | 'RSASSA_PSS_SHA_512'
+}
+
+/** @internal */
+export function toWireSignRequest(v: SignRequest): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.message !== undefined) o['message'] = v.message
+  if (v.messageType !== undefined) o['message-type'] = v.messageType
+  if (v.signingAlgorithm !== undefined) o['signing-algorithm'] = v.signingAlgorithm
+  return o
+}
+
+/** @internal */
+export function fromWireSignRequest(w: any): SignRequest {
+  const v = {} as SignRequest
+  v.message = w['message']
+  if (w['message-type'] !== undefined) v.messageType = w['message-type']
+  v.signingAlgorithm = w['signing-algorithm']
+  return v
+}
+
+export interface SignResponse {
+  /**
+   * The cryptographic key specification used to produce the signature.
+   */
+  keySpec: string
+  /**
+   * The resulting Base64-encoded signature.
+   */
+  signature: string
+  /**
+   * The signing algorithm used to produce the signature, echoing the request's `signing-algorithm`.
+   */
+  signingAlgorithm: string
+}
+
+/** @internal */
+export function toWireSignResponse(v: SignResponse): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.keySpec !== undefined) o['key-spec'] = v.keySpec
+  if (v.signature !== undefined) o['signature'] = v.signature
+  if (v.signingAlgorithm !== undefined) o['signing-algorithm'] = v.signingAlgorithm
+  return o
+}
+
+/** @internal */
+export function fromWireSignResponse(w: any): SignResponse {
+  const v = {} as SignResponse
+  v.keySpec = w['key-spec']
+  v.signature = w['signature']
+  v.signingAlgorithm = w['signing-algorithm']
+  return v
+}
+
 /**
  * Kubernetes Audit parameters
  */
@@ -18423,6 +19852,10 @@ export interface SKSCluster {
    */
   addons?: string[]
   /**
+   * EXPERIMENTAL: List of ranges of allowed IPs using CIDR notation.
+   */
+  allowedNetworks?: SKSClusterAllowedNetworks
+  /**
    * Kubernetes Audit
    */
   audit?: SKSAudit
@@ -18477,6 +19910,10 @@ export interface SKSCluster {
    */
   id?: string
   /**
+   * A list of Karpenter controller feature gates to enable for the Karpenter controller binary
+   */
+  karpenterFeatureGates?: string[]
+  /**
    * Cluster labels
    */
   labels?: SKSClusterLabels
@@ -18527,6 +19964,7 @@ export interface SKSCluster {
 export function toWireSKSCluster(v: SKSCluster): Record<string, unknown> {
   const o: Record<string, unknown> = {}
   if (v.addons !== undefined) o['addons'] = v.addons
+  if (v.allowedNetworks !== undefined) o['allowed-networks'] = v.allowedNetworks
   if (v.audit !== undefined) o['audit'] = toWireSKSAudit(v.audit)
   if (v.autoUpgrade !== undefined) o['auto-upgrade'] = v.autoUpgrade
   if (v.cni !== undefined) o['cni'] = v.cni
@@ -18540,6 +19978,7 @@ export function toWireSKSCluster(v: SKSCluster): Record<string, unknown> {
   if (v.endpoint !== undefined) o['endpoint'] = v.endpoint
   if (v.featureGates !== undefined) o['feature-gates'] = v.featureGates
   if (v.id !== undefined) o['id'] = v.id
+  if (v.karpenterFeatureGates !== undefined) o['karpenter-feature-gates'] = v.karpenterFeatureGates
   if (v.labels !== undefined) o['labels'] = v.labels
   if (v.level !== undefined) o['level'] = v.level
   if (v.name !== undefined) o['name'] = v.name
@@ -18554,6 +19993,7 @@ export function toWireSKSCluster(v: SKSCluster): Record<string, unknown> {
 export function fromWireSKSCluster(w: any): SKSCluster {
   const v = {} as SKSCluster
   if (w['addons'] !== undefined) v.addons = w['addons']
+  if (w['allowed-networks'] !== undefined) v.allowedNetworks = w['allowed-networks']
   if (w['audit'] !== undefined) v.audit = fromWireSKSAudit(w['audit'])
   if (w['auto-upgrade'] !== undefined) v.autoUpgrade = w['auto-upgrade']
   if (w['cni'] !== undefined) v.cni = w['cni']
@@ -18566,6 +20006,8 @@ export function fromWireSKSCluster(w: any): SKSCluster {
   if (w['endpoint'] !== undefined) v.endpoint = w['endpoint']
   if (w['feature-gates'] !== undefined) v.featureGates = w['feature-gates']
   if (w['id'] !== undefined) v.id = w['id']
+  if (w['karpenter-feature-gates'] !== undefined)
+    v.karpenterFeatureGates = w['karpenter-feature-gates']
   if (w['labels'] !== undefined) v.labels = w['labels']
   if (w['level'] !== undefined) v.level = w['level']
   if (w['name'] !== undefined) v.name = w['name']
@@ -18576,6 +20018,11 @@ export function fromWireSKSCluster(w: any): SKSCluster {
   if (w['version'] !== undefined) v.version = w['version']
   return v
 }
+
+/**
+ * Max items 16, Unique items
+ */
+export type SKSClusterAllowedNetworks = string
 
 export interface SKSClusterDeprecatedResource {
   group?: string
@@ -18689,6 +20136,10 @@ export interface SKSNodepool {
    * Max items 8, Unique items
    */
   antiAffinityGroups?: AntiAffinityGroupRef[]
+  /**
+   * CPU manager config
+   */
+  cpuManagerConfig?: CPUManagerConfig
   /**
    * Nodepool creation date
    *
@@ -18816,6 +20267,8 @@ export function toWireSKSNodepool(v: SKSNodepool): Record<string, unknown> {
   if (v.addons !== undefined) o['addons'] = v.addons
   if (v.antiAffinityGroups !== undefined)
     o['anti-affinity-groups'] = v.antiAffinityGroups.map((x) => toWireAntiAffinityGroupRef(x))
+  if (v.cpuManagerConfig !== undefined)
+    o['cpu-manager-config'] = toWireCPUManagerConfig(v.cpuManagerConfig)
   if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
   if (v.deployTarget !== undefined) o['deploy-target'] = toWireDeployTargetRef(v.deployTarget)
   if (v.description !== undefined) o['description'] = v.description
@@ -18852,6 +20305,8 @@ export function fromWireSKSNodepool(w: any): SKSNodepool {
     v.antiAffinityGroups = (w['anti-affinity-groups'] as any[]).map((x) =>
       fromWireAntiAffinityGroupRef(x),
     )
+  if (w['cpu-manager-config'] !== undefined)
+    v.cpuManagerConfig = fromWireCPUManagerConfig(w['cpu-manager-config'])
   if (w['created-at'] !== undefined) v.createdAT = new Date(w['created-at'])
   if (w['deploy-target'] !== undefined) v.deployTarget = fromWireDeployTargetRef(w['deploy-target'])
   if (w['description'] !== undefined) v.description = w['description']
@@ -19465,10 +20920,6 @@ export interface Template {
    * Read-only
    */
   visibility?: 'private' | 'public'
-  /**
-   * Zones availability
-   */
-  zones?: ZoneName[]
 }
 
 /** @internal */
@@ -19492,7 +20943,6 @@ export function toWireTemplate(v: Template): Record<string, unknown> {
   if (v.url !== undefined) o['url'] = v.url
   if (v.version !== undefined) o['version'] = v.version
   if (v.visibility !== undefined) o['visibility'] = v.visibility
-  if (v.zones !== undefined) o['zones'] = v.zones
   return o
 }
 
@@ -19517,7 +20967,6 @@ export function fromWireTemplate(w: any): Template {
   if (w['url'] !== undefined) v.url = w['url']
   if (w['version'] !== undefined) v.version = w['version']
   if (w['visibility'] !== undefined) v.visibility = w['visibility']
-  if (w['zones'] !== undefined) v.zones = w['zones']
   return v
 }
 
@@ -19542,6 +20991,87 @@ export function toWireTemplateRef(v: TemplateRef): Record<string, unknown> {
 export function fromWireTemplateRef(w: any): TemplateRef {
   const v = {} as TemplateRef
   if (w['id'] !== undefined) v.id = w['id']
+  return v
+}
+
+/**
+ * Update the models and/or deployments accessible by an AI API key. Omitted properties are left unchanged.
+ */
+export interface UpdateAIAPIKeyRequest {
+  /**
+   * Grant or remove access to all deployments of the organization. Takes precedence over the deployments array, which is ignored when set.
+   */
+  allDeployments?: boolean
+  /**
+   * Grant or remove access to all public models. Takes precedence over the models array, which is ignored when set.
+   */
+  allModels?: boolean
+  deployments?: AIAPIKeyDeployments
+  models?: AIAPIKeyModels
+}
+
+/** @internal */
+export function toWireUpdateAIAPIKeyRequest(v: UpdateAIAPIKeyRequest): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.allDeployments !== undefined) o['all-deployments'] = v.allDeployments
+  if (v.allModels !== undefined) o['all-models'] = v.allModels
+  if (v.deployments !== undefined) o['deployments'] = toWireAIAPIKeyDeployments(v.deployments)
+  if (v.models !== undefined) o['models'] = v.models
+  return o
+}
+
+/** @internal */
+export function fromWireUpdateAIAPIKeyRequest(w: any): UpdateAIAPIKeyRequest {
+  const v = {} as UpdateAIAPIKeyRequest
+  if (w['all-deployments'] !== undefined) v.allDeployments = w['all-deployments']
+  if (w['all-models'] !== undefined) v.allModels = w['all-models']
+  if (w['deployments'] !== undefined) v.deployments = fromWireAIAPIKeyDeployments(w['deployments'])
+  if (w['models'] !== undefined) v.models = w['models']
+  return v
+}
+
+export interface UpdateAIAPIKeyResponse {
+  /**
+   * True when the key has access to all deployments of the organization.
+   */
+  allDeployments: boolean
+  /**
+   * True when the key has access to all public models.
+   */
+  allModels: boolean
+  createdAT: Date
+  deployments: AIAPIKeyDeployments
+  id: string
+  models: AIAPIKeyModels
+  name: string
+  updatedAT: Date
+}
+
+/** @internal */
+export function toWireUpdateAIAPIKeyResponse(v: UpdateAIAPIKeyResponse): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.allDeployments !== undefined) o['all-deployments'] = v.allDeployments
+  if (v.allModels !== undefined) o['all-models'] = v.allModels
+  if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
+  if (v.deployments !== undefined) o['deployments'] = toWireAIAPIKeyDeployments(v.deployments)
+  if (v.id !== undefined) o['id'] = v.id
+  if (v.models !== undefined) o['models'] = v.models
+  if (v.name !== undefined) o['name'] = v.name
+  if (v.updatedAT !== undefined) o['updated-at'] = v.updatedAT.toISOString()
+  return o
+}
+
+/** @internal */
+export function fromWireUpdateAIAPIKeyResponse(w: any): UpdateAIAPIKeyResponse {
+  const v = {} as UpdateAIAPIKeyResponse
+  v.allDeployments = w['all-deployments']
+  v.allModels = w['all-models']
+  v.createdAT = new Date(w['created-at'])
+  v.deployments = fromWireAIAPIKeyDeployments(w['deployments'])
+  v.id = w['id']
+  v.models = w['models']
+  v.name = w['name']
+  v.updatedAT = new Date(w['updated-at'])
   return v
 }
 
@@ -19581,6 +21111,59 @@ export function fromWireUpdateDeploymentRequest(w: any): UpdateDeploymentRequest
   if (w['inference-engine-version'] !== undefined)
     v.inferenceEngineVersion = w['inference-engine-version']
   if (w['name'] !== undefined) v.name = w['name']
+  return v
+}
+
+/**
+ * New customer-managed XKS proxy settings.
+ */
+export interface UpdateKeyStoreProxy {
+  auth?: KeyStoreProxyAuth
+  /**
+   * New public URL used to route communication to the customer-managed XKS proxy.
+   */
+  endpoint?: string
+}
+
+/** @internal */
+export function toWireUpdateKeyStoreProxy(v: UpdateKeyStoreProxy): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.auth !== undefined) o['auth'] = toWireKeyStoreProxyAuth(v.auth)
+  if (v.endpoint !== undefined) o['endpoint'] = v.endpoint
+  return o
+}
+
+/** @internal */
+export function fromWireUpdateKeyStoreProxy(w: any): UpdateKeyStoreProxy {
+  const v = {} as UpdateKeyStoreProxy
+  if (w['auth'] !== undefined) v.auth = fromWireKeyStoreProxyAuth(w['auth'])
+  if (w['endpoint'] !== undefined) v.endpoint = w['endpoint']
+  return v
+}
+
+export interface UpdateKeyStoreRequest {
+  /**
+   * A new detailed description providing additional context about the key store's intended use case.
+   *
+   * Max length 1024
+   */
+  description?: string
+  proxy?: UpdateKeyStoreProxy
+}
+
+/** @internal */
+export function toWireUpdateKeyStoreRequest(v: UpdateKeyStoreRequest): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.description !== undefined) o['description'] = v.description
+  if (v.proxy !== undefined) o['proxy'] = toWireUpdateKeyStoreProxy(v.proxy)
+  return o
+}
+
+/** @internal */
+export function fromWireUpdateKeyStoreRequest(w: any): UpdateKeyStoreRequest {
+  const v = {} as UpdateKeyStoreRequest
+  if (w['description'] !== undefined) v.description = w['description']
+  if (w['proxy'] !== undefined) v.proxy = fromWireUpdateKeyStoreProxy(w['proxy'])
   return v
 }
 
@@ -19646,6 +21229,92 @@ export function fromWireUser(w: any): User {
   return v
 }
 
+export interface VerifyRequest {
+  /**
+   * The Base64-encoded message to verify (1-4096 decoded bytes), with the same semantics as `sign`'s `message` field.
+   *
+   * Length 1-5464
+   */
+  message: string
+  /**
+   * How `message` should be interpreted, with the same semantics as `sign`'s `message-type` field.
+   *
+   * @defaultValue "raw"
+   */
+  messageType?: 'digest' | 'raw'
+  /**
+   * The Base64-encoded signature to verify against `message` (1-6144 decoded bytes).
+   *
+   * Length 1-8192
+   */
+  signature: string
+  /**
+   * The signing algorithm `signature` was produced with. Must match the family implied by the key's `key-spec`, with the same semantics as `sign`'s `signing-algorithm` field.
+   */
+  signingAlgorithm:
+    | 'ECDSA_SHA_256'
+    | 'ECDSA_SHA_384'
+    | 'ECDSA_SHA_512'
+    | 'ED25519_PH_SHA_512'
+    | 'EDDSA_ED25519'
+    | 'RSASSA_PSS_SHA_256'
+    | 'RSASSA_PSS_SHA_384'
+    | 'RSASSA_PSS_SHA_512'
+}
+
+/** @internal */
+export function toWireVerifyRequest(v: VerifyRequest): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.message !== undefined) o['message'] = v.message
+  if (v.messageType !== undefined) o['message-type'] = v.messageType
+  if (v.signature !== undefined) o['signature'] = v.signature
+  if (v.signingAlgorithm !== undefined) o['signing-algorithm'] = v.signingAlgorithm
+  return o
+}
+
+/** @internal */
+export function fromWireVerifyRequest(w: any): VerifyRequest {
+  const v = {} as VerifyRequest
+  v.message = w['message']
+  if (w['message-type'] !== undefined) v.messageType = w['message-type']
+  v.signature = w['signature']
+  v.signingAlgorithm = w['signing-algorithm']
+  return v
+}
+
+export interface VerifyResponse {
+  /**
+   * The UUID of the KMS key used to verify the signature.
+   */
+  keyID: string
+  /**
+   * The cryptographic key specification used to verify the signature.
+   */
+  keySpec: string
+  /**
+   * Whether `signature` is a valid signature over `message` produced by this KMS key.
+   */
+  signatureValid: boolean
+}
+
+/** @internal */
+export function toWireVerifyResponse(v: VerifyResponse): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.keyID !== undefined) o['key-id'] = v.keyID
+  if (v.keySpec !== undefined) o['key-spec'] = v.keySpec
+  if (v.signatureValid !== undefined) o['signature-valid'] = v.signatureValid
+  return o
+}
+
+/** @internal */
+export function fromWireVerifyResponse(w: any): VerifyResponse {
+  const v = {} as VerifyResponse
+  v.keyID = w['key-id']
+  v.keySpec = w['key-spec']
+  v.signatureValid = w['signature-valid']
+  return v
+}
+
 /**
  * VPC
  */
@@ -19664,6 +21333,10 @@ export interface Vpc {
    * Max length 4096
    */
   description?: string
+  /**
+   * DHCP options
+   */
+  dhcpOptions?: VpcDHCPOptions
   /**
    * VPC ID
    */
@@ -19686,6 +21359,7 @@ export function toWireVpc(v: Vpc): Record<string, unknown> {
   if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
   if (v.default !== undefined) o['default'] = v.default
   if (v.description !== undefined) o['description'] = v.description
+  if (v.dhcpOptions !== undefined) o['dhcp-options'] = toWireVpcDHCPOptions(v.dhcpOptions)
   if (v.id !== undefined) o['id'] = v.id
   if (v.labels !== undefined) o['labels'] = v.labels
   if (v.name !== undefined) o['name'] = v.name
@@ -19698,9 +21372,102 @@ export function fromWireVpc(w: any): Vpc {
   if (w['created-at'] !== undefined) v.createdAT = new Date(w['created-at'])
   if (w['default'] !== undefined) v.default = w['default']
   if (w['description'] !== undefined) v.description = w['description']
+  if (w['dhcp-options'] !== undefined) v.dhcpOptions = fromWireVpcDHCPOptions(w['dhcp-options'])
   if (w['id'] !== undefined) v.id = w['id']
   if (w['labels'] !== undefined) v.labels = w['labels']
   if (w['name'] !== undefined) v.name = w['name']
+  return v
+}
+
+/**
+ * VPC DHCP options
+ */
+export interface VpcDHCPOptions {
+  /**
+   * DNS Servers
+   */
+  dnsServers?: string[]
+  /**
+   * Domain search list, limited to 255 octets post RFC3397 compression
+   */
+  domainSearch?: string[]
+  /**
+   * NTP Servers
+   */
+  ntpServers?: string[]
+}
+
+/** @internal */
+export function toWireVpcDHCPOptions(v: VpcDHCPOptions): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.dnsServers !== undefined) o['dns-servers'] = v.dnsServers
+  if (v.domainSearch !== undefined) o['domain-search'] = v.domainSearch
+  if (v.ntpServers !== undefined) o['ntp-servers'] = v.ntpServers
+  return o
+}
+
+/** @internal */
+export function fromWireVpcDHCPOptions(w: any): VpcDHCPOptions {
+  const v = {} as VpcDHCPOptions
+  if (w['dns-servers'] !== undefined) v.dnsServers = w['dns-servers']
+  if (w['domain-search'] !== undefined) v.domainSearch = w['domain-search']
+  if (w['ntp-servers'] !== undefined) v.ntpServers = w['ntp-servers']
+  return v
+}
+
+export interface XksKey {
+  /**
+   * The identifier of the key as known to the external key store, used to reference the key material outside of Exoscale.
+   *
+   * Length 1-128, Pattern `^[a-zA-Z0-9_.-]+$`
+   */
+  externalKeyID: string
+  /**
+   * The Exoscale-generated id of the external key store resource that this key is associated with.
+   */
+  xksID: string
+}
+
+/** @internal */
+export function toWireXksKey(v: XksKey): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.externalKeyID !== undefined) o['external-key-id'] = v.externalKeyID
+  if (v.xksID !== undefined) o['xks-id'] = v.xksID
+  return o
+}
+
+/** @internal */
+export function fromWireXksKey(w: any): XksKey {
+  const v = {} as XksKey
+  v.externalKeyID = w['external-key-id']
+  v.xksID = w['xks-id']
+  return v
+}
+
+export interface XksProxyErrorDetail {
+  /**
+   * Optional bounded XKS proxy `errorMessage`.
+   */
+  errorMessage?: string
+  /**
+   * XKS proxy `errorName` from a valid proxy error envelope.
+   */
+  errorName: string
+}
+
+/** @internal */
+export function toWireXksProxyErrorDetail(v: XksProxyErrorDetail): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.errorMessage !== undefined) o['error-message'] = v.errorMessage
+  if (v.errorName !== undefined) o['error-name'] = v.errorName
+  return o
+}
+
+/** @internal */
+export function fromWireXksProxyErrorDetail(w: any): XksProxyErrorDetail {
+  const v = {} as XksProxyErrorDetail
+  if (w['error-message'] !== undefined) v.errorMessage = w['error-message']
+  v.errorName = w['error-name']
   return v
 }
 
@@ -19789,4 +21556,5 @@ export type ZoneName =
   | 'ch-gva-2'
   | 'de-fra-1'
   | 'de-muc-1'
+  | 'es-mad-1'
   | 'hr-zag-1'

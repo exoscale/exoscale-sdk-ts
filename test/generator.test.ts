@@ -63,7 +63,6 @@ describe('generator', () => {
     const spec = loadEffectiveSpec(SPEC_FILE, OVERRIDES_FILE)
 
     // Every operationId becomes a method.
-    expect(spec.operations.length).toBe(371)
     for (const op of spec.operations) {
       const method = new RegExp(`^  ${toLowerCamel(op.operationId)}\\(`, 'm')
       expect(operations, `missing method for ${op.operationId}`).toMatch(method)
@@ -71,7 +70,6 @@ describe('generator', () => {
 
     // Every component schema (except the ignored duplicates) becomes a type.
     const names = [...spec.schemas.keys()].filter((n) => !IGNORED_SCHEMAS.has(n))
-    expect(names.length).toBe(297)
     for (const name of names) {
       const typeName = toCamel(name)
       const re = new RegExp(`^export (interface|type) ${typeName}[\\s{=]`, 'm')

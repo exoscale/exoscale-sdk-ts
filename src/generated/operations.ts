@@ -53,19 +53,22 @@ import {
   fromWireElasticIP,
   fromWireEnableKmsKeyRotationResponse,
   fromWireEncryptResponse,
-  fromWireEnvImpactReport,
   fromWireEvent,
+  fromWireFocusReport,
   fromWireGenerateDataKeyResponse,
   fromWireGetAIAPIKeyResponse,
   fromWireGetDeploymentLogsResponse,
   fromWireGetDeploymentResponse,
   fromWireGetInferenceEngineHelpResponse,
+  fromWireGetKeyStoreResponse,
   fromWireGetKmsKeyResponse,
   fromWireGetModelResponse,
+  fromWireGetPublicKeyResponse,
   fromWireIAMAPIKey,
   fromWireIAMAPIKeyCreated,
   fromWireIAMPolicy,
   fromWireIAMRole,
+  fromWireIAMSystemRole,
   fromWireImpactBreakdown,
   fromWireImpactValueWithUnit,
   fromWireInstance,
@@ -75,6 +78,8 @@ import {
   fromWireListAIAPIKeysResponse,
   fromWireListAIInstanceTypesResponse,
   fromWireListDeploymentsResponse,
+  fromWireListKeyStoresResponse,
+  fromWireListKeyStoresResponseEntry,
   fromWireListKmsKeyRotationsResponse,
   fromWireListKmsKeysResponse,
   fromWireListModelsResponse,
@@ -91,28 +96,33 @@ import {
   fromWirePrivateNetwork,
   fromWireQuota,
   fromWireReEncryptResponse,
-  fromWireRevealDeploymentAPIKeyResponse,
   fromWireReverseDNSRecord,
   fromWireRotateKmsKeyResponse,
   fromWireRoute,
   fromWireSKSCluster,
   fromWireSKSClusterDeprecatedResource,
   fromWireSKSNodepool,
+  fromWireSKSNodepoolTemplate,
   fromWireSOSBucketUsage,
   fromWireSSHKey,
   fromWireScheduleKmsKeyDeletionResponse,
   fromWireSecurityGroup,
+  fromWireSignResponse,
   fromWireSnapshot,
   fromWireSubnet,
   fromWireSuccessResponse,
   fromWireTemplate,
+  fromWireUpdateAIAPIKeyResponse,
   fromWireUser,
+  fromWireVerifyResponse,
   fromWireVpc,
   fromWireZone,
   toWireAntiAffinityGroupRef,
   toWireBlockStorageSnapshotRef,
+  toWireCPUManager,
   toWireCreateAIAPIKeyRequest,
   toWireCreateDeploymentRequest,
+  toWireCreateKeyStoreRequest,
   toWireCreateKmsKeyRequest,
   toWireCreateModelRequest,
   toWireDBAASClickhouseUserRoleInput,
@@ -161,12 +171,14 @@ import {
   toWireJSONSchemaValkey,
   toWireKubeletImageGC,
   toWireLoadBalancerServiceHealthcheck,
+  toWireLoadBalancerServiceLabelSelector,
   toWireNetworking,
   toWireNvidiaMigProfiles,
   toWirePrivateNetworkOptions,
   toWirePrivateNetworkRef,
   toWireReEncryptRequest,
   toWireReplicateKmsKeyRequest,
+  toWireReservedResources,
   toWireSKSAuditCreate,
   toWireSKSAuditUpdate,
   toWireSKSKubeconfigRequest,
@@ -177,8 +189,15 @@ import {
   toWireScheduleKmsKeyDeletionRequest,
   toWireSecurityGroupRef,
   toWireSecurityGroupResource,
+  toWireSignRequest,
   toWireTemplateRef,
+  toWireUpdateAIAPIKeyRequest,
   toWireUpdateDeploymentRequest,
+  toWireUpdateKeyStoreRequest,
+  toWireVerifyRequest,
+  toWireVpcDHCPOptions,
+  toWireVpcRef,
+  toWireVpcSubnetRef,
   toWireZone,
 } from './schemas.js'
 import type {
@@ -187,9 +206,11 @@ import type {
   BlockStorageSnapshot,
   BlockStorageSnapshotRef,
   BlockStorageVolume,
+  CPUManager,
   CreateAIAPIKeyRequest,
   CreateAIAPIKeyResponse,
   CreateDeploymentRequest,
+  CreateKeyStoreRequest,
   CreateKmsKeyRequest,
   CreateKmsKeyResponse,
   CreateModelRequest,
@@ -279,21 +300,24 @@ import type {
   EnumPGSynchronousReplication,
   EnumPGVariant,
   EnumSortOrder,
-  EnvImpactReport,
   Event,
+  FocusReport,
   GenerateDataKeyRequest,
   GenerateDataKeyResponse,
   GetAIAPIKeyResponse,
   GetDeploymentLogsResponse,
   GetDeploymentResponse,
   GetInferenceEngineHelpResponse,
+  GetKeyStoreResponse,
   GetKmsKeyResponse,
   GetModelResponse,
+  GetPublicKeyResponse,
   IAMAPIKey,
   IAMAPIKeyCreated,
   IAMAssumeRolePolicy,
   IAMPolicy,
   IAMRole,
+  IAMSystemRole,
   ImpactBreakdown,
   ImpactValueWithUnit,
   Instance,
@@ -323,6 +347,8 @@ import type {
   ListAIAPIKeysResponse,
   ListAIInstanceTypesResponse,
   ListDeploymentsResponse,
+  ListKeyStoresResponse,
+  ListKeyStoresResponseEntry,
   ListKmsKeyRotationsResponse,
   ListKmsKeysResponse,
   ListModelsResponse,
@@ -333,6 +359,7 @@ import type {
   LoadBalancer,
   LoadBalancerService,
   LoadBalancerServiceHealthcheck,
+  LoadBalancerServiceLabelSelector,
   Manager,
   Networking,
   NvidiaMigProfiles,
@@ -347,19 +374,21 @@ import type {
   ReEncryptRequest,
   ReEncryptResponse,
   ReplicateKmsKeyRequest,
-  RevealDeploymentAPIKeyResponse,
+  ReservedResources,
   ReverseDNSRecord,
   RotateKmsKeyResponse,
   Route,
   SKSAuditCreate,
   SKSAuditUpdate,
   SKSCluster,
+  SKSClusterAllowedNetworks,
   SKSClusterDeprecatedResource,
   SKSClusterLabels,
   SKSKubeconfigRequest,
   SKSNodepool,
   SKSNodepoolLabels,
   SKSNodepoolTaints,
+  SKSNodepoolTemplate,
   SKSOidc,
   SOSBucketUsage,
   SSHKey,
@@ -370,14 +399,24 @@ import type {
   SecurityGroup,
   SecurityGroupRef,
   SecurityGroupResource,
+  SignRequest,
+  SignResponse,
   Snapshot,
   Subnet,
   SuccessResponse,
   Template,
   TemplateRef,
+  UpdateAIAPIKeyRequest,
+  UpdateAIAPIKeyResponse,
   UpdateDeploymentRequest,
+  UpdateKeyStoreRequest,
   User,
+  VerifyRequest,
+  VerifyResponse,
   Vpc,
+  VpcDHCPOptions,
+  VpcRef,
+  VpcSubnetRef,
   Zone,
 } from './schemas.js'
 import { isoDateTime, type ClientCore } from '../core.js'
@@ -496,9 +535,13 @@ export interface AddServiceToLoadBalancerRequest {
    */
   healthcheck: LoadBalancerServiceHealthcheck
   /**
-   * Instance Pool to forward traffic to
+   * Instance Pool to forward traffic to. A service requires an instance-pool, a label-selector, or both
    */
-  instancePool: InstancePool
+  instancePool?: InstancePool
+  /**
+   * Label selector of the instances to forward traffic to. A service requires an instance-pool, a label-selector, or both
+   */
+  labelSelector?: LoadBalancerServiceLabelSelector
   /**
    * Load Balancer Service name
    *
@@ -535,6 +578,8 @@ export function toWireAddServiceToLoadBalancerRequest(
   if (v.healthcheck !== undefined)
     o['healthcheck'] = toWireLoadBalancerServiceHealthcheck(v.healthcheck)
   if (v.instancePool !== undefined) o['instance-pool'] = toWireInstancePool(v.instancePool)
+  if (v.labelSelector !== undefined)
+    o['label-selector'] = toWireLoadBalancerServiceLabelSelector(v.labelSelector)
   if (v.name !== undefined) o['name'] = v.name
   if (v.port !== undefined) o['port'] = v.port
   if (v.protocol !== undefined) o['protocol'] = v.protocol
@@ -697,11 +742,11 @@ export interface AttachInstanceToSubnetRequest {
   subnetID: string
   vpcID: string
   /**
-   * Compute instance
+   * The target instance to attach
    */
   instance: InstanceRef
   /**
-   * Instance IPv4
+   * An optional IPv4 address assign to the instance
    */
   ipv4?: string
 }
@@ -716,6 +761,10 @@ export function toWireAttachInstanceToSubnetRequest(
 }
 
 export interface CancelKmsKeyDeletionRequest {
+  id: string
+}
+
+export interface ConnectKeyStoreRequest {
   id: string
 }
 
@@ -924,6 +973,24 @@ export function toWireCreateDBAASMysqlDatabaseRequest(
   return o
 }
 
+export interface CreateDBAASMysqlUpgradeCheckRequest {
+  serviceName: DBAASServiceName
+  /**
+   * Target version for upgrade
+   *
+   * Length 1-32
+   */
+  targetVersion: string
+}
+/** @internal */
+export function toWireCreateDBAASMysqlUpgradeCheckRequest(
+  v: CreateDBAASMysqlUpgradeCheckRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.targetVersion !== undefined) o['target-version'] = v.targetVersion
+  return o
+}
+
 export interface CreateDBAASMysqlUserRequest {
   serviceName: DBAASServiceName
   /**
@@ -1099,7 +1166,7 @@ export interface CreateDBAASServiceClickhouseRequest {
   /**
    * Allow incoming connections from CIDR address block, e.g. '10.20.0.0/16'
    */
-  ipFilter?: string[]
+  ipFilter?: string[] | null
   /**
    * Automatic maintenance settings
    */
@@ -1135,7 +1202,7 @@ export function toWireCreateDBAASServiceClickhouseRequest(
   if (v.clickhouseSettings !== undefined)
     o['clickhouse-settings'] = toWireJSONSchemaClickhouse(v.clickhouseSettings)
   if (v.forkFromService !== undefined) o['fork-from-service'] = v.forkFromService
-  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter
+  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter === null ? null : v.ipFilter
   if (v.maintenance !== undefined)
     o['maintenance'] = toWireCreateDBAASServiceClickhouseRequestMaintenance(v.maintenance)
   if (v.plan !== undefined) o['plan'] = v.plan
@@ -1183,7 +1250,7 @@ export interface CreateDBAASServiceGrafanaRequest {
   /**
    * Allowed CIDR address blocks for incoming connections
    */
-  ipFilter?: string[]
+  ipFilter?: string[] | null
   /**
    * Automatic maintenance settings
    */
@@ -1207,7 +1274,7 @@ export function toWireCreateDBAASServiceGrafanaRequest(
   if (v.forkFromService !== undefined) o['fork-from-service'] = v.forkFromService
   if (v.grafanaSettings !== undefined)
     o['grafana-settings'] = toWireJSONSchemaGrafana(v.grafanaSettings)
-  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter
+  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter === null ? null : v.ipFilter
   if (v.maintenance !== undefined)
     o['maintenance'] = toWireCreateDBAASServiceGrafanaRequestMaintenance(v.maintenance)
   if (v.plan !== undefined) o['plan'] = v.plan
@@ -1273,7 +1340,7 @@ export interface CreateDBAASServiceKafkaRequest {
   /**
    * Allow incoming connections from CIDR address block, e.g. '10.20.0.0/16'
    */
-  ipFilter?: string[]
+  ipFilter?: string[] | null
   /**
    * Allow clients to connect to kafka_connect from the public internet for service nodes that are in a project VPC or another type of private network
    */
@@ -1332,7 +1399,7 @@ export function toWireCreateDBAASServiceKafkaRequest(
     o['authentication-methods'] = toWireCreateDBAASServiceKafkaRequestAuthenticationMethods(
       v.authenticationMethods,
     )
-  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter
+  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter === null ? null : v.ipFilter
   if (v.kafkaConnectEnabled !== undefined) o['kafka-connect-enabled'] = v.kafkaConnectEnabled
   if (v.kafkaConnectSettings !== undefined)
     o['kafka-connect-settings'] = toWireJSONSchemaKafkaConnect(v.kafkaConnectSettings)
@@ -1529,7 +1596,7 @@ export interface CreateDBAASServiceMysqlRequest {
   /**
    * Allow incoming connections from CIDR address block, e.g. '10.20.0.0/16'
    */
-  ipFilter?: string[]
+  ipFilter?: string[] | null
   /**
    * Automatic maintenance settings
    */
@@ -1580,7 +1647,7 @@ export function toWireCreateDBAASServiceMysqlRequest(
     o['integrations'] = v.integrations.map((x) =>
       toWireCreateDBAASServiceMysqlRequestIntegrations(x),
     )
-  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter
+  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter === null ? null : v.ipFilter
   if (v.maintenance !== undefined)
     o['maintenance'] = toWireCreateDBAASServiceMysqlRequestMaintenance(v.maintenance)
   if (v.migration !== undefined)
@@ -1738,7 +1805,7 @@ export interface CreateDBAASServiceOpensearchRequest {
   /**
    * Allow incoming connections from CIDR address block, e.g. '10.20.0.0/16'
    */
-  ipFilter?: string[]
+  ipFilter?: string[] | null
   /**
    * Aiven automation resets index.refresh_interval to default value for every index to be sure that indices are always visible to search. If it doesn't fit your case, you can disable this by setting up this flag to true.
    */
@@ -1796,7 +1863,7 @@ export function toWireCreateDBAASServiceOpensearchRequest(
     )
   if (v.indexTemplate !== undefined)
     o['index-template'] = toWireCreateDBAASServiceOpensearchRequestIndexTemplate(v.indexTemplate)
-  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter
+  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter === null ? null : v.ipFilter
   if (v.keepIndexRefreshInterval !== undefined)
     o['keep-index-refresh-interval'] = v.keepIndexRefreshInterval
   if (v.maintenance !== undefined)
@@ -1990,7 +2057,7 @@ export interface CreateDBAASServicePGRequest {
   /**
    * Allow incoming connections from CIDR address block, e.g. '10.20.0.0/16'
    */
-  ipFilter?: string[]
+  ipFilter?: string[] | null
   /**
    * Automatic maintenance settings
    */
@@ -2072,7 +2139,7 @@ export function toWireCreateDBAASServicePGRequest(
   if (v.forkFromService !== undefined) o['fork-from-service'] = v.forkFromService
   if (v.integrations !== undefined)
     o['integrations'] = v.integrations.map((x) => toWireCreateDBAASServicePGRequestIntegrations(x))
-  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter
+  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter === null ? null : v.ipFilter
   if (v.maintenance !== undefined)
     o['maintenance'] = toWireCreateDBAASServicePGRequestMaintenance(v.maintenance)
   if (v.migration !== undefined)
@@ -2129,7 +2196,7 @@ export interface CreateDBAASServiceThanosRequest {
   /**
    * Allowed CIDR address blocks for incoming connections
    */
-  ipFilter?: string[]
+  ipFilter?: string[] | null
   /**
    * Automatic maintenance settings
    */
@@ -2154,7 +2221,7 @@ export function toWireCreateDBAASServiceThanosRequest(
   v: CreateDBAASServiceThanosRequest,
 ): Record<string, unknown> {
   const o: Record<string, unknown> = {}
-  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter
+  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter === null ? null : v.ipFilter
   if (v.maintenance !== undefined)
     o['maintenance'] = toWireCreateDBAASServiceThanosRequestMaintenance(v.maintenance)
   if (v.plan !== undefined) o['plan'] = v.plan
@@ -2264,7 +2331,7 @@ export interface CreateDBAASServiceValkeyRequest {
   /**
    * Allow incoming connections from CIDR address block, e.g. '10.20.0.0/16'
    */
-  ipFilter?: string[]
+  ipFilter?: string[] | null
   /**
    * Automatic maintenance settings
    */
@@ -2306,7 +2373,7 @@ export function toWireCreateDBAASServiceValkeyRequest(
 ): Record<string, unknown> {
   const o: Record<string, unknown> = {}
   if (v.forkFromService !== undefined) o['fork-from-service'] = v.forkFromService
-  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter
+  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter === null ? null : v.ipFilter
   if (v.maintenance !== undefined)
     o['maintenance'] = toWireCreateDBAASServiceValkeyRequestMaintenance(v.maintenance)
   if (v.migration !== undefined)
@@ -2523,6 +2590,54 @@ export function toWireCreateIAMRoleRequest(v: CreateIAMRoleRequest): Record<stri
   return o
 }
 
+/**
+ * VPC Subnet attachment
+ */
+export interface CreateInstanceRequestVpcSubnets {
+  /**
+   * Subnet ID
+   */
+  id: string
+  /**
+   * Instance IPv4. Random one if unset
+   */
+  ipv4?: string
+}
+
+/** @internal */
+export function toWireCreateInstanceRequestVpcSubnets(
+  v: CreateInstanceRequestVpcSubnets,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.id !== undefined) o['id'] = v.id
+  if (v.ipv4 !== undefined) o['ipv4'] = v.ipv4
+  return o
+}
+
+/**
+ * Attach the Instance to VPC Subnets
+ */
+export interface CreateInstanceRequestVpc {
+  /**
+   * VPC ID
+   */
+  id: string
+  /**
+   * VPC Subnets to attach the Instance to
+   */
+  subnets: CreateInstanceRequestVpcSubnets[]
+}
+
+/** @internal */
+export function toWireCreateInstanceRequestVpc(
+  v: CreateInstanceRequestVpc,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.id !== undefined) o['id'] = v.id
+  if (v.subnets !== undefined)
+    o['subnets'] = v.subnets.map((x) => toWireCreateInstanceRequestVpcSubnets(x))
+  return o
+}
 export interface CreateInstanceRequest {
   /**
    * Instance Anti-affinity Groups
@@ -2553,11 +2668,11 @@ export interface CreateInstanceRequest {
    */
   instanceType: InstanceTypeRef
   /**
-   * VPC ip forwarding
+   * Whether the instance can act as a router in a VPC network
    */
   ipForwarding?: boolean
   /**
-   * Enable IPv6. DEPRECATED: use `public-ip-assignments`.
+   * Enable IPv6. DEPRECATED: use `public-ip-assignment`.
    */
   ipv6Enabled?: boolean
   /**
@@ -2608,6 +2723,10 @@ export interface CreateInstanceRequest {
    * Length 1-32768
    */
   userData?: string
+  /**
+   * Attach the Instance to VPC Subnets
+   */
+  vpc?: CreateInstanceRequestVpc
 }
 /** @internal */
 export function toWireCreateInstanceRequest(v: CreateInstanceRequest): Record<string, unknown> {
@@ -2633,9 +2752,55 @@ export function toWireCreateInstanceRequest(v: CreateInstanceRequest): Record<st
   if (v.template !== undefined) o['template'] = toWireTemplateRef(v.template)
   if (v.tpmEnabled !== undefined) o['tpm-enabled'] = v.tpmEnabled
   if (v.userData !== undefined) o['user-data'] = v.userData
+  if (v.vpc !== undefined) o['vpc'] = toWireCreateInstanceRequestVpc(v.vpc)
   return o
 }
 
+/**
+ * VPC Subnet
+ */
+export interface CreateInstancePoolRequestVpcSubnets {
+  /**
+   * Subnet ID
+   */
+  id: string
+}
+
+/** @internal */
+export function toWireCreateInstancePoolRequestVpcSubnets(
+  v: CreateInstancePoolRequestVpcSubnets,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.id !== undefined) o['id'] = v.id
+  return o
+}
+
+/**
+ * Instance Pool VPC
+ */
+export interface CreateInstancePoolRequestVpc {
+  /**
+   * VPC ID
+   */
+  id: string
+  /**
+   * VPC Subnets to attach the Instances to
+   *
+   * Unique items
+   */
+  subnets: CreateInstancePoolRequestVpcSubnets[]
+}
+
+/** @internal */
+export function toWireCreateInstancePoolRequestVpc(
+  v: CreateInstancePoolRequestVpc,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.id !== undefined) o['id'] = v.id
+  if (v.subnets !== undefined)
+    o['subnets'] = v.subnets.map((x) => toWireCreateInstancePoolRequestVpcSubnets(x))
+  return o
+}
 export interface CreateInstancePoolRequest {
   /**
    * Instance Pool Anti-affinity Groups
@@ -2679,6 +2844,10 @@ export interface CreateInstancePoolRequest {
    * Instances type
    */
   instanceType: InstanceTypeRef
+  /**
+   * Enable IP forwarding on the Instances VPC interfaces
+   */
+  ipForwarding?: boolean
   /**
    * Enable IPv6. DEPRECATED: use `public-ip-assignments`.
    */
@@ -2741,6 +2910,10 @@ export interface CreateInstancePoolRequest {
    * Length 1-32768
    */
   userData?: string
+  /**
+   * Instance Pool VPC
+   */
+  vpc?: CreateInstancePoolRequestVpc
 }
 /** @internal */
 export function toWireCreateInstancePoolRequest(
@@ -2757,6 +2930,7 @@ export function toWireCreateInstancePoolRequest(
   if (v.elasticIPS !== undefined) o['elastic-ips'] = v.elasticIPS.map((x) => toWireElasticIPRef(x))
   if (v.instancePrefix !== undefined) o['instance-prefix'] = v.instancePrefix
   if (v.instanceType !== undefined) o['instance-type'] = toWireInstanceTypeRef(v.instanceType)
+  if (v.ipForwarding !== undefined) o['ip-forwarding'] = v.ipForwarding
   if (v.ipv6Enabled !== undefined) o['ipv6-enabled'] = v.ipv6Enabled
   if (v.labels !== undefined) o['labels'] = v.labels
   if (v.minAvailable !== undefined) o['min-available'] = v.minAvailable
@@ -2771,6 +2945,7 @@ export function toWireCreateInstancePoolRequest(
   if (v.sshKeys !== undefined) o['ssh-keys'] = v.sshKeys.map((x) => toWireSSHKeyRef(x))
   if (v.template !== undefined) o['template'] = toWireTemplateRef(v.template)
   if (v.userData !== undefined) o['user-data'] = v.userData
+  if (v.vpc !== undefined) o['vpc'] = toWireCreateInstancePoolRequestVpc(v.vpc)
   return o
 }
 
@@ -2861,17 +3036,15 @@ export interface CreateRouteRequest {
   subnetID: string
   vpcID: string
   /**
-   * Route description
-   *
    * Max length 4096
    */
   description?: string
   /**
-   * Route destination CIDR
+   * The CIDR used to match on which packets the routing rule should be applied
    */
   destination: string
   /**
-   * Route target
+   * Where the packets should be sent to. More details on the format can be found here https://community.exoscale.com/product/networking/vpc/how-to/using-routing-rules/
    */
   target: string
 }
@@ -2916,6 +3089,10 @@ export interface CreateSKSClusterRequest {
    */
   addons?: string[]
   /**
+   * EXPERIMENTAL: List of ranges of allowed IPs using CIDR notation. Defaults to `["0.0.0.0/0"]`, allowing access to all IPs. (default: ["0.0.0.0/0"])
+   */
+  allowedNetworks?: SKSClusterAllowedNetworks
+  /**
    * Kubernetes Audit Log Configuration
    */
   audit?: SKSAuditCreate
@@ -2948,6 +3125,12 @@ export interface CreateSKSClusterRequest {
    */
   featureGates?: string[]
   /**
+   * A list of Karpenter controller feature gates to enable for the Karpenter controller binary
+   *
+   * Unique items
+   */
+  karpenterFeatureGates?: string[]
+  /**
    * Cluster Labels
    */
   labels?: SKSClusterLabels
@@ -2978,6 +3161,7 @@ export interface CreateSKSClusterRequest {
 export function toWireCreateSKSClusterRequest(v: CreateSKSClusterRequest): Record<string, unknown> {
   const o: Record<string, unknown> = {}
   if (v.addons !== undefined) o['addons'] = v.addons
+  if (v.allowedNetworks !== undefined) o['allowed-networks'] = v.allowedNetworks
   if (v.audit !== undefined) o['audit'] = toWireSKSAuditCreate(v.audit)
   if (v.autoUpgrade !== undefined) o['auto-upgrade'] = v.autoUpgrade
   if (v.cni !== undefined) o['cni'] = v.cni
@@ -2987,6 +3171,7 @@ export function toWireCreateSKSClusterRequest(v: CreateSKSClusterRequest): Recor
   if (v.description !== undefined) o['description'] = v.description === null ? null : v.description
   if (v.enableKubeProxy !== undefined) o['enable-kube-proxy'] = v.enableKubeProxy
   if (v.featureGates !== undefined) o['feature-gates'] = v.featureGates
+  if (v.karpenterFeatureGates !== undefined) o['karpenter-feature-gates'] = v.karpenterFeatureGates
   if (v.labels !== undefined) o['labels'] = v.labels
   if (v.level !== undefined) o['level'] = v.level
   if (v.name !== undefined) o['name'] = v.name
@@ -3010,6 +3195,10 @@ export interface CreateSKSNodepoolRequest {
    * Max items 8, Unique items
    */
   antiAffinityGroups?: AntiAffinityGroupRef[]
+  /**
+   * CPU manager (kubelet settings)
+   */
+  cpuManager?: CPUManager | null
   /**
    * Nodepool Deploy Target
    */
@@ -3037,6 +3226,14 @@ export interface CreateSKSNodepoolRequest {
    */
   instanceType: InstanceTypeRef
   /**
+   * Allow the Instances to act as routers in their VPC (IP forwarding). Only applies to new Instances
+   */
+  ipForwarding?: boolean
+  /**
+   * Resources reserved for Kubernetes node components (kubelet setting)
+   */
+  kubeReserved?: ReservedResources | null
+  /**
    * Kubelet image GC options
    */
   kubeletImageGC?: KubeletImageGC
@@ -3056,6 +3253,10 @@ export interface CreateSKSNodepoolRequest {
    * Length 1-255
    */
   name: string
+  /**
+   * Expose the GPUs with the NVIDIA DRA driver instead of the NVIDIA device plugin. Requires a GPU instance type and Kubernetes 1.34 or greater.
+   */
+  nvidiaDraDriver?: boolean
   /**
    * Nvidia MIG Profiles
    */
@@ -3086,9 +3287,21 @@ export interface CreateSKSNodepoolRequest {
    */
   size: number
   /**
+   * Resources reserved for OS system daemons (kubelet setting)
+   */
+  systemReserved?: ReservedResources | null
+  /**
    * Nodepool taints
    */
   taints?: SKSNodepoolTaints
+  /**
+   * Nodepool Instance template: an `id` among the available templates of the Nodepool Kubernetes version and variant (see `list-sks-nodepool-templates`). Without it, the Nodepool follows the latest template of its Kubernetes version
+   */
+  template?: TemplateRef
+  /**
+   * Nodepool VPC: the Instances are attached to the given Subnets of the VPC
+   */
+  vpc?: VpcRef
 }
 /** @internal */
 export function toWireCreateSKSNodepoolRequest(
@@ -3098,16 +3311,22 @@ export function toWireCreateSKSNodepoolRequest(
   if (v.addons !== undefined) o['addons'] = v.addons
   if (v.antiAffinityGroups !== undefined)
     o['anti-affinity-groups'] = v.antiAffinityGroups.map((x) => toWireAntiAffinityGroupRef(x))
+  if (v.cpuManager !== undefined)
+    o['cpu-manager'] = v.cpuManager === null ? null : toWireCPUManager(v.cpuManager)
   if (v.deployTarget !== undefined) o['deploy-target'] = toWireDeployTargetRef(v.deployTarget)
   if (v.description !== undefined) o['description'] = v.description
   if (v.diskSize !== undefined) o['disk-size'] = v.diskSize
   if (v.instancePrefix !== undefined) o['instance-prefix'] = v.instancePrefix
   if (v.instanceType !== undefined) o['instance-type'] = toWireInstanceTypeRef(v.instanceType)
+  if (v.ipForwarding !== undefined) o['ip-forwarding'] = v.ipForwarding
+  if (v.kubeReserved !== undefined)
+    o['kube-reserved'] = v.kubeReserved === null ? null : toWireReservedResources(v.kubeReserved)
   if (v.kubeletImageGC !== undefined) o['kubelet-image-gc'] = toWireKubeletImageGC(v.kubeletImageGC)
   if (v.kubeletMaxPods !== undefined)
     o['kubelet-max-pods'] = v.kubeletMaxPods === null ? null : v.kubeletMaxPods
   if (v.labels !== undefined) o['labels'] = v.labels
   if (v.name !== undefined) o['name'] = v.name
+  if (v.nvidiaDraDriver !== undefined) o['nvidia-dra-driver'] = v.nvidiaDraDriver
   if (v.nvidiaMigProfiles !== undefined)
     o['nvidia-mig-profiles'] = toWireNvidiaMigProfiles(v.nvidiaMigProfiles)
   if (v.privateNetworks !== undefined)
@@ -3116,7 +3335,12 @@ export function toWireCreateSKSNodepoolRequest(
   if (v.securityGroups !== undefined)
     o['security-groups'] = v.securityGroups.map((x) => toWireSecurityGroupRef(x))
   if (v.size !== undefined) o['size'] = v.size
+  if (v.systemReserved !== undefined)
+    o['system-reserved'] =
+      v.systemReserved === null ? null : toWireReservedResources(v.systemReserved)
   if (v.taints !== undefined) o['taints'] = toWireSKSNodepoolTaints(v.taints)
+  if (v.template !== undefined) o['template'] = toWireTemplateRef(v.template)
+  if (v.vpc !== undefined) o['vpc'] = toWireVpcRef(v.vpc)
   return o
 }
 
@@ -3127,29 +3351,24 @@ export interface CreateSnapshotRequest {
 export interface CreateSubnetRequest {
   vpcID: string
   /**
-   * Subnet address space
+   * Whether the subnet is private or public
    */
   addressSpace: 'private'
   /**
-   * Subnet address family
+   * Whether the subnet supports IPv4 and/or IPv6
    */
   addressfamily: 'inet4'
   /**
-   * Subnet description
-   *
    * Max length 4096
    */
   description?: string
   /**
-   * Subnet ipv4 CIDR
+   * Subnet ipv4 CIDR. Must not overlap with other CIDRs of this VPC
    */
   ipv4Block?: string
-  /**
-   * Resource labels
-   */
   labels?: Labels
   /**
-   * Subnet name
+   * Subnet name, up to 255 characters. Must be unique between the subnet of the parent VPC
    *
    * Length 1-255
    */
@@ -3187,17 +3406,13 @@ export function toWireCreateUserRequest(v: CreateUserRequest): Record<string, un
 
 export interface CreateVpcRequest {
   /**
-   * VPC description
-   *
    * Max length 4096
    */
   description?: string
-  /**
-   * Resource labels
-   */
+  dhcpOptions?: VpcDHCPOptions
   labels?: Labels
   /**
-   * VPC name
+   * VPC name, up to 255 characters. Must be unique within its zone
    *
    * Length 1-255
    */
@@ -3207,13 +3422,10 @@ export interface CreateVpcRequest {
 export function toWireCreateVpcRequest(v: CreateVpcRequest): Record<string, unknown> {
   const o: Record<string, unknown> = {}
   if (v.description !== undefined) o['description'] = v.description
+  if (v.dhcpOptions !== undefined) o['dhcp-options'] = toWireVpcDHCPOptions(v.dhcpOptions)
   if (v.labels !== undefined) o['labels'] = v.labels
   if (v.name !== undefined) o['name'] = v.name
   return o
-}
-
-export interface DeleteAIAPIKeyRequest {
-  id: string
 }
 
 export interface DeleteAntiAffinityGroupRequest {
@@ -3381,6 +3593,10 @@ export interface DeleteInstancePoolRequest {
   id: string
 }
 
+export interface DeleteKeyStoreRequest {
+  id: string
+}
+
 export interface DeleteLoadBalancerRequest {
   id: string
 }
@@ -3527,7 +3743,7 @@ export interface DetachInstanceFromSubnetRequest {
   subnetID: string
   vpcID: string
   /**
-   * Compute instance
+   * The target instance to detach
    */
   instance: InstanceRef
 }
@@ -3545,6 +3761,10 @@ export interface DisableKmsKeyRequest {
 }
 
 export interface DisableKmsKeyRotationRequest {
+  id: string
+}
+
+export interface DisconnectKeyStoreRequest {
   id: string
 }
 
@@ -4479,6 +4699,10 @@ export interface GetEnvImpactRequest {
   period: string
 }
 
+export interface GetFocusReportRequest {
+  period: string
+}
+
 export interface GetIAMRoleRequest {
   id: string
 }
@@ -4511,6 +4735,7 @@ export function fromWireGetImpactEstimateResponseImpact(w: any): GetImpactEstima
   )
 }
 export interface GetImpactEstimateResponse {
+  calculationDate: string
   /**
    * Map of SKUs to their different impact indicators
    */
@@ -4520,6 +4745,7 @@ export interface GetImpactEstimateResponse {
 /** @internal */
 export function fromWireGetImpactEstimateResponse(w: any): GetImpactEstimateResponse {
   const v = {} as GetImpactEstimateResponse
+  v.calculationDate = w['calculation-date']
   v.impact = Object.fromEntries(
     Object.entries(w['impact'] ?? {}).map(([k, val]) => [
       k,
@@ -4550,6 +4776,10 @@ export interface GetInstanceTypeRequest {
   id: string
 }
 
+export interface GetKeyStoreRequest {
+  id: string
+}
+
 export interface GetKmsKeyRequest {
   id: string
 }
@@ -4572,6 +4802,10 @@ export interface GetOperationRequest {
 }
 
 export interface GetPrivateNetworkRequest {
+  id: string
+}
+
+export interface GetPublicKeyRequest {
   id: string
 }
 
@@ -4966,10 +5200,6 @@ export function fromWireListDeployTargetsResponse(w: any): ListDeployTargetsResp
   return v
 }
 
-export interface ListDeploymentsRequest {
-  visibility?: string
-}
-
 export interface ListDNSDomainRecordsRequest {
   domainID: string
 }
@@ -5023,6 +5253,18 @@ export function fromWireListIAMRolesResponse(w: any): ListIAMRolesResponse {
   const v = {} as ListIAMRolesResponse
   if (w['iam-roles'] !== undefined)
     v.iamRoles = (w['iam-roles'] as any[]).map((x) => fromWireIAMRole(x))
+  return v
+}
+
+export interface ListIAMSystemRolesResponse {
+  iamSystemRoles?: IAMSystemRole[]
+}
+
+/** @internal */
+export function fromWireListIAMSystemRolesResponse(w: any): ListIAMSystemRolesResponse {
+  const v = {} as ListIAMSystemRolesResponse
+  if (w['iam-system-roles'] !== undefined)
+    v.iamSystemRoles = (w['iam-system-roles'] as any[]).map((x) => fromWireIAMSystemRole(x))
   return v
 }
 
@@ -5206,6 +5448,10 @@ export function fromWireListLoadBalancersResponse(w: any): ListLoadBalancersResp
   return v
 }
 
+export interface ListModelsRequest {
+  visibility?: string
+}
+
 export interface ListPrivateNetworksResponse {
   privateNetworks?: PrivateNetwork[]
 }
@@ -5287,6 +5533,24 @@ export function fromWireListSKSClustersResponse(w: any): ListSKSClustersResponse
   const v = {} as ListSKSClustersResponse
   if (w['sks-clusters'] !== undefined)
     v.sksClusters = (w['sks-clusters'] as any[]).map((x) => fromWireSKSCluster(x))
+  return v
+}
+
+export interface ListSKSNodepoolTemplatesRequest {
+  kubeVersion: string
+  variant?: 'nvidia' | 'standard'
+}
+export interface ListSKSNodepoolTemplatesResponse {
+  sksNodepoolTemplates?: SKSNodepoolTemplate[]
+}
+
+/** @internal */
+export function fromWireListSKSNodepoolTemplatesResponse(w: any): ListSKSNodepoolTemplatesResponse {
+  const v = {} as ListSKSNodepoolTemplatesResponse
+  if (w['sks-nodepool-templates'] !== undefined)
+    v.sksNodepoolTemplates = (w['sks-nodepool-templates'] as any[]).map((x) =>
+      fromWireSKSNodepoolTemplate(x),
+    )
   return v
 }
 
@@ -5748,12 +6012,14 @@ export interface ResetInstancePoolFieldRequest {
     | 'deploy-target'
     | 'description'
     | 'elastic-ips'
+    | 'ip-forwarding'
     | 'ipv6-enabled'
     | 'labels'
     | 'private-networks'
     | 'security-groups'
     | 'ssh-key'
     | 'user-data'
+    | 'vpc'
   id: string
 }
 
@@ -5763,7 +6029,7 @@ export interface ResetLoadBalancerFieldRequest {
 }
 
 export interface ResetLoadBalancerServiceFieldRequest {
-  field: 'description'
+  field: 'description' | 'label-selector'
   id: string
   serviceID: string
 }
@@ -5853,10 +6119,6 @@ export interface RevealDBAASValkeyUserPasswordRequest {
   username: DBAASUserUsername
 }
 
-export interface RevealDeploymentAPIKeyRequest {
-  id: string
-}
-
 export interface RevealInstancePasswordRequest {
   id: string
 }
@@ -5875,6 +6137,10 @@ export function toWireRevertInstanceToSnapshotRequest(
   const o: Record<string, unknown> = {}
   if (v.id !== undefined) o['id'] = v.id
   return o
+}
+
+export interface RevokeAIAPIKeyRequest {
+  id: string
 }
 
 export interface RotateKmsKeyRequest {
@@ -6163,7 +6429,7 @@ export interface UpdateDBAASServiceClickhouseRequest {
   /**
    * Allow incoming connections from CIDR address block, e.g. '10.20.0.0/16'
    */
-  ipFilter?: string[]
+  ipFilter?: string[] | null
   /**
    * Automatic maintenance settings
    */
@@ -6192,7 +6458,7 @@ export function toWireUpdateDBAASServiceClickhouseRequest(
   const o: Record<string, unknown> = {}
   if (v.clickhouseSettings !== undefined)
     o['clickhouse-settings'] = toWireJSONSchemaClickhouse(v.clickhouseSettings)
-  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter
+  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter === null ? null : v.ipFilter
   if (v.maintenance !== undefined)
     o['maintenance'] = toWireUpdateDBAASServiceClickhouseRequestMaintenance(v.maintenance)
   if (v.plan !== undefined) o['plan'] = v.plan
@@ -6235,7 +6501,7 @@ export interface UpdateDBAASServiceGrafanaRequest {
   /**
    * Allowed CIDR address blocks for incoming connections
    */
-  ipFilter?: string[]
+  ipFilter?: string[] | null
   /**
    * Automatic maintenance settings
    */
@@ -6258,7 +6524,7 @@ export function toWireUpdateDBAASServiceGrafanaRequest(
   const o: Record<string, unknown> = {}
   if (v.grafanaSettings !== undefined)
     o['grafana-settings'] = toWireJSONSchemaGrafana(v.grafanaSettings)
-  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter
+  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter === null ? null : v.ipFilter
   if (v.maintenance !== undefined)
     o['maintenance'] = toWireUpdateDBAASServiceGrafanaRequestMaintenance(v.maintenance)
   if (v.plan !== undefined) o['plan'] = v.plan
@@ -6324,7 +6590,7 @@ export interface UpdateDBAASServiceKafkaRequest {
   /**
    * Allow incoming connections from CIDR address block, e.g. '10.20.0.0/16'
    */
-  ipFilter?: string[]
+  ipFilter?: string[] | null
   /**
    * Allow clients to connect to kafka_connect from the public internet for service nodes that are in a project VPC or another type of private network
    */
@@ -6383,7 +6649,7 @@ export function toWireUpdateDBAASServiceKafkaRequest(
     o['authentication-methods'] = toWireUpdateDBAASServiceKafkaRequestAuthenticationMethods(
       v.authenticationMethods,
     )
-  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter
+  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter === null ? null : v.ipFilter
   if (v.kafkaConnectEnabled !== undefined) o['kafka-connect-enabled'] = v.kafkaConnectEnabled
   if (v.kafkaConnectSettings !== undefined)
     o['kafka-connect-settings'] = toWireJSONSchemaKafkaConnect(v.kafkaConnectSettings)
@@ -6531,7 +6797,7 @@ export interface UpdateDBAASServiceMysqlRequest {
   /**
    * Allow incoming connections from CIDR address block, e.g. '10.20.0.0/16'
    */
-  ipFilter?: string[]
+  ipFilter?: string[] | null
   /**
    * Automatic maintenance settings
    */
@@ -6567,7 +6833,7 @@ export function toWireUpdateDBAASServiceMysqlRequest(
   if (v.backupSchedule !== undefined)
     o['backup-schedule'] = toWireUpdateDBAASServiceMysqlRequestBackupSchedule(v.backupSchedule)
   if (v.binlogRetentionPeriod !== undefined) o['binlog-retention-period'] = v.binlogRetentionPeriod
-  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter
+  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter === null ? null : v.ipFilter
   if (v.maintenance !== undefined)
     o['maintenance'] = toWireUpdateDBAASServiceMysqlRequestMaintenance(v.maintenance)
   if (v.migration !== undefined)
@@ -6720,7 +6986,7 @@ export interface UpdateDBAASServiceOpensearchRequest {
   /**
    * Allow incoming connections from CIDR address block, e.g. '10.20.0.0/16'
    */
-  ipFilter?: string[]
+  ipFilter?: string[] | null
   /**
    * Aiven automation resets index.refresh_interval to default value for every index to be sure that indices are always visible to search. If it doesn't fit your case, you can disable this by setting up this flag to true.
    */
@@ -6769,7 +7035,7 @@ export function toWireUpdateDBAASServiceOpensearchRequest(
     )
   if (v.indexTemplate !== undefined)
     o['index-template'] = toWireUpdateDBAASServiceOpensearchRequestIndexTemplate(v.indexTemplate)
-  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter
+  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter === null ? null : v.ipFilter
   if (v.keepIndexRefreshInterval !== undefined)
     o['keep-index-refresh-interval'] = v.keepIndexRefreshInterval
   if (v.maintenance !== undefined)
@@ -6911,7 +7177,7 @@ export interface UpdateDBAASServicePGRequest {
   /**
    * Allow incoming connections from CIDR address block, e.g. '10.20.0.0/16'
    */
-  ipFilter?: string[]
+  ipFilter?: string[] | null
   /**
    * Automatic maintenance settings
    */
@@ -6982,7 +7248,7 @@ export function toWireUpdateDBAASServicePGRequest(
   const o: Record<string, unknown> = {}
   if (v.backupSchedule !== undefined)
     o['backup-schedule'] = toWireUpdateDBAASServicePGRequestBackupSchedule(v.backupSchedule)
-  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter
+  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter === null ? null : v.ipFilter
   if (v.maintenance !== undefined)
     o['maintenance'] = toWireUpdateDBAASServicePGRequestMaintenance(v.maintenance)
   if (v.migration !== undefined)
@@ -7038,7 +7304,7 @@ export interface UpdateDBAASServiceThanosRequest {
   /**
    * Allowed CIDR address blocks for incoming connections
    */
-  ipFilter?: string[]
+  ipFilter?: string[] | null
   /**
    * Automatic maintenance settings
    */
@@ -7063,7 +7329,7 @@ export function toWireUpdateDBAASServiceThanosRequest(
   v: UpdateDBAASServiceThanosRequest,
 ): Record<string, unknown> {
   const o: Record<string, unknown> = {}
-  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter
+  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter === null ? null : v.ipFilter
   if (v.maintenance !== undefined)
     o['maintenance'] = toWireUpdateDBAASServiceThanosRequestMaintenance(v.maintenance)
   if (v.plan !== undefined) o['plan'] = v.plan
@@ -7169,7 +7435,7 @@ export interface UpdateDBAASServiceValkeyRequest {
   /**
    * Allow incoming connections from CIDR address block, e.g. '10.20.0.0/16'
    */
-  ipFilter?: string[]
+  ipFilter?: string[] | null
   /**
    * Automatic maintenance settings
    */
@@ -7204,7 +7470,7 @@ export function toWireUpdateDBAASServiceValkeyRequest(
   v: UpdateDBAASServiceValkeyRequest,
 ): Record<string, unknown> {
   const o: Record<string, unknown> = {}
-  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter
+  if (v.ipFilter !== undefined) o['ip-filter'] = v.ipFilter === null ? null : v.ipFilter
   if (v.maintenance !== undefined)
     o['maintenance'] = toWireUpdateDBAASServiceValkeyRequestMaintenance(v.maintenance)
   if (v.migration !== undefined)
@@ -7374,6 +7640,51 @@ export function toWireUpdateInstanceRequest(v: UpdateInstanceRequest): Record<st
   return o
 }
 
+/**
+ * VPC Subnet
+ */
+export interface UpdateInstancePoolRequestVpcSubnets {
+  /**
+   * Subnet ID
+   */
+  id: string
+}
+
+/** @internal */
+export function toWireUpdateInstancePoolRequestVpcSubnets(
+  v: UpdateInstancePoolRequestVpcSubnets,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.id !== undefined) o['id'] = v.id
+  return o
+}
+
+/**
+ * Instance Pool VPC
+ */
+export interface UpdateInstancePoolRequestVpc {
+  /**
+   * VPC ID
+   */
+  id: string
+  /**
+   * VPC Subnets to attach the Instances to
+   *
+   * Unique items
+   */
+  subnets: UpdateInstancePoolRequestVpcSubnets[]
+}
+
+/** @internal */
+export function toWireUpdateInstancePoolRequestVpc(
+  v: UpdateInstancePoolRequestVpc,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.id !== undefined) o['id'] = v.id
+  if (v.subnets !== undefined)
+    o['subnets'] = v.subnets.map((x) => toWireUpdateInstancePoolRequestVpcSubnets(x))
+  return o
+}
 export interface UpdateInstancePoolRequest {
   id: string
   /**
@@ -7414,6 +7725,10 @@ export interface UpdateInstancePoolRequest {
    * Instances type
    */
   instanceType?: InstanceTypeRef
+  /**
+   * Enable IP forwarding on the Instances VPC interfaces
+   */
+  ipForwarding?: boolean
   /**
    * Enable IPv6. DEPRECATED: use `public-ip-assignments`.
    */
@@ -7470,6 +7785,10 @@ export interface UpdateInstancePoolRequest {
    * Min length 1
    */
   userData?: string | null
+  /**
+   * Instance Pool VPC
+   */
+  vpc?: UpdateInstancePoolRequestVpc | null
 }
 /** @internal */
 export function toWireUpdateInstancePoolRequest(
@@ -7492,6 +7811,7 @@ export function toWireUpdateInstancePoolRequest(
   if (v.instancePrefix !== undefined)
     o['instance-prefix'] = v.instancePrefix === null ? null : v.instancePrefix
   if (v.instanceType !== undefined) o['instance-type'] = toWireInstanceTypeRef(v.instanceType)
+  if (v.ipForwarding !== undefined) o['ip-forwarding'] = v.ipForwarding
   if (v.ipv6Enabled !== undefined) o['ipv6-enabled'] = v.ipv6Enabled
   if (v.labels !== undefined) o['labels'] = v.labels
   if (v.minAvailable !== undefined)
@@ -7509,6 +7829,8 @@ export function toWireUpdateInstancePoolRequest(
     o['ssh-keys'] = v.sshKeys === null ? null : v.sshKeys.map((x) => toWireSSHKeyRef(x))
   if (v.template !== undefined) o['template'] = toWireTemplateRef(v.template)
   if (v.userData !== undefined) o['user-data'] = v.userData === null ? null : v.userData
+  if (v.vpc !== undefined)
+    o['vpc'] = v.vpc === null ? null : toWireUpdateInstancePoolRequestVpc(v.vpc)
   return o
 }
 
@@ -7519,23 +7841,23 @@ export interface UpdateLoadBalancerRequest {
    *
    * Max length 255
    */
-  description?: string
-  labels?: Labels
+  description?: string | null
+  labels?: Labels | null
   /**
    * Load Balancer name
    *
    * Length 1-255
    */
-  name?: string
+  name?: string | null
 }
 /** @internal */
 export function toWireUpdateLoadBalancerRequest(
   v: UpdateLoadBalancerRequest,
 ): Record<string, unknown> {
   const o: Record<string, unknown> = {}
-  if (v.description !== undefined) o['description'] = v.description
-  if (v.labels !== undefined) o['labels'] = v.labels
-  if (v.name !== undefined) o['name'] = v.name
+  if (v.description !== undefined) o['description'] = v.description === null ? null : v.description
+  if (v.labels !== undefined) o['labels'] = v.labels === null ? null : v.labels
+  if (v.name !== undefined) o['name'] = v.name === null ? null : v.name
   return o
 }
 
@@ -7547,51 +7869,58 @@ export interface UpdateLoadBalancerServiceRequest {
    *
    * Max length 255
    */
-  description?: string
+  description?: string | null
   /**
    * Healthcheck configuration
    */
   healthcheck?: LoadBalancerServiceHealthcheck
   /**
+   * Label selector of the instances to forward traffic to. Empty labels remove it
+   */
+  labelSelector?: LoadBalancerServiceLabelSelector | null
+  /**
    * Load Balancer Service name
    *
    * Max length 255
    */
-  name?: string
+  name?: string | null
   /**
    * Port exposed on the Load Balancer's public IP
    *
    * Min 1, Max 65535
    */
-  port?: number
+  port?: number | null
   /**
    * Network traffic protocol
    */
-  protocol?: 'tcp' | 'udp'
+  protocol?: 'tcp' | 'udp' | null
   /**
    * Load balancing strategy
    */
-  strategy?: 'maglev-hash' | 'round-robin' | 'source-hash'
+  strategy?: 'maglev-hash' | 'round-robin' | 'source-hash' | null
   /**
    * Port on which the network traffic will be forwarded to on the receiving instance
    *
    * Min 1, Max 65535
    */
-  targetPort?: number
+  targetPort?: number | null
 }
 /** @internal */
 export function toWireUpdateLoadBalancerServiceRequest(
   v: UpdateLoadBalancerServiceRequest,
 ): Record<string, unknown> {
   const o: Record<string, unknown> = {}
-  if (v.description !== undefined) o['description'] = v.description
+  if (v.description !== undefined) o['description'] = v.description === null ? null : v.description
   if (v.healthcheck !== undefined)
     o['healthcheck'] = toWireLoadBalancerServiceHealthcheck(v.healthcheck)
-  if (v.name !== undefined) o['name'] = v.name
-  if (v.port !== undefined) o['port'] = v.port
-  if (v.protocol !== undefined) o['protocol'] = v.protocol
-  if (v.strategy !== undefined) o['strategy'] = v.strategy
-  if (v.targetPort !== undefined) o['target-port'] = v.targetPort
+  if (v.labelSelector !== undefined)
+    o['label-selector'] =
+      v.labelSelector === null ? null : toWireLoadBalancerServiceLabelSelector(v.labelSelector)
+  if (v.name !== undefined) o['name'] = v.name === null ? null : v.name
+  if (v.port !== undefined) o['port'] = v.port === null ? null : v.port
+  if (v.protocol !== undefined) o['protocol'] = v.protocol === null ? null : v.protocol
+  if (v.strategy !== undefined) o['strategy'] = v.strategy === null ? null : v.strategy
+  if (v.targetPort !== undefined) o['target-port'] = v.targetPort === null ? null : v.targetPort
   return o
 }
 
@@ -7711,6 +8040,31 @@ export function toWireUpdateReverseDNSInstanceRequest(
   return o
 }
 
+export interface UpdateSecurityGroupRequest {
+  id: string
+  /**
+   * Security Group description
+   *
+   * Max length 255
+   */
+  description?: string
+  /**
+   * Security Group name
+   *
+   * Length 1-255
+   */
+  name?: string
+}
+/** @internal */
+export function toWireUpdateSecurityGroupRequest(
+  v: UpdateSecurityGroupRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.description !== undefined) o['description'] = v.description
+  if (v.name !== undefined) o['name'] = v.name
+  return o
+}
+
 export interface UpdateSKSClusterRequest {
   id: string
   /**
@@ -7719,6 +8073,10 @@ export interface UpdateSKSClusterRequest {
    * Unique items
    */
   addons?: string[]
+  /**
+   * EXPERIMENTAL: List of ranges of allowed IPs using CIDR notation. Defaults to `["0.0.0.0/0"]`, allowing access to all IPs. (default: ["0.0.0.0/0"])
+   */
+  allowedNetworks?: SKSClusterAllowedNetworks
   /**
    * Kubernetes Audit Log Configuration
    */
@@ -7744,6 +8102,12 @@ export interface UpdateSKSClusterRequest {
    */
   featureGates?: string[] | null
   /**
+   * A list of Karpenter controller feature gates to enable for the Karpenter controller binary
+   *
+   * Unique items
+   */
+  karpenterFeatureGates?: string[] | null
+  /**
    * Cluster labels
    */
   labels?: SKSClusterLabels
@@ -7762,18 +8126,46 @@ export interface UpdateSKSClusterRequest {
 export function toWireUpdateSKSClusterRequest(v: UpdateSKSClusterRequest): Record<string, unknown> {
   const o: Record<string, unknown> = {}
   if (v.addons !== undefined) o['addons'] = v.addons
+  if (v.allowedNetworks !== undefined) o['allowed-networks'] = v.allowedNetworks
   if (v.audit !== undefined) o['audit'] = toWireSKSAuditUpdate(v.audit)
   if (v.autoUpgrade !== undefined) o['auto-upgrade'] = v.autoUpgrade
   if (v.description !== undefined) o['description'] = v.description === null ? null : v.description
   if (v.enableOperatorsCA !== undefined) o['enable-operators-ca'] = v.enableOperatorsCA
   if (v.featureGates !== undefined)
     o['feature-gates'] = v.featureGates === null ? null : v.featureGates
+  if (v.karpenterFeatureGates !== undefined)
+    o['karpenter-feature-gates'] = v.karpenterFeatureGates === null ? null : v.karpenterFeatureGates
   if (v.labels !== undefined) o['labels'] = v.labels
   if (v.name !== undefined) o['name'] = v.name
   if (v.oidc !== undefined) o['oidc'] = v.oidc === null ? null : toWireSKSOidc(v.oidc)
   return o
 }
 
+/**
+ * Nodepool VPC: the Instances are attached to the given Subnets of the VPC, or none (`null` or `{}`) to detach them
+ */
+export interface UpdateSKSNodepoolRequestVpc {
+  /**
+   * VPC ID, required with `subnets`
+   */
+  id?: string
+  /**
+   * VPC Subnets to attach the Instances to, required with `id`
+   *
+   * Unique items
+   */
+  subnets?: VpcSubnetRef[]
+}
+
+/** @internal */
+export function toWireUpdateSKSNodepoolRequestVpc(
+  v: UpdateSKSNodepoolRequestVpc,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.id !== undefined) o['id'] = v.id
+  if (v.subnets !== undefined) o['subnets'] = v.subnets.map((x) => toWireVpcSubnetRef(x))
+  return o
+}
 export interface UpdateSKSNodepoolRequest {
   id: string
   sksNodepoolID: string
@@ -7783,6 +8175,10 @@ export interface UpdateSKSNodepoolRequest {
    * Max items 8, Unique items
    */
   antiAffinityGroups?: AntiAffinityGroupRef[]
+  /**
+   * CPU manager (kubelet settings)
+   */
+  cpuManager?: CPUManager | null
   /**
    * Nodepool Deploy Target
    */
@@ -7810,6 +8206,14 @@ export interface UpdateSKSNodepoolRequest {
    */
   instanceType?: InstanceTypeRef
   /**
+   * Allow the Instances to act as routers in their VPC (IP forwarding). Only applies to new Instances
+   */
+  ipForwarding?: boolean
+  /**
+   * Resources reserved for Kubernetes node components (kubelet setting)
+   */
+  kubeReserved?: ReservedResources | null
+  /**
    * Kubelet image GC options
    */
   kubeletImageGC?: KubeletImageGC
@@ -7829,6 +8233,10 @@ export interface UpdateSKSNodepoolRequest {
    * Length 1-255
    */
   name?: string
+  /**
+   * Expose the GPUs with the NVIDIA DRA driver instead of the NVIDIA device plugin. Requires a GPU instance type and Kubernetes 1.34 or greater.
+   */
+  nvidiaDraDriver?: boolean
   /**
    * Nvidia MIG Profiles
    */
@@ -7853,9 +8261,21 @@ export interface UpdateSKSNodepoolRequest {
    */
   securityGroups?: SecurityGroupRef[]
   /**
+   * Resources reserved for OS system daemons (kubelet setting)
+   */
+  systemReserved?: ReservedResources | null
+  /**
    * Nodepool taints
    */
   taints?: SKSNodepoolTaints
+  /**
+   * Nodepool Instance template: an `id` among the available templates of the Nodepool Kubernetes version and variant (see `list-sks-nodepool-templates`), or empty (`{}`) to follow the latest template of the Nodepool Kubernetes version
+   */
+  template?: TemplateRef
+  /**
+   * Nodepool VPC: the Instances are attached to the given Subnets of the VPC, or none (`null` or `{}`) to detach them
+   */
+  vpc?: UpdateSKSNodepoolRequestVpc | null
 }
 /** @internal */
 export function toWireUpdateSKSNodepoolRequest(
@@ -7864,17 +8284,23 @@ export function toWireUpdateSKSNodepoolRequest(
   const o: Record<string, unknown> = {}
   if (v.antiAffinityGroups !== undefined)
     o['anti-affinity-groups'] = v.antiAffinityGroups.map((x) => toWireAntiAffinityGroupRef(x))
+  if (v.cpuManager !== undefined)
+    o['cpu-manager'] = v.cpuManager === null ? null : toWireCPUManager(v.cpuManager)
   if (v.deployTarget !== undefined)
     o['deploy-target'] = v.deployTarget === null ? null : toWireDeployTargetRef(v.deployTarget)
   if (v.description !== undefined) o['description'] = v.description
   if (v.diskSize !== undefined) o['disk-size'] = v.diskSize
   if (v.instancePrefix !== undefined) o['instance-prefix'] = v.instancePrefix
   if (v.instanceType !== undefined) o['instance-type'] = toWireInstanceTypeRef(v.instanceType)
+  if (v.ipForwarding !== undefined) o['ip-forwarding'] = v.ipForwarding
+  if (v.kubeReserved !== undefined)
+    o['kube-reserved'] = v.kubeReserved === null ? null : toWireReservedResources(v.kubeReserved)
   if (v.kubeletImageGC !== undefined) o['kubelet-image-gc'] = toWireKubeletImageGC(v.kubeletImageGC)
   if (v.kubeletMaxPods !== undefined)
     o['kubelet-max-pods'] = v.kubeletMaxPods === null ? null : v.kubeletMaxPods
   if (v.labels !== undefined) o['labels'] = v.labels
   if (v.name !== undefined) o['name'] = v.name
+  if (v.nvidiaDraDriver !== undefined) o['nvidia-dra-driver'] = v.nvidiaDraDriver
   if (v.nvidiaMigProfiles !== undefined)
     o['nvidia-mig-profiles'] =
       v.nvidiaMigProfiles === null ? null : toWireNvidiaMigProfiles(v.nvidiaMigProfiles)
@@ -7883,7 +8309,13 @@ export function toWireUpdateSKSNodepoolRequest(
   if (v.publicIPAssignment !== undefined) o['public-ip-assignment'] = v.publicIPAssignment
   if (v.securityGroups !== undefined)
     o['security-groups'] = v.securityGroups.map((x) => toWireSecurityGroupRef(x))
+  if (v.systemReserved !== undefined)
+    o['system-reserved'] =
+      v.systemReserved === null ? null : toWireReservedResources(v.systemReserved)
   if (v.taints !== undefined) o['taints'] = toWireSKSNodepoolTaints(v.taints)
+  if (v.template !== undefined) o['template'] = toWireTemplateRef(v.template)
+  if (v.vpc !== undefined)
+    o['vpc'] = v.vpc === null ? null : toWireUpdateSKSNodepoolRequestVpc(v.vpc)
   return o
 }
 
@@ -7891,18 +8323,11 @@ export interface UpdateSubnetRequest {
   id: string
   vpcID: string
   /**
-   * Subnet description
-   *
    * Max length 4096
    */
   description?: string | null
-  /**
-   * Resource labels
-   */
   labels?: Labels | null
   /**
-   * Subnet name
-   *
    * Length 1-255
    */
   name?: string | null
@@ -7956,18 +8381,15 @@ export function toWireUpdateUserRoleRequest(v: UpdateUserRoleRequest): Record<st
 export interface UpdateVpcRequest {
   id: string
   /**
-   * VPC description
-   *
    * Max length 4096
    */
   description?: string | null
   /**
-   * Resource labels
+   * DHCP options (only allowed if VPC has no instances attached)
    */
+  dhcpOptions?: VpcDHCPOptions
   labels?: Labels | null
   /**
-   * VPC name
-   *
    * Length 1-255
    */
   name?: string | null
@@ -7976,6 +8398,7 @@ export interface UpdateVpcRequest {
 export function toWireUpdateVpcRequest(v: UpdateVpcRequest): Record<string, unknown> {
   const o: Record<string, unknown> = {}
   if (v.description !== undefined) o['description'] = v.description === null ? null : v.description
+  if (v.dhcpOptions !== undefined) o['dhcp-options'] = toWireVpcDHCPOptions(v.dhcpOptions)
   if (v.labels !== undefined) o['labels'] = v.labels === null ? null : v.labels
   if (v.name !== undefined) o['name'] = v.name === null ? null : v.name
   return o
@@ -8007,7 +8430,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Add an external source as a member of a Security Group
    *
-   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
+   * @see https://community.exoscale.com/product/networking/security-group/ Read more
    */
   addExternalSourceToSecurityGroup(
     params: AddExternalSourceToSecurityGroupRequest,
@@ -8030,7 +8453,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Create a Security Group rule
    *
-   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
+   * @see https://community.exoscale.com/product/networking/security-group/ Read more
    */
   addRuleToSecurityGroup(params: AddRuleToSecurityGroupRequest): Promise<Operation> {
     const path = `/security-group/${encodeURIComponent(params.id)}/rules`
@@ -8041,7 +8464,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Add a Load Balancer Service
    *
-   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
+   * @see https://community.exoscale.com/product/networking/nlb/ Read more
    */
   addServiceToLoadBalancer(params: AddServiceToLoadBalancerRequest): Promise<Operation> {
     const path = `/load-balancer/${encodeURIComponent(params.id)}/service`
@@ -8052,7 +8475,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * [BETA] Request generation of key/secret that allow caller to assume target role
    *
-   * @see https://community.exoscale.com/product/iam/operation/role-mgmt/ Read more
+   * @see https://community.exoscale.com/product/security/iam/how-to/role-mgmt/ Read more
    */
   assumeIAMRole(params: AssumeIAMRoleRequest): Promise<AssumeIAMRoleResponse> {
     const path = `/iam-role/${encodeURIComponent(params.id)}/assume`
@@ -8063,7 +8486,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Attach block storage volume to an instance
    *
-   * @see https://community.exoscale.com/documentation/block-storage/ Read more
+   * @see https://community.exoscale.com/product/storage/block-storage/ Read more
    */
   attachBlockStorageVolumeToInstance(
     params: AttachBlockStorageVolumeToInstanceRequest,
@@ -8096,7 +8519,7 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * Attach a Compute instance to a Private Network
+   * Private Networks are deprecated in favor of VPC.
    *
    * @see https://community.exoscale.com/product/networking/private-network/ Read more
    */
@@ -8111,7 +8534,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Attach a Compute instance to a Security Group
    *
-   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
+   * @see https://community.exoscale.com/product/networking/security-group/ Read more
    */
   attachInstanceToSecurityGroup(params: AttachInstanceToSecurityGroupRequest): Promise<Operation> {
     const path = `/security-group/${encodeURIComponent(params.id)}:attach`
@@ -8120,7 +8543,7 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * [BETA] Attach a Compute instance to a Subnet
+   * Attach a Compute instance to a Subnet
    *
    * @see https://community.exoscale.com/product/networking/vpc Read more
    */
@@ -8136,7 +8559,7 @@ export abstract class GeneratedExoscaleClient {
    * Errors:
    *
    * **400**
-   * ### Errors
+   * Errors
    *
    * Key Not Found: The request was rejected because the specified KMS Key could not be found.
    *
@@ -8144,10 +8567,29 @@ export abstract class GeneratedExoscaleClient {
    *
    * Not Pending Deletion: The request was rejected because the key is not pending deletion.
    *
-   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   * @see https://community.exoscale.com/product/security/kms/overview/ Read more
    */
   cancelKmsKeyDeletion(params: CancelKmsKeyDeletionRequest): Promise<SuccessResponse> {
     const path = `/kms-key/${encodeURIComponent(params.id)}/cancel-deletion`
+    return this.core.request('POST', path, { decode: fromWireSuccessResponse })
+  }
+
+  /**
+   * Connects an External Key Store once its customer-managed XKS proxy passes a health check, then resumes periodic proxy health checks and lets keys backed by this store be used for cryptographic operations.
+   *
+   * Errors:
+   *
+   * **400**
+   * Errors
+   *
+   * Not Found: The request was rejected because no key store with the given id exists in the organization.
+   *
+   * Key Store Proxy Unhealthy: The request was rejected because the customer-managed XKS proxy failed its health check.
+   *
+   * Bad Request: The request was rejected because of an invalid path parameter.
+   */
+  connectKeyStore(params: ConnectKeyStoreRequest): Promise<SuccessResponse> {
+    const path = `/key-store/${encodeURIComponent(params.id)}/connect`
     return this.core.request('POST', path, { decode: fromWireSuccessResponse })
   }
 
@@ -8199,7 +8641,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Create a new API key
    *
-   * @see https://community.exoscale.com/product/iam/how-to/key-mgmt/ Read more
+   * @see https://community.exoscale.com/product/security/iam/how-to/key-mgmt/ Read more
    */
   createAPIKey(params: CreateAPIKeyRequest): Promise<IAMAPIKeyCreated> {
     const body = toWireCreateAPIKeyRequest(params)
@@ -8209,7 +8651,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Create a block storage snapshot
    *
-   * @see https://community.exoscale.com/documentation/block-storage/ Read more
+   * @see https://community.exoscale.com/product/storage/block-storage/ Read more
    */
   createBlockStorageSnapshot(params: CreateBlockStorageSnapshotRequest): Promise<Operation> {
     const path = `/block-storage/${encodeURIComponent(params.id)}:create-snapshot`
@@ -8220,7 +8662,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Create a block storage volume
    *
-   * @see https://community.exoscale.com/documentation/block-storage/ Read more
+   * @see https://community.exoscale.com/product/storage/block-storage/ Read more
    */
   createBlockStorageVolume(params: CreateBlockStorageVolumeRequest): Promise<Operation> {
     const body = toWireCreateBlockStorageVolumeRequest(params)
@@ -8375,6 +8817,17 @@ export abstract class GeneratedExoscaleClient {
     const path = `/dbaas-mysql/${encodeURIComponent(params.serviceName)}/database`
     const body = toWireCreateDBAASMysqlDatabaseRequest(params)
     return this.core.request('POST', path, { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Check whether you can upgrade MySQL service to a newer version
+   *
+   * @see https://community.exoscale.com/product/dbaas/ Read more
+   */
+  createDBAASMysqlUpgradeCheck(params: CreateDBAASMysqlUpgradeCheckRequest): Promise<DBAASTask> {
+    const path = `/dbaas-mysql/${encodeURIComponent(params.serviceName)}/upgrade-check`
+    const body = toWireCreateDBAASMysqlUpgradeCheckRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireDBAASTask })
   }
 
   /**
@@ -8608,7 +9061,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Create IAM Role
    *
-   * @see https://community.exoscale.com/product/iam/operation/role-mgmt/ Read more
+   * @see https://community.exoscale.com/product/security/iam/how-to/role-mgmt/ Read more
    */
   createIAMRole(params: CreateIAMRoleRequest): Promise<Operation> {
     const body = toWireCreateIAMRoleRequest(params)
@@ -8628,11 +9081,33 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Create an Instance Pool
    *
-   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
+   * @see https://community.exoscale.com/product/compute/instances/how-to/instance-pools/ Read more
    */
   createInstancePool(params: CreateInstancePoolRequest): Promise<Operation> {
     const body = toWireCreateInstancePoolRequest(params)
     return this.core.request('POST', '/instance-pool', { body, decode: fromWireOperation })
+  }
+
+  /**
+   * Create an External Key Store after validating the configured customer-managed XKS proxy.
+   *
+   * Errors:
+   *
+   * **400**
+   * Errors
+   *
+   * Name Conflict: The request was rejected because a key store with the same name already exists in the organization.
+   *
+   * Key Store Proxy Unhealthy: The request was rejected because the customer-managed XKS proxy failed its health check.
+   *
+   * Bad Request: The request was rejected because of an invalid request body, path parameter, proxy endpoint, or proxy credentials.
+   */
+  createKeyStore(params: CreateKeyStoreRequest): Promise<ListKeyStoresResponseEntry> {
+    const body = toWireCreateKeyStoreRequest(params)
+    return this.core.request('POST', '/key-store', {
+      body,
+      decode: fromWireListKeyStoresResponseEntry,
+    })
   }
 
   /**
@@ -8641,13 +9116,21 @@ export abstract class GeneratedExoscaleClient {
    * Errors:
    *
    * **400**
-   * ### Errors
+   * Errors
    *
    * Name Conflict: The request was rejected because a key with the same name already exists in the target zone.
    *
+   * [BETA] Key Store Not Found: The request was rejected because the specified external key store could not be found.
+   *
+   * [BETA] Key Store Disconnected: The request was rejected because the specified external key store is disconnected.
+   *
+   * [BETA] Key Store Proxy Request Failed: The request was rejected because the request to the external key store proxy failed, or because the external key is not enabled or does not support encrypt and decrypt.
+   *
+   * [BETA] Key Store State Changed: The request was rejected because the external key store was modified concurrently while the key was being created. The request can be retried.
+   *
    * Bad Request: The request was rejected because of an invalid request body or path parameter.
    *
-   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   * @see https://community.exoscale.com/product/security/kms/overview/ Read more
    */
   createKmsKey(params: CreateKmsKeyRequest): Promise<CreateKmsKeyResponse> {
     const body = toWireCreateKmsKeyRequest(params)
@@ -8657,7 +9140,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Create a Load Balancer
    *
-   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
+   * @see https://community.exoscale.com/product/networking/nlb/ Read more
    */
   createLoadBalancer(params: CreateLoadBalancerRequest): Promise<Operation> {
     const body = toWireCreateLoadBalancerRequest(params)
@@ -8684,7 +9167,7 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * Create a Private Network
+   * Private Networks are deprecated in favor of VPC.
    *
    * @see https://community.exoscale.com/product/networking/private-network/ Read more
    */
@@ -8694,7 +9177,7 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * [BETA] Create a route
+   * Create a route
    *
    * @see https://community.exoscale.com/product/networking/vpc Read more
    */
@@ -8707,7 +9190,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Create a Security Group
    *
-   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
+   * @see https://community.exoscale.com/product/networking/security-group/ Read more
    */
   createSecurityGroup(params: CreateSecurityGroupRequest): Promise<Operation> {
     const body = toWireCreateSecurityGroupRequest(params)
@@ -8717,7 +9200,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Create an SKS cluster
    *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
+   * @see https://community.exoscale.com/product/compute/containers/ Read more
    */
   createSKSCluster(params: CreateSKSClusterRequest): Promise<Operation> {
     const body = toWireCreateSKSClusterRequest(params)
@@ -8727,7 +9210,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Create a new SKS Nodepool
    *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
+   * @see https://community.exoscale.com/product/compute/containers/ Read more
    */
   createSKSNodepool(params: CreateSKSNodepoolRequest): Promise<Operation> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}/nodepool`
@@ -8739,7 +9222,7 @@ export abstract class GeneratedExoscaleClient {
    * Create a Snapshot of a Compute instance
    *
    * @see https://www.exoscale.com/compute/ Read more
-   * @see https://community.exoscale.com/documentation/compute/snapshots/ Read more
+   * @see https://community.exoscale.com/product/compute/instances/how-to/snapshot/ Read more
    */
   createSnapshot(params: CreateSnapshotRequest): Promise<Operation> {
     const path = `/instance/${encodeURIComponent(params.id)}:create-snapshot`
@@ -8747,7 +9230,7 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * [BETA] Create a Subnet
+   * Create a Subnet
    *
    * @see https://community.exoscale.com/product/networking/vpc Read more
    */
@@ -8760,7 +9243,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Create a User
    *
-   * @see https://community.exoscale.com/product/iam/operation/users-keys/ Read more
+   * @see https://community.exoscale.com/product/security/iam/how-to/users-keys/ Read more
    */
   createUser(params: CreateUserRequest): Promise<Operation> {
     const body = toWireCreateUserRequest(params)
@@ -8768,7 +9251,7 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * [BETA] Create a VPC
+   * Create a VPC
    *
    * @see https://community.exoscale.com/product/networking/vpc Read more
    */
@@ -8783,15 +9266,25 @@ export abstract class GeneratedExoscaleClient {
    * Errors:
    *
    * **400**
-   * ### Errors
+   * Errors
    *
    * Key Not Found: The request was rejected because the specified KMS Key could not be found.
    *
    * Key is Disabled: The request was rejected because the specified KMS key is disabled.
    *
-   * Invalid Usage: The request was rejected because the operation is only allowed on symmetric keys with usage "encrypt-decrypt".
+   * Invalid Usage: The request was rejected because the operation is not allowed for this key's usage.
    *
-   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   * Invalid Algorithm: The request was rejected because the specified encryption algorithm does not match the key's cryptographic profile.
+   *
+   * Invalid Ciphertext: The request was rejected because the ciphertext is malformed, was not produced by the specified KMS Key, or could not be authenticated (for example, because of a mismatched encryption context).
+   *
+   * [BETA] Key Store Not Found: The request was rejected because the external key store of the specified KMS Key could not be found.
+   *
+   * [BETA] Key Store Disconnected: The request was rejected because the external key store of the specified KMS Key is disconnected.
+   *
+   * [BETA] Key Store Proxy Request Failed: The request was rejected because the request to the external key store proxy failed.
+   *
+   * @see https://community.exoscale.com/product/security/kms/overview/ Read more
    */
   decrypt(
     params: DecryptRequest & {
@@ -8801,24 +9294,6 @@ export abstract class GeneratedExoscaleClient {
     const path = `/kms-key/${encodeURIComponent(params.id)}/decrypt`
     const body = toWireDecryptRequest(params)
     return this.core.request('POST', path, { body, decode: fromWireDecryptResponse })
-  }
-
-  /**
-   * Delete AI API key
-   *
-   * Errors:
-   *
-   * **403**
-   * Forbidden
-   *
-   * **404**
-   * Not Found
-   *
-   * @see https://www.exoscale.com/ai-cloud-infrastructure/managed-inference/ Read more
-   */
-  deleteAIAPIKey(params: DeleteAIAPIKeyRequest): Promise<Operation> {
-    const path = `/ai/api-key/${encodeURIComponent(params.id)}`
-    return this.core.request('DELETE', path, { decode: fromWireOperation })
   }
 
   /**
@@ -8834,7 +9309,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Delete an API key
    *
-   * @see https://community.exoscale.com/product/iam/how-to/key-mgmt/ Read more
+   * @see https://community.exoscale.com/product/security/iam/how-to/key-mgmt/ Read more
    */
   deleteAPIKey(params: DeleteAPIKeyRequest): Promise<Operation> {
     const path = `/api-key/${encodeURIComponent(params.id)}`
@@ -8844,7 +9319,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Delete a block storage snapshot, data will be unrecoverable
    *
-   * @see https://community.exoscale.com/documentation/block-storage/ Read more
+   * @see https://community.exoscale.com/product/storage/block-storage/ Read more
    */
   deleteBlockStorageSnapshot(params: DeleteBlockStorageSnapshotRequest): Promise<Operation> {
     const path = `/block-storage-snapshot/${encodeURIComponent(params.id)}`
@@ -8854,7 +9329,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Delete a block storage volume, data will be unrecoverable
    *
-   * @see https://community.exoscale.com/documentation/block-storage/ Read more
+   * @see https://community.exoscale.com/product/storage/block-storage/ Read more
    */
   deleteBlockStorageVolume(params: DeleteBlockStorageVolumeRequest): Promise<Operation> {
     const path = `/block-storage/${encodeURIComponent(params.id)}`
@@ -9096,7 +9571,7 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * Delete a OpenSearch service
+   * Delete an OpenSearch service
    *
    * @see https://community.exoscale.com/product/dbaas/ Read more
    */
@@ -9199,7 +9674,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Delete IAM Role
    *
-   * @see https://community.exoscale.com/product/iam/operation/role-mgmt/ Read more
+   * @see https://community.exoscale.com/product/security/iam/how-to/role-mgmt/ Read more
    */
   deleteIAMRole(params: DeleteIAMRoleRequest): Promise<Operation> {
     const path = `/iam-role/${encodeURIComponent(params.id)}`
@@ -9219,7 +9694,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Delete an Instance Pool
    *
-   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
+   * @see https://community.exoscale.com/product/compute/instances/how-to/instance-pools/ Read more
    */
   deleteInstancePool(params: DeleteInstancePoolRequest): Promise<Operation> {
     const path = `/instance-pool/${encodeURIComponent(params.id)}`
@@ -9227,9 +9702,28 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
+   * Deletes an External Key Store when no KMS keys reference it.
+   *
+   * Errors:
+   *
+   * **400**
+   * Errors
+   *
+   * Not Found: The request was rejected because no key store with the given id exists in the organization.
+   *
+   * Key Store Is Referenced: The request was rejected because one or more KMS keys reference the key store.
+   *
+   * Bad Request: The request was rejected because of an invalid path parameter.
+   */
+  deleteKeyStore(params: DeleteKeyStoreRequest): Promise<SuccessResponse> {
+    const path = `/key-store/${encodeURIComponent(params.id)}`
+    return this.core.request('DELETE', path, { decode: fromWireSuccessResponse })
+  }
+
+  /**
    * Delete a Load Balancer
    *
-   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
+   * @see https://community.exoscale.com/product/networking/nlb/ Read more
    */
   deleteLoadBalancer(params: DeleteLoadBalancerRequest): Promise<Operation> {
     const path = `/load-balancer/${encodeURIComponent(params.id)}`
@@ -9239,7 +9733,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Delete a Load Balancer Service
    *
-   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
+   * @see https://community.exoscale.com/product/networking/nlb/ Read more
    */
   deleteLoadBalancerService(params: DeleteLoadBalancerServiceRequest): Promise<Operation> {
     const path = `/load-balancer/${encodeURIComponent(params.id)}/service/${encodeURIComponent(params.serviceID)}`
@@ -9268,7 +9762,7 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * Delete a Private Network
+   * Private Networks are deprecated in favor of VPC.
    *
    * @see https://community.exoscale.com/product/networking/private-network/ Read more
    */
@@ -9298,7 +9792,7 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * [BETA] Delete a route
+   * Delete a route
    *
    * @see https://community.exoscale.com/product/networking/vpc Read more
    */
@@ -9310,7 +9804,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Delete a Security Group rule
    *
-   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
+   * @see https://community.exoscale.com/product/networking/security-group/ Read more
    */
   deleteRuleFromSecurityGroup(params: DeleteRuleFromSecurityGroupRequest): Promise<Operation> {
     const path = `/security-group/${encodeURIComponent(params.id)}/rules/${encodeURIComponent(params.ruleID)}`
@@ -9320,7 +9814,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Delete a Security Group
    *
-   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
+   * @see https://community.exoscale.com/product/networking/security-group/ Read more
    */
   deleteSecurityGroup(params: DeleteSecurityGroupRequest): Promise<Operation> {
     const path = `/security-group/${encodeURIComponent(params.id)}`
@@ -9330,7 +9824,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Delete an SKS cluster
    *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
+   * @see https://community.exoscale.com/product/compute/containers/ Read more
    */
   deleteSKSCluster(params: DeleteSKSClusterRequest): Promise<Operation> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}`
@@ -9340,7 +9834,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Delete an SKS Nodepool
    *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
+   * @see https://community.exoscale.com/product/compute/containers/ Read more
    */
   deleteSKSNodepool(params: DeleteSKSNodepoolRequest): Promise<Operation> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}/nodepool/${encodeURIComponent(params.sksNodepoolID)}`
@@ -9350,7 +9844,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Delete a Snapshot
    *
-   * @see https://community.exoscale.com/documentation/compute/snapshots/ Read more
+   * @see https://community.exoscale.com/product/compute/instances/how-to/snapshot/ Read more
    */
   deleteSnapshot(params: DeleteSnapshotRequest): Promise<Operation> {
     const path = `/snapshot/${encodeURIComponent(params.id)}`
@@ -9360,7 +9854,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Delete a SSH key
    *
-   * @see https://community.exoscale.com/documentation/compute/ssh-keypairs/ Read more
+   * @see https://community.exoscale.com/product/compute/instances/how-to/ssh-keypairs/ Read more
    */
   deleteSSHKey(params: DeleteSSHKeyRequest): Promise<Operation> {
     const path = `/ssh-key/${encodeURIComponent(params.name)}`
@@ -9368,7 +9862,7 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * [BETA] Delete a Subnet
+   * Delete a Subnet
    *
    * @see https://community.exoscale.com/product/networking/vpc Read more
    */
@@ -9390,7 +9884,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Delete User
    *
-   * @see https://community.exoscale.com/product/iam/operation/users-keys/ Read more
+   * @see https://community.exoscale.com/product/security/iam/how-to/users-keys/ Read more
    */
   deleteUser(params: DeleteUserRequest): Promise<Operation> {
     const path = `/user/${encodeURIComponent(params.id)}`
@@ -9398,7 +9892,7 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * [BETA] Delete a VPC
+   * Delete a VPC
    *
    * @see https://community.exoscale.com/product/networking/vpc Read more
    */
@@ -9410,7 +9904,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Detach block storage volume
    *
-   * @see https://community.exoscale.com/documentation/block-storage/ Read more
+   * @see https://community.exoscale.com/product/storage/block-storage/ Read more
    */
   detachBlockStorageVolume(params: DetachBlockStorageVolumeRequest): Promise<Operation> {
     const path = `/block-storage/${encodeURIComponent(params.id)}:detach`
@@ -9442,7 +9936,7 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * Detach a Compute instance from a Private Network
+   * Private Networks are deprecated in favor of VPC.
    *
    * @see https://community.exoscale.com/product/networking/private-network/ Read more
    */
@@ -9457,7 +9951,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Detach a Compute instance from a Security Group
    *
-   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
+   * @see https://community.exoscale.com/product/networking/security-group/ Read more
    */
   detachInstanceFromSecurityGroup(
     params: DetachInstanceFromSecurityGroupRequest,
@@ -9468,7 +9962,7 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * [BETA] Detach a Compute instance from a Subnet
+   * Detach a Compute instance from a Subnet
    *
    * @see https://community.exoscale.com/product/networking/vpc Read more
    */
@@ -9484,7 +9978,7 @@ export abstract class GeneratedExoscaleClient {
    * Errors:
    *
    * **400**
-   * ### Errors
+   * Errors
    *
    * Key Not Found: The request was rejected because the specified KMS Key could not be found.
    *
@@ -9492,7 +9986,7 @@ export abstract class GeneratedExoscaleClient {
    *
    * Not on Default: The request was rejected because the operation is not allowed on the default key.
    *
-   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   * @see https://community.exoscale.com/product/security/kms/overview/ Read more
    */
   disableKmsKey(params: DisableKmsKeyRequest): Promise<SuccessResponse> {
     const path = `/kms-key/${encodeURIComponent(params.id)}/disable`
@@ -9505,9 +9999,7 @@ export abstract class GeneratedExoscaleClient {
    * Errors:
    *
    * **400**
-   * ### Errors
-   *
-   * Invalid Origin: The request was rejected because automatic key rotation can only be enabled on a KMS key with origin "exoscale-kms".
+   * Errors
    *
    * Key Not Found: The request was rejected because the specified KMS Key could not be found.
    *
@@ -9523,13 +10015,30 @@ export abstract class GeneratedExoscaleClient {
    *
    * Conflict: The request was rejected because the automatic rotation is already enabled for this KMS Key.
    *
-   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   * @see https://community.exoscale.com/product/security/kms/overview/ Read more
    */
   disableKmsKeyRotation(
     params: DisableKmsKeyRotationRequest,
   ): Promise<DisableKmsKeyRotationResponse> {
     const path = `/kms-key/${encodeURIComponent(params.id)}/disable-key-rotation`
     return this.core.request('POST', path, { decode: fromWireDisableKmsKeyRotationResponse })
+  }
+
+  /**
+   * Disconnects an External Key Store and suspends periodic proxy health checks; keys backed by this store remain intact but cannot be used for cryptographic operations until it is reconnected.
+   *
+   * Errors:
+   *
+   * **400**
+   * Errors
+   *
+   * Not Found: The request was rejected because no key store with the given id exists in the organization.
+   *
+   * Bad Request: The request was rejected because of an invalid path parameter.
+   */
+  disconnectKeyStore(params: DisconnectKeyStoreRequest): Promise<SuccessResponse> {
+    const path = `/key-store/${encodeURIComponent(params.id)}/disconnect`
+    return this.core.request('POST', path, { decode: fromWireSuccessResponse })
   }
 
   /**
@@ -9548,13 +10057,13 @@ export abstract class GeneratedExoscaleClient {
    * Errors:
    *
    * **400**
-   * ### Errors
+   * Errors
    *
    * Key Not Found: The request was rejected because the specified KMS Key could not be found.
    *
    * Key is Pending Deletion: The request was rejected because it was performed on a key that is pending deletion.
    *
-   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   * @see https://community.exoscale.com/product/security/kms/overview/ Read more
    */
   enableKmsKey(params: EnableKmsKeyRequest): Promise<SuccessResponse> {
     const path = `/kms-key/${encodeURIComponent(params.id)}/enable`
@@ -9567,9 +10076,7 @@ export abstract class GeneratedExoscaleClient {
    * Errors:
    *
    * **400**
-   * ### Errors
-   *
-   * Invalid Origin: The request was rejected because automatic key rotation can only be enabled on a KMS key with origin "exoscale-kms".
+   * Errors
    *
    * Key Not Found: The request was rejected because the specified KMS Key could not be found.
    *
@@ -9587,7 +10094,7 @@ export abstract class GeneratedExoscaleClient {
    *
    * Bad Request: The request was rejected because of an invalid request body or path parameter.
    *
-   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   * @see https://community.exoscale.com/product/security/kms/overview/ Read more
    */
   enableKmsKeyRotation(
     params: EnableKmsKeyRotationRequest & {
@@ -9615,15 +10122,23 @@ export abstract class GeneratedExoscaleClient {
    * Errors:
    *
    * **400**
-   * ### Errors
+   * Errors
    *
    * Key Not Found: The request was rejected because the specified KMS Key could not be found.
    *
    * Key is Disabled: The request was rejected because the specified KMS key is disabled.
    *
-   * Invalid Usage: The request was rejected because the operation is only allowed on symmetric keys with usage "encrypt-decrypt".
+   * Invalid Usage: The request was rejected because the operation is not allowed for this key's usage.
    *
-   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   * Invalid Algorithm: The request was rejected because the specified encryption algorithm does not match the key's cryptographic profile.
+   *
+   * [BETA] Key Store Not Found: The request was rejected because the external key store of the specified KMS Key could not be found.
+   *
+   * [BETA] Key Store Disconnected: The request was rejected because the external key store of the specified KMS Key is disconnected.
+   *
+   * [BETA] Key Store Proxy Request Failed: The request was rejected because the request to the external key store proxy failed.
+   *
+   * @see https://community.exoscale.com/product/security/kms/overview/ Read more
    */
   encrypt(
     params: EncryptRequest & {
@@ -9638,7 +10153,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * This operation evicts the specified Compute instances member from the Instance Pool, shrinking it to `&lt;current pool size&gt; - &lt;# evicted members&gt;`.
    *
-   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
+   * @see https://community.exoscale.com/product/compute/instances/how-to/instance-pools/ Read more
    */
   evictInstancePoolMembers(params: EvictInstancePoolMembersRequest): Promise<Operation> {
     const path = `/instance-pool/${encodeURIComponent(params.id)}:evict`
@@ -9649,7 +10164,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * This operation evicts the specified Compute instances member from the Nodepool, shrinking it to `&lt;current nodepool size&gt; - &lt;# evicted members&gt;`.
    *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
+   * @see https://community.exoscale.com/product/compute/containers/ Read more
    */
   evictSKSNodepoolMembers(params: EvictSKSNodepoolMembersRequest): Promise<Operation> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}/nodepool/${encodeURIComponent(params.sksNodepoolID)}:evict`
@@ -9660,7 +10175,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Export a Snapshot
    *
-   * @see https://community.exoscale.com/documentation/compute/snapshots/ Read more
+   * @see https://community.exoscale.com/product/compute/instances/how-to/snapshot/ Read more
    */
   exportSnapshot(params: ExportSnapshotRequest): Promise<Operation> {
     const path = `/snapshot/${encodeURIComponent(params.id)}:export`
@@ -9673,7 +10188,7 @@ export abstract class GeneratedExoscaleClient {
    * Errors:
    *
    * **400**
-   * ### Errors
+   * Errors
    *
    * Key Not Found: The request was rejected because the specified KMS Key could not be found.
    *
@@ -9681,7 +10196,13 @@ export abstract class GeneratedExoscaleClient {
    *
    * Invalid Usage: The request was rejected because the operation is only allowed on symmetric keys with usage "encrypt-decrypt".
    *
-   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   * [BETA] Key Store Not Found: The request was rejected because the external key store of the specified KMS Key could not be found.
+   *
+   * [BETA] Key Store Disconnected: The request was rejected because the external key store of the specified KMS Key is disconnected.
+   *
+   * [BETA] Key Store Proxy Request Failed: The request was rejected because the request to the external key store proxy failed.
+   *
+   * @see https://community.exoscale.com/product/security/kms/overview/ Read more
    */
   generateDataKey(
     params: GenerateDataKeyRequest & {
@@ -9696,7 +10217,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * This operation returns a Kubeconfig file encoded in base64.
    *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
+   * @see https://community.exoscale.com/product/compute/containers/ Read more
    */
   generateSKSClusterKubeconfig(
     params: SKSKubeconfigRequest & {
@@ -9714,7 +10235,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Generate a Karpenter ExoscaleNodeClass manifest for an SKS cluster, including its default security group and feature flags if present
    *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
+   * @see https://community.exoscale.com/product/compute/containers/ Read more
    */
   generateSKSKarpenterExoscaleNodeclass(
     params: GenerateSKSKarpenterExoscaleNodeclassRequest,
@@ -9728,7 +10249,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Generate a Karpenter NodePool manifest with minimal configuration for an SKS cluster
    *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
+   * @see https://community.exoscale.com/product/compute/containers/ Read more
    */
   generateSKSKarpenterNodepool(
     params: GenerateSKSKarpenterNodepoolRequest,
@@ -9740,7 +10261,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Get the active template for a given kube version and variant (standard | nvidia)
    *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
+   * @see https://community.exoscale.com/product/compute/containers/ Read more
    */
   getActiveNodepoolTemplate(
     params: GetActiveNodepoolTemplateRequest,
@@ -9780,7 +10301,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Get API key
    *
-   * @see https://community.exoscale.com/product/iam/how-to/key-mgmt/ Read more
+   * @see https://community.exoscale.com/product/security/iam/how-to/key-mgmt/ Read more
    */
   getAPIKey(params: GetAPIKeyRequest): Promise<IAMAPIKey> {
     const path = `/api-key/${encodeURIComponent(params.id)}`
@@ -9790,7 +10311,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Retrieve block storage snapshot details
    *
-   * @see https://community.exoscale.com/documentation/block-storage/ Read more
+   * @see https://community.exoscale.com/product/storage/block-storage/ Read more
    */
   getBlockStorageSnapshot(params: GetBlockStorageSnapshotRequest): Promise<BlockStorageSnapshot> {
     const path = `/block-storage-snapshot/${encodeURIComponent(params.id)}`
@@ -9800,7 +10321,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Retrieve block storage volume details
    *
-   * @see https://community.exoscale.com/documentation/block-storage/ Read more
+   * @see https://community.exoscale.com/product/storage/block-storage/ Read more
    */
   getBlockStorageVolume(params: GetBlockStorageVolumeRequest): Promise<BlockStorageVolume> {
     const path = `/block-storage/${encodeURIComponent(params.id)}`
@@ -10210,7 +10731,7 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * Return logs for the vLLM deployment (deploy/<release-name>--deployment-vllm). Optional ?stream=true to request streaming (may not be supported).
+   * Return logs for the vLLM deployment (dedicated inference: deploy/<release-name>--deployment-vllm; llm-d: deploy/<release-name>-vllm). Optional ?stream=true to request streaming (may not be supported).
    *
    * Errors:
    *
@@ -10274,11 +10795,24 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * [DEPRECATED] use get-impact-report endpoint
+   * [REMOVED] This endpoint is no longer available: it always returns 410 Gone with a message. Use get-impact-report endpoint instead.
+   *
+   * Errors:
+   *
+   * **410**
+   * 410
    */
-  getEnvImpact(params: GetEnvImpactRequest): Promise<EnvImpactReport> {
+  getEnvImpact(params: GetEnvImpactRequest): Promise<void> {
     const path = `/env-impact/${encodeURIComponent(params.period)}`
-    return this.core.request('GET', path, { decode: fromWireEnvImpactReport })
+    return this.core.request('GET', path)
+  }
+
+  /**
+   * [BETA] Returns a presigned URL for the organization's focus report for the period
+   */
+  getFocusReport(params: GetFocusReportRequest): Promise<FocusReport> {
+    const path = `/focus-report/${encodeURIComponent(params.period)}`
+    return this.core.request('GET', path, { decode: fromWireFocusReport })
   }
 
   /**
@@ -10293,7 +10827,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Retrieve IAM Role
    *
-   * @see https://community.exoscale.com/product/iam/operation/role-mgmt/ Read more
+   * @see https://community.exoscale.com/product/security/iam/how-to/role-mgmt/ Read more
    */
   getIAMRole(params: GetIAMRoleRequest): Promise<IAMRole> {
     const path = `/iam-role/${encodeURIComponent(params.id)}`
@@ -10306,12 +10840,12 @@ export abstract class GeneratedExoscaleClient {
    * Errors:
    *
    * **400**
-   * Invalid request (e.g. product does not exist)
+   * Invalid request (e.g. malformed SKU)
    *
    * **500**
    * Internal server error
    *
-   * @see https://www.exoscale.com/sustainability/ Read more
+   * @see https://community.exoscale.com/platform/environmental-impact/ Read more
    */
   getImpactEstimate(params: GetImpactEstimateRequest): Promise<GetImpactEstimateResponse> {
     const body = toWireGetImpactEstimateRequest(params)
@@ -10332,7 +10866,7 @@ export abstract class GeneratedExoscaleClient {
    * **500**
    * Internal server error
    *
-   * @see https://www.exoscale.com/sustainability/ Read more
+   * @see https://community.exoscale.com/platform/environmental-impact/ Read more
    */
   getImpactReport(params?: GetImpactReportRequest): Promise<ImpactBreakdown> {
     const query: Record<string, string> = {}
@@ -10373,7 +10907,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Retrieve Instance Pool details
    *
-   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
+   * @see https://community.exoscale.com/product/compute/instances/how-to/instance-pools/ Read more
    */
   getInstancePool(params: GetInstancePoolRequest): Promise<InstancePool> {
     const path = `/instance-pool/${encodeURIComponent(params.id)}`
@@ -10391,16 +10925,33 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
+   * Fetch an External Key Store including its latest XKS health observation when available.
+   *
+   * Errors:
+   *
+   * **400**
+   * Errors
+   *
+   * Not Found: The request was rejected because no key store with the given id exists in the organization.
+   *
+   * Bad Request: The request was rejected because of an invalid path parameter.
+   */
+  getKeyStore(params: GetKeyStoreRequest): Promise<GetKeyStoreResponse> {
+    const path = `/key-store/${encodeURIComponent(params.id)}`
+    return this.core.request('GET', path, { decode: fromWireGetKeyStoreResponse })
+  }
+
+  /**
    * Retrieve KMS Key details.
    *
    * Errors:
    *
    * **400**
-   * ### Errors
+   * Errors
    *
    * Key Not Found: The request was rejected because the specified KMS Key could not be found.
    *
-   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   * @see https://community.exoscale.com/product/security/kms/overview/ Read more
    */
   getKmsKey(params: GetKmsKeyRequest): Promise<GetKmsKeyResponse> {
     const path = `/kms-key/${encodeURIComponent(params.id)}`
@@ -10422,7 +10973,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Retrieve Load Balancer details
    *
-   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
+   * @see https://community.exoscale.com/product/networking/nlb/ Read more
    */
   getLoadBalancer(params: GetLoadBalancerRequest): Promise<LoadBalancer> {
     const path = `/load-balancer/${encodeURIComponent(params.id)}`
@@ -10432,7 +10983,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Retrieve Load Balancer Service details
    *
-   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
+   * @see https://community.exoscale.com/product/networking/nlb/ Read more
    */
   getLoadBalancerService(params: GetLoadBalancerServiceRequest): Promise<LoadBalancerService> {
     const path = `/load-balancer/${encodeURIComponent(params.id)}/service/${encodeURIComponent(params.serviceID)}`
@@ -10472,13 +11023,34 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * Retrieve Private Network details
+   * Private Networks are deprecated in favor of VPC.
    *
    * @see https://community.exoscale.com/product/networking/private-network/ Read more
    */
   getPrivateNetwork(params: GetPrivateNetworkRequest): Promise<PrivateNetwork> {
     const path = `/private-network/${encodeURIComponent(params.id)}`
     return this.core.request('GET', path, { decode: fromWirePrivateNetwork })
+  }
+
+  /**
+   * Retrieve the public key material of an asymmetric KMS key.
+   *
+   * Errors:
+   *
+   * **400**
+   * Errors
+   *
+   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
+   *
+   * Key is Disabled: The request was rejected because the specified KMS Key is disabled (or pending deletion).
+   *
+   * Invalid Usage: The request was rejected because the specified KMS Key does not have public key material (its key-spec is symmetric).
+   *
+   * @see https://community.exoscale.com/product/security/kms/overview/ Read more
+   */
+  getPublicKey(params: GetPublicKeyRequest): Promise<GetPublicKeyResponse> {
+    const path = `/kms-key/${encodeURIComponent(params.id)}/get-public-key`
+    return this.core.request('GET', path, { decode: fromWireGetPublicKeyResponse })
   }
 
   /**
@@ -10512,7 +11084,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Retrieve Security Group details
    *
-   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
+   * @see https://community.exoscale.com/product/networking/security-group/ Read more
    */
   getSecurityGroup(params: GetSecurityGroupRequest): Promise<SecurityGroup> {
     const path = `/security-group/${encodeURIComponent(params.id)}`
@@ -10522,7 +11094,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Retrieve SKS cluster details
    *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
+   * @see https://community.exoscale.com/product/compute/containers/ Read more
    */
   getSKSCluster(params: GetSKSClusterRequest): Promise<SKSCluster> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}`
@@ -10532,7 +11104,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * This operation returns the certificate for the given SKS cluster authority encoded in base64.
    *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
+   * @see https://community.exoscale.com/product/compute/containers/ Read more
    */
   getSKSClusterAuthorityCert(
     params: GetSKSClusterAuthorityCertRequest,
@@ -10544,7 +11116,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Helps troubleshoot common problems when deploying a kubernetes cluster. Inspections run every couple of minutes.
    *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
+   * @see https://community.exoscale.com/product/compute/containers/ Read more
    */
   getSKSClusterInspection(
     params: GetSKSClusterInspectionRequest,
@@ -10556,7 +11128,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Retrieve SKS Nodepool details
    *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
+   * @see https://community.exoscale.com/product/compute/containers/ Read more
    */
   getSKSNodepool(params: GetSKSNodepoolRequest): Promise<SKSNodepool> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}/nodepool/${encodeURIComponent(params.sksNodepoolID)}`
@@ -10566,7 +11138,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Retrieve Snapshot details
    *
-   * @see https://community.exoscale.com/documentation/compute/snapshots/ Read more
+   * @see https://community.exoscale.com/product/compute/instances/how-to/snapshot/ Read more
    */
   getSnapshot(params: GetSnapshotRequest): Promise<Snapshot> {
     const path = `/snapshot/${encodeURIComponent(params.id)}`
@@ -10588,7 +11160,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Retrieve SSH key details
    *
-   * @see https://community.exoscale.com/documentation/compute/ssh-keypairs/ Read more
+   * @see https://community.exoscale.com/product/compute/instances/how-to/ssh-keypairs/ Read more
    */
   getSSHKey(params: GetSSHKeyRequest): Promise<SSHKey> {
     const path = `/ssh-key/${encodeURIComponent(params.name)}`
@@ -10596,7 +11168,7 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * [BETA] Retrieve Subnet details
+   * Retrieve Subnet details
    *
    * @see https://community.exoscale.com/product/networking/vpc Read more
    */
@@ -10642,7 +11214,7 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * [BETA] Retrieve VPC details
+   * Retrieve VPC details
    *
    * @see https://community.exoscale.com/product/networking/vpc Read more
    */
@@ -10690,7 +11262,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * List API keys
    *
-   * @see https://community.exoscale.com/product/iam/how-to/key-mgmt/ Read more
+   * @see https://community.exoscale.com/product/security/iam/how-to/key-mgmt/ Read more
    */
   listAPIKeys(): Promise<ListAPIKeysResponse> {
     return this.core.request('GET', '/api-key', { decode: fromWireListAPIKeysResponse })
@@ -10699,7 +11271,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * List block storage snapshots
    *
-   * @see https://community.exoscale.com/documentation/block-storage/ Read more
+   * @see https://community.exoscale.com/product/storage/block-storage/ Read more
    */
   listBlockStorageSnapshots(): Promise<ListBlockStorageSnapshotsResponse> {
     return this.core.request('GET', '/block-storage-snapshot', {
@@ -10710,7 +11282,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * List block storage volumes
    *
-   * @see https://community.exoscale.com/documentation/block-storage/ Read more
+   * @see https://community.exoscale.com/product/storage/block-storage/ Read more
    */
   listBlockStorageVolumes(
     params?: ListBlockStorageVolumesRequest,
@@ -10849,13 +11421,8 @@ export abstract class GeneratedExoscaleClient {
    *
    * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
    */
-  listDeployments(params?: ListDeploymentsRequest): Promise<ListDeploymentsResponse> {
-    const query: Record<string, string> = {}
-    if (params?.visibility !== undefined) query['visibility'] = params?.visibility
-    return this.core.request('GET', '/ai/deployment', {
-      query,
-      decode: fromWireListDeploymentsResponse,
-    })
+  listDeployments(): Promise<ListDeploymentsResponse> {
+    return this.core.request('GET', '/ai/deployment', { decode: fromWireListDeploymentsResponse })
   }
 
   /**
@@ -10889,7 +11456,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Retrieve Mutation Events for a given date range. Defaults to retrieving Events for the past 24 hours.
    *          Both a `from` and `to` arguments can be specified to filter Events over a specific period.
-   *          Events will be the the most descriptive possible but not all fields are mandatory
+   *          Events will be the most descriptive possible but not all fields are mandatory
    *
    * @see https://community.exoscale.com/platform/audit-trail/ Read more
    */
@@ -10906,16 +11473,27 @@ export abstract class GeneratedExoscaleClient {
   /**
    * List IAM Roles
    *
-   * @see https://community.exoscale.com/product/iam/operation/role-mgmt/ Read more
+   * @see https://community.exoscale.com/product/security/iam/how-to/role-mgmt/ Read more
    */
   listIAMRoles(): Promise<ListIAMRolesResponse> {
     return this.core.request('GET', '/iam-role', { decode: fromWireListIAMRolesResponse })
   }
 
   /**
+   * List IAM System Roles
+   *
+   * @see https://community.exoscale.com/product/security/iam/how-to/role-mgmt/ Read more
+   */
+  listIAMSystemRoles(): Promise<ListIAMSystemRolesResponse> {
+    return this.core.request('GET', '/iam-system-role', {
+      decode: fromWireListIAMSystemRolesResponse,
+    })
+  }
+
+  /**
    * List Instance Pools
    *
-   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
+   * @see https://community.exoscale.com/product/compute/instances/how-to/instance-pools/ Read more
    */
   listInstancePools(): Promise<ListInstancePoolsResponse> {
     return this.core.request('GET', '/instance-pool', { decode: fromWireListInstancePoolsResponse })
@@ -10945,16 +11523,30 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
+   * Lists all key stores configured for an organization.
+   *
+   * Errors:
+   *
+   * **400**
+   * Errors
+   *
+   * Bad Request: The request was rejected because of an invalid path parameter.
+   */
+  listKeyStores(): Promise<ListKeyStoresResponse> {
+    return this.core.request('GET', '/key-store', { decode: fromWireListKeyStoresResponse })
+  }
+
+  /**
    * List all the key material versions of a KMS Key.
    *
    * Errors:
    *
    * **400**
-   * ### Errors
+   * Errors
    *
    * Key Not Found: The request was rejected because the specified KMS Key could not be found.
    *
-   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   * @see https://community.exoscale.com/product/security/kms/overview/ Read more
    */
   listKmsKeyRotations(params: ListKmsKeyRotationsRequest): Promise<ListKmsKeyRotationsResponse> {
     const path = `/kms-key/${encodeURIComponent(params.id)}/list-key-rotations`
@@ -10967,11 +11559,11 @@ export abstract class GeneratedExoscaleClient {
    * Errors:
    *
    * **400**
-   * ### Errors
+   * Errors
    *
    * Bad Request: The request was rejected because of an invalid request body or path parameter.
    *
-   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   * @see https://community.exoscale.com/product/security/kms/overview/ Read more
    */
   listKmsKeys(): Promise<ListKmsKeysResponse> {
     return this.core.request('GET', '/kms-key', { decode: fromWireListKmsKeysResponse })
@@ -10980,7 +11572,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * List Load Balancers
    *
-   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
+   * @see https://community.exoscale.com/product/networking/nlb/ Read more
    */
   listLoadBalancers(): Promise<ListLoadBalancersResponse> {
     return this.core.request('GET', '/load-balancer', { decode: fromWireListLoadBalancersResponse })
@@ -10991,12 +11583,14 @@ export abstract class GeneratedExoscaleClient {
    *
    * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
    */
-  listModels(): Promise<ListModelsResponse> {
-    return this.core.request('GET', '/ai/model', { decode: fromWireListModelsResponse })
+  listModels(params?: ListModelsRequest): Promise<ListModelsResponse> {
+    const query: Record<string, string> = {}
+    if (params?.visibility !== undefined) query['visibility'] = params?.visibility
+    return this.core.request('GET', '/ai/model', { query, decode: fromWireListModelsResponse })
   }
 
   /**
-   * List Private Networks
+   * Private Networks are deprecated in favor of VPC.
    *
    * @see https://community.exoscale.com/product/networking/private-network/ Read more
    */
@@ -11014,7 +11608,7 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * [BETA] List Subnet routes
+   * List Subnet routes
    *
    * @see https://community.exoscale.com/product/networking/vpc Read more
    */
@@ -11029,7 +11623,7 @@ export abstract class GeneratedExoscaleClient {
    * relevant services hosted by Exoscale. They can be used a source in ingress rules and as a destination
    * in egress rules.
    *
-   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
+   * @see https://community.exoscale.com/product/networking/security-group/ Read more
    */
   listSecurityGroups(params?: ListSecurityGroupsRequest): Promise<ListSecurityGroupsResponse> {
     const query: Record<string, string> = {}
@@ -11043,7 +11637,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * This operation returns the deprecated resources for a given cluster
    *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
+   * @see https://community.exoscale.com/product/compute/containers/ Read more
    */
   listSKSClusterDeprecatedResources(
     params: ListSKSClusterDeprecatedResourcesRequest,
@@ -11057,7 +11651,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * List available versions for SKS clusters
    *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
+   * @see https://community.exoscale.com/product/compute/containers/ Read more
    */
   listSKSClusterVersions(
     params?: ListSKSClusterVersionsRequest,
@@ -11074,16 +11668,33 @@ export abstract class GeneratedExoscaleClient {
   /**
    * List SKS clusters
    *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
+   * @see https://community.exoscale.com/product/compute/containers/ Read more
    */
   listSKSClusters(): Promise<ListSKSClustersResponse> {
     return this.core.request('GET', '/sks-cluster', { decode: fromWireListSKSClustersResponse })
   }
 
   /**
+   * List the available templates for a given kube version (major.minor or major.minor.patch), of the given variant (standard | nvidia) when provided, latest first
+   *
+   * @see https://community.exoscale.com/product/compute/containers/ Read more
+   */
+  listSKSNodepoolTemplates(
+    params: ListSKSNodepoolTemplatesRequest,
+  ): Promise<ListSKSNodepoolTemplatesResponse> {
+    const path = `/sks-template/${encodeURIComponent(params.kubeVersion)}`
+    const query: Record<string, string> = {}
+    if (params.variant !== undefined) query['variant'] = params.variant
+    return this.core.request('GET', path, {
+      query,
+      decode: fromWireListSKSNodepoolTemplatesResponse,
+    })
+  }
+
+  /**
    * List Snapshots
    *
-   * @see https://community.exoscale.com/documentation/compute/snapshots/ Read more
+   * @see https://community.exoscale.com/product/compute/instances/how-to/snapshot/ Read more
    */
   listSnapshots(): Promise<ListSnapshotsResponse> {
     return this.core.request('GET', '/snapshot', { decode: fromWireListSnapshotsResponse })
@@ -11103,14 +11714,14 @@ export abstract class GeneratedExoscaleClient {
   /**
    * List SSH keys
    *
-   * @see https://community.exoscale.com/documentation/compute/ssh-keypairs/ Read more
+   * @see https://community.exoscale.com/product/compute/instances/how-to/ssh-keypairs/ Read more
    */
   listSSHKeys(): Promise<ListSSHKeysResponse> {
     return this.core.request('GET', '/ssh-key', { decode: fromWireListSSHKeysResponse })
   }
 
   /**
-   * [BETA] List Subnets
+   * List Subnets
    *
    * @see https://community.exoscale.com/product/networking/vpc Read more
    */
@@ -11134,14 +11745,14 @@ export abstract class GeneratedExoscaleClient {
   /**
    * List Users
    *
-   * @see https://community.exoscale.com/product/iam/operation/users-keys/ Read more
+   * @see https://community.exoscale.com/product/security/iam/how-to/users-keys/ Read more
    */
   listUsers(): Promise<ListUsersResponse> {
     return this.core.request('GET', '/user', { decode: fromWireListUsersResponse })
   }
 
   /**
-   * [BETA] List VPC routes
+   * List VPC routes
    *
    * @see https://community.exoscale.com/product/networking/vpc Read more
    */
@@ -11151,7 +11762,7 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * [BETA] List VPCs
+   * List VPCs
    *
    * @see https://community.exoscale.com/product/networking/vpc Read more
    */
@@ -11171,7 +11782,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Promote a Snapshot to a Template
    *
-   * @see https://community.exoscale.com/documentation/compute/snapshots/ Read more
+   * @see https://community.exoscale.com/product/compute/instances/how-to/snapshot/ Read more
    * @see https://www.exoscale.com/templates/ Read more
    */
   promoteSnapshotToTemplate(params: PromoteSnapshotToTemplateRequest): Promise<Operation> {
@@ -11181,12 +11792,12 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * Decrypts an existing ciphertext using its original key material and re-encrypts the underlying plaintext using a specified KMS key or the latest key material of the same KMS Key.
+   * Decrypts an existing ciphertext using its original key material and re-encrypts the underlying plaintext using a specified KMS key or the latest key material of the same KMS Key. Source and destination keys must belong to the same key family. IAM policies are evaluated for both the source and the destination key.
    *
    * Errors:
    *
    * **400**
-   * ### Errors
+   * Errors
    *
    * Key Not Found: The request was rejected because the specified KMS Key could not be found.
    *
@@ -11194,9 +11805,23 @@ export abstract class GeneratedExoscaleClient {
    *
    * Not on Default: The request was rejected because the operation is not allowed on the default key.
    *
+   * Invalid Usage: The request was rejected because the operation is not allowed for this key's usage.
+   *
+   * Invalid Algorithm: The request was rejected because the specified encryption algorithm does not match the key's cryptographic profile.
+   *
+   * Key Family Mismatch: The request was rejected because the source and destination keys do not belong to the same key family.
+   *
+   * Invalid Ciphertext: The request was rejected because the source ciphertext is malformed, was not produced by the source KMS Key, or could not be authenticated (for example, because of a mismatched encryption context).
+   *
+   * [BETA] Key Store Not Found: The request was rejected because the external key store of the source or destination KMS Key could not be found.
+   *
+   * [BETA] Key Store Disconnected: The request was rejected because the external key store of the source or destination KMS Key is disconnected.
+   *
+   * [BETA] Key Store Proxy Request Failed: The request was rejected because the request to the external key store proxy failed.
+   *
    * Bad Request: The request was rejected because of an invalid request body or path parameter.
    *
-   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   * @see https://community.exoscale.com/product/security/kms/overview/ Read more
    */
   reEncrypt(
     params: ReEncryptRequest & {
@@ -11221,7 +11846,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Import SSH key
    *
-   * @see https://community.exoscale.com/documentation/compute/ssh-keypairs/ Read more
+   * @see https://community.exoscale.com/product/compute/instances/how-to/ssh-keypairs/ Read more
    */
   registerSSHKey(params: RegisterSSHKeyRequest): Promise<Operation> {
     const body = toWireRegisterSSHKeyRequest(params)
@@ -11241,7 +11866,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Remove an external source from a Security Group
    *
-   * @see https://community.exoscale.com/documentation/compute/security-groups/ Read more
+   * @see https://community.exoscale.com/product/networking/security-group/ Read more
    */
   removeExternalSourceFromSecurityGroup(
     params: RemoveExternalSourceFromSecurityGroupRequest,
@@ -11267,7 +11892,7 @@ export abstract class GeneratedExoscaleClient {
    * Errors:
    *
    * **400**
-   * ### Errors
+   * Errors
    *
    * Key Not Found: The request was rejected because the specified KMS Key could not be found.
    *
@@ -11281,7 +11906,7 @@ export abstract class GeneratedExoscaleClient {
    *
    * Invalid Argument: The request was rejected because the target zone is invalid.
    *
-   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   * @see https://community.exoscale.com/product/security/kms/overview/ Read more
    */
   replicateKmsKey(
     params: ReplicateKmsKeyRequest & {
@@ -11431,7 +12056,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Reset an Instance Pool field to its default value
    *
-   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
+   * @see https://community.exoscale.com/product/compute/instances/how-to/instance-pools/ Read more
    */
   resetInstancePoolField(params: ResetInstancePoolFieldRequest): Promise<Operation> {
     const path = `/instance-pool/${encodeURIComponent(params.id)}/${encodeURIComponent(params.field)}`
@@ -11441,7 +12066,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Reset a Load Balancer field to its default value
    *
-   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
+   * @see https://community.exoscale.com/product/networking/nlb/ Read more
    */
   resetLoadBalancerField(params: ResetLoadBalancerFieldRequest): Promise<Operation> {
     const path = `/load-balancer/${encodeURIComponent(params.id)}/${encodeURIComponent(params.field)}`
@@ -11451,8 +12076,8 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Reset a Load Balancer Service field to its default value
    *
-   * @see https://community.exoscale.com/documentation/compute/ Read more
-   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
+   * @see https://community.exoscale.com/product/compute/ Read more
+   * @see https://community.exoscale.com/product/networking/nlb/ Read more
    */
   resetLoadBalancerServiceField(params: ResetLoadBalancerServiceFieldRequest): Promise<Operation> {
     const path = `/load-balancer/${encodeURIComponent(params.id)}/service/${encodeURIComponent(params.serviceID)}/${encodeURIComponent(params.field)}`
@@ -11460,7 +12085,7 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * Reset Private Network field
+   * Private Networks are deprecated in favor of VPC.
    *
    * @see https://community.exoscale.com/product/networking/private-network/ Read more
    */
@@ -11472,7 +12097,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * This operation resizes a Block storage volume. Note: the volume can only grow, cannot be shrunk. Only detached volumes or volumes attached to stopped instances can be resized.
    *
-   * @see https://community.exoscale.com/documentation/block-storage/ Read more
+   * @see https://community.exoscale.com/product/storage/block-storage/ Read more
    */
   resizeBlockStorageVolume(params: ResizeBlockStorageVolumeRequest): Promise<BlockStorageVolume> {
     const path = `/block-storage/${encodeURIComponent(params.id)}:resize-volume`
@@ -11600,23 +12225,6 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * Get Deployment API Key
-   *
-   * Errors:
-   *
-   * **404**
-   * Not Found
-   *
-   * @see https://www.exoscale.com/ai-cloud-infrastructure/dedicated-inference/ Read more
-   */
-  revealDeploymentAPIKey(
-    params: RevealDeploymentAPIKeyRequest,
-  ): Promise<RevealDeploymentAPIKeyResponse> {
-    const path = `/ai/deployment/${encodeURIComponent(params.id)}/api-key`
-    return this.core.request('GET', path, { decode: fromWireRevealDeploymentAPIKeyResponse })
-  }
-
-  /**
    * Reveal the password used during instance creation or the latest password reset.
    *             This is only available for VMs created against templates having the `password-enabled`
    *             property set to `true`.
@@ -11644,12 +12252,33 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
+   * Revoke an AI API key. Key will be deleted after 30 days of retention
+   *
+   * Errors:
+   *
+   * **403**
+   * Forbidden
+   *
+   * **404**
+   * Not Found
+   *
+   * **500**
+   * Internal Server Error
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/managed-inference/ Read more
+   */
+  revokeAIAPIKey(params: RevokeAIAPIKeyRequest): Promise<Operation> {
+    const path = `/ai/api-key/${encodeURIComponent(params.id)}/revoke`
+    return this.core.request('POST', path, { decode: fromWireOperation })
+  }
+
+  /**
    * Performs an immediate rotation of the key material for a symmetric key.
    *
    * Errors:
    *
    * **400**
-   * ### Errors
+   * Errors
    *
    * Key Not Found: The request was rejected because the specified KMS Key could not be found.
    *
@@ -11663,7 +12292,7 @@ export abstract class GeneratedExoscaleClient {
    *
    * Manual Rotation Limit: The request was rejected because you reached your limit of 10 manual rotations per key for this KMS key.
    *
-   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   * @see https://community.exoscale.com/product/security/kms/overview/ Read more
    */
   rotateKmsKey(params: RotateKmsKeyRequest): Promise<RotateKmsKeyResponse> {
     const path = `/kms-key/${encodeURIComponent(params.id)}/rotate`
@@ -11673,7 +12302,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Rotate Exoscale CCM credentials
    *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
+   * @see https://community.exoscale.com/product/compute/containers/ Read more
    */
   rotateSKSCcmCredentials(params: RotateSKSCcmCredentialsRequest): Promise<Operation> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}/rotate-ccm-credentials`
@@ -11683,7 +12312,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Rotate Exoscale CSI credentials
    *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
+   * @see https://community.exoscale.com/product/compute/containers/ Read more
    */
   rotateSKSCsiCredentials(params: RotateSKSCsiCredentialsRequest): Promise<Operation> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}/rotate-csi-credentials`
@@ -11693,7 +12322,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Rotate Exoscale Karpenter credentials
    *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
+   * @see https://community.exoscale.com/product/compute/containers/ Read more
    */
   rotateSKSKarpenterCredentials(params: RotateSKSKarpenterCredentialsRequest): Promise<Operation> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}/rotate-karpenter-credentials`
@@ -11703,7 +12332,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Rotate operators certificate authority
    *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
+   * @see https://community.exoscale.com/product/compute/containers/ Read more
    */
   rotateSKSOperatorsCA(params: RotateSKSOperatorsCARequest): Promise<Operation> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}/rotate-operators-ca`
@@ -11753,7 +12382,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Scale an Instance Pool
    *
-   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
+   * @see https://community.exoscale.com/product/compute/instances/how-to/instance-pools/ Read more
    */
   scaleInstancePool(params: ScaleInstancePoolRequest): Promise<Operation> {
     const path = `/instance-pool/${encodeURIComponent(params.id)}:scale`
@@ -11764,7 +12393,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Scale a SKS Nodepool
    *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
+   * @see https://community.exoscale.com/product/compute/containers/ Read more
    */
   scaleSKSNodepool(params: ScaleSKSNodepoolRequest): Promise<Operation> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}/nodepool/${encodeURIComponent(params.sksNodepoolID)}:scale`
@@ -11778,7 +12407,7 @@ export abstract class GeneratedExoscaleClient {
    * Errors:
    *
    * **400**
-   * ### Errors
+   * Errors
    *
    * Key Not Found: The request was rejected because the specified KMS Key could not be found.
    *
@@ -11788,7 +12417,7 @@ export abstract class GeneratedExoscaleClient {
    *
    * Bad Request: The request was rejected because of an invalid request body or path parameter.
    *
-   * @see https://community.exoscale.com/documentation/security/kms/overview Read more
+   * @see https://community.exoscale.com/product/security/kms/overview/ Read more
    */
   scheduleKmsKeyDeletion(
     params: ScheduleKmsKeyDeletionRequest & {
@@ -11798,6 +12427,34 @@ export abstract class GeneratedExoscaleClient {
     const path = `/kms-key/${encodeURIComponent(params.id)}/schedule-deletion`
     const body = toWireScheduleKmsKeyDeletionRequest(params)
     return this.core.request('POST', path, { body, decode: fromWireScheduleKmsKeyDeletionResponse })
+  }
+
+  /**
+   * Signs a message or digest using a KMS key with usage `sign-verify`.
+   *
+   * Errors:
+   *
+   * **400**
+   * Errors
+   *
+   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
+   *
+   * Key is Disabled: The request was rejected because the specified KMS Key is disabled (or pending deletion).
+   *
+   * Invalid Usage: The request was rejected because the operation is only allowed on keys with usage "sign-verify".
+   *
+   * Invalid Argument: The request was rejected because `message-type`, `message`, or `signing-algorithm` is invalid.
+   *
+   * @see https://community.exoscale.com/product/security/kms/overview/ Read more
+   */
+  sign(
+    params: SignRequest & {
+      id: string
+    },
+  ): Promise<SignResponse> {
+    const path = `/kms-key/${encodeURIComponent(params.id)}/sign`
+    const body = toWireSignRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireSignResponse })
   }
 
   /**
@@ -11936,9 +12593,35 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
+   * Update the models and deployments accessible by an AI API key.
+   *
+   * Errors:
+   *
+   * **400**
+   * Bad Request
+   *
+   * **403**
+   * Forbidden
+   *
+   * **404**
+   * Not Found
+   *
+   * @see https://www.exoscale.com/ai-cloud-infrastructure/managed-inference/ Read more
+   */
+  updateAIAPIKey(
+    params: UpdateAIAPIKeyRequest & {
+      id: string
+    },
+  ): Promise<UpdateAIAPIKeyResponse> {
+    const path = `/ai/api-key/${encodeURIComponent(params.id)}`
+    const body = toWireUpdateAIAPIKeyRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireUpdateAIAPIKeyResponse })
+  }
+
+  /**
    * Update block storage volume snapshot
    *
-   * @see https://community.exoscale.com/documentation/block-storage/ Read more
+   * @see https://community.exoscale.com/product/storage/block-storage/ Read more
    */
   updateBlockStorageSnapshot(params: UpdateBlockStorageSnapshotRequest): Promise<Operation> {
     const path = `/block-storage-snapshot/${encodeURIComponent(params.id)}`
@@ -11949,7 +12632,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Update block storage volume
    *
-   * @see https://community.exoscale.com/documentation/block-storage/ Read more
+   * @see https://community.exoscale.com/product/storage/block-storage/ Read more
    */
   updateBlockStorageVolume(params: UpdateBlockStorageVolumeRequest): Promise<Operation> {
     const path = `/block-storage/${encodeURIComponent(params.id)}`
@@ -12046,7 +12729,7 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * [BETA] Update a existing DBaaS integration
+   * [BETA] Update an existing DBaaS integration
    *
    * @see https://community.exoscale.com/product/dbaas/ Read more
    */
@@ -12260,7 +12943,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Update IAM Role
    *
-   * @see https://community.exoscale.com/product/iam/operation/role-mgmt/ Read more
+   * @see https://community.exoscale.com/product/security/iam/how-to/role-mgmt/ Read more
    */
   updateIAMRole(params: UpdateIAMRoleRequest): Promise<Operation> {
     const path = `/iam-role/${encodeURIComponent(params.id)}`
@@ -12271,7 +12954,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Update IAM Role Policy
    *
-   * @see https://community.exoscale.com/product/iam/operation/role-mgmt/ Read more
+   * @see https://community.exoscale.com/product/security/iam/how-to/role-mgmt/ Read more
    */
   updateIAMRolePolicy(
     params: IAMPolicy & {
@@ -12297,7 +12980,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Update an Instance Pool
    *
-   * @see https://community.exoscale.com/documentation/compute/instance-pools/ Read more
+   * @see https://community.exoscale.com/product/compute/instances/how-to/instance-pools/ Read more
    */
   updateInstancePool(params: UpdateInstancePoolRequest): Promise<Operation> {
     const path = `/instance-pool/${encodeURIComponent(params.id)}`
@@ -12306,9 +12989,33 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
+   * Updates an External Key Store with a new description, endpoint, or credentials.
+   *
+   * Errors:
+   *
+   * **400**
+   * Errors
+   *
+   * Not Found: The request was rejected because no key store with the given id exists in the organization.
+   *
+   * Bad Request: The request was rejected because of an invalid path parameter.
+   *
+   * Conflict: The request was rejected because the key store was concurrently modified. Retry with the latest state.
+   */
+  updateKeyStore(
+    params: UpdateKeyStoreRequest & {
+      id: string
+    },
+  ): Promise<GetKeyStoreResponse> {
+    const path = `/key-store/${encodeURIComponent(params.id)}/update`
+    const body = toWireUpdateKeyStoreRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireGetKeyStoreResponse })
+  }
+
+  /**
    * Update a Load Balancer
    *
-   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
+   * @see https://community.exoscale.com/product/networking/nlb/ Read more
    */
   updateLoadBalancer(params: UpdateLoadBalancerRequest): Promise<Operation> {
     const path = `/load-balancer/${encodeURIComponent(params.id)}`
@@ -12319,7 +13026,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Update a Load Balancer Service
    *
-   * @see https://community.exoscale.com/documentation/compute/network-load-balancer/ Read more
+   * @see https://community.exoscale.com/product/networking/nlb/ Read more
    */
   updateLoadBalancerService(params: UpdateLoadBalancerServiceRequest): Promise<Operation> {
     const path = `/load-balancer/${encodeURIComponent(params.id)}/service/${encodeURIComponent(params.serviceID)}`
@@ -12328,7 +13035,7 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * Update a Private Network
+   * Private Networks are deprecated in favor of VPC.
    *
    * @see https://community.exoscale.com/product/networking/private-network/ Read more
    */
@@ -12339,7 +13046,7 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * Update the IP address of an instance attached to a managed private network
+   * Private Networks are deprecated in favor of VPC.
    *
    * @see https://community.exoscale.com/product/networking/private-network/ Read more
    */
@@ -12374,9 +13081,20 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
+   * Update a Security Group
+   *
+   * @see https://community.exoscale.com/product/networking/security-group/ Read more
+   */
+  updateSecurityGroup(params: UpdateSecurityGroupRequest): Promise<Operation> {
+    const path = `/security-group/${encodeURIComponent(params.id)}`
+    const body = toWireUpdateSecurityGroupRequest(params)
+    return this.core.request('PUT', path, { body, decode: fromWireOperation })
+  }
+
+  /**
    * Update an SKS cluster
    *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
+   * @see https://community.exoscale.com/product/compute/containers/ Read more
    */
   updateSKSCluster(params: UpdateSKSClusterRequest): Promise<Operation> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}`
@@ -12387,7 +13105,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Update an SKS Nodepool
    *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
+   * @see https://community.exoscale.com/product/compute/containers/ Read more
    */
   updateSKSNodepool(params: UpdateSKSNodepoolRequest): Promise<Operation> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}/nodepool/${encodeURIComponent(params.sksNodepoolID)}`
@@ -12396,7 +13114,7 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * [BETA] Update a Subnet
+   * Update a Subnet
    *
    * @see https://community.exoscale.com/product/networking/vpc Read more
    */
@@ -12420,7 +13138,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Update a User's IAM role
    *
-   * @see https://community.exoscale.com/product/iam/operation/users-keys/ Read more
+   * @see https://community.exoscale.com/product/security/iam/how-to/users-keys/ Read more
    */
   updateUserRole(params: UpdateUserRoleRequest): Promise<Operation> {
     const path = `/user/${encodeURIComponent(params.id)}`
@@ -12429,7 +13147,7 @@ export abstract class GeneratedExoscaleClient {
   }
 
   /**
-   * [BETA] Update a VPC
+   * Update a VPC
    *
    * @see https://community.exoscale.com/product/networking/vpc Read more
    */
@@ -12442,7 +13160,7 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Upgrade an SKS cluster
    *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
+   * @see https://community.exoscale.com/product/compute/containers/ Read more
    */
   upgradeSKSCluster(params: UpgradeSKSClusterRequest): Promise<Operation> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}/upgrade`
@@ -12453,10 +13171,40 @@ export abstract class GeneratedExoscaleClient {
   /**
    * Upgrade a SKS cluster to pro
    *
-   * @see https://community.exoscale.com/documentation/sks/ Read more
+   * @see https://community.exoscale.com/product/compute/containers/ Read more
    */
   upgradeSKSClusterServiceLevel(params: UpgradeSKSClusterServiceLevelRequest): Promise<Operation> {
     const path = `/sks-cluster/${encodeURIComponent(params.id)}/upgrade-service-level`
     return this.core.request('PUT', path, { decode: fromWireOperation })
+  }
+
+  /**
+   * Verifies a signature against the public key of a KMS key with usage `sign-verify`.
+   *
+   * Errors:
+   *
+   * **400**
+   * Errors
+   *
+   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
+   *
+   * Key is Disabled: The request was rejected because the specified KMS Key is disabled (or pending deletion).
+   *
+   * Invalid Usage: The request was rejected because the operation is only allowed on keys with usage "sign-verify".
+   *
+   * Invalid Argument: The request was rejected because `message-type`, `message`, or `signing-algorithm` is invalid.
+   *
+   * Invalid Signature: The request was rejected because `signature` is not a valid signature for `message` under this key.
+   *
+   * @see https://community.exoscale.com/product/security/kms/overview/ Read more
+   */
+  verify(
+    params: VerifyRequest & {
+      id: string
+    },
+  ): Promise<VerifyResponse> {
+    const path = `/kms-key/${encodeURIComponent(params.id)}/verify`
+    const body = toWireVerifyRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireVerifyResponse })
   }
 }

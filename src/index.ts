@@ -1,6 +1,6 @@
 export * from './generated/schemas.js'
 export * from './generated/operations.js'
-export { ExoscaleClient, ENDPOINTS } from './client.js'
+export { ExoscaleClient } from './client.js'
 export type { ExoscaleClientOptions, OperationState } from './client.js'
 export { ClientCore, isoDateTime, signRequest } from './core.js'
 export type { ClientCoreOptions, RequestOptions } from './core.js'

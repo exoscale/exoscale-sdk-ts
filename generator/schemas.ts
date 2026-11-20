@@ -1,5 +1,6 @@
 // Generates src/generated/schemas.ts: one TS type per OpenAPI component
-// schema, plus the toWire*/fromWire* wire transform functions.
+// schema, plus the toWire*/fromWire* wire transform functions and the
+// ENDPOINTS zone map.
 
 import type { Spec } from './model.js'
 import { toCamel } from './naming.js'
@@ -18,6 +19,28 @@ export function generateSchemas(spec: Spec, registry: TypeRegistry): string {
     const schema = spec.schemas.get(kebab)!
     ctx.out.push(renderNamedType(name, schema, ctx, schema.description ?? schema.title))
   }
+  ctx.out.push(endpointsConst(spec))
 
   return header + ctx.out.join('\n')
+}
+
+// endpointsConst emits ENDPOINTS, mapping every zone in the spec's zone-name
+// enum to its API endpoint (uniform api-<zone>.exoscale.com/v2 host pattern;
+// the spec only carries zone names). The satisfies check keeps the map in
+// lockstep with the generated ZoneName type.
+function endpointsConst(spec: Spec): string {
+  const zone = spec.schemas.get('zone-name')
+  if (zone === undefined || !Array.isArray(zone.enum) || zone.enum.length === 0) {
+    throw new Error('zone-name schema with a non-empty enum not found in spec')
+  }
+  for (const v of zone.enum) {
+    if (typeof v !== 'string')
+      throw new Error(`zone-name enum entry ${JSON.stringify(v)} is not a string`)
+  }
+  const zones = [...zone.enum].sort((a, b) => (a < b ? -1 : 1))
+  const entries = zones.map((z) => `  '${z}': 'https://api-${z}.exoscale.com/v2'`).join(',\n')
+  return (
+    `/** Zone API endpoints, derived from the zone-name spec enum. */\n` +
+    `export const ENDPOINTS = {\n${entries}\n} as const satisfies Record<ZoneName, string>\n`
+  )
 }

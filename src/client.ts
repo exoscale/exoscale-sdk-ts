@@ -4,21 +4,11 @@
 
 import { ClientCore } from './core.js'
 import { GeneratedExoscaleClient } from './generated/operations.js'
-import type { Operation, ZoneName } from './generated/schemas.js'
+import { ENDPOINTS, type Operation } from './generated/schemas.js'
+
+export { ENDPOINTS }
 
 const VERSION = '0.1.0'
-
-/** Zone API endpoints. */
-export const ENDPOINTS = {
-  'ch-gva-2': 'https://api-ch-gva-2.exoscale.com/v2',
-  'ch-dk-2': 'https://api-ch-dk-2.exoscale.com/v2',
-  'de-fra-1': 'https://api-de-fra-1.exoscale.com/v2',
-  'de-muc-1': 'https://api-de-muc-1.exoscale.com/v2',
-  'at-vie-1': 'https://api-at-vie-1.exoscale.com/v2',
-  'at-vie-2': 'https://api-at-vie-2.exoscale.com/v2',
-  'bg-sof-1': 'https://api-bg-sof-1.exoscale.com/v2',
-  'hr-zag-1': 'https://api-hr-zag-1.exoscale.com/v2',
-} as const satisfies Record<ZoneName, string>
 
 export type OperationState = NonNullable<Operation['state']>
 

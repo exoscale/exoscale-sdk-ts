@@ -137,91 +137,50 @@ export function fromWireAccessKeyResource(w: any): AccessKeyResource {
   return v
 }
 
-/**
- * AI API key metadata
- */
-export interface AIAPIKey {
+export interface AIAPIKeyDeploymentRef {
   /**
-   * Creation timestamp
-   *
-   * Read-only
-   */
-  createdAT: Date
-  /**
-   * AI API key ID
-   *
-   * Read-only
+   * Deployment ID
    */
   id: string
-  /**
-   * Human-readable name for the AI API key
-   */
-  name: string
-  /**
-   * Organization UUID that owns this key
-   *
-   * Read-only
-   */
-  orgUuid: string
-  /**
-   * Key scope: 'public' for all deployments, or a specific deployment UUID
-   */
-  scope: string
-  /**
-   * Last update timestamp
-   *
-   * Read-only
-   */
-  updatedAT: Date
 }
 
 /** @internal */
-export function toWireAIAPIKey(v: AIAPIKey): Record<string, unknown> {
+export function toWireAIAPIKeyDeploymentRef(v: AIAPIKeyDeploymentRef): Record<string, unknown> {
   const o: Record<string, unknown> = {}
-  if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
   if (v.id !== undefined) o['id'] = v.id
-  if (v.name !== undefined) o['name'] = v.name
-  if (v.orgUuid !== undefined) o['org-uuid'] = v.orgUuid
-  if (v.scope !== undefined) o['scope'] = v.scope
-  if (v.updatedAT !== undefined) o['updated-at'] = v.updatedAT.toISOString()
   return o
 }
 
 /** @internal */
-export function fromWireAIAPIKey(w: any): AIAPIKey {
-  const v = {} as AIAPIKey
-  v.createdAT = new Date(w['created-at'])
+export function fromWireAIAPIKeyDeploymentRef(w: any): AIAPIKeyDeploymentRef {
+  const v = {} as AIAPIKeyDeploymentRef
   v.id = w['id']
-  v.name = w['name']
-  v.orgUuid = w['org-uuid']
-  v.scope = w['scope']
-  v.updatedAT = new Date(w['updated-at'])
   return v
 }
 
 /**
- * AI API key plaintext value
+ * Allowlist of deployments. An empty array denies access to all deployments. Grant access to all deployments with all-deployments instead.
+ *
+ * Unique items
  */
-export interface AIAPIKeyValue {
-  /**
-   * Plaintext AI API key value
-   */
-  value: string
+export type AIAPIKeyDeployments = AIAPIKeyDeploymentRef[]
+
+/** @internal */
+export function toWireAIAPIKeyDeployments(v: AIAPIKeyDeployments): unknown[] {
+  return v.map((x) => toWireAIAPIKeyDeploymentRef(x))
 }
 
 /** @internal */
-export function toWireAIAPIKeyValue(v: AIAPIKeyValue): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.value !== undefined) o['value'] = v.value
-  return o
+export function fromWireAIAPIKeyDeployments(w: any): AIAPIKeyDeployments {
+  return (w as any[]).map((x) => fromWireAIAPIKeyDeploymentRef(x))
 }
 
-/** @internal */
-export function fromWireAIAPIKeyValue(w: any): AIAPIKeyValue {
-  const v = {} as AIAPIKeyValue
-  v.value = w['value']
-  return v
-}
+/**
+ * Allowlist of public model names. An empty array denies access to all public models. Grant access to all public models with all-models instead.
+ *
+ * Unique items
+ */
+export type AIAPIKeyModels = string[]
 
 /**
  * Anti-affinity Group
@@ -299,37 +258,40 @@ export function fromWireAntiAffinityGroupRef(w: any): AntiAffinityGroupRef {
 }
 
 /**
- * Usage breakdown for one API key, grouped by model
+ * Usage breakdown for one API key, grouped by product-name
  */
 export interface APIKeyUsageEntry {
-  /**
-   * Map of model-uuid to accumulated counters. Keys are model UUIDs.
-   */
-  models: Record<string, ModelUsageCounters>
   /**
    * Organization that owns this API key
    */
   organizationID: string
+  /**
+   * Map of product-name to accumulated counters. Keys are product names.
+   */
+  productNames: Record<string, ModelUsageCounters>
 }
 
 /** @internal */
 export function toWireAPIKeyUsageEntry(v: APIKeyUsageEntry): Record<string, unknown> {
   const o: Record<string, unknown> = {}
-  if (v.models !== undefined)
-    o['models'] = Object.fromEntries(
-      Object.entries(v.models).map(([k, val]) => [k, toWireModelUsageCounters(val)]),
-    )
   if (v.organizationID !== undefined) o['organization-id'] = v.organizationID
+  if (v.productNames !== undefined)
+    o['product-names'] = Object.fromEntries(
+      Object.entries(v.productNames).map(([k, val]) => [k, toWireModelUsageCounters(val)]),
+    )
   return o
 }
 
 /** @internal */
 export function fromWireAPIKeyUsageEntry(w: any): APIKeyUsageEntry {
   const v = {} as APIKeyUsageEntry
-  v.models = Object.fromEntries(
-    Object.entries(w['models'] ?? {}).map(([k, val]) => [k, fromWireModelUsageCounters(val)]),
-  )
   v.organizationID = w['organization-id']
+  v.productNames = Object.fromEntries(
+    Object.entries(w['product-names'] ?? {}).map(([k, val]) => [
+      k,
+      fromWireModelUsageCounters(val),
+    ]),
+  )
   return v
 }
 
@@ -577,34 +539,88 @@ export function fromWireBlockStorageVolumeRef(w: any): BlockStorageVolumeRef {
 }
 
 /**
- * Request to create a new AI API key
+ * CPU manager (kubelet settings)
+ */
+export interface CPUManager {
+  /**
+   * CPU management policy used by the kubelet. The "static" policy grants exclusive CPUs to Guaranteed pods requesting integer CPU limits. When set to "static", a cpu value must be set in the Nodepool kube-reserved or system-reserved
+   */
+  policy?: 'none' | 'static'
+  /**
+   * CPU manager policy options used by the kubelet. They refine the behavior of the "static" policy and are only valid when the policy is "static"
+   *
+   * Unique items
+   */
+  policyOptions?: string[]
+  /**
+   * CPU manager reconcile period used by the kubelet, as a duration string (for example "10s").
+   */
+  reconcilePeriod?: string
+}
+
+/** @internal */
+export function toWireCPUManager(v: CPUManager): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.policy !== undefined) o['policy'] = v.policy
+  if (v.policyOptions !== undefined) o['policy-options'] = v.policyOptions
+  if (v.reconcilePeriod !== undefined) o['reconcile-period'] = v.reconcilePeriod
+  return o
+}
+
+/** @internal */
+export function fromWireCPUManager(w: any): CPUManager {
+  const v = {} as CPUManager
+  if (w['policy'] !== undefined) v.policy = w['policy']
+  if (w['policy-options'] !== undefined) v.policyOptions = w['policy-options']
+  if (w['reconcile-period'] !== undefined) v.reconcilePeriod = w['reconcile-period']
+  return v
+}
+
+/**
+ * Request to create a new AI API key.
  */
 export interface CreateAIAPIKeyRequest {
+  /**
+   * Grant access to all deployments of the organization. Takes precedence over the deployments array, which is ignored when set.
+   *
+   * @defaultValue false
+   */
+  allDeployments?: boolean
+  /**
+   * Grant access to all public models. Takes precedence over the models array, which is ignored when set.
+   *
+   * @defaultValue false
+   */
+  allModels?: boolean
+  deployments?: AIAPIKeyDeployments
+  models?: AIAPIKeyModels
   /**
    * Human-readable name for the AI API key
    *
    * Length 1-50, Pattern `^[A-Za-z0-9](?:[A-Za-z0-9 _'()-]*[A-Za-z0-9])?$`
    */
   name: string
-  /**
-   * Key scope: 'public' for all deployments, or a specific deployment UUID
-   */
-  scope: string
 }
 
 /** @internal */
 export function toWireCreateAIAPIKeyRequest(v: CreateAIAPIKeyRequest): Record<string, unknown> {
   const o: Record<string, unknown> = {}
+  if (v.allDeployments !== undefined) o['all-deployments'] = v.allDeployments
+  if (v.allModels !== undefined) o['all-models'] = v.allModels
+  if (v.deployments !== undefined) o['deployments'] = toWireAIAPIKeyDeployments(v.deployments)
+  if (v.models !== undefined) o['models'] = v.models
   if (v.name !== undefined) o['name'] = v.name
-  if (v.scope !== undefined) o['scope'] = v.scope
   return o
 }
 
 /** @internal */
 export function fromWireCreateAIAPIKeyRequest(w: any): CreateAIAPIKeyRequest {
   const v = {} as CreateAIAPIKeyRequest
+  if (w['all-deployments'] !== undefined) v.allDeployments = w['all-deployments']
+  if (w['all-models'] !== undefined) v.allModels = w['all-models']
+  if (w['deployments'] !== undefined) v.deployments = fromWireAIAPIKeyDeployments(w['deployments'])
+  if (w['models'] !== undefined) v.models = w['models']
   v.name = w['name']
-  v.scope = w['scope']
   return v
 }
 
@@ -613,34 +629,31 @@ export function fromWireCreateAIAPIKeyRequest(w: any): CreateAIAPIKeyRequest {
  */
 export interface CreateAIAPIKeyResponse {
   /**
-   * Creation timestamp
-   *
+   * True when the key has access to all deployments of the organization.
+   */
+  allDeployments: boolean
+  /**
+   * True when the key has access to all public models.
+   */
+  allModels: boolean
+  /**
    * Read-only
    */
   createdAT: Date
+  deployments: AIAPIKeyDeployments
   /**
-   * AI API key ID
-   *
    * Read-only
    */
   id: string
-  /**
-   * Human-readable name for the AI API key
-   */
+  models: AIAPIKeyModels
   name: string
-  /**
-   * Organization UUID that owns this key
-   *
-   * Read-only
-   */
-  orgUuid: string
-  /**
-   * Key scope: 'public' for all deployments, or a specific deployment UUID
-   */
-  scope: string
   /**
    * Last update timestamp
    *
+   * Read-only
+   */
+  revokedAT?: Date | null
+  /**
    * Read-only
    */
   updatedAT: Date
@@ -653,11 +666,15 @@ export interface CreateAIAPIKeyResponse {
 /** @internal */
 export function toWireCreateAIAPIKeyResponse(v: CreateAIAPIKeyResponse): Record<string, unknown> {
   const o: Record<string, unknown> = {}
+  if (v.allDeployments !== undefined) o['all-deployments'] = v.allDeployments
+  if (v.allModels !== undefined) o['all-models'] = v.allModels
   if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
+  if (v.deployments !== undefined) o['deployments'] = toWireAIAPIKeyDeployments(v.deployments)
   if (v.id !== undefined) o['id'] = v.id
+  if (v.models !== undefined) o['models'] = v.models
   if (v.name !== undefined) o['name'] = v.name
-  if (v.orgUuid !== undefined) o['org-uuid'] = v.orgUuid
-  if (v.scope !== undefined) o['scope'] = v.scope
+  if (v.revokedAT !== undefined)
+    o['revoked-at'] = v.revokedAT === null ? null : v.revokedAT.toISOString()
   if (v.updatedAT !== undefined) o['updated-at'] = v.updatedAT.toISOString()
   if (v.value !== undefined) o['value'] = v.value
   return o
@@ -666,11 +683,14 @@ export function toWireCreateAIAPIKeyResponse(v: CreateAIAPIKeyResponse): Record<
 /** @internal */
 export function fromWireCreateAIAPIKeyResponse(w: any): CreateAIAPIKeyResponse {
   const v = {} as CreateAIAPIKeyResponse
+  v.allDeployments = w['all-deployments']
+  v.allModels = w['all-models']
   v.createdAT = new Date(w['created-at'])
+  v.deployments = fromWireAIAPIKeyDeployments(w['deployments'])
   v.id = w['id']
+  v.models = w['models']
   v.name = w['name']
-  v.orgUuid = w['org-uuid']
-  v.scope = w['scope']
+  if (w['revoked-at'] !== undefined) v.revokedAT = new Date(w['revoked-at'])
   v.updatedAT = new Date(w['updated-at'])
   v.value = w['value']
   return v
@@ -705,7 +725,7 @@ export interface CreateDeploymentRequest {
   /**
    * Billing identifier for this deployment. Used by the Router for usage counters and Kafka events.
    *
-   * Min length 1
+   * Length 1-256, Pattern `^[a-z0-9]+(?:-[a-z0-9]+)*$`
    */
   productName?: string
   /**
@@ -748,11 +768,68 @@ export function fromWireCreateDeploymentRequest(w: any): CreateDeploymentRequest
   return v
 }
 
+export interface CreateKeyStoreRequest {
+  /**
+   * An optional detailed description providing additional context about the key store's intended use case.
+   *
+   * Max length 1024
+   */
+  description?: string
+  /**
+   * A human-readable display name uniquely identifying the key store within the organization.
+   *
+   * Length 1-256
+   */
+  name: string
+  proxy: KeyStoreProxy
+  /**
+   * The key store type. Only external key stores are supported for this API version.
+   *
+   * @defaultValue "external-key-store"
+   */
+  type?: 'external-key-store'
+}
+
+/** @internal */
+export function toWireCreateKeyStoreRequest(v: CreateKeyStoreRequest): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.description !== undefined) o['description'] = v.description
+  if (v.name !== undefined) o['name'] = v.name
+  if (v.proxy !== undefined) o['proxy'] = toWireKeyStoreProxy(v.proxy)
+  if (v.type !== undefined) o['type'] = v.type
+  return o
+}
+
+/** @internal */
+export function fromWireCreateKeyStoreRequest(w: any): CreateKeyStoreRequest {
+  const v = {} as CreateKeyStoreRequest
+  if (w['description'] !== undefined) v.description = w['description']
+  v.name = w['name']
+  v.proxy = fromWireKeyStoreProxy(w['proxy'])
+  if (w['type'] !== undefined) v.type = w['type']
+  return v
+}
+
 export interface CreateKmsKeyRequest {
   /**
    * An optional detailed description providing additional context about the key's intended use case.
    */
   description?: string
+  /**
+   * The cryptographic key specification defining the key's algorithm and, for asymmetric keys, its curve or modulus size.
+   *
+   * @defaultValue "AES_256"
+   */
+  keySpec?:
+    | 'AES_256'
+    | 'ECC_EDWARDS25519'
+    | 'ECC_NIST_P256'
+    | 'ECC_NIST_P384'
+    | 'ECC_NIST_P521'
+    | 'ML_DSA_65'
+    | 'ML_DSA_87'
+    | 'RSA_3072'
+    | 'RSA_4096'
   /**
    * True if this is a multi-zone key.
    *
@@ -764,18 +841,28 @@ export interface CreateKmsKeyRequest {
    */
   name: string
   /**
+   * Indicates the source of the key material, either generated and held within Exoscale KMS, or backed by an external key store ([BETA]).
+   *
+   * @defaultValue "exoscale-kms"
+   */
+  source?: 'exoscale-kms' | 'external-key-store'
+  /**
    * @defaultValue "encrypt-decrypt"
    */
-  usage?: 'encrypt-decrypt'
+  usage?: 'encrypt-decrypt' | 'sign-verify'
+  xks?: XksKey
 }
 
 /** @internal */
 export function toWireCreateKmsKeyRequest(v: CreateKmsKeyRequest): Record<string, unknown> {
   const o: Record<string, unknown> = {}
   if (v.description !== undefined) o['description'] = v.description
+  if (v.keySpec !== undefined) o['key-spec'] = v.keySpec
   if (v.multiZone !== undefined) o['multi-zone'] = v.multiZone
   if (v.name !== undefined) o['name'] = v.name
+  if (v.source !== undefined) o['source'] = v.source
   if (v.usage !== undefined) o['usage'] = v.usage
+  if (v.xks !== undefined) o['xks'] = toWireXksKey(v.xks)
   return o
 }
 
@@ -783,9 +870,12 @@ export function toWireCreateKmsKeyRequest(v: CreateKmsKeyRequest): Record<string
 export function fromWireCreateKmsKeyRequest(w: any): CreateKmsKeyRequest {
   const v = {} as CreateKmsKeyRequest
   if (w['description'] !== undefined) v.description = w['description']
+  if (w['key-spec'] !== undefined) v.keySpec = w['key-spec']
   if (w['multi-zone'] !== undefined) v.multiZone = w['multi-zone']
   v.name = w['name']
+  if (w['source'] !== undefined) v.source = w['source']
   if (w['usage'] !== undefined) v.usage = w['usage']
+  if (w['xks'] !== undefined) v.xks = fromWireXksKey(w['xks'])
   return v
 }
 
@@ -803,6 +893,10 @@ export interface CreateKmsKeyResponse {
    */
   id: string
   /**
+   * The cryptographic key specification used to generate the key, defining its algorithm and, for asymmetric keys, its curve or modulus size.
+   */
+  keySpec: string
+  /**
    * True if this is a multi-zone key.
    */
   multiZone: boolean
@@ -815,7 +909,11 @@ export interface CreateKmsKeyResponse {
    */
   originZone: string
   revision: RevisionStamp
-  source: 'exoscale-kms'
+  rotation?: KeyRotationConfig
+  /**
+   * Indicates the source of the key material, either generated and held within Exoscale KMS, or backed by an external key store ([BETA]).
+   */
+  source: 'exoscale-kms' | 'external-key-store'
   status: 'disabled' | 'enabled' | 'pending-deletion'
   /**
    * The timestamp indicating exactly when the current key status was last transitioned.
@@ -825,6 +923,7 @@ export interface CreateKmsKeyResponse {
    * The cryptographic operation constraints allowed on this key.
    */
   usage: string
+  xks?: XksKey
 }
 
 /** @internal */
@@ -833,14 +932,17 @@ export function toWireCreateKmsKeyResponse(v: CreateKmsKeyResponse): Record<stri
   if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
   if (v.description !== undefined) o['description'] = v.description
   if (v.id !== undefined) o['id'] = v.id
+  if (v.keySpec !== undefined) o['key-spec'] = v.keySpec
   if (v.multiZone !== undefined) o['multi-zone'] = v.multiZone
   if (v.name !== undefined) o['name'] = v.name
   if (v.originZone !== undefined) o['origin-zone'] = v.originZone
   if (v.revision !== undefined) o['revision'] = toWireRevisionStamp(v.revision)
+  if (v.rotation !== undefined) o['rotation'] = toWireKeyRotationConfig(v.rotation)
   if (v.source !== undefined) o['source'] = v.source
   if (v.status !== undefined) o['status'] = v.status
   if (v.statusSince !== undefined) o['status-since'] = v.statusSince.toISOString()
   if (v.usage !== undefined) o['usage'] = v.usage
+  if (v.xks !== undefined) o['xks'] = toWireXksKey(v.xks)
   return o
 }
 
@@ -850,14 +952,17 @@ export function fromWireCreateKmsKeyResponse(w: any): CreateKmsKeyResponse {
   v.createdAT = new Date(w['created-at'])
   if (w['description'] !== undefined) v.description = w['description']
   v.id = w['id']
+  v.keySpec = w['key-spec']
   v.multiZone = w['multi-zone']
   v.name = w['name']
   v.originZone = w['origin-zone']
   v.revision = fromWireRevisionStamp(w['revision'])
+  if (w['rotation'] !== undefined) v.rotation = fromWireKeyRotationConfig(w['rotation'])
   v.source = w['source']
   v.status = w['status']
   v.statusSince = new Date(w['status-since'])
   v.usage = w['usage']
+  if (w['xks'] !== undefined) v.xks = fromWireXksKey(w['xks'])
   return v
 }
 
@@ -3835,7 +3940,7 @@ export type DBAASPGPoolSize = number
  */
 export type DBAASPGPoolUsername = string
 
-export type DBAASPGTargetVersions = '13' | '14' | '15' | '16' | '17' | '18'
+export type DBAASPGTargetVersions = '15' | '16' | '17' | '18'
 
 /**
  * DBaaS plan
@@ -4161,7 +4266,7 @@ export interface DBAASServiceClickhouse {
    */
   createdAT?: Date
   /**
-   * TODO UNIT disk space for data storage
+   * Disk space for data storage, in bytes
    *
    * Min 0
    */
@@ -4195,7 +4300,7 @@ export interface DBAASServiceClickhouse {
    */
   nodeCPUCount?: number
   /**
-   * TODO UNIT of memory for each node
+   * Memory of each node, in bytes
    *
    * Min 0
    */
@@ -4343,7 +4448,7 @@ export interface DBAASServiceCommon {
    */
   createdAT?: Date
   /**
-   * TODO UNIT disk space for data storage
+   * Disk space for data storage, in bytes
    *
    * Min 0
    */
@@ -4369,7 +4474,7 @@ export interface DBAASServiceCommon {
    */
   nodeCPUCount?: number
   /**
-   * TODO UNIT of memory for each node
+   * Memory of each node, in bytes
    *
    * Min 0
    */
@@ -4678,7 +4783,7 @@ export interface DBAASServiceGrafana {
    */
   description?: string
   /**
-   * TODO UNIT disk space for data storage
+   * Disk space for data storage, in bytes
    *
    * Min 0
    */
@@ -4716,7 +4821,7 @@ export interface DBAASServiceGrafana {
    */
   nodeCPUCount?: number
   /**
-   * TODO UNIT of memory for each node
+   * Memory of each node, in bytes
    *
    * Min 0
    */
@@ -5071,7 +5176,7 @@ export interface DBAASServiceKafka {
    */
   createdAT?: Date
   /**
-   * TODO UNIT disk space for data storage
+   * Disk space for data storage, in bytes
    *
    * Min 0
    */
@@ -5125,7 +5230,7 @@ export interface DBAASServiceKafka {
    */
   nodeCPUCount?: number
   /**
-   * TODO UNIT of memory for each node
+   * Memory of each node, in bytes
    *
    * Min 0
    */
@@ -5593,7 +5698,7 @@ export interface DBAASServiceMysql {
    */
   databases?: DBAASMysqlDatabaseName[]
   /**
-   * TODO UNIT disk space for data storage
+   * Disk space for data storage, in bytes
    *
    * Min 0
    */
@@ -5631,7 +5736,7 @@ export interface DBAASServiceMysql {
    */
   nodeCPUCount?: number
   /**
-   * TODO UNIT of memory for each node
+   * Memory of each node, in bytes
    *
    * Min 0
    */
@@ -6128,7 +6233,7 @@ export interface DBAASServiceOpensearch {
    */
   description?: string
   /**
-   * TODO UNIT disk space for data storage
+   * Disk space for data storage, in bytes
    *
    * Min 0
    */
@@ -6180,7 +6285,7 @@ export interface DBAASServiceOpensearch {
    */
   nodeCPUCount?: number
   /**
-   * TODO UNIT of memory for each node
+   * Memory of each node, in bytes
    *
    * Min 0
    */
@@ -6627,7 +6732,7 @@ export interface DBAASServicePG {
    */
   databases?: DBAASDatabaseName[]
   /**
-   * TODO UNIT disk space for data storage
+   * Disk space for data storage, in bytes
    *
    * Min 0
    */
@@ -6667,7 +6772,7 @@ export interface DBAASServicePG {
    */
   nodeCPUCount?: number
   /**
-   * TODO UNIT of memory for each node
+   * Memory of each node, in bytes
    *
    * Min 0
    */
@@ -7043,7 +7148,7 @@ export interface DBAASServiceThanos {
    */
   createdAT?: Date
   /**
-   * TODO UNIT disk space for data storage
+   * Disk space for data storage, in bytes
    *
    * Min 0
    */
@@ -7077,7 +7182,7 @@ export interface DBAASServiceThanos {
    */
   nodeCPUCount?: number
   /**
-   * TODO UNIT of memory for each node
+   * Memory of each node, in bytes
    *
    * Min 0
    */
@@ -7511,7 +7616,7 @@ export interface DBAASServiceValkey {
    */
   createdAT?: Date
   /**
-   * TODO UNIT disk space for data storage
+   * Disk space for data storage, in bytes
    *
    * Min 0
    */
@@ -7545,7 +7650,7 @@ export interface DBAASServiceValkey {
    */
   nodeCPUCount?: number
   /**
-   * TODO UNIT of memory for each node
+   * Memory of each node, in bytes
    *
    * Min 0
    */
@@ -7712,10 +7817,15 @@ export function fromWireDBAASTaskResultCodes(w: any): DBAASTaskResultCodes {
 
 export interface DBAASTask {
   createTime?: Date
+  durationSeconds?: number
   id?: string
   result?: string
   resultCodes?: DBAASTaskResultCodes[]
+  sourceMysqlVersion?: string
+  sourcePGVersion?: string
   success?: boolean
+  targetMysqlVersion?: string
+  targetPGVersion?: string
   taskType?: string
 }
 
@@ -7723,11 +7833,16 @@ export interface DBAASTask {
 export function toWireDBAASTask(v: DBAASTask): Record<string, unknown> {
   const o: Record<string, unknown> = {}
   if (v.createTime !== undefined) o['create-time'] = v.createTime.toISOString()
+  if (v.durationSeconds !== undefined) o['duration-seconds'] = v.durationSeconds
   if (v.id !== undefined) o['id'] = v.id
   if (v.result !== undefined) o['result'] = v.result
   if (v.resultCodes !== undefined)
     o['result-codes'] = v.resultCodes.map((x) => toWireDBAASTaskResultCodes(x))
+  if (v.sourceMysqlVersion !== undefined) o['source-mysql-version'] = v.sourceMysqlVersion
+  if (v.sourcePGVersion !== undefined) o['source-pg-version'] = v.sourcePGVersion
   if (v.success !== undefined) o['success'] = v.success
+  if (v.targetMysqlVersion !== undefined) o['target-mysql-version'] = v.targetMysqlVersion
+  if (v.targetPGVersion !== undefined) o['target-pg-version'] = v.targetPGVersion
   if (v.taskType !== undefined) o['task-type'] = v.taskType
   return o
 }
@@ -7736,11 +7851,16 @@ export function toWireDBAASTask(v: DBAASTask): Record<string, unknown> {
 export function fromWireDBAASTask(w: any): DBAASTask {
   const v = {} as DBAASTask
   if (w['create-time'] !== undefined) v.createTime = new Date(w['create-time'])
+  if (w['duration-seconds'] !== undefined) v.durationSeconds = w['duration-seconds']
   if (w['id'] !== undefined) v.id = w['id']
   if (w['result'] !== undefined) v.result = w['result']
   if (w['result-codes'] !== undefined)
     v.resultCodes = (w['result-codes'] as any[]).map((x) => fromWireDBAASTaskResultCodes(x))
+  if (w['source-mysql-version'] !== undefined) v.sourceMysqlVersion = w['source-mysql-version']
+  if (w['source-pg-version'] !== undefined) v.sourcePGVersion = w['source-pg-version']
   if (w['success'] !== undefined) v.success = w['success']
+  if (w['target-mysql-version'] !== undefined) v.targetMysqlVersion = w['target-mysql-version']
+  if (w['target-pg-version'] !== undefined) v.targetPGVersion = w['target-pg-version']
   if (w['task-type'] !== undefined) v.taskType = w['task-type']
   return v
 }
@@ -8143,6 +8263,10 @@ export interface DecryptRequest {
    */
   ciphertext: string
   /**
+   * The encryption algorithm this key must use. Validated against the key's actual cryptographic profile. Required for asymmetric keys. Symmetric keys use AES_256 when it is omitted.
+   */
+  encryptionAlgorithm?: 'AES_256' | 'RSAES_OAEP_SHA_256'
+  /**
    * The exact Base64-encoded Additional Authenticated Data (AAD) used during encryption to verify data integrity.
    */
   encryptionContext?: string | null
@@ -8152,6 +8276,7 @@ export interface DecryptRequest {
 export function toWireDecryptRequest(v: DecryptRequest): Record<string, unknown> {
   const o: Record<string, unknown> = {}
   if (v.ciphertext !== undefined) o['ciphertext'] = v.ciphertext
+  if (v.encryptionAlgorithm !== undefined) o['encryption-algorithm'] = v.encryptionAlgorithm
   if (v.encryptionContext !== undefined)
     o['encryption-context'] = v.encryptionContext === null ? null : v.encryptionContext
   return o
@@ -8161,11 +8286,16 @@ export function toWireDecryptRequest(v: DecryptRequest): Record<string, unknown>
 export function fromWireDecryptRequest(w: any): DecryptRequest {
   const v = {} as DecryptRequest
   v.ciphertext = w['ciphertext']
+  if (w['encryption-algorithm'] !== undefined) v.encryptionAlgorithm = w['encryption-algorithm']
   if (w['encryption-context'] !== undefined) v.encryptionContext = w['encryption-context']
   return v
 }
 
 export interface DecryptResponse {
+  /**
+   * The encryption algorithm that was used to decrypt this ciphertext.
+   */
+  encryptionAlgorithm: 'AES_256' | 'RSAES_OAEP_SHA_256'
   /**
    * The recovered Base64-encoded original plaintext payload.
    */
@@ -8175,6 +8305,7 @@ export interface DecryptResponse {
 /** @internal */
 export function toWireDecryptResponse(v: DecryptResponse): Record<string, unknown> {
   const o: Record<string, unknown> = {}
+  if (v.encryptionAlgorithm !== undefined) o['encryption-algorithm'] = v.encryptionAlgorithm
   if (v.plaintext !== undefined) o['plaintext'] = v.plaintext
   return o
 }
@@ -8182,6 +8313,7 @@ export function toWireDecryptResponse(v: DecryptResponse): Record<string, unknow
 /** @internal */
 export function fromWireDecryptResponse(w: any): DecryptResponse {
   const v = {} as DecryptResponse
+  v.encryptionAlgorithm = w['encryption-algorithm']
   v.plaintext = w['plaintext']
   return v
 }
@@ -8678,6 +8810,10 @@ export function fromWireEnableKmsKeyRotationResponse(w: any): EnableKmsKeyRotati
 
 export interface EncryptRequest {
   /**
+   * The encryption algorithm this key must use. Validated against the key's actual cryptographic profile. Required for asymmetric keys. Symmetric keys use AES_256 when it is omitted.
+   */
+  encryptionAlgorithm?: 'AES_256' | 'RSAES_OAEP_SHA_256'
+  /**
    * Base64-encoded bytes to be used as the Additional Authenticated Data (AAD) for encryption integrity.
    */
   encryptionContext?: string | null
@@ -8690,6 +8826,7 @@ export interface EncryptRequest {
 /** @internal */
 export function toWireEncryptRequest(v: EncryptRequest): Record<string, unknown> {
   const o: Record<string, unknown> = {}
+  if (v.encryptionAlgorithm !== undefined) o['encryption-algorithm'] = v.encryptionAlgorithm
   if (v.encryptionContext !== undefined)
     o['encryption-context'] = v.encryptionContext === null ? null : v.encryptionContext
   if (v.plaintext !== undefined) o['plaintext'] = v.plaintext
@@ -8699,6 +8836,7 @@ export function toWireEncryptRequest(v: EncryptRequest): Record<string, unknown>
 /** @internal */
 export function fromWireEncryptRequest(w: any): EncryptRequest {
   const v = {} as EncryptRequest
+  if (w['encryption-algorithm'] !== undefined) v.encryptionAlgorithm = w['encryption-algorithm']
   if (w['encryption-context'] !== undefined) v.encryptionContext = w['encryption-context']
   v.plaintext = w['plaintext']
   return v
@@ -8709,12 +8847,17 @@ export interface EncryptResponse {
    * The resulting Base64-encoded ciphertext after encryption.
    */
   ciphertext: string
+  /**
+   * The encryption algorithm that was used to encrypt this plaintext.
+   */
+  encryptionAlgorithm: 'AES_256' | 'RSAES_OAEP_SHA_256'
 }
 
 /** @internal */
 export function toWireEncryptResponse(v: EncryptResponse): Record<string, unknown> {
   const o: Record<string, unknown> = {}
   if (v.ciphertext !== undefined) o['ciphertext'] = v.ciphertext
+  if (v.encryptionAlgorithm !== undefined) o['encryption-algorithm'] = v.encryptionAlgorithm
   return o
 }
 
@@ -8722,6 +8865,7 @@ export function toWireEncryptResponse(v: EncryptResponse): Record<string, unknow
 export function fromWireEncryptResponse(w: any): EncryptResponse {
   const v = {} as EncryptResponse
   v.ciphertext = w['ciphertext']
+  v.encryptionAlgorithm = w['encryption-algorithm']
   return v
 }
 
@@ -8758,7 +8902,7 @@ export type EnumPGPoolMode = 'session' | 'statement' | 'transaction'
 
 export type EnumPGSynchronousReplication = 'off' | 'quorum'
 
-export type EnumPGVariant = 'aiven' | 'timescale'
+export type EnumPGVariant = 'aiven'
 
 export type EnumRsyslogFormat = 'custom' | 'rfc3164' | 'rfc5424'
 
@@ -8956,6 +9100,7 @@ export interface ErrorResponse {
    * An absolute or relative URI reference pointing to human-readable documentation concerning the specific problem type encountered.
    */
   type: string
+  xksProxyError?: XksProxyErrorDetail
 }
 
 /** @internal */
@@ -8965,6 +9110,8 @@ export function toWireErrorResponse(v: ErrorResponse): Record<string, unknown> {
   if (v.status !== undefined) o['status'] = v.status
   if (v.title !== undefined) o['title'] = v.title
   if (v.type !== undefined) o['type'] = v.type
+  if (v.xksProxyError !== undefined)
+    o['xks-proxy-error'] = toWireXksProxyErrorDetail(v.xksProxyError)
   return o
 }
 
@@ -8975,6 +9122,8 @@ export function fromWireErrorResponse(w: any): ErrorResponse {
   v.status = w['status']
   v.title = w['title']
   v.type = w['type']
+  if (w['xks-proxy-error'] !== undefined)
+    v.xksProxyError = fromWireXksProxyErrorDetail(w['xks-proxy-error'])
   return v
 }
 
@@ -9090,6 +9239,38 @@ export function fromWireEvent(w: any): Event {
   return v
 }
 
+/**
+ * Focus report download URL
+ */
+export interface FocusReport {
+  /**
+   * URL expiration in seconds
+   *
+   * Min >0
+   */
+  expiresIn?: number
+  /**
+   * Focus report presigned URL
+   */
+  presignedURL?: string
+}
+
+/** @internal */
+export function toWireFocusReport(v: FocusReport): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.expiresIn !== undefined) o['expires_in'] = v.expiresIn
+  if (v.presignedURL !== undefined) o['presigned_url'] = v.presignedURL
+  return o
+}
+
+/** @internal */
+export function fromWireFocusReport(w: any): FocusReport {
+  const v = {} as FocusReport
+  if (w['expires_in'] !== undefined) v.expiresIn = w['expires_in']
+  if (w['presigned_url'] !== undefined) v.presignedURL = w['presigned_url']
+  return v
+}
+
 export interface GenerateDataKeyRequest {
   /**
    * Min 1, Max 1024
@@ -9153,31 +9334,41 @@ export function fromWireGenerateDataKeyResponse(w: any): GenerateDataKeyResponse
  */
 export interface GetAIAPIKeyResponse {
   /**
+   * True when the key has access to all deployments of the organization.
+   *
+   * Read-only
+   */
+  allDeployments: boolean
+  /**
+   * True when the key has access to all public models.
+   *
+   * Read-only
+   */
+  allModels: boolean
+  /**
    * Creation timestamp
    *
    * Read-only
    */
   createdAT: Date
+  deployments: AIAPIKeyDeployments
   /**
    * AI API key ID
    *
    * Read-only
    */
   id: string
+  models: AIAPIKeyModels
   /**
    * Human-readable name for the AI API key
    */
   name: string
   /**
-   * Organization UUID that owns this key
+   * Revocation timestamp. Null when the API key is active.
    *
    * Read-only
    */
-  orgUuid: string
-  /**
-   * Key scope: 'public' for all deployments, or a specific deployment UUID
-   */
-  scope: string
+  revokedAT: Date | null
   /**
    * Last update timestamp
    *
@@ -9189,11 +9380,15 @@ export interface GetAIAPIKeyResponse {
 /** @internal */
 export function toWireGetAIAPIKeyResponse(v: GetAIAPIKeyResponse): Record<string, unknown> {
   const o: Record<string, unknown> = {}
+  if (v.allDeployments !== undefined) o['all-deployments'] = v.allDeployments
+  if (v.allModels !== undefined) o['all-models'] = v.allModels
   if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
+  if (v.deployments !== undefined) o['deployments'] = toWireAIAPIKeyDeployments(v.deployments)
   if (v.id !== undefined) o['id'] = v.id
+  if (v.models !== undefined) o['models'] = v.models
   if (v.name !== undefined) o['name'] = v.name
-  if (v.orgUuid !== undefined) o['org-uuid'] = v.orgUuid
-  if (v.scope !== undefined) o['scope'] = v.scope
+  if (v.revokedAT !== undefined)
+    o['revoked-at'] = v.revokedAT === null ? null : v.revokedAT.toISOString()
   if (v.updatedAT !== undefined) o['updated-at'] = v.updatedAT.toISOString()
   return o
 }
@@ -9201,11 +9396,14 @@ export function toWireGetAIAPIKeyResponse(v: GetAIAPIKeyResponse): Record<string
 /** @internal */
 export function fromWireGetAIAPIKeyResponse(w: any): GetAIAPIKeyResponse {
   const v = {} as GetAIAPIKeyResponse
+  v.allDeployments = w['all-deployments']
+  v.allModels = w['all-models']
   v.createdAT = new Date(w['created-at'])
+  v.deployments = fromWireAIAPIKeyDeployments(w['deployments'])
   v.id = w['id']
+  v.models = w['models']
   v.name = w['name']
-  v.orgUuid = w['org-uuid']
-  v.scope = w['scope']
+  v.revokedAT = new Date(w['revoked-at'])
   v.updatedAT = new Date(w['updated-at'])
   return v
 }
@@ -9373,10 +9571,6 @@ export interface GetDeploymentResponse {
    * Read-only
    */
   updatedAT?: Date
-  /**
-   * Deployment visibility: private for your organization's deployments, public for Exoscale Managed Inference deployments.
-   */
-  visibility: 'private' | 'public'
 }
 
 /** @internal */
@@ -9398,7 +9592,6 @@ export function toWireGetDeploymentResponse(v: GetDeploymentResponse): Record<st
   if (v.state !== undefined) o['state'] = v.state
   if (v.stateDetails !== undefined) o['state-details'] = v.stateDetails
   if (v.updatedAT !== undefined) o['updated-at'] = v.updatedAT.toISOString()
-  if (v.visibility !== undefined) o['visibility'] = v.visibility
   return o
 }
 
@@ -9421,7 +9614,6 @@ export function fromWireGetDeploymentResponse(w: any): GetDeploymentResponse {
   v.state = w['state']
   if (w['state-details'] !== undefined) v.stateDetails = w['state-details']
   if (w['updated-at'] !== undefined) v.updatedAT = new Date(w['updated-at'])
-  v.visibility = w['visibility']
   return v
 }
 
@@ -9449,6 +9641,69 @@ export function fromWireGetInferenceEngineHelpResponse(w: any): GetInferenceEngi
   return v
 }
 
+export interface GetKeyStoreResponse {
+  /**
+   * The creation timestamp.
+   */
+  createdAT?: Date
+  /**
+   * An optional detailed description providing additional context about the key store's intended use case.
+   */
+  description?: string
+  health?: KeyStoreHealth
+  /**
+   * The globally unique identifier assigned to the key store.
+   */
+  id?: string
+  /**
+   * The display name assigned to the key store.
+   */
+  name?: string
+  proxy?: KeyStoreProxyResponse
+  /**
+   * The current connection status of the key store.
+   */
+  status?: 'connected' | 'disconnected'
+  /**
+   * The timestamp indicating when the current key store status last transitioned.
+   */
+  statusSince?: Date
+  /**
+   * The key store type.
+   */
+  type?: 'external-key-store'
+}
+
+/** @internal */
+export function toWireGetKeyStoreResponse(v: GetKeyStoreResponse): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
+  if (v.description !== undefined) o['description'] = v.description
+  if (v.health !== undefined) o['health'] = toWireKeyStoreHealth(v.health)
+  if (v.id !== undefined) o['id'] = v.id
+  if (v.name !== undefined) o['name'] = v.name
+  if (v.proxy !== undefined) o['proxy'] = toWireKeyStoreProxyResponse(v.proxy)
+  if (v.status !== undefined) o['status'] = v.status
+  if (v.statusSince !== undefined) o['status-since'] = v.statusSince.toISOString()
+  if (v.type !== undefined) o['type'] = v.type
+  return o
+}
+
+/** @internal */
+export function fromWireGetKeyStoreResponse(w: any): GetKeyStoreResponse {
+  const v = {} as GetKeyStoreResponse
+  if (w['created-at'] !== undefined) v.createdAT = new Date(w['created-at'])
+  if (w['description'] !== undefined) v.description = w['description']
+  if (w['health'] !== undefined) v.health = fromWireKeyStoreHealth(w['health'])
+  if (w['id'] !== undefined) v.id = w['id']
+  if (w['name'] !== undefined) v.name = w['name']
+  if (w['proxy'] !== undefined) v.proxy = fromWireKeyStoreProxyResponse(w['proxy'])
+  if (w['status'] !== undefined) v.status = w['status']
+  if (w['status-since'] !== undefined) v.statusSince = new Date(w['status-since'])
+  if (w['type'] !== undefined) v.type = w['type']
+  return v
+}
+
 export interface GetKmsKeyResponse {
   /**
    * The UTC timestamp showing when the KMS key was originally provisioned.
@@ -9463,6 +9718,10 @@ export interface GetKmsKeyResponse {
    * The globally unique identifier (UUID) of the retrieved KMS key.
    */
   id: string
+  /**
+   * The cryptographic key specification used to generate the key, defining its algorithm and, for asymmetric keys, its curve or modulus size.
+   */
+  keySpec: string
   material: KeyMaterial
   /**
    * True if this is a multi-zone key.
@@ -9486,7 +9745,10 @@ export interface GetKmsKeyResponse {
   replicasStatus?: ReplicaState[]
   revision: RevisionStamp
   rotation: KeyRotationConfig
-  source: 'exoscale-kms'
+  /**
+   * Indicates the source of the key material, either generated and held within Exoscale KMS, or backed by an external key store ([BETA]).
+   */
+  source: 'exoscale-kms' | 'external-key-store'
   status: 'disabled' | 'enabled' | 'pending-deletion'
   /**
    * The timestamp indicating exactly when the current key status was last transitioned.
@@ -9496,6 +9758,7 @@ export interface GetKmsKeyResponse {
    * The cryptographic operation constraints allowed on this key.
    */
   usage: string
+  xks?: XksKey
 }
 
 /** @internal */
@@ -9505,6 +9768,7 @@ export function toWireGetKmsKeyResponse(v: GetKmsKeyResponse): Record<string, un
   if (v.deleteAT !== undefined) o['delete-at'] = v.deleteAT.toISOString()
   if (v.description !== undefined) o['description'] = v.description
   if (v.id !== undefined) o['id'] = v.id
+  if (v.keySpec !== undefined) o['key-spec'] = v.keySpec
   if (v.material !== undefined) o['material'] = toWireKeyMaterial(v.material)
   if (v.multiZone !== undefined) o['multi-zone'] = v.multiZone
   if (v.name !== undefined) o['name'] = v.name
@@ -9518,6 +9782,7 @@ export function toWireGetKmsKeyResponse(v: GetKmsKeyResponse): Record<string, un
   if (v.status !== undefined) o['status'] = v.status
   if (v.statusSince !== undefined) o['status-since'] = v.statusSince.toISOString()
   if (v.usage !== undefined) o['usage'] = v.usage
+  if (v.xks !== undefined) o['xks'] = toWireXksKey(v.xks)
   return o
 }
 
@@ -9528,6 +9793,7 @@ export function fromWireGetKmsKeyResponse(w: any): GetKmsKeyResponse {
   if (w['delete-at'] !== undefined) v.deleteAT = new Date(w['delete-at'])
   if (w['description'] !== undefined) v.description = w['description']
   v.id = w['id']
+  v.keySpec = w['key-spec']
   v.material = fromWireKeyMaterial(w['material'])
   v.multiZone = w['multi-zone']
   v.name = w['name']
@@ -9541,6 +9807,7 @@ export function fromWireGetKmsKeyResponse(w: any): GetKmsKeyResponse {
   v.status = w['status']
   v.statusSince = new Date(w['status-since'])
   v.usage = w['usage']
+  if (w['xks'] !== undefined) v.xks = fromWireXksKey(w['xks'])
   return v
 }
 
@@ -9555,11 +9822,21 @@ export interface GetModelResponse {
    */
   createdAT: Date
   /**
+   * Model deprecation date
+   *
+   * Read-only
+   */
+  deprecationDate?: Date | null
+  /**
    * Model ID
    *
    * Read-only
    */
   id: string
+  /**
+   * Model lifecycle state
+   */
+  lifecycleStatus?: 'active' | 'deprecated' | 'eol' | null | 'preview' | null
   /**
    * Model size in bytes
    *
@@ -9582,17 +9859,26 @@ export interface GetModelResponse {
    * Read-only
    */
   updatedAT: Date
+  /**
+   * Model visibility
+   */
+  visibility?: 'private' | 'public'
 }
 
 /** @internal */
 export function toWireGetModelResponse(v: GetModelResponse): Record<string, unknown> {
   const o: Record<string, unknown> = {}
   if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
+  if (v.deprecationDate !== undefined)
+    o['deprecation-date'] = v.deprecationDate === null ? null : v.deprecationDate.toISOString()
   if (v.id !== undefined) o['id'] = v.id
+  if (v.lifecycleStatus !== undefined)
+    o['lifecycle-status'] = v.lifecycleStatus === null ? null : v.lifecycleStatus
   if (v.modelSize !== undefined) o['model-size'] = v.modelSize
   if (v.name !== undefined) o['name'] = v.name
   if (v.state !== undefined) o['state'] = v.state
   if (v.updatedAT !== undefined) o['updated-at'] = v.updatedAT.toISOString()
+  if (v.visibility !== undefined) o['visibility'] = v.visibility
   return o
 }
 
@@ -9600,39 +9886,53 @@ export function toWireGetModelResponse(v: GetModelResponse): Record<string, unkn
 export function fromWireGetModelResponse(w: any): GetModelResponse {
   const v = {} as GetModelResponse
   v.createdAT = new Date(w['created-at'])
+  if (w['deprecation-date'] !== undefined) v.deprecationDate = new Date(w['deprecation-date'])
   v.id = w['id']
+  if (w['lifecycle-status'] !== undefined) v.lifecycleStatus = w['lifecycle-status']
   v.modelSize = w['model-size']
   v.name = w['name']
   v.state = w['state']
   v.updatedAT = new Date(w['updated-at'])
+  if (w['visibility'] !== undefined) v.visibility = w['visibility']
   return v
 }
 
-/**
- * GPU usage for an organization
- */
-export interface GetOrganizationUsageResponse {
+export interface GetPublicKeyResponse {
   /**
-   * Total GPU count
-   *
-   * Min 0, Read-only
+   * The UUID of the KMS key the public key material belongs to.
    */
-  gpu: number
+  keyID?: string
+  /**
+   * The cryptographic key specification of the key pair, defining its algorithm and curve.
+   */
+  keySpec?: string
+  /**
+   * The Base64-encoded X.509 SubjectPublicKeyInfo (SPKI) DER encoding of the key's public key.
+   */
+  publicKey?: string
+  /**
+   * The usage of the key pair, either `encrypt-decrypt` or `sign-verify`.
+   */
+  usage?: string
 }
 
 /** @internal */
-export function toWireGetOrganizationUsageResponse(
-  v: GetOrganizationUsageResponse,
-): Record<string, unknown> {
+export function toWireGetPublicKeyResponse(v: GetPublicKeyResponse): Record<string, unknown> {
   const o: Record<string, unknown> = {}
-  if (v.gpu !== undefined) o['gpu'] = v.gpu
+  if (v.keyID !== undefined) o['key-id'] = v.keyID
+  if (v.keySpec !== undefined) o['key-spec'] = v.keySpec
+  if (v.publicKey !== undefined) o['public-key'] = v.publicKey
+  if (v.usage !== undefined) o['usage'] = v.usage
   return o
 }
 
 /** @internal */
-export function fromWireGetOrganizationUsageResponse(w: any): GetOrganizationUsageResponse {
-  const v = {} as GetOrganizationUsageResponse
-  v.gpu = w['gpu']
+export function fromWireGetPublicKeyResponse(w: any): GetPublicKeyResponse {
+  const v = {} as GetPublicKeyResponse
+  if (w['key-id'] !== undefined) v.keyID = w['key-id']
+  if (w['key-spec'] !== undefined) v.keySpec = w['key-spec']
+  if (w['public-key'] !== undefined) v.publicKey = w['public-key']
+  if (w['usage'] !== undefined) v.usage = w['usage']
   return v
 }
 
@@ -9919,7 +10219,92 @@ export function fromWireIAMServicePolicyRule(w: any): IAMServicePolicyRule {
   return v
 }
 
+/**
+ * IAM System Role
+ */
+export interface IAMSystemRole {
+  /**
+   * IAM Assume System Role Policy
+   */
+  assumeRolePolicy?: IAMAssumeRolePolicy
+  /**
+   * IAM System Role description
+   *
+   * Length 1-255
+   */
+  description?: string
+  /**
+   * IAM System Role mutability
+   */
+  editable?: boolean
+  /**
+   * IAM System Role ID
+   *
+   * Read-only
+   */
+  id?: string
+  /**
+   * IAM System Role Labels
+   */
+  labels?: Labels
+  /**
+   * Maximum TTL requester is allowed to ask for when assuming a system role
+   *
+   * Min >0
+   */
+  maxSessionTtl?: number
+  /**
+   * IAM System Role name
+   *
+   * Length 1-255
+   */
+  name?: string
+  /**
+   * IAM System Role permissions
+   *
+   * Unique items
+   */
+  permissions?: string[]
+  /**
+   * IAM System Role Policy
+   */
+  policy?: IAMPolicy
+}
+
+/** @internal */
+export function toWireIAMSystemRole(v: IAMSystemRole): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.assumeRolePolicy !== undefined)
+    o['assume-role-policy'] = toWireIAMAssumeRolePolicy(v.assumeRolePolicy)
+  if (v.description !== undefined) o['description'] = v.description
+  if (v.editable !== undefined) o['editable'] = v.editable
+  if (v.id !== undefined) o['id'] = v.id
+  if (v.labels !== undefined) o['labels'] = v.labels
+  if (v.maxSessionTtl !== undefined) o['max-session-ttl'] = v.maxSessionTtl
+  if (v.name !== undefined) o['name'] = v.name
+  if (v.permissions !== undefined) o['permissions'] = v.permissions
+  if (v.policy !== undefined) o['policy'] = toWireIAMPolicy(v.policy)
+  return o
+}
+
+/** @internal */
+export function fromWireIAMSystemRole(w: any): IAMSystemRole {
+  const v = {} as IAMSystemRole
+  if (w['assume-role-policy'] !== undefined)
+    v.assumeRolePolicy = fromWireIAMAssumeRolePolicy(w['assume-role-policy'])
+  if (w['description'] !== undefined) v.description = w['description']
+  if (w['editable'] !== undefined) v.editable = w['editable']
+  if (w['id'] !== undefined) v.id = w['id']
+  if (w['labels'] !== undefined) v.labels = w['labels']
+  if (w['max-session-ttl'] !== undefined) v.maxSessionTtl = w['max-session-ttl']
+  if (w['name'] !== undefined) v.name = w['name']
+  if (w['permissions'] !== undefined) v.permissions = w['permissions']
+  if (w['policy'] !== undefined) v.policy = fromWireIAMPolicy(w['policy'])
+  return v
+}
+
 export interface ImpactBreakdown {
+  calculationDate: string
   impact: Record<string, ImpactValueWithUnit>
   zones: Record<string, ZoneImpact>
 }
@@ -9927,6 +10312,7 @@ export interface ImpactBreakdown {
 /** @internal */
 export function toWireImpactBreakdown(v: ImpactBreakdown): Record<string, unknown> {
   const o: Record<string, unknown> = {}
+  if (v.calculationDate !== undefined) o['calculation-date'] = v.calculationDate
   if (v.impact !== undefined)
     o['impact'] = Object.fromEntries(
       Object.entries(v.impact).map(([k, val]) => [k, toWireImpactValueWithUnit(val)]),
@@ -9941,6 +10327,7 @@ export function toWireImpactBreakdown(v: ImpactBreakdown): Record<string, unknow
 /** @internal */
 export function fromWireImpactBreakdown(w: any): ImpactBreakdown {
   const v = {} as ImpactBreakdown
+  v.calculationDate = w['calculation-date']
   v.impact = Object.fromEntries(
     Object.entries(w['impact'] ?? {}).map(([k, val]) => [k, fromWireImpactValueWithUnit(val)]),
   )
@@ -10106,7 +10493,7 @@ export function fromWireInferenceEngineParameterEntry(w: any): InferenceEnginePa
 /**
  * Inference engine version
  *
- * @defaultValue "0.28.0"
+ * @defaultValue "0.34.0"
  */
 export type InferenceEngineVersion =
   | '0.12.0'
@@ -10131,6 +10518,12 @@ export type InferenceEngineVersion =
   | '0.27.0'
   | '0.27.1'
   | '0.28.0'
+  | '0.29.0'
+  | '0.30.0'
+  | '0.31.0'
+  | '0.32.0'
+  | '0.33.0'
+  | '0.34.0'
 
 /**
  * Router flush payload: the router's full in-memory usage map with flush identity fields
@@ -10363,7 +10756,7 @@ export interface Instance {
    */
   instanceType?: InstanceType
   /**
-   * VPC ip forwarding
+   * Indicates if the instance can act as a router in a VPC network
    */
   ipForwarding?: boolean
   /**
@@ -10560,6 +10953,98 @@ export function fromWireInstancePassword(w: any): InstancePassword {
 }
 
 /**
+ * Instance Pool Error Reason
+ */
+export interface InstancePoolErrorReason {
+  /**
+   * Error cause
+   */
+  cause?: string
+  /**
+   * Job ID at the origin of error
+   */
+  jobID?: string
+  /**
+   * Error type
+   */
+  type?: string
+}
+
+/** @internal */
+export function toWireInstancePoolErrorReason(v: InstancePoolErrorReason): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.cause !== undefined) o['cause'] = v.cause
+  if (v.jobID !== undefined) o['job-id'] = v.jobID
+  if (v.type !== undefined) o['type'] = v.type
+  return o
+}
+
+/** @internal */
+export function fromWireInstancePoolErrorReason(w: any): InstancePoolErrorReason {
+  const v = {} as InstancePoolErrorReason
+  if (w['cause'] !== undefined) v.cause = w['cause']
+  if (w['job-id'] !== undefined) v.jobID = w['job-id']
+  if (w['type'] !== undefined) v.type = w['type']
+  return v
+}
+
+/**
+ * VPC Subnet
+ */
+export interface InstancePoolVpcSubnets {
+  /**
+   * Subnet ID
+   */
+  id: string
+}
+
+/** @internal */
+export function toWireInstancePoolVpcSubnets(v: InstancePoolVpcSubnets): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.id !== undefined) o['id'] = v.id
+  return o
+}
+
+/** @internal */
+export function fromWireInstancePoolVpcSubnets(w: any): InstancePoolVpcSubnets {
+  const v = {} as InstancePoolVpcSubnets
+  v.id = w['id']
+  return v
+}
+
+/**
+ * Instance Pool VPC
+ */
+export interface InstancePoolVpc {
+  /**
+   * VPC ID
+   */
+  id: string
+  /**
+   * VPC Subnets to attach the Instances to
+   *
+   * Unique items
+   */
+  subnets: InstancePoolVpcSubnets[]
+}
+
+/** @internal */
+export function toWireInstancePoolVpc(v: InstancePoolVpc): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.id !== undefined) o['id'] = v.id
+  if (v.subnets !== undefined) o['subnets'] = v.subnets.map((x) => toWireInstancePoolVpcSubnets(x))
+  return o
+}
+
+/** @internal */
+export function fromWireInstancePoolVpc(w: any): InstancePoolVpc {
+  const v = {} as InstancePoolVpc
+  v.id = w['id']
+  v.subnets = (w['subnets'] as any[]).map((x) => fromWireInstancePoolVpcSubnets(x))
+  return v
+}
+
+/**
  * Instance Pool
  */
 export interface InstancePool {
@@ -10592,6 +11077,10 @@ export interface InstancePool {
    */
   elasticIPS?: ElasticIPRef[]
   /**
+   * Instance Pool Error Reason
+   */
+  errorReason?: InstancePoolErrorReason
+  /**
    * Instance Pool ID
    *
    * Read-only
@@ -10613,6 +11102,10 @@ export interface InstancePool {
    * Read-only
    */
   instances?: InstanceRef[]
+  /**
+   * Enable IP forwarding on the Instances VPC interfaces
+   */
+  ipForwarding?: boolean
   /**
    * Enable IPv6 for instances
    */
@@ -10669,7 +11162,14 @@ export interface InstancePool {
    * Read-only
    */
   state?:
-    'creating' | 'destroying' | 'running' | 'scaling-down' | 'scaling-up' | 'suspended' | 'updating'
+    | 'creating'
+    | 'destroying'
+    | 'error'
+    | 'running'
+    | 'scaling-down'
+    | 'scaling-up'
+    | 'suspended'
+    | 'updating'
   /**
    * Instances template
    */
@@ -10680,6 +11180,10 @@ export interface InstancePool {
    * Min length 1
    */
   userData?: string
+  /**
+   * Instance Pool VPC
+   */
+  vpc?: InstancePoolVpc
 }
 
 /** @internal */
@@ -10693,10 +11197,12 @@ export function toWireInstancePool(v: InstancePool): Record<string, unknown> {
   if (v.description !== undefined) o['description'] = v.description
   if (v.diskSize !== undefined) o['disk-size'] = v.diskSize
   if (v.elasticIPS !== undefined) o['elastic-ips'] = v.elasticIPS.map((x) => toWireElasticIPRef(x))
+  if (v.errorReason !== undefined) o['error-reason'] = toWireInstancePoolErrorReason(v.errorReason)
   if (v.id !== undefined) o['id'] = v.id
   if (v.instancePrefix !== undefined) o['instance-prefix'] = v.instancePrefix
   if (v.instanceType !== undefined) o['instance-type'] = toWireInstanceTypeRef(v.instanceType)
   if (v.instances !== undefined) o['instances'] = v.instances.map((x) => toWireInstanceRef(x))
+  if (v.ipForwarding !== undefined) o['ip-forwarding'] = v.ipForwarding
   if (v.ipv6Enabled !== undefined) o['ipv6-enabled'] = v.ipv6Enabled
   if (v.labels !== undefined) o['labels'] = v.labels
   if (v.manager !== undefined) o['manager'] = toWireManager(v.manager)
@@ -10713,6 +11219,7 @@ export function toWireInstancePool(v: InstancePool): Record<string, unknown> {
   if (v.state !== undefined) o['state'] = v.state
   if (v.template !== undefined) o['template'] = toWireTemplateRef(v.template)
   if (v.userData !== undefined) o['user-data'] = v.userData
+  if (v.vpc !== undefined) o['vpc'] = toWireInstancePoolVpc(v.vpc)
   return o
 }
 
@@ -10730,11 +11237,14 @@ export function fromWireInstancePool(w: any): InstancePool {
   if (w['disk-size'] !== undefined) v.diskSize = w['disk-size']
   if (w['elastic-ips'] !== undefined)
     v.elasticIPS = (w['elastic-ips'] as any[]).map((x) => fromWireElasticIPRef(x))
+  if (w['error-reason'] !== undefined)
+    v.errorReason = fromWireInstancePoolErrorReason(w['error-reason'])
   if (w['id'] !== undefined) v.id = w['id']
   if (w['instance-prefix'] !== undefined) v.instancePrefix = w['instance-prefix']
   if (w['instance-type'] !== undefined) v.instanceType = fromWireInstanceTypeRef(w['instance-type'])
   if (w['instances'] !== undefined)
     v.instances = (w['instances'] as any[]).map((x) => fromWireInstanceRef(x))
+  if (w['ip-forwarding'] !== undefined) v.ipForwarding = w['ip-forwarding']
   if (w['ipv6-enabled'] !== undefined) v.ipv6Enabled = w['ipv6-enabled']
   if (w['labels'] !== undefined) v.labels = w['labels']
   if (w['manager'] !== undefined) v.manager = fromWireManager(w['manager'])
@@ -10752,6 +11262,7 @@ export function fromWireInstancePool(w: any): InstancePool {
   if (w['state'] !== undefined) v.state = w['state']
   if (w['template'] !== undefined) v.template = fromWireTemplateRef(w['template'])
   if (w['user-data'] !== undefined) v.userData = w['user-data']
+  if (w['vpc'] !== undefined) v.vpc = fromWireInstancePoolVpc(w['vpc'])
   return v
 }
 
@@ -10809,6 +11320,8 @@ export type InstanceState =
   | 'error'
   | 'expunging'
   | 'migrating'
+  | 'rebooting'
+  | 'resetting'
   | 'running'
   | 'starting'
   | 'stopped'
@@ -12782,6 +13295,107 @@ export function fromWireJSONSchemaKafkaRest(w: any): JSONSchemaKafkaRest {
  */
 export interface JSONSchemaMysql {
   /**
+   * When enabled, the server automatically grants the EXECUTE and ALTER ROUTINE privileges to the creator of a stored routine and drops them when the routine is dropped.
+   *
+   * @example true
+   */
+  automaticSPPrivileges?: boolean
+  /**
+   * The default collation for databases created without one, which their new tables then inherit. Only collations of the utf8mb4 character set are accepted. Databases Aiven creates, defaultdb and those added through the API or Console, keep utf8mb4_0900_ai_ci. Changing it leaves existing databases as they are. A change applies to new connections at once. After the next server restart, for example at maintenance, an upgrade, a plan change or a node replacement, sessions reset with COM_RESET_CONNECTION also compare strings with this collation, which a change without a restart does not do. Every 0900 collation except utf8mb4_0900_ai_ci has an id above 255, so after that restart MySQL announces a wrong character set to connecting clients. Clients that take their character set from the server, such as PHP mysqli and PDO without a charset option and MySQL Connector/NET (MySql.Data) without CharSet, must then set utf8mb4 themselves. Default is utf8mb4_0900_ai_ci.
+   *
+   * @example "utf8mb4_unicode_ci"
+   */
+  collationServer?:
+    | 'utf8mb4_0900_ai_ci'
+    | 'utf8mb4_0900_as_ci'
+    | 'utf8mb4_0900_as_cs'
+    | 'utf8mb4_0900_bin'
+    | 'utf8mb4_bg_0900_ai_ci'
+    | 'utf8mb4_bg_0900_as_cs'
+    | 'utf8mb4_bin'
+    | 'utf8mb4_bs_0900_ai_ci'
+    | 'utf8mb4_bs_0900_as_cs'
+    | 'utf8mb4_croatian_ci'
+    | 'utf8mb4_cs_0900_ai_ci'
+    | 'utf8mb4_cs_0900_as_cs'
+    | 'utf8mb4_czech_ci'
+    | 'utf8mb4_da_0900_ai_ci'
+    | 'utf8mb4_da_0900_as_cs'
+    | 'utf8mb4_danish_ci'
+    | 'utf8mb4_de_pb_0900_ai_ci'
+    | 'utf8mb4_de_pb_0900_as_cs'
+    | 'utf8mb4_eo_0900_ai_ci'
+    | 'utf8mb4_eo_0900_as_cs'
+    | 'utf8mb4_es_0900_ai_ci'
+    | 'utf8mb4_es_0900_as_cs'
+    | 'utf8mb4_es_trad_0900_ai_ci'
+    | 'utf8mb4_es_trad_0900_as_cs'
+    | 'utf8mb4_esperanto_ci'
+    | 'utf8mb4_estonian_ci'
+    | 'utf8mb4_et_0900_ai_ci'
+    | 'utf8mb4_et_0900_as_cs'
+    | 'utf8mb4_general_ci'
+    | 'utf8mb4_german2_ci'
+    | 'utf8mb4_gl_0900_ai_ci'
+    | 'utf8mb4_gl_0900_as_cs'
+    | 'utf8mb4_hr_0900_ai_ci'
+    | 'utf8mb4_hr_0900_as_cs'
+    | 'utf8mb4_hu_0900_ai_ci'
+    | 'utf8mb4_hu_0900_as_cs'
+    | 'utf8mb4_hungarian_ci'
+    | 'utf8mb4_icelandic_ci'
+    | 'utf8mb4_is_0900_ai_ci'
+    | 'utf8mb4_is_0900_as_cs'
+    | 'utf8mb4_ja_0900_as_cs'
+    | 'utf8mb4_ja_0900_as_cs_ks'
+    | 'utf8mb4_la_0900_ai_ci'
+    | 'utf8mb4_la_0900_as_cs'
+    | 'utf8mb4_latvian_ci'
+    | 'utf8mb4_lithuanian_ci'
+    | 'utf8mb4_lt_0900_ai_ci'
+    | 'utf8mb4_lt_0900_as_cs'
+    | 'utf8mb4_lv_0900_ai_ci'
+    | 'utf8mb4_lv_0900_as_cs'
+    | 'utf8mb4_mn_cyrl_0900_ai_ci'
+    | 'utf8mb4_mn_cyrl_0900_as_cs'
+    | 'utf8mb4_nb_0900_ai_ci'
+    | 'utf8mb4_nb_0900_as_cs'
+    | 'utf8mb4_nn_0900_ai_ci'
+    | 'utf8mb4_nn_0900_as_cs'
+    | 'utf8mb4_persian_ci'
+    | 'utf8mb4_pl_0900_ai_ci'
+    | 'utf8mb4_pl_0900_as_cs'
+    | 'utf8mb4_polish_ci'
+    | 'utf8mb4_ro_0900_ai_ci'
+    | 'utf8mb4_ro_0900_as_cs'
+    | 'utf8mb4_roman_ci'
+    | 'utf8mb4_romanian_ci'
+    | 'utf8mb4_ru_0900_ai_ci'
+    | 'utf8mb4_ru_0900_as_cs'
+    | 'utf8mb4_sinhala_ci'
+    | 'utf8mb4_sk_0900_ai_ci'
+    | 'utf8mb4_sk_0900_as_cs'
+    | 'utf8mb4_sl_0900_ai_ci'
+    | 'utf8mb4_sl_0900_as_cs'
+    | 'utf8mb4_slovak_ci'
+    | 'utf8mb4_slovenian_ci'
+    | 'utf8mb4_spanish2_ci'
+    | 'utf8mb4_spanish_ci'
+    | 'utf8mb4_sr_latn_0900_ai_ci'
+    | 'utf8mb4_sr_latn_0900_as_cs'
+    | 'utf8mb4_sv_0900_ai_ci'
+    | 'utf8mb4_sv_0900_as_cs'
+    | 'utf8mb4_swedish_ci'
+    | 'utf8mb4_tr_0900_ai_ci'
+    | 'utf8mb4_tr_0900_as_cs'
+    | 'utf8mb4_turkish_ci'
+    | 'utf8mb4_unicode_520_ci'
+    | 'utf8mb4_unicode_ci'
+    | 'utf8mb4_vi_0900_ai_ci'
+    | 'utf8mb4_vi_0900_as_cs'
+    | 'utf8mb4_vietnamese_ci'
+    | 'utf8mb4_zh_0900_as_cs'
+  /**
    * The number of seconds that the mysqld server waits for a connect packet before responding with Bad handshake
    *
    * Min 2, Max 3600
@@ -12797,6 +13411,34 @@ export interface JSONSchemaMysql {
    * @example "+03:00"
    */
   defaultTimeZone?: string
+  /**
+   * Number of digits by which to increase the scale of the result of division operations performed with the / operator. Default is 4.
+   *
+   * Min 0, Max 30
+   *
+   * @example 6
+   */
+  divPrecisionIncrement?: number
+  /**
+   * Whether optimizer JSON output such as EXPLAIN FORMAT=JSON adds end markers that repeat a structure's key near its closing bracket, making large JSON structures easier to read.
+   *
+   * @example false
+   */
+  endMarkersInJSON?: boolean
+  /**
+   * The number of equality ranges in a query at or above which the optimizer switches from index dives to index statistics when estimating the number of qualifying rows. 0 means always use index dives. Default is 200.
+   *
+   * Min 0, Max 4294967295
+   *
+   * @example 100
+   */
+  eqRangeIndexDiveLimit?: number
+  /**
+   * Whether the event scheduler runs the events created with CREATE EVENT. Set OFF to stop every event on the service without dropping it, and ON to start them again. A change applies at once, without a restart. Events take effect only on the primary node. After a failover, they are re-enabled on the new primary. Default is ON.
+   *
+   * @example "OFF"
+   */
+  eventScheduler?: 'OFF' | 'ON'
   /**
    * The maximum permitted result length in bytes for the GROUP_CONCAT() function.
    *
@@ -12814,6 +13456,12 @@ export interface JSONSchemaMysql {
    */
   informationSchemaStatsExpiry?: number
   /**
+   * Whether InnoDB adaptive hash indexing is enabled. The optimal setting is workload-dependent: it speeds up lookups for some workloads but its internal latch can become a contention point under high concurrency, in which case disabling it can improve throughput.
+   *
+   * @example false
+   */
+  innodbAdaptiveHashIndex?: boolean
+  /**
    * Maximum size for the InnoDB change buffer, as a percentage of the total size of the buffer pool. Default is 25
    *
    * Min 0, Max 50
@@ -12830,6 +13478,28 @@ export interface JSONSchemaMysql {
    */
   innodbFlushNeighbors?: number
   /**
+   * The size in bytes of the InnoDB FULLTEXT index cache for each table. Pending index updates are flushed to disk when the cache reaches this limit. innodb_ft_total_cache_size controls the combined cache limit for all tables. Default is 8000000. Changing this parameter will lead to a restart of the MySQL service.
+   *
+   * Min 1600000, Max 80000000
+   *
+   * @example 8000000
+   */
+  innodbFTCacheSize?: number
+  /**
+   * Whether stopword processing is applied when creating or rebuilding an InnoDB FULLTEXT index. Enabled by default.
+   *
+   * @example false
+   */
+  innodbFTEnableStopword?: boolean
+  /**
+   * Maximum length of words that are stored in an InnoDB FULLTEXT index. Changing this parameter will lead to a restart of the MySQL service.
+   *
+   * Min 10, Max 84
+   *
+   * @example 60
+   */
+  innodbFTMaxTokenSize?: number
+  /**
    * Minimum length of words that are stored in an InnoDB FULLTEXT index. Changing this parameter will lead to a restart of the MySQL service.
    *
    * Min 0, Max 16
@@ -12838,6 +13508,22 @@ export interface JSONSchemaMysql {
    */
   innodbFTMinTokenSize?: number
   /**
+   * Number of words processed during each OPTIMIZE TABLE operation on an InnoDB FULLTEXT index. Default is 2000.
+   *
+   * Min 1000, Max 10000
+   *
+   * @example 4000
+   */
+  innodbFTNumWordOptimize?: number
+  /**
+   * Maximum memory in bytes used per query for the InnoDB FULLTEXT search query result cache. Aiven sizes this automatically based on the service plan's memory; setting a value overrides the calculated default.
+   *
+   * Min 1000000, Max 4294967295
+   *
+   * @example 2000000000
+   */
+  innodbFTResultCacheLimit?: number
+  /**
    * This option is used to specify your own InnoDB FULLTEXT index stopword list for all InnoDB tables.
    *
    * Max length 1024, Pattern `^.+/.+$`
@@ -12845,6 +13531,46 @@ export interface JSONSchemaMysql {
    * @example "db_name/table_name"
    */
   innodbFTServerStopwordTable?: string | null
+  /**
+   * The number of parallel threads used to tokenize and index text when building an InnoDB FULLTEXT index. Default is 2. Changing this parameter will lead to a restart of the MySQL service.
+   *
+   * Min 1, Max 32
+   *
+   * @example 2
+   */
+  innodbFTSortPllDegree?: number
+  /**
+   * The combined memory limit in bytes for InnoDB FULLTEXT index caches across all tables. When an index operation reaches this limit, InnoDB forces cached index updates to disk to reduce memory usage. Values above 5% of plan RAM are rejected. Changing this parameter will lead to a restart of the MySQL service.
+   *
+   * Min 32000000, Max 1600000000
+   *
+   * @example 640000000
+   */
+  innodbFTTotalCacheSize?: number
+  /**
+   * This option is used to specify your own InnoDB FULLTEXT index stopword list for specific InnoDB tables.
+   *
+   * Max length 1024, Pattern `^.+/.+$`
+   *
+   * @example "db_name/table_name"
+   */
+  innodbFTUserStopwordTable?: string | null
+  /**
+   * The number of I/O operations per second (IOPS) available to InnoDB background tasks, such as flushing pages from the buffer pool and merging data from the change buffer. Set this to a value appropriate for the underlying storage; it must not exceed innodb_io_capacity_max.
+   *
+   * Min 100, Max 4294967295
+   *
+   * @example 2000
+   */
+  innodbIoCapacity?: number
+  /**
+   * The maximum number of I/O operations per second (IOPS) that InnoDB background tasks may perform when flushing falls behind. Defaults to twice innodb_io_capacity (minimum 2000). This must be greater than or equal to innodb_io_capacity.
+   *
+   * Min 100, Max 4294967295
+   *
+   * @example 4000
+   */
+  innodbIoCapacityMax?: number
   /**
    * The length of time in seconds an InnoDB transaction waits for a row lock before giving up. Default is 120.
    *
@@ -12862,6 +13588,38 @@ export interface JSONSchemaMysql {
    */
   innodbLogBufferSize?: number
   /**
+   * Percentage of dirty pages in the InnoDB buffer pool at which InnoDB starts flushing aggressively. Lowering it spreads write I/O more evenly and shortens crash recovery, at the cost of flushing pages that might have been modified again. Must stay at or above innodb_max_dirty_pages_pct_lwm. Default is 90.
+   *
+   * Min 5, Max 99
+   *
+   * @example 75
+   */
+  innodbMaxDirtyPagesPct?: number
+  /**
+   * Percentage of dirty pages in the InnoDB buffer pool at which InnoDB starts pre-flushing, to keep the dirty page ratio from reaching innodb_max_dirty_pages_pct. 0 turns pre-flushing off. Cannot be set above innodb_max_dirty_pages_pct. Default is 10.
+   *
+   * Min 0, Max 99
+   *
+   * @example 10
+   */
+  innodbMaxDirtyPagesPctLwm?: number
+  /**
+   * Number of outstanding transactions the InnoDB purge operation may fall behind by before INSERT, UPDATE and DELETE are delayed to let it catch up. The delay applies per row and grows with the lag, and it is capped by innodb_max_purge_lag_delay, which has to be set as well for this option to have any effect. Default is 0, which never delays anything.
+   *
+   * Min 0, Max 4294967295
+   *
+   * @example 1000000
+   */
+  innodbMaxPurgeLag?: number
+  /**
+   * Cap in microseconds on the per-row delay innodb_max_purge_lag applies to INSERT, UPDATE and DELETE. MySQL clamps the delay to this value unconditionally, so while this is 0 no delay is ever applied and innodb_max_purge_lag on its own does nothing. Both options must be non-zero for either to take effect. Default is 0.
+   *
+   * Min 0, Max 10000000
+   *
+   * @example 10000
+   */
+  innodbMaxPurgeLagDelay?: number
+  /**
    * The upper limit in bytes on the size of the temporary log files used during online DDL operations for InnoDB tables.
    *
    * Min 65536, Max 1099511627776
@@ -12869,6 +13627,12 @@ export interface JSONSchemaMysql {
    * @example 134217728
    */
   innodbOnlineAlterLogMaxSize?: number
+  /**
+   * When enabled, OPTIMIZE TABLE on InnoDB tables only updates the FULLTEXT index instead of rebuilding the table. Intended to be enabled temporarily during FULLTEXT index maintenance and disabled afterwards; while enabled, OPTIMIZE TABLE does not reclaim table space.
+   *
+   * @example false
+   */
+  innodbOptimizeFulltextOnly?: boolean
   /**
    * When enabled, information about all deadlocks in InnoDB user transactions is recorded in the error log. Disabled by default.
    *
@@ -12889,6 +13653,14 @@ export interface JSONSchemaMysql {
    * @example true
    */
   innodbRollbackOnTimeout?: boolean
+  /**
+   * The size in bytes of the sort buffer used when creating InnoDB indexes. Also controls the read and write buffer sizes for the temporary log used during online DDL operations. Default is 1048576 (1 MiB). Changing this parameter will lead to a restart of the MySQL service.
+   *
+   * Min 65536, Max 67108864
+   *
+   * @example 1048576
+   */
+  innodbSortBufferSize?: number
   /**
    * Defines the maximum number of threads permitted inside of InnoDB. Default is 0 (infinite concurrency - no limit)
    *
@@ -12934,6 +13706,12 @@ export interface JSONSchemaMysql {
    */
   longQueryTime?: number
   /**
+   * Sets how table and database names are stored and compared. 0 = case-sensitive (default), 1 = names stored lowercase, comparisons are case-insensitive. This option can only be set when creating the service and cannot be changed later. See https://dev.mysql.com/doc/refman/8.0/en/identifier-case-sensitivity.html for details.
+   *
+   * @example 0
+   */
+  lowerCaseTableNames?: 0 | 1
+  /**
    * Size of the largest message in bytes that can be received by the server. Default is 67108864 (64M)
    *
    * Min 102400, Max 1073741824
@@ -12942,6 +13720,22 @@ export interface JSONSchemaMysql {
    */
   maxAllowedPacket?: number
   /**
+   * The maximum permitted number of simultaneous client connections. Lower this to reserve memory for other work. The value cannot exceed the limit provided by your service plan. Upgrading the plan does not raise a value you have set explicitly, so increase it yourself after an upgrade.
+   *
+   * Min 30, Max 100000
+   *
+   * @example 200
+   */
+  maxConnections?: number
+  /**
+   * Execution timeout in milliseconds for read-only top-level SELECT statements. 0 (the default) means no timeout.
+   *
+   * Min 0, Max 4294967295
+   *
+   * @example 15000
+   */
+  maxExecutionTime?: number
+  /**
    * Limits the size of internal in-memory tables. Also set tmp_table_size. Default is 16777216 (16M)
    *
    * Min 1048576, Max 1073741824
@@ -12949,6 +13743,22 @@ export interface JSONSchemaMysql {
    * @example 16777216
    */
   maxHeapTableSize?: number
+  /**
+   * Limit on the assumed maximum number of index seeks when looking up rows based on a key. Lowering this value causes the optimizer to prefer index lookups over table scans.
+   *
+   * Min 1, Max 18446744073709552000
+   *
+   * @example 100
+   */
+  maxSeeksForKey?: number
+  /**
+   * The maximum number of simultaneous connections permitted to any single user account. 0, the default, means no per-account limit. Any other value must be at least 10 below max_connections, so that monitoring and your own admin sessions can still connect when an application saturates its own limit. Aiven's replication and management connections are unaffected however low you set this.
+   *
+   * Min 0, Max 99990
+   *
+   * @example 50
+   */
+  maxUserConnections?: number
   /**
    * Start sizes of connection buffer and result buffer. Default is 16384 (16K). Changing this parameter will lead to a restart of the MySQL service.
    *
@@ -12973,6 +13783,52 @@ export interface JSONSchemaMysql {
    * @example 30
    */
   netWriteTimeout?: number
+  /**
+   * Controls the heuristics applied during query optimization to prune less-promising partial plans from the optimizer search space. 0 disables heuristics (exhaustive search); 1 prunes plans based on the number of rows retrieved.
+   *
+   * Min 0, Max 1
+   *
+   * @example 1
+   */
+  optimizerPruneLevel?: number
+  /**
+   * Maximum depth of search performed by the query optimizer when choosing a join order. Larger values produce better plans for joins over many tables but take longer to compile; 0 lets the optimizer choose the depth automatically.
+   *
+   * Min 0, Max 62
+   *
+   * @example 62
+   */
+  optimizerSearchDepth?: number
+  /**
+   * Comma-separated list of optimizer flag assignments in the form flag=on|off|default, or the single value 'default' to reset all flags. Flags not listed keep their current values. Controls query optimizer behaviors such as index merge, hash join and semijoin strategies.
+   *
+   * Pattern `^(default|[a-z_]+=(on|off|default)(,[a-z_]+=(on|off|default))*)$`
+   *
+   * @example "batched_key_access=on,mrr_cost_based=off"
+   */
+  optimizerSwitch?: string
+  /**
+   * The number of rows per thread in the events_statements_history table. Changing this parameter will lead to a restart of the MySQL service.
+   *
+   * Min 0, Max 1024
+   */
+  performanceSchemaEventsStatementsHistorySize?: number | null
+  /**
+   * The maximum amount of space in bytes to use for all relay logs while replicating from an external migration source. When the limit is reached, the replication I/O thread stops fetching relay log events until the SQL thread has caught up. Raise this to give a large migration a bigger relay-log budget; ensure the service disk is sized accordingly. The setting applies only on the node replicating from the external source; standby nodes always use the Aiven-managed default (the smaller of 5 GiB and 30% of the service disk), which is also used when this option is left unset. Changing this parameter will lead to a restart of the MySQL service.
+   *
+   * Min 134217728, Max 18446744073709552000
+   *
+   * @example 5368709120
+   */
+  relayLogSpaceLimit?: number
+  /**
+   * The number of schema definition objects the data dictionary object cache can hold. Raise it above the number of schemas on the service to keep their definitions in memory. Each cached definition uses a small amount of memory, and the cache never holds more than the service's own schemas, so a high value costs nothing extra on a service with few schemas. Default is 256.
+   *
+   * Min 256, Max 524288
+   *
+   * @example 4000
+   */
+  schemaDefinitionCache?: number
   /**
    * Slow query log enables capturing of slow queries. Setting slow_query_log to false also truncates the mysql.slow_log table. Default is off
    *
@@ -13002,6 +13858,14 @@ export interface JSONSchemaMysql {
    */
   sqlRequirePrimaryKey?: boolean
   /**
+   * The number of tablespace definition objects the data dictionary object cache can hold. Each InnoDB table stored in its own file is a separate tablespace, so raise it above the number of tables on the service to keep their tablespace definitions in memory. Each cached definition uses a small amount of memory, and the cache never holds more than the service's own tables, so a high value costs nothing extra on a service with few tables. Default is 256.
+   *
+   * Min 256, Max 524288
+   *
+   * @example 10000
+   */
+  tablespaceDefinitionCache?: number
+  /**
    * Limits the size of internal in-memory tables. Also set max_heap_table_size. Default is 16777216 (16M)
    *
    * Min 1048576, Max 1073741824
@@ -13022,27 +13886,63 @@ export interface JSONSchemaMysql {
 /** @internal */
 export function toWireJSONSchemaMysql(v: JSONSchemaMysql): Record<string, unknown> {
   const o: Record<string, unknown> = {}
+  if (v.automaticSPPrivileges !== undefined) o['automatic_sp_privileges'] = v.automaticSPPrivileges
+  if (v.collationServer !== undefined) o['collation_server'] = v.collationServer
   if (v.connectTimeout !== undefined) o['connect_timeout'] = v.connectTimeout
   if (v.defaultTimeZone !== undefined) o['default_time_zone'] = v.defaultTimeZone
+  if (v.divPrecisionIncrement !== undefined) o['div_precision_increment'] = v.divPrecisionIncrement
+  if (v.endMarkersInJSON !== undefined) o['end_markers_in_json'] = v.endMarkersInJSON
+  if (v.eqRangeIndexDiveLimit !== undefined)
+    o['eq_range_index_dive_limit'] = v.eqRangeIndexDiveLimit
+  if (v.eventScheduler !== undefined) o['event_scheduler'] = v.eventScheduler
   if (v.groupConcatMaxLen !== undefined) o['group_concat_max_len'] = v.groupConcatMaxLen
   if (v.informationSchemaStatsExpiry !== undefined)
     o['information_schema_stats_expiry'] = v.informationSchemaStatsExpiry
+  if (v.innodbAdaptiveHashIndex !== undefined)
+    o['innodb_adaptive_hash_index'] = v.innodbAdaptiveHashIndex
   if (v.innodbChangeBufferMaxSize !== undefined)
     o['innodb_change_buffer_max_size'] = v.innodbChangeBufferMaxSize
   if (v.innodbFlushNeighbors !== undefined) o['innodb_flush_neighbors'] = v.innodbFlushNeighbors
+  if (v.innodbFTCacheSize !== undefined) o['innodb_ft_cache_size'] = v.innodbFTCacheSize
+  if (v.innodbFTEnableStopword !== undefined)
+    o['innodb_ft_enable_stopword'] = v.innodbFTEnableStopword
+  if (v.innodbFTMaxTokenSize !== undefined) o['innodb_ft_max_token_size'] = v.innodbFTMaxTokenSize
   if (v.innodbFTMinTokenSize !== undefined) o['innodb_ft_min_token_size'] = v.innodbFTMinTokenSize
+  if (v.innodbFTNumWordOptimize !== undefined)
+    o['innodb_ft_num_word_optimize'] = v.innodbFTNumWordOptimize
+  if (v.innodbFTResultCacheLimit !== undefined)
+    o['innodb_ft_result_cache_limit'] = v.innodbFTResultCacheLimit
   if (v.innodbFTServerStopwordTable !== undefined)
     o['innodb_ft_server_stopword_table'] =
       v.innodbFTServerStopwordTable === null ? null : v.innodbFTServerStopwordTable
+  if (v.innodbFTSortPllDegree !== undefined)
+    o['innodb_ft_sort_pll_degree'] = v.innodbFTSortPllDegree
+  if (v.innodbFTTotalCacheSize !== undefined)
+    o['innodb_ft_total_cache_size'] = v.innodbFTTotalCacheSize
+  if (v.innodbFTUserStopwordTable !== undefined)
+    o['innodb_ft_user_stopword_table'] =
+      v.innodbFTUserStopwordTable === null ? null : v.innodbFTUserStopwordTable
+  if (v.innodbIoCapacity !== undefined) o['innodb_io_capacity'] = v.innodbIoCapacity
+  if (v.innodbIoCapacityMax !== undefined) o['innodb_io_capacity_max'] = v.innodbIoCapacityMax
   if (v.innodbLockWaitTimeout !== undefined) o['innodb_lock_wait_timeout'] = v.innodbLockWaitTimeout
   if (v.innodbLogBufferSize !== undefined) o['innodb_log_buffer_size'] = v.innodbLogBufferSize
+  if (v.innodbMaxDirtyPagesPct !== undefined)
+    o['innodb_max_dirty_pages_pct'] = v.innodbMaxDirtyPagesPct
+  if (v.innodbMaxDirtyPagesPctLwm !== undefined)
+    o['innodb_max_dirty_pages_pct_lwm'] = v.innodbMaxDirtyPagesPctLwm
+  if (v.innodbMaxPurgeLag !== undefined) o['innodb_max_purge_lag'] = v.innodbMaxPurgeLag
+  if (v.innodbMaxPurgeLagDelay !== undefined)
+    o['innodb_max_purge_lag_delay'] = v.innodbMaxPurgeLagDelay
   if (v.innodbOnlineAlterLogMaxSize !== undefined)
     o['innodb_online_alter_log_max_size'] = v.innodbOnlineAlterLogMaxSize
+  if (v.innodbOptimizeFulltextOnly !== undefined)
+    o['innodb_optimize_fulltext_only'] = v.innodbOptimizeFulltextOnly
   if (v.innodbPrintAllDeadlocks !== undefined)
     o['innodb_print_all_deadlocks'] = v.innodbPrintAllDeadlocks
   if (v.innodbReadIoThreads !== undefined) o['innodb_read_io_threads'] = v.innodbReadIoThreads
   if (v.innodbRollbackOnTimeout !== undefined)
     o['innodb_rollback_on_timeout'] = v.innodbRollbackOnTimeout
+  if (v.innodbSortBufferSize !== undefined) o['innodb_sort_buffer_size'] = v.innodbSortBufferSize
   if (v.innodbThreadConcurrency !== undefined)
     o['innodb_thread_concurrency'] = v.innodbThreadConcurrency
   if (v.innodbWriteIoThreads !== undefined) o['innodb_write_io_threads'] = v.innodbWriteIoThreads
@@ -13051,15 +13951,32 @@ export function toWireJSONSchemaMysql(v: JSONSchemaMysql): Record<string, unknow
     o['internal_tmp_mem_storage_engine'] = v.internalTmpMemStorageEngine
   if (v.logOutput !== undefined) o['log_output'] = v.logOutput
   if (v.longQueryTime !== undefined) o['long_query_time'] = v.longQueryTime
+  if (v.lowerCaseTableNames !== undefined) o['lower_case_table_names'] = v.lowerCaseTableNames
   if (v.maxAllowedPacket !== undefined) o['max_allowed_packet'] = v.maxAllowedPacket
+  if (v.maxConnections !== undefined) o['max_connections'] = v.maxConnections
+  if (v.maxExecutionTime !== undefined) o['max_execution_time'] = v.maxExecutionTime
   if (v.maxHeapTableSize !== undefined) o['max_heap_table_size'] = v.maxHeapTableSize
+  if (v.maxSeeksForKey !== undefined) o['max_seeks_for_key'] = v.maxSeeksForKey
+  if (v.maxUserConnections !== undefined) o['max_user_connections'] = v.maxUserConnections
   if (v.netBufferLength !== undefined) o['net_buffer_length'] = v.netBufferLength
   if (v.netReadTimeout !== undefined) o['net_read_timeout'] = v.netReadTimeout
   if (v.netWriteTimeout !== undefined) o['net_write_timeout'] = v.netWriteTimeout
+  if (v.optimizerPruneLevel !== undefined) o['optimizer_prune_level'] = v.optimizerPruneLevel
+  if (v.optimizerSearchDepth !== undefined) o['optimizer_search_depth'] = v.optimizerSearchDepth
+  if (v.optimizerSwitch !== undefined) o['optimizer_switch'] = v.optimizerSwitch
+  if (v.performanceSchemaEventsStatementsHistorySize !== undefined)
+    o['performance_schema_events_statements_history_size'] =
+      v.performanceSchemaEventsStatementsHistorySize === null
+        ? null
+        : v.performanceSchemaEventsStatementsHistorySize
+  if (v.relayLogSpaceLimit !== undefined) o['relay_log_space_limit'] = v.relayLogSpaceLimit
+  if (v.schemaDefinitionCache !== undefined) o['schema_definition_cache'] = v.schemaDefinitionCache
   if (v.slowQueryLog !== undefined) o['slow_query_log'] = v.slowQueryLog
   if (v.sortBufferSize !== undefined) o['sort_buffer_size'] = v.sortBufferSize
   if (v.sqlMode !== undefined) o['sql_mode'] = v.sqlMode
   if (v.sqlRequirePrimaryKey !== undefined) o['sql_require_primary_key'] = v.sqlRequirePrimaryKey
+  if (v.tablespaceDefinitionCache !== undefined)
+    o['tablespace_definition_cache'] = v.tablespaceDefinitionCache
   if (v.tmpTableSize !== undefined) o['tmp_table_size'] = v.tmpTableSize
   if (v.waitTimeout !== undefined) o['wait_timeout'] = v.waitTimeout
   return o
@@ -13068,29 +13985,68 @@ export function toWireJSONSchemaMysql(v: JSONSchemaMysql): Record<string, unknow
 /** @internal */
 export function fromWireJSONSchemaMysql(w: any): JSONSchemaMysql {
   const v = {} as JSONSchemaMysql
+  if (w['automatic_sp_privileges'] !== undefined)
+    v.automaticSPPrivileges = w['automatic_sp_privileges']
+  if (w['collation_server'] !== undefined) v.collationServer = w['collation_server']
   if (w['connect_timeout'] !== undefined) v.connectTimeout = w['connect_timeout']
   if (w['default_time_zone'] !== undefined) v.defaultTimeZone = w['default_time_zone']
+  if (w['div_precision_increment'] !== undefined)
+    v.divPrecisionIncrement = w['div_precision_increment']
+  if (w['end_markers_in_json'] !== undefined) v.endMarkersInJSON = w['end_markers_in_json']
+  if (w['eq_range_index_dive_limit'] !== undefined)
+    v.eqRangeIndexDiveLimit = w['eq_range_index_dive_limit']
+  if (w['event_scheduler'] !== undefined) v.eventScheduler = w['event_scheduler']
   if (w['group_concat_max_len'] !== undefined) v.groupConcatMaxLen = w['group_concat_max_len']
   if (w['information_schema_stats_expiry'] !== undefined)
     v.informationSchemaStatsExpiry = w['information_schema_stats_expiry']
+  if (w['innodb_adaptive_hash_index'] !== undefined)
+    v.innodbAdaptiveHashIndex = w['innodb_adaptive_hash_index']
   if (w['innodb_change_buffer_max_size'] !== undefined)
     v.innodbChangeBufferMaxSize = w['innodb_change_buffer_max_size']
   if (w['innodb_flush_neighbors'] !== undefined)
     v.innodbFlushNeighbors = w['innodb_flush_neighbors']
+  if (w['innodb_ft_cache_size'] !== undefined) v.innodbFTCacheSize = w['innodb_ft_cache_size']
+  if (w['innodb_ft_enable_stopword'] !== undefined)
+    v.innodbFTEnableStopword = w['innodb_ft_enable_stopword']
+  if (w['innodb_ft_max_token_size'] !== undefined)
+    v.innodbFTMaxTokenSize = w['innodb_ft_max_token_size']
   if (w['innodb_ft_min_token_size'] !== undefined)
     v.innodbFTMinTokenSize = w['innodb_ft_min_token_size']
+  if (w['innodb_ft_num_word_optimize'] !== undefined)
+    v.innodbFTNumWordOptimize = w['innodb_ft_num_word_optimize']
+  if (w['innodb_ft_result_cache_limit'] !== undefined)
+    v.innodbFTResultCacheLimit = w['innodb_ft_result_cache_limit']
   if (w['innodb_ft_server_stopword_table'] !== undefined)
     v.innodbFTServerStopwordTable = w['innodb_ft_server_stopword_table']
+  if (w['innodb_ft_sort_pll_degree'] !== undefined)
+    v.innodbFTSortPllDegree = w['innodb_ft_sort_pll_degree']
+  if (w['innodb_ft_total_cache_size'] !== undefined)
+    v.innodbFTTotalCacheSize = w['innodb_ft_total_cache_size']
+  if (w['innodb_ft_user_stopword_table'] !== undefined)
+    v.innodbFTUserStopwordTable = w['innodb_ft_user_stopword_table']
+  if (w['innodb_io_capacity'] !== undefined) v.innodbIoCapacity = w['innodb_io_capacity']
+  if (w['innodb_io_capacity_max'] !== undefined) v.innodbIoCapacityMax = w['innodb_io_capacity_max']
   if (w['innodb_lock_wait_timeout'] !== undefined)
     v.innodbLockWaitTimeout = w['innodb_lock_wait_timeout']
   if (w['innodb_log_buffer_size'] !== undefined) v.innodbLogBufferSize = w['innodb_log_buffer_size']
+  if (w['innodb_max_dirty_pages_pct'] !== undefined)
+    v.innodbMaxDirtyPagesPct = w['innodb_max_dirty_pages_pct']
+  if (w['innodb_max_dirty_pages_pct_lwm'] !== undefined)
+    v.innodbMaxDirtyPagesPctLwm = w['innodb_max_dirty_pages_pct_lwm']
+  if (w['innodb_max_purge_lag'] !== undefined) v.innodbMaxPurgeLag = w['innodb_max_purge_lag']
+  if (w['innodb_max_purge_lag_delay'] !== undefined)
+    v.innodbMaxPurgeLagDelay = w['innodb_max_purge_lag_delay']
   if (w['innodb_online_alter_log_max_size'] !== undefined)
     v.innodbOnlineAlterLogMaxSize = w['innodb_online_alter_log_max_size']
+  if (w['innodb_optimize_fulltext_only'] !== undefined)
+    v.innodbOptimizeFulltextOnly = w['innodb_optimize_fulltext_only']
   if (w['innodb_print_all_deadlocks'] !== undefined)
     v.innodbPrintAllDeadlocks = w['innodb_print_all_deadlocks']
   if (w['innodb_read_io_threads'] !== undefined) v.innodbReadIoThreads = w['innodb_read_io_threads']
   if (w['innodb_rollback_on_timeout'] !== undefined)
     v.innodbRollbackOnTimeout = w['innodb_rollback_on_timeout']
+  if (w['innodb_sort_buffer_size'] !== undefined)
+    v.innodbSortBufferSize = w['innodb_sort_buffer_size']
   if (w['innodb_thread_concurrency'] !== undefined)
     v.innodbThreadConcurrency = w['innodb_thread_concurrency']
   if (w['innodb_write_io_threads'] !== undefined)
@@ -13100,16 +14056,33 @@ export function fromWireJSONSchemaMysql(w: any): JSONSchemaMysql {
     v.internalTmpMemStorageEngine = w['internal_tmp_mem_storage_engine']
   if (w['log_output'] !== undefined) v.logOutput = w['log_output']
   if (w['long_query_time'] !== undefined) v.longQueryTime = w['long_query_time']
+  if (w['lower_case_table_names'] !== undefined) v.lowerCaseTableNames = w['lower_case_table_names']
   if (w['max_allowed_packet'] !== undefined) v.maxAllowedPacket = w['max_allowed_packet']
+  if (w['max_connections'] !== undefined) v.maxConnections = w['max_connections']
+  if (w['max_execution_time'] !== undefined) v.maxExecutionTime = w['max_execution_time']
   if (w['max_heap_table_size'] !== undefined) v.maxHeapTableSize = w['max_heap_table_size']
+  if (w['max_seeks_for_key'] !== undefined) v.maxSeeksForKey = w['max_seeks_for_key']
+  if (w['max_user_connections'] !== undefined) v.maxUserConnections = w['max_user_connections']
   if (w['net_buffer_length'] !== undefined) v.netBufferLength = w['net_buffer_length']
   if (w['net_read_timeout'] !== undefined) v.netReadTimeout = w['net_read_timeout']
   if (w['net_write_timeout'] !== undefined) v.netWriteTimeout = w['net_write_timeout']
+  if (w['optimizer_prune_level'] !== undefined) v.optimizerPruneLevel = w['optimizer_prune_level']
+  if (w['optimizer_search_depth'] !== undefined)
+    v.optimizerSearchDepth = w['optimizer_search_depth']
+  if (w['optimizer_switch'] !== undefined) v.optimizerSwitch = w['optimizer_switch']
+  if (w['performance_schema_events_statements_history_size'] !== undefined)
+    v.performanceSchemaEventsStatementsHistorySize =
+      w['performance_schema_events_statements_history_size']
+  if (w['relay_log_space_limit'] !== undefined) v.relayLogSpaceLimit = w['relay_log_space_limit']
+  if (w['schema_definition_cache'] !== undefined)
+    v.schemaDefinitionCache = w['schema_definition_cache']
   if (w['slow_query_log'] !== undefined) v.slowQueryLog = w['slow_query_log']
   if (w['sort_buffer_size'] !== undefined) v.sortBufferSize = w['sort_buffer_size']
   if (w['sql_mode'] !== undefined) v.sqlMode = w['sql_mode']
   if (w['sql_require_primary_key'] !== undefined)
     v.sqlRequirePrimaryKey = w['sql_require_primary_key']
+  if (w['tablespace_definition_cache'] !== undefined)
+    v.tablespaceDefinitionCache = w['tablespace_definition_cache']
   if (w['tmp_table_size'] !== undefined) v.tmpTableSize = w['tmp_table_size']
   if (w['wait_timeout'] !== undefined) v.waitTimeout = w['wait_timeout']
   return v
@@ -13338,6 +14311,266 @@ export function fromWireJSONSchemaOpensearchAuthFailureListeners(
   return v
 }
 
+export interface JSONSchemaOpensearchClusterClusterRemoteStore {
+  /**
+   * The amount of time to wait for the cluster state upload to complete. Defaults to 20s.
+   *
+   * Pattern `^\d+\s*(?:[dhms]|ms|micros|nanos)$`
+   *
+   * @example "20s"
+   */
+  stateGlobalMetadataUploadTimeout?: string
+  /**
+   * The amount of time to wait for the manifest file upload to complete. The manifest file contains the details of each of the files uploaded for a single cluster state, both index metadata files and global metadata files. Defaults to 20s.
+   *
+   * Pattern `^\d+\s*(?:[dhms]|ms|micros|nanos)$`
+   *
+   * @example "20s"
+   */
+  stateMetadataManifestUploadTimeout?: string
+  /**
+   * The default value of the translog buffer interval used when performing periodic translog updates. This setting is only effective when the index setting `index.remote_store.translog.buffer_interval` is not present. Defaults to 650ms.
+   *
+   * Pattern `^\d+\s*(?:[dhms]|ms|micros|nanos)$`
+   *
+   * @example "650ms"
+   */
+  translogBufferInterval?: string
+  /**
+   * Sets the maximum number of open translog files for remote-backed indexes. This limits the total number of translog files per shard. After reaching this limit, the remote store flushes the translog files. Default is 1000. The minimum required is 100.
+   *
+   * Min 100, Max 2147483647
+   *
+   * @example 1000
+   */
+  translogMaxReaders?: number
+}
+
+/** @internal */
+export function toWireJSONSchemaOpensearchClusterClusterRemoteStore(
+  v: JSONSchemaOpensearchClusterClusterRemoteStore,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.stateGlobalMetadataUploadTimeout !== undefined)
+    o['state.global_metadata.upload_timeout'] = v.stateGlobalMetadataUploadTimeout
+  if (v.stateMetadataManifestUploadTimeout !== undefined)
+    o['state.metadata_manifest.upload_timeout'] = v.stateMetadataManifestUploadTimeout
+  if (v.translogBufferInterval !== undefined)
+    o['translog.buffer_interval'] = v.translogBufferInterval
+  if (v.translogMaxReaders !== undefined) o['translog.max_readers'] = v.translogMaxReaders
+  return o
+}
+
+/** @internal */
+export function fromWireJSONSchemaOpensearchClusterClusterRemoteStore(
+  w: any,
+): JSONSchemaOpensearchClusterClusterRemoteStore {
+  const v = {} as JSONSchemaOpensearchClusterClusterRemoteStore
+  if (w['state.global_metadata.upload_timeout'] !== undefined)
+    v.stateGlobalMetadataUploadTimeout = w['state.global_metadata.upload_timeout']
+  if (w['state.metadata_manifest.upload_timeout'] !== undefined)
+    v.stateMetadataManifestUploadTimeout = w['state.metadata_manifest.upload_timeout']
+  if (w['translog.buffer_interval'] !== undefined)
+    v.translogBufferInterval = w['translog.buffer_interval']
+  if (w['translog.max_readers'] !== undefined) v.translogMaxReaders = w['translog.max_readers']
+  return v
+}
+
+export interface JSONSchemaOpensearchClusterClusterSearchRequestSlowlogThreshold {
+  /**
+   * Debug threshold for total request took time. The value should be in the form count and unit, where unit one of (s,m,h,d,nanos,ms,micros) or -1. Default is -1
+   *
+   * Pattern `^[^\r\n]*$`
+   */
+  debug?: string
+  /**
+   * Info threshold for total request took time. The value should be in the form count and unit, where unit one of (s,m,h,d,nanos,ms,micros) or -1. Default is -1
+   *
+   * Pattern `^[^\r\n]*$`
+   */
+  info?: string
+  /**
+   * Trace threshold for total request took time. The value should be in the form count and unit, where unit one of (s,m,h,d,nanos,ms,micros) or -1. Default is -1
+   *
+   * Pattern `^[^\r\n]*$`
+   */
+  trace?: string
+  /**
+   * Warning threshold for total request took time. The value should be in the form count and unit, where unit one of (s,m,h,d,nanos,ms,micros) or -1. Default is -1
+   *
+   * Pattern `^[^\r\n]*$`
+   */
+  warn?: string
+}
+
+/** @internal */
+export function toWireJSONSchemaOpensearchClusterClusterSearchRequestSlowlogThreshold(
+  v: JSONSchemaOpensearchClusterClusterSearchRequestSlowlogThreshold,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.debug !== undefined) o['debug'] = v.debug
+  if (v.info !== undefined) o['info'] = v.info
+  if (v.trace !== undefined) o['trace'] = v.trace
+  if (v.warn !== undefined) o['warn'] = v.warn
+  return o
+}
+
+/** @internal */
+export function fromWireJSONSchemaOpensearchClusterClusterSearchRequestSlowlogThreshold(
+  w: any,
+): JSONSchemaOpensearchClusterClusterSearchRequestSlowlogThreshold {
+  const v = {} as JSONSchemaOpensearchClusterClusterSearchRequestSlowlogThreshold
+  if (w['debug'] !== undefined) v.debug = w['debug']
+  if (w['info'] !== undefined) v.info = w['info']
+  if (w['trace'] !== undefined) v.trace = w['trace']
+  if (w['warn'] !== undefined) v.warn = w['warn']
+  return v
+}
+
+export interface JSONSchemaOpensearchClusterClusterSearchRequestSlowlog {
+  /**
+   * Log level
+   *
+   * @defaultValue "trace"
+   */
+  level?: 'debug' | 'info' | 'trace' | 'warn'
+  threshold?: JSONSchemaOpensearchClusterClusterSearchRequestSlowlogThreshold
+}
+
+/** @internal */
+export function toWireJSONSchemaOpensearchClusterClusterSearchRequestSlowlog(
+  v: JSONSchemaOpensearchClusterClusterSearchRequestSlowlog,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.level !== undefined) o['level'] = v.level
+  if (v.threshold !== undefined)
+    o['threshold'] = toWireJSONSchemaOpensearchClusterClusterSearchRequestSlowlogThreshold(
+      v.threshold,
+    )
+  return o
+}
+
+/** @internal */
+export function fromWireJSONSchemaOpensearchClusterClusterSearchRequestSlowlog(
+  w: any,
+): JSONSchemaOpensearchClusterClusterSearchRequestSlowlog {
+  const v = {} as JSONSchemaOpensearchClusterClusterSearchRequestSlowlog
+  if (w['level'] !== undefined) v.level = w['level']
+  if (w['threshold'] !== undefined)
+    v.threshold = fromWireJSONSchemaOpensearchClusterClusterSearchRequestSlowlogThreshold(
+      w['threshold'],
+    )
+  return v
+}
+
+/**
+ * Cluster settings
+ */
+export interface JSONSchemaOpensearchCluster {
+  /**
+   * Defines a limit of how much total remote data can be referenced as a ratio of the size of the disk reserved for the file cache. This is designed to be a safeguard to prevent oversubscribing a cluster. Defaults to 0.
+   *
+   * Min 0, Max 100
+   *
+   * @example 5
+   */
+  clusterFilecacheRemoteDataRatio?: number | null
+  clusterRemoteStore?: JSONSchemaOpensearchClusterClusterRemoteStore
+  /**
+   * When set to true, OpenSearch attempts to evenly distribute the primary shards between the cluster nodes. Enabling this setting does not always guarantee an equal number of primary shards on each node, especially in the event of a failover. Changing this setting to false after it was set to true does not invoke redistribution of primary shards. Default is false.
+   *
+   * @example false
+   */
+  clusterRoutingAllocationBalancePreferPrimary?: boolean
+  clusterSearchRequestSlowlog?: JSONSchemaOpensearchClusterClusterSearchRequestSlowlog
+}
+
+/** @internal */
+export function toWireJSONSchemaOpensearchCluster(
+  v: JSONSchemaOpensearchCluster,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.clusterFilecacheRemoteDataRatio !== undefined)
+    o['cluster.filecache.remote_data_ratio'] =
+      v.clusterFilecacheRemoteDataRatio === null ? null : v.clusterFilecacheRemoteDataRatio
+  if (v.clusterRemoteStore !== undefined)
+    o['cluster.remote_store'] = toWireJSONSchemaOpensearchClusterClusterRemoteStore(
+      v.clusterRemoteStore,
+    )
+  if (v.clusterRoutingAllocationBalancePreferPrimary !== undefined)
+    o['cluster.routing.allocation.balance.prefer_primary'] =
+      v.clusterRoutingAllocationBalancePreferPrimary
+  if (v.clusterSearchRequestSlowlog !== undefined)
+    o['cluster.search.request.slowlog'] =
+      toWireJSONSchemaOpensearchClusterClusterSearchRequestSlowlog(v.clusterSearchRequestSlowlog)
+  return o
+}
+
+/** @internal */
+export function fromWireJSONSchemaOpensearchCluster(w: any): JSONSchemaOpensearchCluster {
+  const v = {} as JSONSchemaOpensearchCluster
+  if (w['cluster.filecache.remote_data_ratio'] !== undefined)
+    v.clusterFilecacheRemoteDataRatio = w['cluster.filecache.remote_data_ratio']
+  if (w['cluster.remote_store'] !== undefined)
+    v.clusterRemoteStore = fromWireJSONSchemaOpensearchClusterClusterRemoteStore(
+      w['cluster.remote_store'],
+    )
+  if (w['cluster.routing.allocation.balance.prefer_primary'] !== undefined)
+    v.clusterRoutingAllocationBalancePreferPrimary =
+      w['cluster.routing.allocation.balance.prefer_primary']
+  if (w['cluster.search.request.slowlog'] !== undefined)
+    v.clusterSearchRequestSlowlog = fromWireJSONSchemaOpensearchClusterClusterSearchRequestSlowlog(
+      w['cluster.search.request.slowlog'],
+    )
+  return v
+}
+
+/**
+ * Watermark settings
+ */
+export interface JSONSchemaOpensearchDiskWatermarks {
+  /**
+   * The flood stage watermark for disk usage.
+   *
+   * @example 95
+   */
+  floodStage: number
+  /**
+   * The high watermark for disk usage.
+   *
+   * @example 90
+   */
+  high: number
+  /**
+   * The low watermark for disk usage.
+   *
+   * @example 85
+   */
+  low: number
+}
+
+/** @internal */
+export function toWireJSONSchemaOpensearchDiskWatermarks(
+  v: JSONSchemaOpensearchDiskWatermarks,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.floodStage !== undefined) o['flood_stage'] = v.floodStage
+  if (v.high !== undefined) o['high'] = v.high
+  if (v.low !== undefined) o['low'] = v.low
+  return o
+}
+
+/** @internal */
+export function fromWireJSONSchemaOpensearchDiskWatermarks(
+  w: any,
+): JSONSchemaOpensearchDiskWatermarks {
+  const v = {} as JSONSchemaOpensearchDiskWatermarks
+  v.floodStage = w['flood_stage']
+  v.high = w['high']
+  v.low = w['low']
+  return v
+}
+
 /**
  * Opensearch Email Sender Settings
  */
@@ -13471,6 +14704,353 @@ export function fromWireJSONSchemaOpensearchIsmHistory(w: any): JSONSchemaOpense
     v.ismHistoryRolloverCheckPeriod = w['ism_history_rollover_check_period']
   if (w['ism_history_rollover_retention_period'] !== undefined)
     v.ismHistoryRolloverRetentionPeriod = w['ism_history_rollover_retention_period']
+  return v
+}
+
+/**
+ * ML Commons settings
+ */
+export interface JSONSchemaOpensearchMlCommons {
+  /**
+   * When set to true, the setting allows admins to control access and permissions to the connector API using backend_roles. Defaults to false.
+   *
+   * @example false
+   */
+  mlCommonsConnectorAccessControlEnabled?: boolean
+  /**
+   * Maximum number of ML models that can be deployed on a single ML node. Defaults to 10.
+   *
+   * Min 1
+   *
+   * @example 10
+   */
+  mlCommonsMaxModelOnNode?: number
+  /**
+   * Enable or disable model access control for ML Commons. When enabled, access to ML models is controlled by security permissions. Defaults to false.
+   *
+   * @example false
+   */
+  mlCommonsModelAccessControlEnabled?: boolean
+  /**
+   * For externally hosted models only: automatically deploy a model on its first predict request instead of requiring an explicit deploy call first. Defaults to true.
+   *
+   * @example true
+   */
+  mlCommonsModelAutoDeployEnable?: boolean
+  /**
+   * Automatically redeploy deployed or partially deployed models after ML nodes rejoin the cluster, e.g. after a node replacement. Defaults to true.
+   *
+   * @example true
+   */
+  mlCommonsModelAutoRedeployEnable?: boolean
+  /**
+   * Native memory threshold percentage for ML Commons. Controls the maximum percentage of native memory that can be used by ML Commons operations. Defaults to 90%.
+   *
+   * Min 1, Max 100
+   *
+   * @example 90
+   */
+  mlCommonsNativeMemoryThreshold?: number
+  /**
+   * Enable or disable running ML Commons tasks only on ML nodes. When enabled, ML tasks will only execute on nodes designated as ML nodes. Defaults to true.
+   *
+   * @example false
+   */
+  mlCommonsOnlyRunOnMlNode?: boolean
+  /**
+   * Adds the trusted endpoints to the cluster settings. Supports Java regex expressions.
+   *
+   * Max items 50
+   */
+  mlCommonsTrustedConnectorEndpointsRegex?: string[]
+}
+
+/** @internal */
+export function toWireJSONSchemaOpensearchMlCommons(
+  v: JSONSchemaOpensearchMlCommons,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.mlCommonsConnectorAccessControlEnabled !== undefined)
+    o['ml_commons_connector_access_control_enabled'] = v.mlCommonsConnectorAccessControlEnabled
+  if (v.mlCommonsMaxModelOnNode !== undefined)
+    o['ml_commons_max_model_on_node'] = v.mlCommonsMaxModelOnNode
+  if (v.mlCommonsModelAccessControlEnabled !== undefined)
+    o['ml_commons_model_access_control_enabled'] = v.mlCommonsModelAccessControlEnabled
+  if (v.mlCommonsModelAutoDeployEnable !== undefined)
+    o['ml_commons_model_auto_deploy_enable'] = v.mlCommonsModelAutoDeployEnable
+  if (v.mlCommonsModelAutoRedeployEnable !== undefined)
+    o['ml_commons_model_auto_redeploy_enable'] = v.mlCommonsModelAutoRedeployEnable
+  if (v.mlCommonsNativeMemoryThreshold !== undefined)
+    o['ml_commons_native_memory_threshold'] = v.mlCommonsNativeMemoryThreshold
+  if (v.mlCommonsOnlyRunOnMlNode !== undefined)
+    o['ml_commons_only_run_on_ml_node'] = v.mlCommonsOnlyRunOnMlNode
+  if (v.mlCommonsTrustedConnectorEndpointsRegex !== undefined)
+    o['ml_commons_trusted_connector_endpoints_regex'] = v.mlCommonsTrustedConnectorEndpointsRegex
+  return o
+}
+
+/** @internal */
+export function fromWireJSONSchemaOpensearchMlCommons(w: any): JSONSchemaOpensearchMlCommons {
+  const v = {} as JSONSchemaOpensearchMlCommons
+  if (w['ml_commons_connector_access_control_enabled'] !== undefined)
+    v.mlCommonsConnectorAccessControlEnabled = w['ml_commons_connector_access_control_enabled']
+  if (w['ml_commons_max_model_on_node'] !== undefined)
+    v.mlCommonsMaxModelOnNode = w['ml_commons_max_model_on_node']
+  if (w['ml_commons_model_access_control_enabled'] !== undefined)
+    v.mlCommonsModelAccessControlEnabled = w['ml_commons_model_access_control_enabled']
+  if (w['ml_commons_model_auto_deploy_enable'] !== undefined)
+    v.mlCommonsModelAutoDeployEnable = w['ml_commons_model_auto_deploy_enable']
+  if (w['ml_commons_model_auto_redeploy_enable'] !== undefined)
+    v.mlCommonsModelAutoRedeployEnable = w['ml_commons_model_auto_redeploy_enable']
+  if (w['ml_commons_native_memory_threshold'] !== undefined)
+    v.mlCommonsNativeMemoryThreshold = w['ml_commons_native_memory_threshold']
+  if (w['ml_commons_only_run_on_ml_node'] !== undefined)
+    v.mlCommonsOnlyRunOnMlNode = w['ml_commons_only_run_on_ml_node']
+  if (w['ml_commons_trusted_connector_endpoints_regex'] !== undefined)
+    v.mlCommonsTrustedConnectorEndpointsRegex = w['ml_commons_trusted_connector_endpoints_regex']
+  return v
+}
+
+export interface JSONSchemaOpensearchRemoteStore {
+  /**
+   * The variance factor that is used together with the moving average to calculate the dynamic bytes lag threshold for activating remote segment backpressure. Defaults to 10.
+   *
+   * Min 1
+   *
+   * @example 10
+   */
+  segmentPressureBytesLagVarianceFactor?: number
+  /**
+   * The minimum consecutive failure count for activating remote segment backpressure. Defaults to 5.
+   *
+   * Min 1, Max 2147483647
+   *
+   * @example 5
+   */
+  segmentPressureConsecutiveFailuresLimit?: number
+  /**
+   * Enables remote segment backpressure. Default is `true`
+   *
+   * @example true
+   */
+  segmentPressureEnabled?: boolean
+  /**
+   * The variance factor that is used together with the moving average to calculate the dynamic time lag threshold for activating remote segment backpressure. Defaults to 10.
+   *
+   * Min 1
+   *
+   * @example 10
+   */
+  segmentPressureTimeLagVarianceFactor?: number
+}
+
+/** @internal */
+export function toWireJSONSchemaOpensearchRemoteStore(
+  v: JSONSchemaOpensearchRemoteStore,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.segmentPressureBytesLagVarianceFactor !== undefined)
+    o['segment.pressure.bytes_lag.variance_factor'] = v.segmentPressureBytesLagVarianceFactor
+  if (v.segmentPressureConsecutiveFailuresLimit !== undefined)
+    o['segment.pressure.consecutive_failures.limit'] = v.segmentPressureConsecutiveFailuresLimit
+  if (v.segmentPressureEnabled !== undefined)
+    o['segment.pressure.enabled'] = v.segmentPressureEnabled
+  if (v.segmentPressureTimeLagVarianceFactor !== undefined)
+    o['segment.pressure.time_lag.variance_factor'] = v.segmentPressureTimeLagVarianceFactor
+  return o
+}
+
+/** @internal */
+export function fromWireJSONSchemaOpensearchRemoteStore(w: any): JSONSchemaOpensearchRemoteStore {
+  const v = {} as JSONSchemaOpensearchRemoteStore
+  if (w['segment.pressure.bytes_lag.variance_factor'] !== undefined)
+    v.segmentPressureBytesLagVarianceFactor = w['segment.pressure.bytes_lag.variance_factor']
+  if (w['segment.pressure.consecutive_failures.limit'] !== undefined)
+    v.segmentPressureConsecutiveFailuresLimit = w['segment.pressure.consecutive_failures.limit']
+  if (w['segment.pressure.enabled'] !== undefined)
+    v.segmentPressureEnabled = w['segment.pressure.enabled']
+  if (w['segment.pressure.time_lag.variance_factor'] !== undefined)
+    v.segmentPressureTimeLagVarianceFactor = w['segment.pressure.time_lag.variance_factor']
+  return v
+}
+
+/**
+ * Top N queries monitoring by CPU
+ */
+export interface JSONSchemaOpensearchSearchInsightsTopQueriesCPU {
+  /**
+   * Enable or disable top N query monitoring by the metric
+   *
+   * @defaultValue false
+   */
+  enabled?: boolean
+  /**
+   * Specify the value of N for the top N queries by the metric
+   *
+   * Min 1
+   */
+  topNSize?: number
+  /**
+   * Configure the window size of the top N queries. The value should be a time value with unit, e.g. 1m, 5s, 1h.
+   *
+   * Pattern `^\d+\s*(?:[dhms]|ms|micros|nanos)$`
+   */
+  windowSize?: string
+}
+
+/** @internal */
+export function toWireJSONSchemaOpensearchSearchInsightsTopQueriesCPU(
+  v: JSONSchemaOpensearchSearchInsightsTopQueriesCPU,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.enabled !== undefined) o['enabled'] = v.enabled
+  if (v.topNSize !== undefined) o['top_n_size'] = v.topNSize
+  if (v.windowSize !== undefined) o['window_size'] = v.windowSize
+  return o
+}
+
+/** @internal */
+export function fromWireJSONSchemaOpensearchSearchInsightsTopQueriesCPU(
+  w: any,
+): JSONSchemaOpensearchSearchInsightsTopQueriesCPU {
+  const v = {} as JSONSchemaOpensearchSearchInsightsTopQueriesCPU
+  if (w['enabled'] !== undefined) v.enabled = w['enabled']
+  if (w['top_n_size'] !== undefined) v.topNSize = w['top_n_size']
+  if (w['window_size'] !== undefined) v.windowSize = w['window_size']
+  return v
+}
+
+/**
+ * Top N queries monitoring by latency
+ */
+export interface JSONSchemaOpensearchSearchInsightsTopQueriesLatency {
+  /**
+   * Enable or disable top N query monitoring by the metric
+   *
+   * @defaultValue false
+   */
+  enabled?: boolean
+  /**
+   * Specify the value of N for the top N queries by the metric
+   *
+   * Min 1
+   */
+  topNSize?: number
+  /**
+   * Configure the window size of the top N queries. The value should be a time value with unit, e.g. 1m, 5s, 1h.
+   *
+   * Pattern `^\d+\s*(?:[dhms]|ms|micros|nanos)$`
+   */
+  windowSize?: string
+}
+
+/** @internal */
+export function toWireJSONSchemaOpensearchSearchInsightsTopQueriesLatency(
+  v: JSONSchemaOpensearchSearchInsightsTopQueriesLatency,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.enabled !== undefined) o['enabled'] = v.enabled
+  if (v.topNSize !== undefined) o['top_n_size'] = v.topNSize
+  if (v.windowSize !== undefined) o['window_size'] = v.windowSize
+  return o
+}
+
+/** @internal */
+export function fromWireJSONSchemaOpensearchSearchInsightsTopQueriesLatency(
+  w: any,
+): JSONSchemaOpensearchSearchInsightsTopQueriesLatency {
+  const v = {} as JSONSchemaOpensearchSearchInsightsTopQueriesLatency
+  if (w['enabled'] !== undefined) v.enabled = w['enabled']
+  if (w['top_n_size'] !== undefined) v.topNSize = w['top_n_size']
+  if (w['window_size'] !== undefined) v.windowSize = w['window_size']
+  return v
+}
+
+/**
+ * Top N queries monitoring by memory
+ */
+export interface JSONSchemaOpensearchSearchInsightsTopQueriesMemory {
+  /**
+   * Enable or disable top N query monitoring by the metric
+   *
+   * @defaultValue false
+   */
+  enabled?: boolean
+  /**
+   * Specify the value of N for the top N queries by the metric
+   *
+   * Min 1
+   */
+  topNSize?: number
+  /**
+   * Configure the window size of the top N queries. The value should be a time value with unit, e.g. 1m, 5s, 1h.
+   *
+   * Pattern `^\d+\s*(?:[dhms]|ms|micros|nanos)$`
+   */
+  windowSize?: string
+}
+
+/** @internal */
+export function toWireJSONSchemaOpensearchSearchInsightsTopQueriesMemory(
+  v: JSONSchemaOpensearchSearchInsightsTopQueriesMemory,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.enabled !== undefined) o['enabled'] = v.enabled
+  if (v.topNSize !== undefined) o['top_n_size'] = v.topNSize
+  if (v.windowSize !== undefined) o['window_size'] = v.windowSize
+  return o
+}
+
+/** @internal */
+export function fromWireJSONSchemaOpensearchSearchInsightsTopQueriesMemory(
+  w: any,
+): JSONSchemaOpensearchSearchInsightsTopQueriesMemory {
+  const v = {} as JSONSchemaOpensearchSearchInsightsTopQueriesMemory
+  if (w['enabled'] !== undefined) v.enabled = w['enabled']
+  if (w['top_n_size'] !== undefined) v.topNSize = w['top_n_size']
+  if (w['window_size'] !== undefined) v.windowSize = w['window_size']
+  return v
+}
+
+export interface JSONSchemaOpensearchSearchInsightsTopQueries {
+  /**
+   * Top N queries monitoring by CPU
+   */
+  cpu?: JSONSchemaOpensearchSearchInsightsTopQueriesCPU
+  /**
+   * Top N queries monitoring by latency
+   */
+  latency?: JSONSchemaOpensearchSearchInsightsTopQueriesLatency
+  /**
+   * Top N queries monitoring by memory
+   */
+  memory?: JSONSchemaOpensearchSearchInsightsTopQueriesMemory
+}
+
+/** @internal */
+export function toWireJSONSchemaOpensearchSearchInsightsTopQueries(
+  v: JSONSchemaOpensearchSearchInsightsTopQueries,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.cpu !== undefined) o['cpu'] = toWireJSONSchemaOpensearchSearchInsightsTopQueriesCPU(v.cpu)
+  if (v.latency !== undefined)
+    o['latency'] = toWireJSONSchemaOpensearchSearchInsightsTopQueriesLatency(v.latency)
+  if (v.memory !== undefined)
+    o['memory'] = toWireJSONSchemaOpensearchSearchInsightsTopQueriesMemory(v.memory)
+  return o
+}
+
+/** @internal */
+export function fromWireJSONSchemaOpensearchSearchInsightsTopQueries(
+  w: any,
+): JSONSchemaOpensearchSearchInsightsTopQueries {
+  const v = {} as JSONSchemaOpensearchSearchInsightsTopQueries
+  if (w['cpu'] !== undefined)
+    v.cpu = fromWireJSONSchemaOpensearchSearchInsightsTopQueriesCPU(w['cpu'])
+  if (w['latency'] !== undefined)
+    v.latency = fromWireJSONSchemaOpensearchSearchInsightsTopQueriesLatency(w['latency'])
+  if (w['memory'] !== undefined)
+    v.memory = fromWireJSONSchemaOpensearchSearchInsightsTopQueriesMemory(w['memory'])
   return v
 }
 
@@ -13784,6 +15364,72 @@ export function fromWireJSONSchemaOpensearchSearchBackpressure(
 }
 
 /**
+ * Segment Replication Backpressure Settings
+ */
+export interface JSONSchemaOpensearchSegrep {
+  /**
+   * The maximum number of indexing checkpoints that a replica shard can fall behind when copying from primary. Once `segrep.pressure.checkpoint.limit` is breached along with `segrep.pressure.time.limit`, the segment replication backpressure mechanism is initiated. Default is 4 checkpoints.
+   *
+   * Min 0
+   *
+   * @defaultValue 4
+   * @example 4
+   */
+  pressureCheckpointLimit?: number
+  /**
+   * Enables the segment replication backpressure mechanism. Default is false.
+   *
+   * @defaultValue false
+   * @example false
+   */
+  pressureEnabled?: boolean
+  /**
+   * The maximum number of stale replica shards that can exist in a replication group. Once `segrep.pressure.replica.stale.limit` is breached, the segment replication backpressure mechanism is initiated. Default is .5, which is 50% of a replication group.
+   *
+   * Min 0, Max 1
+   *
+   * @defaultValue 0.5
+   * @example 0.5
+   */
+  pressureReplicaStaleLimit?: number
+  /**
+   * The maximum amount of time that a replica shard can take to copy from the primary shard. Once segrep.pressure.time.limit is breached along with segrep.pressure.checkpoint.limit, the segment replication backpressure mechanism is initiated. Default is 5 minutes.
+   *
+   * Pattern `^\d+\s*(?:[dhms]|ms|micros|nanos)$`
+   *
+   * @defaultValue "5m"
+   * @example "5m"
+   */
+  pressureTimeLimit?: string
+}
+
+/** @internal */
+export function toWireJSONSchemaOpensearchSegrep(
+  v: JSONSchemaOpensearchSegrep,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.pressureCheckpointLimit !== undefined)
+    o['pressure.checkpoint.limit'] = v.pressureCheckpointLimit
+  if (v.pressureEnabled !== undefined) o['pressure.enabled'] = v.pressureEnabled
+  if (v.pressureReplicaStaleLimit !== undefined)
+    o['pressure.replica.stale.limit'] = v.pressureReplicaStaleLimit
+  if (v.pressureTimeLimit !== undefined) o['pressure.time.limit'] = v.pressureTimeLimit
+  return o
+}
+
+/** @internal */
+export function fromWireJSONSchemaOpensearchSegrep(w: any): JSONSchemaOpensearchSegrep {
+  const v = {} as JSONSchemaOpensearchSegrep
+  if (w['pressure.checkpoint.limit'] !== undefined)
+    v.pressureCheckpointLimit = w['pressure.checkpoint.limit']
+  if (w['pressure.enabled'] !== undefined) v.pressureEnabled = w['pressure.enabled']
+  if (w['pressure.replica.stale.limit'] !== undefined)
+    v.pressureReplicaStaleLimit = w['pressure.replica.stale.limit']
+  if (w['pressure.time.limit'] !== undefined) v.pressureTimeLimit = w['pressure.time.limit']
+  return v
+}
+
+/**
  * Operating factor
  */
 export interface JSONSchemaOpensearchShardIndexingPressureOperatingFactor {
@@ -13994,6 +15640,10 @@ export interface JSONSchemaOpensearch {
    */
   authFailureListeners?: JSONSchemaOpensearchAuthFailureListeners
   /**
+   * Cluster settings
+   */
+  cluster?: JSONSchemaOpensearchCluster
+  /**
    * Controls the number of shards allowed in the cluster per data node
    *
    * Min 100, Max 10000
@@ -14008,9 +15658,25 @@ export interface JSONSchemaOpensearch {
    */
   clusterRoutingAllocationNodeConcurrentRecoveries?: number
   /**
+   * Watermark settings
+   */
+  diskWatermarks?: JSONSchemaOpensearchDiskWatermarks
+  /**
    * Opensearch Email Sender Settings
    */
   emailSender?: JSONSchemaOpensearchEmailSender
+  /**
+   * Enable remote-backed storage
+   *
+   * @example true
+   */
+  enableRemoteBackedStorage?: boolean
+  /**
+   * Enable searchable snapshots
+   *
+   * @example true
+   */
+  enableSearchableSnapshots?: boolean
   /**
    * Enable/Disable security audit
    *
@@ -14018,6 +15684,12 @@ export interface JSONSchemaOpensearch {
    * @example true
    */
   enableSecurityAudit?: boolean
+  /**
+   * Enable/Disable snapshot API for custom repositories, this requires security management to be enabled
+   *
+   * @example false
+   */
+  enableSnapshotAPI?: boolean
   /**
    * Maximum content length for HTTP requests to the OpenSearch HTTP API, in bytes.
    *
@@ -14093,19 +15765,53 @@ export interface JSONSchemaOpensearch {
    */
   ismHistory?: JSONSchemaOpensearchIsmHistory
   /**
+   * Enable or disable removing KNN graphs from the cache when they are idle. Disabled by default.
+   *
+   * @example true
+   */
+  knnCacheItemExpiryEnabled?: boolean | null
+  /**
+   * If enabled, the amount of time in minutes a KNN graph can be idle in the cache before being evicted.
+   *
+   * Min 1, Max 10080
+   *
+   * @example 180
+   */
+  knnCacheItemExpiryMinutes?: number | null
+  /**
+   * The native memory usage, as a percentage below the KNN memory circuit breaker limit, at which a tripped circuit breaker resets. Defaults to 5%.
+   *
+   * Min 0, Max 100
+   *
+   * @example 5
+   */
+  knnCircuitBreakerUnsetPercentage?: number | null
+  /**
    * Enable or disable KNN memory circuit breaker. Defaults to true.
    *
    * @example true
    */
   knnMemoryCircuitBreakerEnabled?: boolean
   /**
-   * Maximum amount of memory that can be used for KNN index. Defaults to 50% of the JVM heap size.
+   * Maximum amount of memory in percentage that can be used for the KNN index. Defaults to 50% of the JVM heap size. 0 is used to set it to null which can be used to invalidate caches.
    *
-   * Min 3, Max 100
+   * Min 0, Max 100
    *
    * @example 50
    */
   knnMemoryCircuitBreakerLimit?: number
+  /**
+   * ML Commons settings
+   */
+  mlCommons?: JSONSchemaOpensearchMlCommons
+  /**
+   * Defines a limit of how much total remote data can be referenced as a ratio of the size of the disk reserved for the file cache. This is designed to be a safeguard to prevent oversubscribing a cluster. Defaults to 5gb. Requires restarting all OpenSearch nodes.
+   *
+   * Pattern `\d+(?:b|kb|mb|gb|tb)`
+   *
+   * @example "5gb"
+   */
+  nodeSearchCacheSize?: string | null
   /**
    * Compatibility mode sets OpenSearch to report its version as 7.10 so clients continue to work. Default is false
    *
@@ -14124,6 +15830,7 @@ export interface JSONSchemaOpensearch {
    * Max items 32
    */
   reindexRemoteWhitelist?: string[] | null
+  remoteStore?: JSONSchemaOpensearchRemoteStore
   /**
    * Script compilation circuit breaker limits the number of inline script compilations within a period of time. Default is use-context
    *
@@ -14132,10 +15839,27 @@ export interface JSONSchemaOpensearch {
    * @example "75/5m"
    */
   scriptMaxCompilationsRate?: string
+  searchInsightsTopQueries?: JSONSchemaOpensearchSearchInsightsTopQueries
   /**
    * Search Backpressure Settings
    */
   searchBackpressure?: JSONSchemaOpensearchSearchBackpressure
+  /**
+   * Hard limit for search requests. When it is reached, the search task is cancelled and the request fails. OpenSearch default value is used when this is not defined.
+   *
+   * Pattern `^\d+\s*(?:[dhms]|ms|micros|nanos)$`
+   *
+   * @example "5m"
+   */
+  searchCancelAfterTimeInterval?: string | null
+  /**
+   * Soft timeout for search requests that don't set their own timeout. When it is reached, the search returns partial results with `timed_out: true`, and the search task keeps running unless it is cancelled. OpenSearch default value is used when this is not defined.
+   *
+   * Pattern `^\d+\s*(?:[dhms]|ms|micros|nanos)$`
+   *
+   * @example "30s"
+   */
+  searchDefaultSearchTimeout?: string | null
   /**
    * Maximum number of aggregation buckets allowed in a single response. OpenSearch default value is used when this is not defined.
    *
@@ -14144,6 +15868,10 @@ export interface JSONSchemaOpensearch {
    * @example 10000
    */
   searchMaxBuckets?: number | null
+  /**
+   * Segment Replication Backpressure Settings
+   */
+  segrep?: JSONSchemaOpensearchSegrep
   /**
    * Shard indexing back pressure settings
    */
@@ -14228,14 +15956,22 @@ export function toWireJSONSchemaOpensearch(v: JSONSchemaOpensearch): Record<stri
     o['auth_failure_listeners'] = toWireJSONSchemaOpensearchAuthFailureListeners(
       v.authFailureListeners,
     )
+  if (v.cluster !== undefined) o['cluster'] = toWireJSONSchemaOpensearchCluster(v.cluster)
   if (v.clusterMaxShardsPerNode !== undefined)
     o['cluster_max_shards_per_node'] = v.clusterMaxShardsPerNode
   if (v.clusterRoutingAllocationNodeConcurrentRecoveries !== undefined)
     o['cluster_routing_allocation_node_concurrent_recoveries'] =
       v.clusterRoutingAllocationNodeConcurrentRecoveries
+  if (v.diskWatermarks !== undefined)
+    o['disk_watermarks'] = toWireJSONSchemaOpensearchDiskWatermarks(v.diskWatermarks)
   if (v.emailSender !== undefined)
     o['email-sender'] = toWireJSONSchemaOpensearchEmailSender(v.emailSender)
+  if (v.enableRemoteBackedStorage !== undefined)
+    o['enable_remote_backed_storage'] = v.enableRemoteBackedStorage
+  if (v.enableSearchableSnapshots !== undefined)
+    o['enable_searchable_snapshots'] = v.enableSearchableSnapshots
   if (v.enableSecurityAudit !== undefined) o['enable_security_audit'] = v.enableSecurityAudit
+  if (v.enableSnapshotAPI !== undefined) o['enable_snapshot_api'] = v.enableSnapshotAPI
   if (v.httpMaxContentLength !== undefined) o['http_max_content_length'] = v.httpMaxContentLength
   if (v.httpMaxHeaderSize !== undefined) o['http_max_header_size'] = v.httpMaxHeaderSize
   if (v.httpMaxInitialLineLength !== undefined)
@@ -14259,10 +15995,22 @@ export function toWireJSONSchemaOpensearch(v: JSONSchemaOpensearch): Record<stri
     o['indices_recovery_max_concurrent_file_chunks'] = v.indicesRecoveryMaxConcurrentFileChunks
   if (v.ismHistory !== undefined)
     o['ism-history'] = toWireJSONSchemaOpensearchIsmHistory(v.ismHistory)
+  if (v.knnCacheItemExpiryEnabled !== undefined)
+    o['knn_cache_item_expiry_enabled'] =
+      v.knnCacheItemExpiryEnabled === null ? null : v.knnCacheItemExpiryEnabled
+  if (v.knnCacheItemExpiryMinutes !== undefined)
+    o['knn_cache_item_expiry_minutes'] =
+      v.knnCacheItemExpiryMinutes === null ? null : v.knnCacheItemExpiryMinutes
+  if (v.knnCircuitBreakerUnsetPercentage !== undefined)
+    o['knn_circuit_breaker_unset_percentage'] =
+      v.knnCircuitBreakerUnsetPercentage === null ? null : v.knnCircuitBreakerUnsetPercentage
   if (v.knnMemoryCircuitBreakerEnabled !== undefined)
     o['knn_memory_circuit_breaker_enabled'] = v.knnMemoryCircuitBreakerEnabled
   if (v.knnMemoryCircuitBreakerLimit !== undefined)
     o['knn_memory_circuit_breaker_limit'] = v.knnMemoryCircuitBreakerLimit
+  if (v.mlCommons !== undefined) o['ml-commons'] = toWireJSONSchemaOpensearchMlCommons(v.mlCommons)
+  if (v.nodeSearchCacheSize !== undefined)
+    o['node.search.cache.size'] = v.nodeSearchCacheSize === null ? null : v.nodeSearchCacheSize
   if (v.overrideMainResponseVersion !== undefined)
     o['override_main_response_version'] = v.overrideMainResponseVersion
   if (v.pluginsAlertingFilterByBackendRoles !== undefined)
@@ -14270,12 +16018,25 @@ export function toWireJSONSchemaOpensearch(v: JSONSchemaOpensearch): Record<stri
   if (v.reindexRemoteWhitelist !== undefined)
     o['reindex_remote_whitelist'] =
       v.reindexRemoteWhitelist === null ? null : v.reindexRemoteWhitelist
+  if (v.remoteStore !== undefined)
+    o['remote_store'] = toWireJSONSchemaOpensearchRemoteStore(v.remoteStore)
   if (v.scriptMaxCompilationsRate !== undefined)
     o['script_max_compilations_rate'] = v.scriptMaxCompilationsRate
+  if (v.searchInsightsTopQueries !== undefined)
+    o['search.insights.top_queries'] = toWireJSONSchemaOpensearchSearchInsightsTopQueries(
+      v.searchInsightsTopQueries,
+    )
   if (v.searchBackpressure !== undefined)
     o['search_backpressure'] = toWireJSONSchemaOpensearchSearchBackpressure(v.searchBackpressure)
+  if (v.searchCancelAfterTimeInterval !== undefined)
+    o['search_cancel_after_time_interval'] =
+      v.searchCancelAfterTimeInterval === null ? null : v.searchCancelAfterTimeInterval
+  if (v.searchDefaultSearchTimeout !== undefined)
+    o['search_default_search_timeout'] =
+      v.searchDefaultSearchTimeout === null ? null : v.searchDefaultSearchTimeout
   if (v.searchMaxBuckets !== undefined)
     o['search_max_buckets'] = v.searchMaxBuckets === null ? null : v.searchMaxBuckets
+  if (v.segrep !== undefined) o['segrep'] = toWireJSONSchemaOpensearchSegrep(v.segrep)
   if (v.shardIndexingPressure !== undefined)
     o['shard_indexing_pressure'] = toWireJSONSchemaOpensearchShardIndexingPressure(
       v.shardIndexingPressure,
@@ -14312,14 +16073,22 @@ export function fromWireJSONSchemaOpensearch(w: any): JSONSchemaOpensearch {
     v.authFailureListeners = fromWireJSONSchemaOpensearchAuthFailureListeners(
       w['auth_failure_listeners'],
     )
+  if (w['cluster'] !== undefined) v.cluster = fromWireJSONSchemaOpensearchCluster(w['cluster'])
   if (w['cluster_max_shards_per_node'] !== undefined)
     v.clusterMaxShardsPerNode = w['cluster_max_shards_per_node']
   if (w['cluster_routing_allocation_node_concurrent_recoveries'] !== undefined)
     v.clusterRoutingAllocationNodeConcurrentRecoveries =
       w['cluster_routing_allocation_node_concurrent_recoveries']
+  if (w['disk_watermarks'] !== undefined)
+    v.diskWatermarks = fromWireJSONSchemaOpensearchDiskWatermarks(w['disk_watermarks'])
   if (w['email-sender'] !== undefined)
     v.emailSender = fromWireJSONSchemaOpensearchEmailSender(w['email-sender'])
+  if (w['enable_remote_backed_storage'] !== undefined)
+    v.enableRemoteBackedStorage = w['enable_remote_backed_storage']
+  if (w['enable_searchable_snapshots'] !== undefined)
+    v.enableSearchableSnapshots = w['enable_searchable_snapshots']
   if (w['enable_security_audit'] !== undefined) v.enableSecurityAudit = w['enable_security_audit']
+  if (w['enable_snapshot_api'] !== undefined) v.enableSnapshotAPI = w['enable_snapshot_api']
   if (w['http_max_content_length'] !== undefined)
     v.httpMaxContentLength = w['http_max_content_length']
   if (w['http_max_header_size'] !== undefined) v.httpMaxHeaderSize = w['http_max_header_size']
@@ -14343,21 +16112,41 @@ export function fromWireJSONSchemaOpensearch(w: any): JSONSchemaOpensearch {
     v.indicesRecoveryMaxConcurrentFileChunks = w['indices_recovery_max_concurrent_file_chunks']
   if (w['ism-history'] !== undefined)
     v.ismHistory = fromWireJSONSchemaOpensearchIsmHistory(w['ism-history'])
+  if (w['knn_cache_item_expiry_enabled'] !== undefined)
+    v.knnCacheItemExpiryEnabled = w['knn_cache_item_expiry_enabled']
+  if (w['knn_cache_item_expiry_minutes'] !== undefined)
+    v.knnCacheItemExpiryMinutes = w['knn_cache_item_expiry_minutes']
+  if (w['knn_circuit_breaker_unset_percentage'] !== undefined)
+    v.knnCircuitBreakerUnsetPercentage = w['knn_circuit_breaker_unset_percentage']
   if (w['knn_memory_circuit_breaker_enabled'] !== undefined)
     v.knnMemoryCircuitBreakerEnabled = w['knn_memory_circuit_breaker_enabled']
   if (w['knn_memory_circuit_breaker_limit'] !== undefined)
     v.knnMemoryCircuitBreakerLimit = w['knn_memory_circuit_breaker_limit']
+  if (w['ml-commons'] !== undefined)
+    v.mlCommons = fromWireJSONSchemaOpensearchMlCommons(w['ml-commons'])
+  if (w['node.search.cache.size'] !== undefined) v.nodeSearchCacheSize = w['node.search.cache.size']
   if (w['override_main_response_version'] !== undefined)
     v.overrideMainResponseVersion = w['override_main_response_version']
   if (w['plugins_alerting_filter_by_backend_roles'] !== undefined)
     v.pluginsAlertingFilterByBackendRoles = w['plugins_alerting_filter_by_backend_roles']
   if (w['reindex_remote_whitelist'] !== undefined)
     v.reindexRemoteWhitelist = w['reindex_remote_whitelist']
+  if (w['remote_store'] !== undefined)
+    v.remoteStore = fromWireJSONSchemaOpensearchRemoteStore(w['remote_store'])
   if (w['script_max_compilations_rate'] !== undefined)
     v.scriptMaxCompilationsRate = w['script_max_compilations_rate']
+  if (w['search.insights.top_queries'] !== undefined)
+    v.searchInsightsTopQueries = fromWireJSONSchemaOpensearchSearchInsightsTopQueries(
+      w['search.insights.top_queries'],
+    )
   if (w['search_backpressure'] !== undefined)
     v.searchBackpressure = fromWireJSONSchemaOpensearchSearchBackpressure(w['search_backpressure'])
+  if (w['search_cancel_after_time_interval'] !== undefined)
+    v.searchCancelAfterTimeInterval = w['search_cancel_after_time_interval']
+  if (w['search_default_search_timeout'] !== undefined)
+    v.searchDefaultSearchTimeout = w['search_default_search_timeout']
   if (w['search_max_buckets'] !== undefined) v.searchMaxBuckets = w['search_max_buckets']
+  if (w['segrep'] !== undefined) v.segrep = fromWireJSONSchemaOpensearchSegrep(w['segrep'])
   if (w['shard_indexing_pressure'] !== undefined)
     v.shardIndexingPressure = fromWireJSONSchemaOpensearchShardIndexingPressure(
       w['shard_indexing_pressure'],
@@ -15350,14 +17139,14 @@ export function toWireJSONSchemaThanosCompactor(
   v: JSONSchemaThanosCompactor,
 ): Record<string, unknown> {
   const o: Record<string, unknown> = {}
-  if (v.retentionDays !== undefined) o['retention.days'] = v.retentionDays
+  if (v.retentionDays !== undefined) o['retention-days'] = v.retentionDays
   return o
 }
 
 /** @internal */
 export function fromWireJSONSchemaThanosCompactor(w: any): JSONSchemaThanosCompactor {
   const v = {} as JSONSchemaThanosCompactor
-  if (w['retention.days'] !== undefined) v.retentionDays = w['retention.days']
+  if (w['retention-days'] !== undefined) v.retentionDays = w['retention-days']
   return v
 }
 
@@ -15372,7 +17161,7 @@ export interface JSONSchemaThanosQuery {
    *
    * @defaultValue "1m"
    */
-  queryDefaultEvaluationInterval?: string
+  defaultEvaluationInterval?: string
   /**
    * The maximum lookback duration for retrieving metrics during expression evaluations in PromQL. PromQL always evaluates the query for a certain timestamp, and it looks back for the given amount of time to get the latest sample. If it exceeds the maximum lookback delta, it assumes the series is stale and returns none (a gap). The lookback delta should be set to at least 2 times the slowest scrape interval. If unset, it will use the promql default of 5m.
    *
@@ -15380,7 +17169,7 @@ export interface JSONSchemaThanosQuery {
    *
    * @defaultValue "5m"
    */
-  queryLookbackDelta?: string
+  lookbackDelta?: string
   /**
    * The default metadata time range duration for retrieving labels through Labels and Series API when the range parameters are not specified. The zero value means the range covers the time since the beginning.
    *
@@ -15388,15 +17177,7 @@ export interface JSONSchemaThanosQuery {
    *
    * @defaultValue "0s"
    */
-  queryMetadataDefaultTimeRange?: string
-  /**
-   * Maximum time to process a query by the query node.
-   *
-   * Max length 20
-   *
-   * @defaultValue "2m"
-   */
-  queryTimeout?: string
+  metadataDefaultTimeRange?: string
   /**
    * The maximum samples allowed for a single Series request. The Series call fails if this limit is exceeded. Set to 0 for no limit. NOTE: For efficiency, the limit is internally implemented as 'chunks limit' considering each chunk contains a maximum of 120 samples. The default value is 100 * store.limits.request-series.
    *
@@ -15404,7 +17185,7 @@ export interface JSONSchemaThanosQuery {
    *
    * @defaultValue 0
    */
-  storeLimitsRequestSamples?: number
+  requestSamplesLimits?: number
   /**
    * The maximum series allowed for a single Series request. The Series call fails if this limit is exceeded. Set to 0 for no limit. The default value is 1000 * cpu_count.
    *
@@ -15412,38 +17193,43 @@ export interface JSONSchemaThanosQuery {
    *
    * @defaultValue 0
    */
-  storeLimitsRequestSeries?: number
+  requestSeriesLimits?: number
+  /**
+   * Maximum time to process a query by the query node.
+   *
+   * Max length 20
+   *
+   * @defaultValue "2m"
+   */
+  timeout?: string
 }
 
 /** @internal */
 export function toWireJSONSchemaThanosQuery(v: JSONSchemaThanosQuery): Record<string, unknown> {
   const o: Record<string, unknown> = {}
-  if (v.queryDefaultEvaluationInterval !== undefined)
-    o['query.default-evaluation-interval'] = v.queryDefaultEvaluationInterval
-  if (v.queryLookbackDelta !== undefined) o['query.lookback-delta'] = v.queryLookbackDelta
-  if (v.queryMetadataDefaultTimeRange !== undefined)
-    o['query.metadata.default-time-range'] = v.queryMetadataDefaultTimeRange
-  if (v.queryTimeout !== undefined) o['query.timeout'] = v.queryTimeout
-  if (v.storeLimitsRequestSamples !== undefined)
-    o['store.limits.request-samples'] = v.storeLimitsRequestSamples
-  if (v.storeLimitsRequestSeries !== undefined)
-    o['store.limits.request-series'] = v.storeLimitsRequestSeries
+  if (v.defaultEvaluationInterval !== undefined)
+    o['default-evaluation-interval'] = v.defaultEvaluationInterval
+  if (v.lookbackDelta !== undefined) o['lookback-delta'] = v.lookbackDelta
+  if (v.metadataDefaultTimeRange !== undefined)
+    o['metadata-default-time-range'] = v.metadataDefaultTimeRange
+  if (v.requestSamplesLimits !== undefined) o['request-samples-limits'] = v.requestSamplesLimits
+  if (v.requestSeriesLimits !== undefined) o['request-series-limits'] = v.requestSeriesLimits
+  if (v.timeout !== undefined) o['timeout'] = v.timeout
   return o
 }
 
 /** @internal */
 export function fromWireJSONSchemaThanosQuery(w: any): JSONSchemaThanosQuery {
   const v = {} as JSONSchemaThanosQuery
-  if (w['query.default-evaluation-interval'] !== undefined)
-    v.queryDefaultEvaluationInterval = w['query.default-evaluation-interval']
-  if (w['query.lookback-delta'] !== undefined) v.queryLookbackDelta = w['query.lookback-delta']
-  if (w['query.metadata.default-time-range'] !== undefined)
-    v.queryMetadataDefaultTimeRange = w['query.metadata.default-time-range']
-  if (w['query.timeout'] !== undefined) v.queryTimeout = w['query.timeout']
-  if (w['store.limits.request-samples'] !== undefined)
-    v.storeLimitsRequestSamples = w['store.limits.request-samples']
-  if (w['store.limits.request-series'] !== undefined)
-    v.storeLimitsRequestSeries = w['store.limits.request-series']
+  if (w['default-evaluation-interval'] !== undefined)
+    v.defaultEvaluationInterval = w['default-evaluation-interval']
+  if (w['lookback-delta'] !== undefined) v.lookbackDelta = w['lookback-delta']
+  if (w['metadata-default-time-range'] !== undefined)
+    v.metadataDefaultTimeRange = w['metadata-default-time-range']
+  if (w['request-samples-limits'] !== undefined)
+    v.requestSamplesLimits = w['request-samples-limits']
+  if (w['request-series-limits'] !== undefined) v.requestSeriesLimits = w['request-series-limits']
+  if (w['timeout'] !== undefined) v.timeout = w['timeout']
   return v
 }
 
@@ -15764,6 +17550,149 @@ export function fromWireKeyRotationConfig(w: any): KeyRotationConfig {
   return v
 }
 
+export interface KeyStoreHealth {
+  /**
+   * Timestamp of the latest completed health check.
+   */
+  checkedAT?: Date
+  /**
+   * Normalized error detail for unhealthy observations.
+   */
+  errorDetail?: string
+  /**
+   * Base64-encoded documented fields of the successful AWS GetHealthStatus JSON metadata.
+   */
+  metadataJSON?: string
+  /**
+   * Latest normalized XKS proxy health status.
+   */
+  status?: 'healthy' | 'unhealthy' | 'unknown'
+  /**
+   * Normalized reason for the latest status.
+   */
+  statusReason?: string
+}
+
+/** @internal */
+export function toWireKeyStoreHealth(v: KeyStoreHealth): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.checkedAT !== undefined) o['checked-at'] = v.checkedAT.toISOString()
+  if (v.errorDetail !== undefined) o['error-detail'] = v.errorDetail
+  if (v.metadataJSON !== undefined) o['metadata-json'] = v.metadataJSON
+  if (v.status !== undefined) o['status'] = v.status
+  if (v.statusReason !== undefined) o['status-reason'] = v.statusReason
+  return o
+}
+
+/** @internal */
+export function fromWireKeyStoreHealth(w: any): KeyStoreHealth {
+  const v = {} as KeyStoreHealth
+  if (w['checked-at'] !== undefined) v.checkedAT = new Date(w['checked-at'])
+  if (w['error-detail'] !== undefined) v.errorDetail = w['error-detail']
+  if (w['metadata-json'] !== undefined) v.metadataJSON = w['metadata-json']
+  if (w['status'] !== undefined) v.status = w['status']
+  if (w['status-reason'] !== undefined) v.statusReason = w['status-reason']
+  return v
+}
+
+export interface KeyStoreProxy {
+  auth: KeyStoreProxyAuth
+  /**
+   * Public URL used to route communication to the customer-managed XKS proxy. Its host must resolve to a public IP address.
+   */
+  endpoint: string
+}
+
+/** @internal */
+export function toWireKeyStoreProxy(v: KeyStoreProxy): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.auth !== undefined) o['auth'] = toWireKeyStoreProxyAuth(v.auth)
+  if (v.endpoint !== undefined) o['endpoint'] = v.endpoint
+  return o
+}
+
+/** @internal */
+export function fromWireKeyStoreProxy(w: any): KeyStoreProxy {
+  const v = {} as KeyStoreProxy
+  v.auth = fromWireKeyStoreProxyAuth(w['auth'])
+  v.endpoint = w['endpoint']
+  return v
+}
+
+export interface KeyStoreProxyAuth {
+  /**
+   * Access key used to sign requests sent to the XKS proxy.
+   */
+  key: string
+  /**
+   * Secret key used to sign requests sent to the XKS proxy. This value is never returned by the API.
+   */
+  secret: string
+}
+
+/** @internal */
+export function toWireKeyStoreProxyAuth(v: KeyStoreProxyAuth): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.key !== undefined) o['key'] = v.key
+  if (v.secret !== undefined) o['secret'] = v.secret
+  return o
+}
+
+/** @internal */
+export function fromWireKeyStoreProxyAuth(w: any): KeyStoreProxyAuth {
+  const v = {} as KeyStoreProxyAuth
+  v.key = w['key']
+  v.secret = w['secret']
+  return v
+}
+
+export interface KeyStoreProxyAuthResponse {
+  /**
+   * Access key used to sign requests sent to the XKS proxy.
+   */
+  key?: string
+}
+
+/** @internal */
+export function toWireKeyStoreProxyAuthResponse(
+  v: KeyStoreProxyAuthResponse,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.key !== undefined) o['key'] = v.key
+  return o
+}
+
+/** @internal */
+export function fromWireKeyStoreProxyAuthResponse(w: any): KeyStoreProxyAuthResponse {
+  const v = {} as KeyStoreProxyAuthResponse
+  if (w['key'] !== undefined) v.key = w['key']
+  return v
+}
+
+export interface KeyStoreProxyResponse {
+  auth?: KeyStoreProxyAuthResponse
+  /**
+   * Public URL used to route communication to the customer-managed XKS proxy.
+   */
+  endpoint?: string
+}
+
+/** @internal */
+export function toWireKeyStoreProxyResponse(v: KeyStoreProxyResponse): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.auth !== undefined) o['auth'] = toWireKeyStoreProxyAuthResponse(v.auth)
+  if (v.endpoint !== undefined) o['endpoint'] = v.endpoint
+  return o
+}
+
+/** @internal */
+export function fromWireKeyStoreProxyResponse(w: any): KeyStoreProxyResponse {
+  const v = {} as KeyStoreProxyResponse
+  if (w['auth'] !== undefined) v.auth = fromWireKeyStoreProxyAuthResponse(w['auth'])
+  if (w['endpoint'] !== undefined) v.endpoint = w['endpoint']
+  return v
+}
+
 /**
  * Kubelet image GC options
  */
@@ -15802,7 +17731,7 @@ export type Labels = Record<string, string>
 /**
  * List of AI API keys
  *
- * @example {"ai-api-keys":[{"created-at":"2026-03-25T10:00:00Z","id":"11111111-1111-1111-1111-111111111111","name":"default-public-key","org-uuid":"22222222-2222-2222-2222-222222222222","scope":"public","updated-at":"2026-03-25T10:00:00Z"}]}
+ * @example {"ai-api-keys":[{"all-deployments":false,"all-models":true,"created-at":"2026-03-25T10:00:00Z","deployments":[],"id":"11111111-1111-1111-1111-111111111111","models":[],"name":"default-public-key","revoked-at":"2026-03-25T10:00:00Z","updated-at":"2026-03-25T10:00:00Z"},{"all-deployments":false,"all-models":false,"created-at":"2026-03-25T10:00:00Z","deployments":[{"id":"33333333-3333-3333-3333-333333333333"},{"id":"44444444-4444-4444-4444-444444444444"}],"id":"22222222-2222-2222-2222-222222222222","models":["GLM 5.2","Kimi 2.7"],"name":"restricted-key","revoked-at":"","updated-at":"2026-03-25T10:00:00Z"}]}
  */
 export interface ListAIAPIKeysResponse {
   aiAPIKeys: ListAIAPIKeysResponseEntry[]
@@ -15828,34 +17757,35 @@ export function fromWireListAIAPIKeysResponse(w: any): ListAIAPIKeysResponse {
  */
 export interface ListAIAPIKeysResponseEntry {
   /**
-   * Creation timestamp
+   * True when the key has access to all deployments of the organization.
    *
+   * Read-only
+   */
+  allDeployments: boolean
+  /**
+   * True when the key has access to all public models.
+   *
+   * Read-only
+   */
+  allModels: boolean
+  /**
    * Read-only
    */
   createdAT: Date
+  deployments: AIAPIKeyDeployments
   /**
-   * AI API key ID
-   *
    * Read-only
    */
   id: string
-  /**
-   * Human-readable name for the AI API key
-   */
+  models: AIAPIKeyModels
   name: string
   /**
-   * Organization UUID that owns this key
+   * Revocation timestamp. Null when the API key is active.
    *
    * Read-only
    */
-  orgUuid: string
+  revokedAT: Date | null
   /**
-   * Key scope: 'public' for all deployments, or a specific deployment UUID
-   */
-  scope: string
-  /**
-   * Last update timestamp
-   *
    * Read-only
    */
   updatedAT: Date
@@ -15866,11 +17796,15 @@ export function toWireListAIAPIKeysResponseEntry(
   v: ListAIAPIKeysResponseEntry,
 ): Record<string, unknown> {
   const o: Record<string, unknown> = {}
+  if (v.allDeployments !== undefined) o['all-deployments'] = v.allDeployments
+  if (v.allModels !== undefined) o['all-models'] = v.allModels
   if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
+  if (v.deployments !== undefined) o['deployments'] = toWireAIAPIKeyDeployments(v.deployments)
   if (v.id !== undefined) o['id'] = v.id
+  if (v.models !== undefined) o['models'] = v.models
   if (v.name !== undefined) o['name'] = v.name
-  if (v.orgUuid !== undefined) o['org-uuid'] = v.orgUuid
-  if (v.scope !== undefined) o['scope'] = v.scope
+  if (v.revokedAT !== undefined)
+    o['revoked-at'] = v.revokedAT === null ? null : v.revokedAT.toISOString()
   if (v.updatedAT !== undefined) o['updated-at'] = v.updatedAT.toISOString()
   return o
 }
@@ -15878,11 +17812,14 @@ export function toWireListAIAPIKeysResponseEntry(
 /** @internal */
 export function fromWireListAIAPIKeysResponseEntry(w: any): ListAIAPIKeysResponseEntry {
   const v = {} as ListAIAPIKeysResponseEntry
+  v.allDeployments = w['all-deployments']
+  v.allModels = w['all-models']
   v.createdAT = new Date(w['created-at'])
+  v.deployments = fromWireAIAPIKeyDeployments(w['deployments'])
   v.id = w['id']
+  v.models = w['models']
   v.name = w['name']
-  v.orgUuid = w['org-uuid']
-  v.scope = w['scope']
+  v.revokedAT = new Date(w['revoked-at'])
   v.updatedAT = new Date(w['updated-at'])
   return v
 }
@@ -15994,10 +17931,6 @@ export interface ListDeploymentsResponseEntry {
    * Read-only
    */
   updatedAT?: Date
-  /**
-   * Deployment visibility: private for your organization's deployments, public for Exoscale Managed Inference deployments.
-   */
-  visibility: 'private' | 'public'
 }
 
 /** @internal */
@@ -16016,7 +17949,6 @@ export function toWireListDeploymentsResponseEntry(
   if (v.serviceLevel !== undefined) o['service-level'] = v.serviceLevel
   if (v.state !== undefined) o['state'] = v.state
   if (v.updatedAT !== undefined) o['updated-at'] = v.updatedAT.toISOString()
-  if (v.visibility !== undefined) o['visibility'] = v.visibility
   return o
 }
 
@@ -16034,7 +17966,91 @@ export function fromWireListDeploymentsResponseEntry(w: any): ListDeploymentsRes
   if (w['service-level'] !== undefined) v.serviceLevel = w['service-level']
   v.state = w['state']
   if (w['updated-at'] !== undefined) v.updatedAT = new Date(w['updated-at'])
-  v.visibility = w['visibility']
+  return v
+}
+
+export interface ListKeyStoresResponse {
+  /**
+   * The key stores configured for the organization.
+   */
+  keyStores?: ListKeyStoresResponseEntry[]
+}
+
+/** @internal */
+export function toWireListKeyStoresResponse(v: ListKeyStoresResponse): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.keyStores !== undefined)
+    o['key-stores'] = v.keyStores.map((x) => toWireListKeyStoresResponseEntry(x))
+  return o
+}
+
+/** @internal */
+export function fromWireListKeyStoresResponse(w: any): ListKeyStoresResponse {
+  const v = {} as ListKeyStoresResponse
+  if (w['key-stores'] !== undefined)
+    v.keyStores = (w['key-stores'] as any[]).map((x) => fromWireListKeyStoresResponseEntry(x))
+  return v
+}
+
+export interface ListKeyStoresResponseEntry {
+  /**
+   * The creation timestamp.
+   */
+  createdAT?: Date
+  /**
+   * An optional detailed description providing additional context about the key store's intended use case.
+   */
+  description?: string
+  /**
+   * The globally unique identifier assigned to the key store.
+   */
+  id?: string
+  /**
+   * The display name assigned to the key store.
+   */
+  name?: string
+  proxy?: KeyStoreProxyResponse
+  /**
+   * The current connection status of the key store.
+   */
+  status?: 'connected' | 'disconnected'
+  /**
+   * The timestamp indicating when the current key store status last transitioned.
+   */
+  statusSince?: Date
+  /**
+   * The key store type.
+   */
+  type?: 'external-key-store'
+}
+
+/** @internal */
+export function toWireListKeyStoresResponseEntry(
+  v: ListKeyStoresResponseEntry,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
+  if (v.description !== undefined) o['description'] = v.description
+  if (v.id !== undefined) o['id'] = v.id
+  if (v.name !== undefined) o['name'] = v.name
+  if (v.proxy !== undefined) o['proxy'] = toWireKeyStoreProxyResponse(v.proxy)
+  if (v.status !== undefined) o['status'] = v.status
+  if (v.statusSince !== undefined) o['status-since'] = v.statusSince.toISOString()
+  if (v.type !== undefined) o['type'] = v.type
+  return o
+}
+
+/** @internal */
+export function fromWireListKeyStoresResponseEntry(w: any): ListKeyStoresResponseEntry {
+  const v = {} as ListKeyStoresResponseEntry
+  if (w['created-at'] !== undefined) v.createdAT = new Date(w['created-at'])
+  if (w['description'] !== undefined) v.description = w['description']
+  if (w['id'] !== undefined) v.id = w['id']
+  if (w['name'] !== undefined) v.name = w['name']
+  if (w['proxy'] !== undefined) v.proxy = fromWireKeyStoreProxyResponse(w['proxy'])
+  if (w['status'] !== undefined) v.status = w['status']
+  if (w['status-since'] !== undefined) v.statusSince = new Date(w['status-since'])
+  if (w['type'] !== undefined) v.type = w['type']
   return v
 }
 
@@ -16133,6 +18149,10 @@ export interface ListKmsKeysResponseEntry {
    * The globally unique identifier (UUID) tracking this key entity.
    */
   id: string
+  /**
+   * The cryptographic key specification used to generate the key, defining its algorithm and, for asymmetric keys, its curve or modulus size.
+   */
+  keySpec: string
   material: KeyMaterial
   /**
    * True if this is a multi-zone key.
@@ -16152,7 +18172,10 @@ export interface ListKmsKeysResponseEntry {
   replicas?: string[]
   revision: RevisionStamp
   rotation: KeyRotationConfig
-  source: 'exoscale-kms'
+  /**
+   * Indicates the source of the key material, either generated and held within Exoscale KMS, or backed by an external key store ([BETA]).
+   */
+  source: 'exoscale-kms' | 'external-key-store'
   status: 'disabled' | 'enabled' | 'pending-deletion'
   /**
    * The precise time when the key entered its current configuration phase.
@@ -16162,6 +18185,7 @@ export interface ListKmsKeysResponseEntry {
    * The cryptographic operation constraints allowed on this key.
    */
   usage: string
+  xks?: XksKey
 }
 
 /** @internal */
@@ -16173,6 +18197,7 @@ export function toWireListKmsKeysResponseEntry(
   if (v.deleteAT !== undefined) o['delete-at'] = v.deleteAT.toISOString()
   if (v.description !== undefined) o['description'] = v.description
   if (v.id !== undefined) o['id'] = v.id
+  if (v.keySpec !== undefined) o['key-spec'] = v.keySpec
   if (v.material !== undefined) o['material'] = toWireKeyMaterial(v.material)
   if (v.multiZone !== undefined) o['multi-zone'] = v.multiZone
   if (v.name !== undefined) o['name'] = v.name
@@ -16184,6 +18209,7 @@ export function toWireListKmsKeysResponseEntry(
   if (v.status !== undefined) o['status'] = v.status
   if (v.statusSince !== undefined) o['status-since'] = v.statusSince.toISOString()
   if (v.usage !== undefined) o['usage'] = v.usage
+  if (v.xks !== undefined) o['xks'] = toWireXksKey(v.xks)
   return o
 }
 
@@ -16194,6 +18220,7 @@ export function fromWireListKmsKeysResponseEntry(w: any): ListKmsKeysResponseEnt
   if (w['delete-at'] !== undefined) v.deleteAT = new Date(w['delete-at'])
   if (w['description'] !== undefined) v.description = w['description']
   v.id = w['id']
+  v.keySpec = w['key-spec']
   v.material = fromWireKeyMaterial(w['material'])
   v.multiZone = w['multi-zone']
   v.name = w['name']
@@ -16205,6 +18232,7 @@ export function fromWireListKmsKeysResponseEntry(w: any): ListKmsKeysResponseEnt
   v.status = w['status']
   v.statusSince = new Date(w['status-since'])
   v.usage = w['usage']
+  if (w['xks'] !== undefined) v.xks = fromWireXksKey(w['xks'])
   return v
 }
 
@@ -16246,6 +18274,10 @@ export interface ListModelsResponseEntry {
    */
   id: string
   /**
+   * Model lifecycle state
+   */
+  lifecycleStatus?: 'active' | 'deprecated' | 'eol' | null | 'preview' | null
+  /**
    * Model size in bytes
    *
    * Min 0
@@ -16267,6 +18299,10 @@ export interface ListModelsResponseEntry {
    * Read-only
    */
   updatedAT: Date
+  /**
+   * Model visibility
+   */
+  visibility?: 'private' | 'public'
 }
 
 /** @internal */
@@ -16274,10 +18310,13 @@ export function toWireListModelsResponseEntry(v: ListModelsResponseEntry): Recor
   const o: Record<string, unknown> = {}
   if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
   if (v.id !== undefined) o['id'] = v.id
+  if (v.lifecycleStatus !== undefined)
+    o['lifecycle-status'] = v.lifecycleStatus === null ? null : v.lifecycleStatus
   if (v.modelSize !== undefined) o['model-size'] = v.modelSize
   if (v.name !== undefined) o['name'] = v.name
   if (v.state !== undefined) o['state'] = v.state
   if (v.updatedAT !== undefined) o['updated-at'] = v.updatedAT.toISOString()
+  if (v.visibility !== undefined) o['visibility'] = v.visibility
   return o
 }
 
@@ -16286,10 +18325,12 @@ export function fromWireListModelsResponseEntry(w: any): ListModelsResponseEntry
   const v = {} as ListModelsResponseEntry
   v.createdAT = new Date(w['created-at'])
   v.id = w['id']
+  if (w['lifecycle-status'] !== undefined) v.lifecycleStatus = w['lifecycle-status']
   v.modelSize = w['model-size']
   v.name = w['name']
   v.state = w['state']
   v.updatedAT = new Date(w['updated-at'])
+  if (w['visibility'] !== undefined) v.visibility = w['visibility']
   return v
 }
 
@@ -16298,25 +18339,17 @@ export function fromWireListModelsResponseEntry(w: any): ListModelsResponseEntry
  */
 export interface ListRouteEntry {
   /**
-   * Route description
-   *
    * Max length 4096
    */
   description?: string
   /**
-   * Route destination CIDR
+   * The CIDR used to match on which packets the routing rule should be applied
    */
   destination?: string
-  /**
-   * Route ID
-   */
   id?: string
-  /**
-   * Route kind
-   */
   kind?: 'Subnet' | 'Vpc'
   /**
-   * Route target
+   * Where the packets should be sent to
    */
   target?: string
 }
@@ -16348,38 +18381,25 @@ export function fromWireListRouteEntry(w: any): ListRouteEntry {
  */
 export interface ListSubnetEntry {
   /**
-   * Subnet address space
+   * Whether the subnet is private or public
    */
   addressSpace?: 'private'
   /**
-   * Subnet address family
+   * Whether the subnet supports IPv4 and/or IPv6
    */
   addressfamily?: 'dual' | 'inet4'
-  /**
-   * Subnet creation date
-   */
   createdAT?: Date
   /**
-   * Subnet description
-   *
    * Max length 4096
    */
   description?: string
-  /**
-   * Subnet ID
-   */
   id?: string
   /**
    * Subnet ipv4 CIDR
    */
   ipv4Block?: string
-  /**
-   * Resource labels
-   */
   labels?: Labels
   /**
-   * Subnet name
-   *
    * Length 1-255
    */
   name?: string
@@ -16417,31 +18437,19 @@ export function fromWireListSubnetEntry(w: any): ListSubnetEntry {
  * VPC
  */
 export interface ListVpcEntry {
-  /**
-   * VPC creation date
-   */
   createdAT?: Date
   /**
    * Indicates if this is the organization's default VPC
    */
   default?: boolean
   /**
-   * VPC description
-   *
    * Max length 4096
    */
   description?: string
-  /**
-   * VPC ID
-   */
+  dhcpOptions?: VpcDHCPOptions
   id?: string
-  /**
-   * Resource labels
-   */
   labels?: Labels
   /**
-   * VPC name
-   *
    * Length 1-255
    */
   name?: string
@@ -16453,6 +18461,7 @@ export function toWireListVpcEntry(v: ListVpcEntry): Record<string, unknown> {
   if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
   if (v.default !== undefined) o['default'] = v.default
   if (v.description !== undefined) o['description'] = v.description
+  if (v.dhcpOptions !== undefined) o['dhcp-options'] = toWireVpcDHCPOptions(v.dhcpOptions)
   if (v.id !== undefined) o['id'] = v.id
   if (v.labels !== undefined) o['labels'] = v.labels
   if (v.name !== undefined) o['name'] = v.name
@@ -16465,6 +18474,7 @@ export function fromWireListVpcEntry(w: any): ListVpcEntry {
   if (w['created-at'] !== undefined) v.createdAT = new Date(w['created-at'])
   if (w['default'] !== undefined) v.default = w['default']
   if (w['description'] !== undefined) v.description = w['description']
+  if (w['dhcp-options'] !== undefined) v.dhcpOptions = fromWireVpcDHCPOptions(w['dhcp-options'])
   if (w['id'] !== undefined) v.id = w['id']
   if (w['labels'] !== undefined) v.labels = w['labels']
   if (w['name'] !== undefined) v.name = w['name']
@@ -16655,6 +18665,16 @@ export interface LoadBalancerService {
    */
   instancePool?: InstancePool
   /**
+   * Instances the network traffic is forwarded to, from the instance pool and the label selector
+   *
+   * Read-only
+   */
+  instances?: LoadBalancerServiceInstance[]
+  /**
+   * Label selector of the instances to forward network traffic to
+   */
+  labelSelector?: LoadBalancerServiceLabelSelector
+  /**
    * Load Balancer Service name
    *
    * Length 1-255
@@ -16698,6 +18718,10 @@ export function toWireLoadBalancerService(v: LoadBalancerService): Record<string
     o['healthcheck-status'] = v.healthcheckStatus.map((x) => toWireLoadBalancerServerStatus(x))
   if (v.id !== undefined) o['id'] = v.id
   if (v.instancePool !== undefined) o['instance-pool'] = toWireInstancePool(v.instancePool)
+  if (v.instances !== undefined)
+    o['instances'] = v.instances.map((x) => toWireLoadBalancerServiceInstance(x))
+  if (v.labelSelector !== undefined)
+    o['label-selector'] = toWireLoadBalancerServiceLabelSelector(v.labelSelector)
   if (v.name !== undefined) o['name'] = v.name
   if (v.port !== undefined) o['port'] = v.port
   if (v.protocol !== undefined) o['protocol'] = v.protocol
@@ -16719,6 +18743,10 @@ export function fromWireLoadBalancerService(w: any): LoadBalancerService {
     )
   if (w['id'] !== undefined) v.id = w['id']
   if (w['instance-pool'] !== undefined) v.instancePool = fromWireInstancePool(w['instance-pool'])
+  if (w['instances'] !== undefined)
+    v.instances = (w['instances'] as any[]).map((x) => fromWireLoadBalancerServiceInstance(x))
+  if (w['label-selector'] !== undefined)
+    v.labelSelector = fromWireLoadBalancerServiceLabelSelector(w['label-selector'])
   if (w['name'] !== undefined) v.name = w['name']
   if (w['port'] !== undefined) v.port = w['port']
   if (w['protocol'] !== undefined) v.protocol = w['protocol']
@@ -16803,6 +18831,70 @@ export function fromWireLoadBalancerServiceHealthcheck(w: any): LoadBalancerServ
 }
 
 /**
+ * Instance the network traffic is forwarded to
+ */
+export interface LoadBalancerServiceInstance {
+  /**
+   * Status of the instance's healthcheck
+   */
+  healthcheckStatus?: 'failure' | 'success'
+  /**
+   * Instance ID
+   */
+  id?: string
+  /**
+   * Instance IP the network traffic is forwarded to
+   */
+  publicIP?: string
+}
+
+/** @internal */
+export function toWireLoadBalancerServiceInstance(
+  v: LoadBalancerServiceInstance,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.healthcheckStatus !== undefined) o['healthcheck-status'] = v.healthcheckStatus
+  if (v.id !== undefined) o['id'] = v.id
+  if (v.publicIP !== undefined) o['public-ip'] = v.publicIP
+  return o
+}
+
+/** @internal */
+export function fromWireLoadBalancerServiceInstance(w: any): LoadBalancerServiceInstance {
+  const v = {} as LoadBalancerServiceInstance
+  if (w['healthcheck-status'] !== undefined) v.healthcheckStatus = w['healthcheck-status']
+  if (w['id'] !== undefined) v.id = w['id']
+  if (w['public-ip'] !== undefined) v.publicIP = w['public-ip']
+  return v
+}
+
+/**
+ * Label selector: the instances carrying all of its labels are backends
+ */
+export interface LoadBalancerServiceLabelSelector {
+  /**
+   * Labels an instance must all carry
+   */
+  labels: Labels
+}
+
+/** @internal */
+export function toWireLoadBalancerServiceLabelSelector(
+  v: LoadBalancerServiceLabelSelector,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.labels !== undefined) o['labels'] = v.labels
+  return o
+}
+
+/** @internal */
+export function fromWireLoadBalancerServiceLabelSelector(w: any): LoadBalancerServiceLabelSelector {
+  const v = {} as LoadBalancerServiceLabelSelector
+  v.labels = w['labels']
+  return v
+}
+
+/**
  * Resource manager
  */
 export interface Manager {
@@ -16869,13 +18961,25 @@ export function fromWireModelRef(w: any): ModelRef {
  */
 export interface ModelUsageCounters {
   /**
+   * Prompt/input UOM served from prefix cache across all calls in this flush window (excluded from input-uom); optional, defaults to 0
+   *
+   * Min 0
+   */
+  cacheReadInputUom?: number
+  /**
+   * Subset of input-uom written to prefix cache across all calls in this flush window; optional, defaults to 0
+   *
+   * Min 0
+   */
+  cacheWriteInputUom?: number
+  /**
    * Number of inference calls in this flush window
    *
    * Min 1
    */
   callCount: number
   /**
-   * Total prompt/input Unit Of Measurement (UOM) across all calls in this flush window (e.g., tokens for LLMs, minutes for TTS, pages for OCR)
+   * Uncached prompt/input Unit Of Measurement (UOM) across all calls in this flush window (total prompt minus cache-read)
    *
    * Min 0
    */
@@ -16891,6 +18995,8 @@ export interface ModelUsageCounters {
 /** @internal */
 export function toWireModelUsageCounters(v: ModelUsageCounters): Record<string, unknown> {
   const o: Record<string, unknown> = {}
+  if (v.cacheReadInputUom !== undefined) o['cache-read-input-uom'] = v.cacheReadInputUom
+  if (v.cacheWriteInputUom !== undefined) o['cache-write-input-uom'] = v.cacheWriteInputUom
   if (v.callCount !== undefined) o['call-count'] = v.callCount
   if (v.inputUom !== undefined) o['input-uom'] = v.inputUom
   if (v.outputUom !== undefined) o['output-uom'] = v.outputUom
@@ -16900,6 +19006,8 @@ export function toWireModelUsageCounters(v: ModelUsageCounters): Record<string, 
 /** @internal */
 export function fromWireModelUsageCounters(w: any): ModelUsageCounters {
   const v = {} as ModelUsageCounters
+  if (w['cache-read-input-uom'] !== undefined) v.cacheReadInputUom = w['cache-read-input-uom']
+  if (w['cache-write-input-uom'] !== undefined) v.cacheWriteInputUom = w['cache-write-input-uom']
   v.callCount = w['call-count']
   v.inputUom = w['input-uom']
   v.outputUom = w['output-uom']
@@ -17234,15 +19342,15 @@ export function fromWireOrganization(w: any): Organization {
 }
 
 /**
- * Organization GPU usage
+ * Organization usage
  */
 export interface OrganizationUsage {
   /**
-   * Total GPU count (sum of all GPU types)
+   * Count of active AI API keys
    *
    * Min 0
    */
-  gpu: number
+  aiAPIKey?: number
   /**
    * GPU3 count
    *
@@ -17278,7 +19386,7 @@ export interface OrganizationUsage {
 /** @internal */
 export function toWireOrganizationUsage(v: OrganizationUsage): Record<string, unknown> {
   const o: Record<string, unknown> = {}
-  if (v.gpu !== undefined) o['gpu'] = v.gpu
+  if (v.aiAPIKey !== undefined) o['ai-api-key'] = v.aiAPIKey
   if (v.gpu3 !== undefined) o['gpu3'] = v.gpu3
   if (v.gpu3080ti !== undefined) o['gpu3080ti'] = v.gpu3080ti
   if (v.gpua30 !== undefined) o['gpua30'] = v.gpua30
@@ -17290,7 +19398,7 @@ export function toWireOrganizationUsage(v: OrganizationUsage): Record<string, un
 /** @internal */
 export function fromWireOrganizationUsage(w: any): OrganizationUsage {
   const v = {} as OrganizationUsage
-  v.gpu = w['gpu']
+  if (w['ai-api-key'] !== undefined) v.aiAPIKey = w['ai-api-key']
   if (w['gpu3'] !== undefined) v.gpu3 = w['gpu3']
   if (w['gpu3080ti'] !== undefined) v.gpu3080ti = w['gpu3080ti']
   if (w['gpua30'] !== undefined) v.gpua30 = w['gpua30']
@@ -17558,6 +19666,10 @@ export function fromWireRateLimited(w: any): RateLimited {
 
 export interface ReEncryptRequestDestination {
   /**
+   * The encryption algorithm the destination key must use. Validated against the key's actual cryptographic profile. Required for asymmetric keys. Symmetric keys use AES_256 when it is omitted.
+   */
+  encryptionAlgorithm?: 'AES_256' | 'RSAES_OAEP_SHA_256'
+  /**
    * Optional new Base64-encoded encryption context to apply under the target destination envelope.
    */
   encryptionContext?: string | null
@@ -17572,6 +19684,7 @@ export function toWireReEncryptRequestDestination(
   v: ReEncryptRequestDestination,
 ): Record<string, unknown> {
   const o: Record<string, unknown> = {}
+  if (v.encryptionAlgorithm !== undefined) o['encryption-algorithm'] = v.encryptionAlgorithm
   if (v.encryptionContext !== undefined)
     o['encryption-context'] = v.encryptionContext === null ? null : v.encryptionContext
   if (v.key !== undefined) o['key'] = v.key
@@ -17581,6 +19694,7 @@ export function toWireReEncryptRequestDestination(
 /** @internal */
 export function fromWireReEncryptRequestDestination(w: any): ReEncryptRequestDestination {
   const v = {} as ReEncryptRequestDestination
+  if (w['encryption-algorithm'] !== undefined) v.encryptionAlgorithm = w['encryption-algorithm']
   if (w['encryption-context'] !== undefined) v.encryptionContext = w['encryption-context']
   v.key = w['key']
   return v
@@ -17591,6 +19705,10 @@ export interface ReEncryptRequestSource {
    * The Base64-encoded encrypted payload package ready to undergo source-side key decryption.
    */
   ciphertext: string
+  /**
+   * The encryption algorithm the source key must use. Validated against the key's actual cryptographic profile. Required for asymmetric keys. Symmetric keys use AES_256 when it is omitted.
+   */
+  encryptionAlgorithm?: 'AES_256' | 'RSAES_OAEP_SHA_256'
   /**
    * Optional Base64-encoded encryption context originally appended to the AAD to confirm package validation rules.
    */
@@ -17605,6 +19723,7 @@ export interface ReEncryptRequestSource {
 export function toWireReEncryptRequestSource(v: ReEncryptRequestSource): Record<string, unknown> {
   const o: Record<string, unknown> = {}
   if (v.ciphertext !== undefined) o['ciphertext'] = v.ciphertext
+  if (v.encryptionAlgorithm !== undefined) o['encryption-algorithm'] = v.encryptionAlgorithm
   if (v.encryptionContext !== undefined)
     o['encryption-context'] = v.encryptionContext === null ? null : v.encryptionContext
   if (v.key !== undefined) o['key'] = v.key
@@ -17615,6 +19734,7 @@ export function toWireReEncryptRequestSource(v: ReEncryptRequestSource): Record<
 export function fromWireReEncryptRequestSource(w: any): ReEncryptRequestSource {
   const v = {} as ReEncryptRequestSource
   v.ciphertext = w['ciphertext']
+  if (w['encryption-algorithm'] !== undefined) v.encryptionAlgorithm = w['encryption-algorithm']
   if (w['encryption-context'] !== undefined) v.encryptionContext = w['encryption-context']
   v.key = w['key']
   return v
@@ -17647,12 +19767,24 @@ export interface ReEncryptResponse {
    * The new Base64-encoded ciphertext block safely wrapped by the chosen destination key parameters.
    */
   ciphertext: string
+  /**
+   * The encryption algorithm that was used to encrypt the destination ciphertext.
+   */
+  destinationEncryptionAlgorithm: 'AES_256' | 'RSAES_OAEP_SHA_256'
+  /**
+   * The encryption algorithm that was used to decrypt the source ciphertext.
+   */
+  sourceEncryptionAlgorithm: 'AES_256' | 'RSAES_OAEP_SHA_256'
 }
 
 /** @internal */
 export function toWireReEncryptResponse(v: ReEncryptResponse): Record<string, unknown> {
   const o: Record<string, unknown> = {}
   if (v.ciphertext !== undefined) o['ciphertext'] = v.ciphertext
+  if (v.destinationEncryptionAlgorithm !== undefined)
+    o['destination-encryption-algorithm'] = v.destinationEncryptionAlgorithm
+  if (v.sourceEncryptionAlgorithm !== undefined)
+    o['source-encryption-algorithm'] = v.sourceEncryptionAlgorithm
   return o
 }
 
@@ -17660,6 +19792,8 @@ export function toWireReEncryptResponse(v: ReEncryptResponse): Record<string, un
 export function fromWireReEncryptResponse(w: any): ReEncryptResponse {
   const v = {} as ReEncryptResponse
   v.ciphertext = w['ciphertext']
+  v.destinationEncryptionAlgorithm = w['destination-encryption-algorithm']
+  v.sourceEncryptionAlgorithm = w['source-encryption-algorithm']
   return v
 }
 
@@ -17772,6 +19906,42 @@ export function fromWireReplicateKmsKeyRequest(w: any): ReplicateKmsKeyRequest {
 }
 
 /**
+ * Resources reserved for kube or system components.
+ */
+export interface ReservedResources {
+  /**
+   * CPU reservation, e.g., "200m"
+   */
+  cpu?: string
+  /**
+   * Ephemeral storage reservation, e.g., "1Gi"
+   */
+  ephemeralStorage?: string
+  /**
+   * Memory reservation, e.g., "512Mi"
+   */
+  memory?: string
+}
+
+/** @internal */
+export function toWireReservedResources(v: ReservedResources): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.cpu !== undefined) o['cpu'] = v.cpu
+  if (v.ephemeralStorage !== undefined) o['ephemeral-storage'] = v.ephemeralStorage
+  if (v.memory !== undefined) o['memory'] = v.memory
+  return o
+}
+
+/** @internal */
+export function fromWireReservedResources(w: any): ReservedResources {
+  const v = {} as ReservedResources
+  if (w['cpu'] !== undefined) v.cpu = w['cpu']
+  if (w['ephemeral-storage'] !== undefined) v.ephemeralStorage = w['ephemeral-storage']
+  if (w['memory'] !== undefined) v.memory = w['memory']
+  return v
+}
+
+/**
  * Resource
  */
 export interface Resource {
@@ -17798,32 +19968,6 @@ export function fromWireResource(w: any): Resource {
   const v = {} as Resource
   if (w['id'] !== undefined) v.id = w['id']
   if (w['name'] !== undefined) v.name = w['name']
-  return v
-}
-
-/**
- * AI deployment inference endpoint authentication key
- */
-export interface RevealDeploymentAPIKeyResponse {
-  /**
-   * Inference endpoint authentication key
-   */
-  apiKey: string
-}
-
-/** @internal */
-export function toWireRevealDeploymentAPIKeyResponse(
-  v: RevealDeploymentAPIKeyResponse,
-): Record<string, unknown> {
-  const o: Record<string, unknown> = {}
-  if (v.apiKey !== undefined) o['api-key'] = v.apiKey
-  return o
-}
-
-/** @internal */
-export function fromWireRevealDeploymentAPIKeyResponse(w: any): RevealDeploymentAPIKeyResponse {
-  const v = {} as RevealDeploymentAPIKeyResponse
-  v.apiKey = w['api-key']
   return v
 }
 
@@ -17897,25 +20041,17 @@ export function fromWireRotateKmsKeyResponse(w: any): RotateKmsKeyResponse {
  */
 export interface Route {
   /**
-   * Route description
-   *
    * Max length 4096
    */
   description?: string
   /**
-   * Route destination CIDR
+   * The CIDR used to match on which packets the routing rule should be applied
    */
   destination?: string
-  /**
-   * Route ID
-   */
   id?: string
-  /**
-   * Route kind
-   */
   kind?: 'Subnet' | 'Vpc'
   /**
-   * Route target
+   * Where the packets should be sent to
    */
   target?: string
 }
@@ -18283,6 +20419,88 @@ export function fromWireSetOrgConsumptionQuotaRequest(w: any): SetOrgConsumption
   return v
 }
 
+export interface SignRequest {
+  /**
+   * The Base64-encoded message to sign (1-4096 decoded bytes). Its meaning depends on `message-type`, either the raw plaintext message or an already-hashed digest.
+   *
+   * Length 1-5464
+   */
+  message: string
+  /**
+   * How `message` should be interpreted.
+   *
+   * @defaultValue "raw"
+   */
+  messageType?: 'digest' | 'raw'
+  /**
+   * The signing algorithm to use. Must match the family implied by the key's `key-spec`.
+   */
+  signingAlgorithm:
+    | 'ECDSA_SHA_256'
+    | 'ECDSA_SHA_384'
+    | 'ECDSA_SHA_512'
+    | 'ED25519_PH_SHA_512'
+    | 'EDDSA_ED25519'
+    | 'ML_DSA_SHAKE_256'
+    | 'RSASSA_PKCS1_V1_5_SHA_256'
+    | 'RSASSA_PKCS1_V1_5_SHA_384'
+    | 'RSASSA_PKCS1_V1_5_SHA_512'
+    | 'RSASSA_PSS_SHA_256'
+    | 'RSASSA_PSS_SHA_384'
+    | 'RSASSA_PSS_SHA_512'
+}
+
+/** @internal */
+export function toWireSignRequest(v: SignRequest): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.message !== undefined) o['message'] = v.message
+  if (v.messageType !== undefined) o['message-type'] = v.messageType
+  if (v.signingAlgorithm !== undefined) o['signing-algorithm'] = v.signingAlgorithm
+  return o
+}
+
+/** @internal */
+export function fromWireSignRequest(w: any): SignRequest {
+  const v = {} as SignRequest
+  v.message = w['message']
+  if (w['message-type'] !== undefined) v.messageType = w['message-type']
+  v.signingAlgorithm = w['signing-algorithm']
+  return v
+}
+
+export interface SignResponse {
+  /**
+   * The cryptographic key specification used to produce the signature.
+   */
+  keySpec: string
+  /**
+   * The resulting Base64-encoded signature.
+   */
+  signature: string
+  /**
+   * The signing algorithm used to produce the signature, echoing the request's `signing-algorithm`.
+   */
+  signingAlgorithm: string
+}
+
+/** @internal */
+export function toWireSignResponse(v: SignResponse): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.keySpec !== undefined) o['key-spec'] = v.keySpec
+  if (v.signature !== undefined) o['signature'] = v.signature
+  if (v.signingAlgorithm !== undefined) o['signing-algorithm'] = v.signingAlgorithm
+  return o
+}
+
+/** @internal */
+export function fromWireSignResponse(w: any): SignResponse {
+  const v = {} as SignResponse
+  v.keySpec = w['key-spec']
+  v.signature = w['signature']
+  v.signingAlgorithm = w['signing-algorithm']
+  return v
+}
+
 /**
  * Kubernetes Audit parameters
  */
@@ -18423,6 +20641,10 @@ export interface SKSCluster {
    */
   addons?: string[]
   /**
+   * EXPERIMENTAL: List of ranges of allowed IPs using CIDR notation.
+   */
+  allowedNetworks?: SKSClusterAllowedNetworks
+  /**
    * Kubernetes Audit
    */
   audit?: SKSAudit
@@ -18477,6 +20699,10 @@ export interface SKSCluster {
    */
   id?: string
   /**
+   * A list of Karpenter controller feature gates to enable for the Karpenter controller binary
+   */
+  karpenterFeatureGates?: string[]
+  /**
    * Cluster labels
    */
   labels?: SKSClusterLabels
@@ -18527,6 +20753,7 @@ export interface SKSCluster {
 export function toWireSKSCluster(v: SKSCluster): Record<string, unknown> {
   const o: Record<string, unknown> = {}
   if (v.addons !== undefined) o['addons'] = v.addons
+  if (v.allowedNetworks !== undefined) o['allowed-networks'] = v.allowedNetworks
   if (v.audit !== undefined) o['audit'] = toWireSKSAudit(v.audit)
   if (v.autoUpgrade !== undefined) o['auto-upgrade'] = v.autoUpgrade
   if (v.cni !== undefined) o['cni'] = v.cni
@@ -18540,6 +20767,7 @@ export function toWireSKSCluster(v: SKSCluster): Record<string, unknown> {
   if (v.endpoint !== undefined) o['endpoint'] = v.endpoint
   if (v.featureGates !== undefined) o['feature-gates'] = v.featureGates
   if (v.id !== undefined) o['id'] = v.id
+  if (v.karpenterFeatureGates !== undefined) o['karpenter-feature-gates'] = v.karpenterFeatureGates
   if (v.labels !== undefined) o['labels'] = v.labels
   if (v.level !== undefined) o['level'] = v.level
   if (v.name !== undefined) o['name'] = v.name
@@ -18554,6 +20782,7 @@ export function toWireSKSCluster(v: SKSCluster): Record<string, unknown> {
 export function fromWireSKSCluster(w: any): SKSCluster {
   const v = {} as SKSCluster
   if (w['addons'] !== undefined) v.addons = w['addons']
+  if (w['allowed-networks'] !== undefined) v.allowedNetworks = w['allowed-networks']
   if (w['audit'] !== undefined) v.audit = fromWireSKSAudit(w['audit'])
   if (w['auto-upgrade'] !== undefined) v.autoUpgrade = w['auto-upgrade']
   if (w['cni'] !== undefined) v.cni = w['cni']
@@ -18566,6 +20795,8 @@ export function fromWireSKSCluster(w: any): SKSCluster {
   if (w['endpoint'] !== undefined) v.endpoint = w['endpoint']
   if (w['feature-gates'] !== undefined) v.featureGates = w['feature-gates']
   if (w['id'] !== undefined) v.id = w['id']
+  if (w['karpenter-feature-gates'] !== undefined)
+    v.karpenterFeatureGates = w['karpenter-feature-gates']
   if (w['labels'] !== undefined) v.labels = w['labels']
   if (w['level'] !== undefined) v.level = w['level']
   if (w['name'] !== undefined) v.name = w['name']
@@ -18576,6 +20807,11 @@ export function fromWireSKSCluster(w: any): SKSCluster {
   if (w['version'] !== undefined) v.version = w['version']
   return v
 }
+
+/**
+ * Max items 16, Unique items
+ */
+export type SKSClusterAllowedNetworks = string[]
 
 export interface SKSClusterDeprecatedResource {
   group?: string
@@ -18644,6 +20880,12 @@ export interface SKSKubeconfigRequest {
    */
   groups: string[]
   /**
+   * Cluster and context name in the generated Kubeconfig (default: cluster ID)
+   *
+   * Length 1-255
+   */
+  name?: string
+  /**
    * Validity in seconds of the Kubeconfig user certificate (default: 30 days)
    *
    * Min >0
@@ -18659,6 +20901,7 @@ export interface SKSKubeconfigRequest {
 export function toWireSKSKubeconfigRequest(v: SKSKubeconfigRequest): Record<string, unknown> {
   const o: Record<string, unknown> = {}
   if (v.groups !== undefined) o['groups'] = v.groups
+  if (v.name !== undefined) o['name'] = v.name
   if (v.ttl !== undefined) o['ttl'] = v.ttl
   if (v.user !== undefined) o['user'] = v.user
   return o
@@ -18668,6 +20911,7 @@ export function toWireSKSKubeconfigRequest(v: SKSKubeconfigRequest): Record<stri
 export function fromWireSKSKubeconfigRequest(w: any): SKSKubeconfigRequest {
   const v = {} as SKSKubeconfigRequest
   v.groups = w['groups']
+  if (w['name'] !== undefined) v.name = w['name']
   if (w['ttl'] !== undefined) v.ttl = w['ttl']
   v.user = w['user']
   return v
@@ -18689,6 +20933,10 @@ export interface SKSNodepool {
    * Max items 8, Unique items
    */
   antiAffinityGroups?: AntiAffinityGroupRef[]
+  /**
+   * CPU manager (kubelet settings)
+   */
+  cpuManager?: CPUManager
   /**
    * Nodepool creation date
    *
@@ -18732,6 +20980,14 @@ export interface SKSNodepool {
    */
   instanceType?: InstanceTypeRef
   /**
+   * Allow the Instances to act as routers in their VPC (IP forwarding). Only applies to new Instances
+   */
+  ipForwarding?: boolean
+  /**
+   * Resources reserved for Kubernetes node components (kubelet setting)
+   */
+  kubeReserved?: ReservedResources
+  /**
    * Kubelet image GC options
    */
   kubeletImageGC?: KubeletImageGC
@@ -18751,6 +21007,10 @@ export interface SKSNodepool {
    * Length 1-255
    */
   name?: string
+  /**
+   * Expose the GPUs with the NVIDIA DRA driver instead of the NVIDIA device plugin. Requires a GPU instance type and Kubernetes 1.34 or greater.
+   */
+  nvidiaDraDriver?: boolean
   /**
    * Nvidia MIG Profiles
    */
@@ -18795,6 +21055,10 @@ export interface SKSNodepool {
     | 'scaling'
     | 'updating'
   /**
+   * Resources reserved for OS system daemons (kubelet setting)
+   */
+  systemReserved?: ReservedResources
+  /**
    * Nodepool taints
    */
   taints?: SKSNodepoolTaints
@@ -18803,11 +21067,24 @@ export interface SKSNodepool {
    */
   template?: TemplateRef
   /**
+   * Nodepool template selection:
+   *
+   * * `auto`: the latest template of the Nodepool Kubernetes version and variant;
+   * * `pinned`: the template set at creation or with `update-sks-nodepool`.
+   *
+   * Read-only
+   */
+  templateSelection?: 'auto' | 'pinned'
+  /**
    * Nodepool version
    *
    * Read-only
    */
   version?: string
+  /**
+   * Nodepool VPC: the Instances are attached to the given Subnets of the VPC
+   */
+  vpc?: VpcRef
 }
 
 /** @internal */
@@ -18816,6 +21093,7 @@ export function toWireSKSNodepool(v: SKSNodepool): Record<string, unknown> {
   if (v.addons !== undefined) o['addons'] = v.addons
   if (v.antiAffinityGroups !== undefined)
     o['anti-affinity-groups'] = v.antiAffinityGroups.map((x) => toWireAntiAffinityGroupRef(x))
+  if (v.cpuManager !== undefined) o['cpu-manager'] = toWireCPUManager(v.cpuManager)
   if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
   if (v.deployTarget !== undefined) o['deploy-target'] = toWireDeployTargetRef(v.deployTarget)
   if (v.description !== undefined) o['description'] = v.description
@@ -18824,11 +21102,14 @@ export function toWireSKSNodepool(v: SKSNodepool): Record<string, unknown> {
   if (v.instancePool !== undefined) o['instance-pool'] = toWireInstancePoolRef(v.instancePool)
   if (v.instancePrefix !== undefined) o['instance-prefix'] = v.instancePrefix
   if (v.instanceType !== undefined) o['instance-type'] = toWireInstanceTypeRef(v.instanceType)
+  if (v.ipForwarding !== undefined) o['ip-forwarding'] = v.ipForwarding
+  if (v.kubeReserved !== undefined) o['kube-reserved'] = toWireReservedResources(v.kubeReserved)
   if (v.kubeletImageGC !== undefined) o['kubelet-image-gc'] = toWireKubeletImageGC(v.kubeletImageGC)
   if (v.kubeletMaxPods !== undefined)
     o['kubelet-max-pods'] = v.kubeletMaxPods === null ? null : v.kubeletMaxPods
   if (v.labels !== undefined) o['labels'] = v.labels
   if (v.name !== undefined) o['name'] = v.name
+  if (v.nvidiaDraDriver !== undefined) o['nvidia-dra-driver'] = v.nvidiaDraDriver
   if (v.nvidiaMigProfiles !== undefined)
     o['nvidia-mig-profiles'] = toWireNvidiaMigProfiles(v.nvidiaMigProfiles)
   if (v.privateNetworks !== undefined)
@@ -18838,9 +21119,13 @@ export function toWireSKSNodepool(v: SKSNodepool): Record<string, unknown> {
     o['security-groups'] = v.securityGroups.map((x) => toWireSecurityGroupRef(x))
   if (v.size !== undefined) o['size'] = v.size
   if (v.state !== undefined) o['state'] = v.state
+  if (v.systemReserved !== undefined)
+    o['system-reserved'] = toWireReservedResources(v.systemReserved)
   if (v.taints !== undefined) o['taints'] = toWireSKSNodepoolTaints(v.taints)
   if (v.template !== undefined) o['template'] = toWireTemplateRef(v.template)
+  if (v.templateSelection !== undefined) o['template-selection'] = v.templateSelection
   if (v.version !== undefined) o['version'] = v.version
+  if (v.vpc !== undefined) o['vpc'] = toWireVpcRef(v.vpc)
   return o
 }
 
@@ -18852,6 +21137,7 @@ export function fromWireSKSNodepool(w: any): SKSNodepool {
     v.antiAffinityGroups = (w['anti-affinity-groups'] as any[]).map((x) =>
       fromWireAntiAffinityGroupRef(x),
     )
+  if (w['cpu-manager'] !== undefined) v.cpuManager = fromWireCPUManager(w['cpu-manager'])
   if (w['created-at'] !== undefined) v.createdAT = new Date(w['created-at'])
   if (w['deploy-target'] !== undefined) v.deployTarget = fromWireDeployTargetRef(w['deploy-target'])
   if (w['description'] !== undefined) v.description = w['description']
@@ -18860,11 +21146,15 @@ export function fromWireSKSNodepool(w: any): SKSNodepool {
   if (w['instance-pool'] !== undefined) v.instancePool = fromWireInstancePoolRef(w['instance-pool'])
   if (w['instance-prefix'] !== undefined) v.instancePrefix = w['instance-prefix']
   if (w['instance-type'] !== undefined) v.instanceType = fromWireInstanceTypeRef(w['instance-type'])
+  if (w['ip-forwarding'] !== undefined) v.ipForwarding = w['ip-forwarding']
+  if (w['kube-reserved'] !== undefined)
+    v.kubeReserved = fromWireReservedResources(w['kube-reserved'])
   if (w['kubelet-image-gc'] !== undefined)
     v.kubeletImageGC = fromWireKubeletImageGC(w['kubelet-image-gc'])
   if (w['kubelet-max-pods'] !== undefined) v.kubeletMaxPods = w['kubelet-max-pods']
   if (w['labels'] !== undefined) v.labels = w['labels']
   if (w['name'] !== undefined) v.name = w['name']
+  if (w['nvidia-dra-driver'] !== undefined) v.nvidiaDraDriver = w['nvidia-dra-driver']
   if (w['nvidia-mig-profiles'] !== undefined)
     v.nvidiaMigProfiles = fromWireNvidiaMigProfiles(w['nvidia-mig-profiles'])
   if (w['private-networks'] !== undefined)
@@ -18874,9 +21164,13 @@ export function fromWireSKSNodepool(w: any): SKSNodepool {
     v.securityGroups = (w['security-groups'] as any[]).map((x) => fromWireSecurityGroupRef(x))
   if (w['size'] !== undefined) v.size = w['size']
   if (w['state'] !== undefined) v.state = w['state']
+  if (w['system-reserved'] !== undefined)
+    v.systemReserved = fromWireReservedResources(w['system-reserved'])
   if (w['taints'] !== undefined) v.taints = fromWireSKSNodepoolTaints(w['taints'])
   if (w['template'] !== undefined) v.template = fromWireTemplateRef(w['template'])
+  if (w['template-selection'] !== undefined) v.templateSelection = w['template-selection']
   if (w['version'] !== undefined) v.version = w['version']
+  if (w['vpc'] !== undefined) v.vpc = fromWireVpcRef(w['vpc'])
   return v
 }
 
@@ -18926,6 +21220,56 @@ export function fromWireSKSNodepoolTaints(w: any): SKSNodepoolTaints {
   return Object.fromEntries(
     Object.entries(w ?? {}).map(([k, x]) => [k, fromWireSKSNodepoolTaint(x)]),
   )
+}
+
+/**
+ * SKS Nodepool template
+ */
+export interface SKSNodepoolTemplate {
+  /**
+   * Template registration date
+   *
+   * Read-only
+   */
+  createdAT?: Date
+  /**
+   * Template ID
+   *
+   * Read-only
+   */
+  id?: string
+  /**
+   * Template name
+   *
+   * Read-only
+   */
+  name?: string
+  /**
+   * Template variant: standard | nvidia
+   *
+   * Read-only
+   */
+  variant?: string
+}
+
+/** @internal */
+export function toWireSKSNodepoolTemplate(v: SKSNodepoolTemplate): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
+  if (v.id !== undefined) o['id'] = v.id
+  if (v.name !== undefined) o['name'] = v.name
+  if (v.variant !== undefined) o['variant'] = v.variant
+  return o
+}
+
+/** @internal */
+export function fromWireSKSNodepoolTemplate(w: any): SKSNodepoolTemplate {
+  const v = {} as SKSNodepoolTemplate
+  if (w['created-at'] !== undefined) v.createdAT = new Date(w['created-at'])
+  if (w['id'] !== undefined) v.id = w['id']
+  if (w['name'] !== undefined) v.name = w['name']
+  if (w['variant'] !== undefined) v.variant = w['variant']
+  return v
 }
 
 /**
@@ -19238,20 +21582,14 @@ export function fromWireSSHKeyRef(w: any): SSHKeyRef {
 }
 
 /**
- * Subnet attachements
+ * Subnet attachments
  */
 export interface SubnetInstances {
-  /**
-   * Instance uuid
-   */
   id?: string
   /**
-   * Instance Ipv4 address
+   * The ipv4 associated with the instance in this subnet
    */
   ipv4?: string
-  /**
-   * Instance name
-   */
   name?: string
 }
 
@@ -19278,26 +21616,18 @@ export function fromWireSubnetInstances(w: any): SubnetInstances {
  */
 export interface Subnet {
   /**
-   * Subnet address space
+   * Whether the subnet is private or public
    */
   addressSpace?: 'private'
   /**
-   * Subnet address family
+   * Whether the subnet support IPv4 and/or IPv6
    */
   addressfamily?: 'dual' | 'inet4'
-  /**
-   * Subnet creation date
-   */
   createdAT?: Date
   /**
-   * Subnet description
-   *
    * Max length 4096
    */
   description?: string
-  /**
-   * Subnet ID
-   */
   id?: string
   /**
    * Instances attached to the subnet
@@ -19307,13 +21637,8 @@ export interface Subnet {
    * Subnet ipv4 CIDR
    */
   ipv4Block?: string
-  /**
-   * Resource labels
-   */
   labels?: Labels
   /**
-   * Subnet name
-   *
    * Length 1-255
    */
   name?: string
@@ -19465,10 +21790,6 @@ export interface Template {
    * Read-only
    */
   visibility?: 'private' | 'public'
-  /**
-   * Zones availability
-   */
-  zones?: ZoneName[]
 }
 
 /** @internal */
@@ -19492,7 +21813,6 @@ export function toWireTemplate(v: Template): Record<string, unknown> {
   if (v.url !== undefined) o['url'] = v.url
   if (v.version !== undefined) o['version'] = v.version
   if (v.visibility !== undefined) o['visibility'] = v.visibility
-  if (v.zones !== undefined) o['zones'] = v.zones
   return o
 }
 
@@ -19517,7 +21837,6 @@ export function fromWireTemplate(w: any): Template {
   if (w['url'] !== undefined) v.url = w['url']
   if (w['version'] !== undefined) v.version = w['version']
   if (w['visibility'] !== undefined) v.visibility = w['visibility']
-  if (w['zones'] !== undefined) v.zones = w['zones']
   return v
 }
 
@@ -19542,6 +21861,87 @@ export function toWireTemplateRef(v: TemplateRef): Record<string, unknown> {
 export function fromWireTemplateRef(w: any): TemplateRef {
   const v = {} as TemplateRef
   if (w['id'] !== undefined) v.id = w['id']
+  return v
+}
+
+/**
+ * Update the models and/or deployments accessible by an AI API key. Omitted properties are left unchanged.
+ */
+export interface UpdateAIAPIKeyRequest {
+  /**
+   * Grant or remove access to all deployments of the organization. Takes precedence over the deployments array, which is ignored when set.
+   */
+  allDeployments?: boolean
+  /**
+   * Grant or remove access to all public models. Takes precedence over the models array, which is ignored when set.
+   */
+  allModels?: boolean
+  deployments?: AIAPIKeyDeployments
+  models?: AIAPIKeyModels
+}
+
+/** @internal */
+export function toWireUpdateAIAPIKeyRequest(v: UpdateAIAPIKeyRequest): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.allDeployments !== undefined) o['all-deployments'] = v.allDeployments
+  if (v.allModels !== undefined) o['all-models'] = v.allModels
+  if (v.deployments !== undefined) o['deployments'] = toWireAIAPIKeyDeployments(v.deployments)
+  if (v.models !== undefined) o['models'] = v.models
+  return o
+}
+
+/** @internal */
+export function fromWireUpdateAIAPIKeyRequest(w: any): UpdateAIAPIKeyRequest {
+  const v = {} as UpdateAIAPIKeyRequest
+  if (w['all-deployments'] !== undefined) v.allDeployments = w['all-deployments']
+  if (w['all-models'] !== undefined) v.allModels = w['all-models']
+  if (w['deployments'] !== undefined) v.deployments = fromWireAIAPIKeyDeployments(w['deployments'])
+  if (w['models'] !== undefined) v.models = w['models']
+  return v
+}
+
+export interface UpdateAIAPIKeyResponse {
+  /**
+   * True when the key has access to all deployments of the organization.
+   */
+  allDeployments: boolean
+  /**
+   * True when the key has access to all public models.
+   */
+  allModels: boolean
+  createdAT: Date
+  deployments: AIAPIKeyDeployments
+  id: string
+  models: AIAPIKeyModels
+  name: string
+  updatedAT: Date
+}
+
+/** @internal */
+export function toWireUpdateAIAPIKeyResponse(v: UpdateAIAPIKeyResponse): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.allDeployments !== undefined) o['all-deployments'] = v.allDeployments
+  if (v.allModels !== undefined) o['all-models'] = v.allModels
+  if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
+  if (v.deployments !== undefined) o['deployments'] = toWireAIAPIKeyDeployments(v.deployments)
+  if (v.id !== undefined) o['id'] = v.id
+  if (v.models !== undefined) o['models'] = v.models
+  if (v.name !== undefined) o['name'] = v.name
+  if (v.updatedAT !== undefined) o['updated-at'] = v.updatedAT.toISOString()
+  return o
+}
+
+/** @internal */
+export function fromWireUpdateAIAPIKeyResponse(w: any): UpdateAIAPIKeyResponse {
+  const v = {} as UpdateAIAPIKeyResponse
+  v.allDeployments = w['all-deployments']
+  v.allModels = w['all-models']
+  v.createdAT = new Date(w['created-at'])
+  v.deployments = fromWireAIAPIKeyDeployments(w['deployments'])
+  v.id = w['id']
+  v.models = w['models']
+  v.name = w['name']
+  v.updatedAT = new Date(w['updated-at'])
   return v
 }
 
@@ -19581,6 +21981,59 @@ export function fromWireUpdateDeploymentRequest(w: any): UpdateDeploymentRequest
   if (w['inference-engine-version'] !== undefined)
     v.inferenceEngineVersion = w['inference-engine-version']
   if (w['name'] !== undefined) v.name = w['name']
+  return v
+}
+
+/**
+ * New customer-managed XKS proxy settings.
+ */
+export interface UpdateKeyStoreProxy {
+  auth?: KeyStoreProxyAuth
+  /**
+   * New public URL used to route communication to the customer-managed XKS proxy. Its host must resolve to a public IP address.
+   */
+  endpoint?: string
+}
+
+/** @internal */
+export function toWireUpdateKeyStoreProxy(v: UpdateKeyStoreProxy): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.auth !== undefined) o['auth'] = toWireKeyStoreProxyAuth(v.auth)
+  if (v.endpoint !== undefined) o['endpoint'] = v.endpoint
+  return o
+}
+
+/** @internal */
+export function fromWireUpdateKeyStoreProxy(w: any): UpdateKeyStoreProxy {
+  const v = {} as UpdateKeyStoreProxy
+  if (w['auth'] !== undefined) v.auth = fromWireKeyStoreProxyAuth(w['auth'])
+  if (w['endpoint'] !== undefined) v.endpoint = w['endpoint']
+  return v
+}
+
+export interface UpdateKeyStoreRequest {
+  /**
+   * A new detailed description providing additional context about the key store's intended use case.
+   *
+   * Max length 1024
+   */
+  description?: string
+  proxy?: UpdateKeyStoreProxy
+}
+
+/** @internal */
+export function toWireUpdateKeyStoreRequest(v: UpdateKeyStoreRequest): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.description !== undefined) o['description'] = v.description
+  if (v.proxy !== undefined) o['proxy'] = toWireUpdateKeyStoreProxy(v.proxy)
+  return o
+}
+
+/** @internal */
+export function fromWireUpdateKeyStoreRequest(w: any): UpdateKeyStoreRequest {
+  const v = {} as UpdateKeyStoreRequest
+  if (w['description'] !== undefined) v.description = w['description']
+  if (w['proxy'] !== undefined) v.proxy = fromWireUpdateKeyStoreProxy(w['proxy'])
   return v
 }
 
@@ -19646,35 +22099,113 @@ export function fromWireUser(w: any): User {
   return v
 }
 
+export interface VerifyRequest {
+  /**
+   * The Base64-encoded message to verify (1-4096 decoded bytes), with the same semantics as `sign`'s `message` field.
+   *
+   * Length 1-5464
+   */
+  message: string
+  /**
+   * How `message` should be interpreted, with the same semantics as `sign`'s `message-type` field.
+   *
+   * @defaultValue "raw"
+   */
+  messageType?: 'digest' | 'raw'
+  /**
+   * The Base64-encoded signature to verify against `message` (1-6144 decoded bytes).
+   *
+   * Length 1-8192
+   */
+  signature: string
+  /**
+   * The signing algorithm `signature` was produced with. Must match the family implied by the key's `key-spec`, with the same semantics as `sign`'s `signing-algorithm` field.
+   */
+  signingAlgorithm:
+    | 'ECDSA_SHA_256'
+    | 'ECDSA_SHA_384'
+    | 'ECDSA_SHA_512'
+    | 'ED25519_PH_SHA_512'
+    | 'EDDSA_ED25519'
+    | 'ML_DSA_SHAKE_256'
+    | 'RSASSA_PKCS1_V1_5_SHA_256'
+    | 'RSASSA_PKCS1_V1_5_SHA_384'
+    | 'RSASSA_PKCS1_V1_5_SHA_512'
+    | 'RSASSA_PSS_SHA_256'
+    | 'RSASSA_PSS_SHA_384'
+    | 'RSASSA_PSS_SHA_512'
+}
+
+/** @internal */
+export function toWireVerifyRequest(v: VerifyRequest): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.message !== undefined) o['message'] = v.message
+  if (v.messageType !== undefined) o['message-type'] = v.messageType
+  if (v.signature !== undefined) o['signature'] = v.signature
+  if (v.signingAlgorithm !== undefined) o['signing-algorithm'] = v.signingAlgorithm
+  return o
+}
+
+/** @internal */
+export function fromWireVerifyRequest(w: any): VerifyRequest {
+  const v = {} as VerifyRequest
+  v.message = w['message']
+  if (w['message-type'] !== undefined) v.messageType = w['message-type']
+  v.signature = w['signature']
+  v.signingAlgorithm = w['signing-algorithm']
+  return v
+}
+
+export interface VerifyResponse {
+  /**
+   * The UUID of the KMS key used to verify the signature.
+   */
+  keyID: string
+  /**
+   * The cryptographic key specification used to verify the signature.
+   */
+  keySpec: string
+  /**
+   * Whether `signature` is a valid signature over `message` produced by this KMS key.
+   */
+  signatureValid: boolean
+}
+
+/** @internal */
+export function toWireVerifyResponse(v: VerifyResponse): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.keyID !== undefined) o['key-id'] = v.keyID
+  if (v.keySpec !== undefined) o['key-spec'] = v.keySpec
+  if (v.signatureValid !== undefined) o['signature-valid'] = v.signatureValid
+  return o
+}
+
+/** @internal */
+export function fromWireVerifyResponse(w: any): VerifyResponse {
+  const v = {} as VerifyResponse
+  v.keyID = w['key-id']
+  v.keySpec = w['key-spec']
+  v.signatureValid = w['signature-valid']
+  return v
+}
+
 /**
  * VPC
  */
 export interface Vpc {
-  /**
-   * VPC creation date
-   */
   createdAT?: Date
   /**
    * Indicates if this is the organization's default VPC
    */
   default?: boolean
   /**
-   * VPC description
-   *
    * Max length 4096
    */
   description?: string
-  /**
-   * VPC ID
-   */
+  dhcpOptions?: VpcDHCPOptions
   id?: string
-  /**
-   * Resource labels
-   */
   labels?: Labels
   /**
-   * VPC name
-   *
    * Length 1-255
    */
   name?: string
@@ -19686,6 +22217,7 @@ export function toWireVpc(v: Vpc): Record<string, unknown> {
   if (v.createdAT !== undefined) o['created-at'] = v.createdAT.toISOString()
   if (v.default !== undefined) o['default'] = v.default
   if (v.description !== undefined) o['description'] = v.description
+  if (v.dhcpOptions !== undefined) o['dhcp-options'] = toWireVpcDHCPOptions(v.dhcpOptions)
   if (v.id !== undefined) o['id'] = v.id
   if (v.labels !== undefined) o['labels'] = v.labels
   if (v.name !== undefined) o['name'] = v.name
@@ -19698,9 +22230,158 @@ export function fromWireVpc(w: any): Vpc {
   if (w['created-at'] !== undefined) v.createdAT = new Date(w['created-at'])
   if (w['default'] !== undefined) v.default = w['default']
   if (w['description'] !== undefined) v.description = w['description']
+  if (w['dhcp-options'] !== undefined) v.dhcpOptions = fromWireVpcDHCPOptions(w['dhcp-options'])
   if (w['id'] !== undefined) v.id = w['id']
   if (w['labels'] !== undefined) v.labels = w['labels']
   if (w['name'] !== undefined) v.name = w['name']
+  return v
+}
+
+/**
+ * VPC DHCP options
+ */
+export interface VpcDHCPOptions {
+  dnsServers?: string[]
+  /**
+   * Domain search list, limited to 255 octets post RFC3397 compression
+   */
+  domainSearch?: string[]
+  ntpServers?: string[]
+}
+
+/** @internal */
+export function toWireVpcDHCPOptions(v: VpcDHCPOptions): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.dnsServers !== undefined) o['dns-servers'] = v.dnsServers
+  if (v.domainSearch !== undefined) o['domain-search'] = v.domainSearch
+  if (v.ntpServers !== undefined) o['ntp-servers'] = v.ntpServers
+  return o
+}
+
+/** @internal */
+export function fromWireVpcDHCPOptions(w: any): VpcDHCPOptions {
+  const v = {} as VpcDHCPOptions
+  if (w['dns-servers'] !== undefined) v.dnsServers = w['dns-servers']
+  if (w['domain-search'] !== undefined) v.domainSearch = w['domain-search']
+  if (w['ntp-servers'] !== undefined) v.ntpServers = w['ntp-servers']
+  return v
+}
+
+/**
+ * VPC
+ */
+export interface VpcRef {
+  /**
+   * VPC ID
+   */
+  id: string
+  /**
+   * VPC Subnets to attach the Instances to
+   *
+   * Unique items
+   */
+  subnets: VpcSubnetRef[]
+}
+
+/** @internal */
+export function toWireVpcRef(v: VpcRef): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.id !== undefined) o['id'] = v.id
+  if (v.subnets !== undefined) o['subnets'] = v.subnets.map((x) => toWireVpcSubnetRef(x))
+  return o
+}
+
+/** @internal */
+export function fromWireVpcRef(w: any): VpcRef {
+  const v = {} as VpcRef
+  v.id = w['id']
+  v.subnets = (w['subnets'] as any[]).map((x) => fromWireVpcSubnetRef(x))
+  return v
+}
+
+/**
+ * VPC Subnet
+ */
+export interface VpcSubnetRef {
+  /**
+   * Subnet ID
+   */
+  id: string
+}
+
+/** @internal */
+export function toWireVpcSubnetRef(v: VpcSubnetRef): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.id !== undefined) o['id'] = v.id
+  return o
+}
+
+/** @internal */
+export function fromWireVpcSubnetRef(w: any): VpcSubnetRef {
+  const v = {} as VpcSubnetRef
+  v.id = w['id']
+  return v
+}
+
+/**
+ * [BETA] External key store reference of a KMS Key with source `external-key-store`.
+ */
+export interface XksKey {
+  /**
+   * [BETA] The identifier of the key as known to the external key store, used to reference the key material outside of Exoscale.
+   *
+   * Length 1-128, Pattern `^[a-zA-Z0-9_.-]+$`
+   */
+  externalKeyID: string
+  /**
+   * [BETA] The Exoscale-generated id of the external key store resource that this key is associated with.
+   */
+  xksID: string
+}
+
+/** @internal */
+export function toWireXksKey(v: XksKey): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.externalKeyID !== undefined) o['external-key-id'] = v.externalKeyID
+  if (v.xksID !== undefined) o['xks-id'] = v.xksID
+  return o
+}
+
+/** @internal */
+export function fromWireXksKey(w: any): XksKey {
+  const v = {} as XksKey
+  v.externalKeyID = w['external-key-id']
+  v.xksID = w['xks-id']
+  return v
+}
+
+/**
+ * [BETA] Error reported by the customer-managed XKS proxy of an external key store.
+ */
+export interface XksProxyErrorDetail {
+  /**
+   * [BETA] Optional bounded XKS proxy `errorMessage`.
+   */
+  errorMessage?: string
+  /**
+   * [BETA] XKS proxy `errorName` from a valid proxy error envelope.
+   */
+  errorName: string
+}
+
+/** @internal */
+export function toWireXksProxyErrorDetail(v: XksProxyErrorDetail): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.errorMessage !== undefined) o['error-message'] = v.errorMessage
+  if (v.errorName !== undefined) o['error-name'] = v.errorName
+  return o
+}
+
+/** @internal */
+export function fromWireXksProxyErrorDetail(w: any): XksProxyErrorDetail {
+  const v = {} as XksProxyErrorDetail
+  if (w['error-message'] !== undefined) v.errorMessage = w['error-message']
+  v.errorName = w['error-name']
   return v
 }
 
@@ -19789,6 +22470,7 @@ export type ZoneName =
   | 'ch-gva-2'
   | 'de-fra-1'
   | 'de-muc-1'
+  | 'es-mad-1'
   | 'hr-zag-1'
 
 /** Zone API endpoints, derived from the zone-name spec enum. */
@@ -19800,5 +22482,6 @@ export const ENDPOINTS = {
   'ch-gva-2': 'https://api-ch-gva-2.exoscale.com/v2',
   'de-fra-1': 'https://api-de-fra-1.exoscale.com/v2',
   'de-muc-1': 'https://api-de-muc-1.exoscale.com/v2',
+  'es-mad-1': 'https://api-es-mad-1.exoscale.com/v2',
   'hr-zag-1': 'https://api-hr-zag-1.exoscale.com/v2',
 } as const satisfies Record<ZoneName, string>

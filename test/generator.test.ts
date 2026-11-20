@@ -7,6 +7,7 @@ import { generate } from '../generator/main.js'
 import { applyPatch } from '../generator/overrides.js'
 import { IGNORED_SCHEMAS, loadEffectiveSpec } from '../generator/model.js'
 import { toCamel, toLowerCamel } from '../generator/naming.js'
+import { ENDPOINTS } from '../src/client.js'
 
 const ROOT = join(fileURLToPath(import.meta.url), '..', '..')
 const SPEC_FILE = join(ROOT, 'spec', 'openapi.json')
@@ -98,6 +99,42 @@ describe('generator', () => {
       const expected = readFileSync(join(ROOT, 'src', 'generated', name), 'utf8')
       expect(readFileSync(join(dir, name), 'utf8')).toBe(expected)
     }
+  })
+
+  it('ENDPOINTS covers exactly the zones in the zone-name enum', () => {
+    const raw = JSON.parse(readFileSync(SPEC_FILE, 'utf8'))
+    const zones = raw.components.schemas['zone-name'].enum as string[]
+    const expected = Object.fromEntries(zones.map((z) => [z, `https://api-${z}.exoscale.com/v2`]))
+    expect(ENDPOINTS).toEqual(expected)
+  })
+
+  it('renders named array schemas as arrays', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'exo-gen-'))
+    const specFile = join(dir, 'spec.json')
+    const overridesFile = join(dir, 'overrides.json')
+    writeFileSync(
+      specFile,
+      JSON.stringify({
+        openapi: '3.0.0',
+        info: { title: 'test', version: '1.0.0' },
+        components: {
+          schemas: {
+            'zone-name': { type: 'string', enum: ['a-1', 'b-2'] },
+            thing: { type: 'object', properties: { id: { type: 'string' } } },
+            things: { type: 'array', items: { $ref: '#/components/schemas/thing' } },
+            names: { type: 'array', items: { type: 'string' } },
+          },
+        },
+      }),
+    )
+    writeFileSync(overridesFile, '[]')
+
+    const out = mkdtempSync(join(tmpdir(), 'exo-gen-'))
+    await generate(specFile, overridesFile, out)
+    const schemas = readFileSync(join(out, 'schemas.ts'), 'utf8')
+    expect(schemas).toContain('export type Things = Thing[]')
+    expect(schemas).toContain('export type Names = string[]')
+    expect(schemas).toContain(`'a-1': 'https://api-a-1.exoscale.com/v2'`)
   })
 })
 

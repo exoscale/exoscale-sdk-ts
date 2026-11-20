@@ -19790,3 +19790,15 @@ export type ZoneName =
   | 'de-fra-1'
   | 'de-muc-1'
   | 'hr-zag-1'
+
+/** Zone API endpoints, derived from the zone-name spec enum. */
+export const ENDPOINTS = {
+  'at-vie-1': 'https://api-at-vie-1.exoscale.com/v2',
+  'at-vie-2': 'https://api-at-vie-2.exoscale.com/v2',
+  'bg-sof-1': 'https://api-bg-sof-1.exoscale.com/v2',
+  'ch-dk-2': 'https://api-ch-dk-2.exoscale.com/v2',
+  'ch-gva-2': 'https://api-ch-gva-2.exoscale.com/v2',
+  'de-fra-1': 'https://api-de-fra-1.exoscale.com/v2',
+  'de-muc-1': 'https://api-de-muc-1.exoscale.com/v2',
+  'hr-zag-1': 'https://api-hr-zag-1.exoscale.com/v2',
+} as const satisfies Record<ZoneName, string>

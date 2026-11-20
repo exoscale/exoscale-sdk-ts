@@ -458,7 +458,7 @@ export function renderNamedType(
     if (items === undefined) throw new Error('array schema without items')
     const base = `${name}Items`
     const te = typeExpr(items, base, ctx)
-    parts.push(`${docStr}export type ${name} = ${te}\n`)
+    parts.push(`${docStr}export type ${name} = ${te}[]\n`)
   } else if (t === 'record') {
     const base = `${name}Value`
     parts.push(`${docStr}export type ${name} = ${recordExpr(schema, base, ctx)}\n`)

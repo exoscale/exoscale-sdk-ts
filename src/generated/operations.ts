@@ -194,6 +194,7 @@ import {
   toWireUpdateAIAPIKeyRequest,
   toWireUpdateDeploymentRequest,
   toWireUpdateKeyStoreRequest,
+  toWireUpdateKmsKeyDescriptionRequest,
   toWireVerifyRequest,
   toWireVpcDHCPOptions,
   toWireVpcRef,
@@ -410,6 +411,7 @@ import type {
   UpdateAIAPIKeyResponse,
   UpdateDeploymentRequest,
   UpdateKeyStoreRequest,
+  UpdateKmsKeyDescriptionRequest,
   User,
   VerifyRequest,
   VerifyResponse,
@@ -3089,7 +3091,7 @@ export interface CreateSKSClusterRequest {
    */
   addons?: string[]
   /**
-   * EXPERIMENTAL: List of ranges of allowed IPs using CIDR notation. Defaults to `["0.0.0.0/0"]`, allowing access to all IPs. (default: ["0.0.0.0/0"])
+   * List of ranges of allowed IPs using CIDR notation. Defaults to `["0.0.0.0/0"]`, allowing access to all IPs. (default: ["0.0.0.0/0"])
    */
   allowedNetworks?: SKSClusterAllowedNetworks
   /**
@@ -8074,7 +8076,7 @@ export interface UpdateSKSClusterRequest {
    */
   addons?: string[]
   /**
-   * EXPERIMENTAL: List of ranges of allowed IPs using CIDR notation. Defaults to `["0.0.0.0/0"]`, allowing access to all IPs. (default: ["0.0.0.0/0"])
+   * List of ranges of allowed IPs using CIDR notation. Defaults to `["0.0.0.0/0"]`, allowing access to all IPs. (default: ["0.0.0.0/0"])
    */
   allowedNetworks?: SKSClusterAllowedNetworks
   /**
@@ -13010,6 +13012,36 @@ export abstract class GeneratedExoscaleClient {
     const path = `/key-store/${encodeURIComponent(params.id)}/update`
     const body = toWireUpdateKeyStoreRequest(params)
     return this.core.request('POST', path, { body, decode: fromWireGetKeyStoreResponse })
+  }
+
+  /**
+   * Updates the description of a KMS Key. On a multi-zone key, the change is propagated to its replicas.
+   *
+   * Errors:
+   *
+   * **400**
+   * Errors
+   *
+   * Key Not Found: The request was rejected because the specified KMS Key could not be found.
+   *
+   * Key is Pending Deletion: The request was rejected because it was performed on a key that is pending deletion.
+   *
+   * Not on Default: The request was rejected because the operation is not allowed on the default key.
+   *
+   * Not on Replica: The request was rejected because the operation is not allowed on a replica.
+   *
+   * Bad Request: The request was rejected because of an invalid request body or path parameter.
+   *
+   * @see https://community.exoscale.com/product/security/kms/overview/ Read more
+   */
+  updateKmsKeyDescription(
+    params: UpdateKmsKeyDescriptionRequest & {
+      id: string
+    },
+  ): Promise<SuccessResponse> {
+    const path = `/kms-key/${encodeURIComponent(params.id)}/update-description`
+    const body = toWireUpdateKmsKeyDescriptionRequest(params)
+    return this.core.request('POST', path, { body, decode: fromWireSuccessResponse })
   }
 
   /**

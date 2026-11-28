@@ -813,6 +813,8 @@ export function fromWireCreateKeyStoreRequest(w: any): CreateKeyStoreRequest {
 export interface CreateKmsKeyRequest {
   /**
    * An optional detailed description providing additional context about the key's intended use case.
+   *
+   * Max length 1024
    */
   description?: string
   /**
@@ -20641,7 +20643,7 @@ export interface SKSCluster {
    */
   addons?: string[]
   /**
-   * EXPERIMENTAL: List of ranges of allowed IPs using CIDR notation.
+   * List of ranges of allowed IPs using CIDR notation.
    */
   allowedNetworks?: SKSClusterAllowedNetworks
   /**
@@ -22034,6 +22036,31 @@ export function fromWireUpdateKeyStoreRequest(w: any): UpdateKeyStoreRequest {
   const v = {} as UpdateKeyStoreRequest
   if (w['description'] !== undefined) v.description = w['description']
   if (w['proxy'] !== undefined) v.proxy = fromWireUpdateKeyStoreProxy(w['proxy'])
+  return v
+}
+
+export interface UpdateKmsKeyDescriptionRequest {
+  /**
+   * A new detailed description providing additional context about the key's intended use case.
+   *
+   * Max length 1024
+   */
+  description: string
+}
+
+/** @internal */
+export function toWireUpdateKmsKeyDescriptionRequest(
+  v: UpdateKmsKeyDescriptionRequest,
+): Record<string, unknown> {
+  const o: Record<string, unknown> = {}
+  if (v.description !== undefined) o['description'] = v.description
+  return o
+}
+
+/** @internal */
+export function fromWireUpdateKmsKeyDescriptionRequest(w: any): UpdateKmsKeyDescriptionRequest {
+  const v = {} as UpdateKmsKeyDescriptionRequest
+  v.description = w['description']
   return v
 }
 
